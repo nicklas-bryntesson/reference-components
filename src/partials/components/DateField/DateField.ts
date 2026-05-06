@@ -289,6 +289,8 @@ class DateField {
       document.removeEventListener('click', this._outsideClickHandler)
     }
 
+    window.removeEventListener('resize', this._handleResize)
+
     this.trigger?.removeEventListener('click', this._handleTriggerClick)
     this.native?.removeEventListener('change', this._handleNativeChange)
 
