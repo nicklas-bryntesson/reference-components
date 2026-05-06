@@ -1,6 +1,12 @@
 .DateField {
   position: relative;
   display: inline-block;
+  overflow: hidden;
+  --df-calendar-gap: 0.5rem;
+  --_df-arrow-size: 0.75rem;
+  --_df-arrow-corner-radius: 0.25rem;
+  --_df-surface-color: white;
+  --_df-rail-max-width: 80rem;
 
   & .Native {
     display: block;
@@ -253,4 +259,62 @@
       }
     }
   }
+}
+
+/* ── Initialisation gate ───────────────────────────────────────────────── */
+.DateField[data-initialized] {
+  overflow: visible;
+}
+
+/* ── Slide rail ────────────────────────────────────────────────────────── */
+.DateField .slideContainer {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(100vw, var(--_df-rail-max-width));
+  height: 0;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* ── Calendar bubble ───────────────────────────────────────────────────── */
+.DateField .DateFieldCalendar {
+  position: absolute;
+  left: var(--df-popup-offset, 50%);
+  transform: translateX(-50%);
+  pointer-events: auto;
+  will-change: filter;
+  filter:
+    drop-shadow(0 0.1875rem 0.1875rem hsl(0 0% 0% / 20%))
+    drop-shadow(0 0.75rem 0.75rem hsl(0 0% 0% / 20%));
+}
+
+/* ── Direction gates ───────────────────────────────────────────────────── */
+.DateField[data-direction="bottom"] .DateFieldCalendar {
+  top: var(--df-calendar-gap);
+}
+
+.DateField[data-direction="top"] .DateFieldCalendar {
+  bottom: var(--df-calendar-gap);
+}
+
+/* ── Arrow ─────────────────────────────────────────────────────────────── */
+.DateField .arrow {
+  position: absolute;
+  width: var(--_df-arrow-size);
+  height: var(--_df-arrow-size);
+  background-color: var(--_df-surface-color);
+  left: 50%;
+}
+
+.DateField[data-direction="top"] .arrow {
+  bottom: calc(var(--_df-arrow-size) * -0.5);
+  transform: translateX(calc(-50% + var(--df-arrow-offset, 0px))) rotate(45deg);
+  border-end-end-radius: var(--_df-arrow-corner-radius);
+}
+
+.DateField[data-direction="bottom"] .arrow {
+  top: calc(var(--_df-arrow-size) * -0.5);
+  transform: translateX(calc(-50% + var(--df-arrow-offset, 0px))) rotate(45deg);
+  border-start-start-radius: var(--_df-arrow-corner-radius);
 }
