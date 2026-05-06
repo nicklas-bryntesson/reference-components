@@ -1,0 +1,211 @@
+.dropdown-accordion-section {
+  width: 100%;
+  position: relative;
+  margin-inline: auto;
+  margin-block: 3rem;
+  padding-inline: 16px;
+  background-color: antiquewhite;
+}
+
+.dropdown-accordion {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  list-style: none;
+  padding-inline: 0;
+  margin-block: 0;
+  width: 100%;
+  max-width: 60rem;
+  margin-inline: auto;
+}
+
+header {
+  width: 100%;
+  max-width: 60rem;
+  margin-inline: auto;
+  margin-bottom: 2.5em;
+}
+
+h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  width: 100%;
+  max-width: 40rem;
+  margin-inline-end: auto;
+}
+
+p {
+  width: 100%;
+  max-width: 40rem;
+  margin-inline-end: auto;
+}
+
+h3 {
+  display: block;
+  width: 100%;
+  padding: 0;
+  height: max-content;
+  margin-block-end: 0.25em;
+}
+
+h3 button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  width: 100%;
+  border: 3px solid #000;
+  background-color: rgba(255, 127, 80, 0.5);
+}
+
+h3 button span {
+  /* Prevent clicks on the icon inside the button */
+  pointer-events: none;
+}
+
+h3 button:hover {
+  background-color: rgba(255, 127, 80, 0.8);
+  border: 3px solid #000;
+}
+
+h3 button:active {
+  background-color: rgba(80, 109, 255, 0.8);
+  border: 3px solid darkblue;
+}
+
+h3 button:focus:not(:focus-visible) {
+  outline: 0;
+}
+
+h3 button:focus-visible {
+  outline: 2px solid white;
+  outline-offset: -8px;
+  color: white;
+  background-color: black;
+}
+
+h3 button[aria-expanded="true"] {
+  background-color: rgba(80, 109, 255, 0.5);
+}
+
+h4 {
+  margin-bottom: 0.25em;
+}
+
+h4 button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem;
+  width: 100%;
+  border: 3px solid #000;
+  background-color: rgba(65, 105, 225, 0.5);
+}
+
+h4 button:focus:not(:focus-visible) {
+  outline: 0;
+}
+
+h4 button:focus-visible {
+  outline: 2px solid white;
+  outline-offset: -6px;
+  color: white;
+  background-color: darkblue;
+}
+
+h4 button:hover {
+  background-color: rgba(65, 105, 225, 0.8);
+  border: 3px solid #000;
+}
+
+h4 button:active {
+  background-color: rgba(80, 109, 255, 0.8);
+  border: 3px solid darkblue;
+}
+
+h4 button[aria-expanded="true"] {
+  background-color: rgba(65, 105, 225, 0.8);
+}
+
+.panel {
+  visibility: hidden;
+  opacity: 0;
+  height: 0;
+}
+
+.panel.expanded {
+  visibility: visible;
+  opacity: 1;
+  height: max-content;
+  transition: height 0.5s ease-in-out;
+}
+
+.sub-panel {
+  display: flex;
+  flex-direction: column;
+  visibility: hidden;
+  opacity: 0;
+  height: 100%;
+  max-height: 0;
+}
+
+.sub-panel.expanded {
+  padding-block-start: 0.5em;
+  margin-block-end: 0.5em;
+  visibility: visible;
+  opacity: 1;
+  max-height: max-content;
+  opacity: 1;
+}
+
+.sub-panel p {
+  font-size: 1rem;
+  margin-block-end: 1rem;
+  color: black;
+}
+
+.sub-panel ul {
+  margin-bottom: 1rem;
+}
+
+@media (min-width: 40rem) {
+  .dropdown-accordion {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    column-gap: 1.5rem;
+    align-items: start;
+  }
+
+  h3 {
+    width: 100%;
+    grid-column-start: 1;
+  }
+
+  h3:last-of-type {
+    margin-block-end: 0;
+  }
+
+  .panel {
+    grid-column-start: 2;
+    grid-row-start: 1;
+    grid-row-end: span var(--rows, 1);
+  }
+}
+
+@keyframes dropdown {
+  0% {
+    height: 0;
+  }
+  100% {
+    height: 100%;
+  }
+}
+
+.next-component {
+  width: 100%;
+  padding: 2rem;
+  background-color: #000;
+  color: white;
+  text-align: center;
+}

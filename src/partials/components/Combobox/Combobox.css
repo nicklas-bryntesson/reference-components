@@ -1,0 +1,419 @@
+.searchDropdownComponent {
+  /* Setup "private" props for component */
+
+  --_component-maxWidth: 28rem;
+  --_component-borderColor: var(--system-color-N80);
+  --_component-borderColorFocus: var(--system-color-N95);
+  --_component-borderRadius: 0.5rem;
+  --_component-backgroundColor: var(--system-color-N00);
+  --_component-textColor: var(--system-color-N95);
+  --_component-textColorSecondary: var(--system-color-N70);
+  --_component-textColorDisabled: var(--system-color-N70);
+
+  /* Search Icon */
+  --_component-searchInput-iconDataImageUrl: ;
+  --_component-searchInput-iconWidth: 1.5rem;
+  --_component-searchInput-iconHeight: 1.5rem;
+
+  width: 100%;
+  max-width: 28rem;
+  margin-block: 2rem;
+
+  & .searchLabel {
+    margin-block-end: 0.35rem;
+  }
+
+  & .searchDropdown {
+    position: relative;
+    border-width: 2px;
+    border-style: solid;
+    border-color: var(--_component-borderColor);
+    border-radius: var(--_component-borderRadius);
+    max-width: var(--_component-maxWidth);
+    background-color: var(--_component-backgroundColor);
+    overflow: hidden;
+    z-index: 1;
+
+    &:focus-within {
+      border-color: var(--_component-borderColorFocus);
+    }
+
+    & input[type="search"] {
+      border: none;
+      border-radius: 0;
+      background-color: transparent;
+      /* background-color: aquamarine; */
+      height: unset;
+
+      &[data-visible="true"] {
+        display: inline-block;
+      }
+
+      &[data-visible="false"] {
+        display: none;
+      }
+    }
+
+    & .searchStatus {
+      position: absolute;
+      inset-inline-end: 0;
+      inset-block-start: 0;
+      place-items: center;
+      padding-block: 0.65rem;
+      padding-inline: 1rem;
+
+      & .spinner {
+        border: 2px solid transparent;
+        border-top: 2px solid var(--_component-borderColor);
+        border-radius: 50%;
+        width: 1.25rem;
+        height: 1.25rem;
+        animation: spin 1s linear infinite;
+        margin-inline: auto;
+      }
+    }
+
+    & .validationSlot {
+      position: relative;
+      padding-inline: 1rem;
+      padding-block-start: calc(0.65rem + 2px);
+      padding-block-end: 0.65rem;
+      border-block-start: 2px solid var(--_component-borderColor);
+
+      & p {
+        margin-block-end: 0;
+        font-family: var(--font-heading);
+        font-weight: var(--font-weight-heading);
+        font-size: var(--font-size-h6);
+      }
+
+      &[data-visible="true"] {
+        display: block;
+      }
+
+      &[data-visible="false"] {
+        display: none;
+      }
+    }
+
+    & fieldset {
+      position: relative;
+      display: none;
+      border: none;
+      border-radius: 0;
+      padding: 0;
+      margin: 0;
+      z-index: 2;
+      scrollbar-color: var(--form-input-border) transparent; /* thumb and track color */
+      scrollbar-width: thin; /* 'auto' or 'thin' are also options */
+
+      /* This styles the scrollbar track (the part the thumb moves within) */
+      &::-webkit-scrollbar-track {
+        background-color: transparent; /* light grey track */
+      }
+
+      /* This styles the scrollbar thumb (the part that is draggable) */
+      &::-webkit-scrollbar-thumb {
+        background-color: var(--form-input-border); /* darker grey thumb */
+        border-radius: 10px; /* rounded corners on the thumb */
+        border: 2px solid var(--color-bjork); /* white border around the thumb */
+      }
+
+      /* This styles the scrollbar itself (including the thumb, track, and button) */
+      &::-webkit-scrollbar {
+        width: 10px; /* width of the entire scrollbar */
+      }
+    }
+
+    /* visually hide legend */
+    & legend {
+      position: absolute;
+      clip: rect(0 0 0 0);
+      margin: -1px;
+      padding: 0;
+      border: 0;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+    }
+
+    /* Wrapper <div> for the <template> */
+    & .responseSlot {
+      display: grid;
+      /* Some framework reset stuff */
+      grid-template-columns: 1fr;
+      grid-template-areas: unset;
+      row-gap: 0;
+    }
+
+    & .confirmContainer {
+      border-block-start: 2px solid var(--_component-borderColor);
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      padding-inline: 1rem;
+      padding-block: 0.65rem;
+
+      & p {
+        margin-block: 0;
+        font-size: 1rem;
+      }
+
+      & .confirmButton {
+        padding-inline: 0.65rem;
+        padding-block: 0.25rem;
+        font-size: 1rem;
+      }
+
+      &[data-visible="true"] {
+        display: flex;
+      }
+
+      &[data-visible="false"] {
+        display: none;
+      }
+    }
+
+    & .searchResponseItem {
+      position: relative;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      grid-template-areas: "label button";
+      column-gap: 0;
+      margin-block-end: 0;
+      border: none;
+      z-index: 3;
+      cursor: default;
+      border-radius: 0.5rem;
+
+      &::after {
+        content: "";
+        position: absolute;
+        inset-block-end: 0;
+        inset-inline: 0;
+        height: 0.125rem;
+        width: calc(100% - 2rem);
+        margin-inline: 1rem;
+        background-color: var(--form-input-border);
+      }
+
+      &:last-child::after {
+        display: none;
+      }
+
+      /* hide radio offscreen */
+      & input[type="radio"] {
+        position: absolute;
+        opacity: 0;
+      }
+
+      & label {
+        padding-inline: 1rem;
+        padding-block-start: calc(0.65rem + 2px);
+        padding-block-end: 0.65rem;
+        grid-area: label;
+        margin-block: 0;
+        cursor: pointer;
+
+        & .labelHeading {
+          display: block;
+          font-family: var(--font-heading);
+          font-weight: var(--font-weight-heading);
+          font-size: var(--font-size-h5);
+          color: var(--_component-textColor);
+        }
+
+        & .labelSubheading {
+          display: block;
+          font-family: var(--font-body);
+          font-weight: var(--font-weight-body);
+          font-size: var(--font-size-body-small);
+          color: var(--_component-textColorSecondary);
+        }
+      }
+
+      & .discardButton {
+        grid-area: button;
+        background-color: transparent;
+        color: var(--color-choklad);
+        place-items: center;
+        border: none;
+        z-index: 4;
+        margin-inline-end: 0.25rem;
+        margin-block: auto;
+        width: 2rem;
+        height: 2rem;
+        padding-inline: 0;
+        padding-block: 0;
+
+        & svg {
+          width: 1.5rem;
+          height: 1.5rem;
+          pointer-events: none;
+        }
+
+        &[data-visible="false"] {
+          display: none;
+        }
+
+        &[data-visible="true"] {
+          display: grid;
+        }
+      }
+
+      &[data-visible="false"] {
+        display: none;
+      }
+
+      &[data-visible="true"] {
+        display: grid;
+      }
+
+      &[data-selected="true"]::before {
+        display: none;
+      }
+
+      &:has(input[type="radio"]:checked:focus-visible) {
+        outline: 2px solid var(--_component-borderColor);
+        outline-offset: -4px;
+      }
+    }
+  }
+
+  &[data-searching="false"] {
+    & .searchStatus {
+      display: none;
+    }
+  }
+
+  &[data-searching="true"] {
+    & .searchStatus {
+      display: grid;
+    }
+
+    & input[type="search"] {
+      background-image: none;
+    }
+  }
+
+  &[data-have-selection="true"] {
+    & fieldset {
+      overflow: hidden;
+
+      & .searchResponseItem {
+        overflow: hidden;
+      }
+    }
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/*
+*
+*
+* DEMO STYLES
+*
+*
+*/
+
+.searchDropdownComponent.radio {
+  .searchDropdown {
+    & .searchResponseItem {
+      & input[type="radio"] {
+        position: relative;
+        opacity: 1;
+        grid-area: label;
+        margin-inline-start: 1rem;
+        margin-block: auto;
+      }
+
+      & .labelHeading {
+        padding-inline-start: 2rem;
+      }
+
+      & .labelSubheading {
+        padding-inline-start: 2rem;
+      }
+    }
+  }
+}
+
+.searchDropdownComponent.scrollable {
+  .searchDropdown {
+    & fieldset {
+      max-height: 14.5rem;
+      overflow-y: auto;
+    }
+  }
+}
+
+@media (min-width: 65rem) {
+  .searchDropdownComponent.scrollable.absolutePosition {
+    height: 68px;
+
+    .searchDropdown {
+      & fieldset {
+        max-height: 18rem;
+        overflow-y: auto;
+      }
+    }
+
+    .searchDropdown:has(fieldset[data-visible="true"]) {
+      box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.25);
+    }
+  }
+}
+
+.searchDropdownComponent {
+  /*   fieldset {
+    display: none;
+  } */
+
+  /*   &[data-have-selection='false'] {
+    &:not(:focus-within) {
+      & fieldset[data-visible='true'] {
+        display: none;
+      }
+    }
+  } */
+  /* 
+  &[data-have-selection='false'] {
+    &:focus-within {
+      & fieldset[data-visible='true'] {
+        display: block;
+        border-block-start: 0.125rem solid var(--_component-borderColor);
+      }
+    }
+  }
+
+  /* Always show the selected item */
+  /*
+  &[data-have-selection='true'] {
+    fieldset[data-visible='true'] {
+      display: block;
+    }
+  } */
+
+  fieldset[data-visible="false"] {
+    display: none;
+  }
+
+  fieldset[data-visible="true"] {
+    display: block;
+    border-block-start: 0.125rem solid var(--_component-borderColor);
+  }
+
+  &[data-have-selection="true"] {
+    fieldset[data-visible="true"] {
+      border-block-start: none;
+    }
+  }
+}

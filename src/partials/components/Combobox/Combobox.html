@@ -1,0 +1,84 @@
+<div 
+    id="" 
+    class="Combobox" 
+    data-visible-label="false"
+    data-label-message="This is the label"
+    data-searching="false" 
+    data-have-selection="false"
+>
+
+    <label class="searchLabel" for=""></label>
+    
+    <div class="searchDropdown" >
+        <input
+            id=""
+            type="search" 
+            placeholder="Search" 
+            aria-autocomplete="list"
+            aria-controls="" 
+            data-visible="true"
+        >
+        
+        <div class="inputSearchStatus">
+<!--             idle="search icon"
+            searching = "spinner"
+
+            These svg's should be paths registred in the javascript -->
+        </div>
+
+        <div class="searchStatus">
+            <div class="spinner"></div>
+        </div>
+
+        <div 
+            class="validationSlot" 
+            aria-live="assertive" 
+            data-visible="false"
+        ></div>
+
+        <fieldset 
+            id=""
+            class="searchResponseList" 
+            aria-live="polite" 
+            data-visible="false"
+        >
+            <legend></legend>
+            
+            <div class="responseSlot"></div>
+
+        </fieldset>
+
+        <div class="confirmContainer" data-visible="false">
+            <p>Confirm your selection:</p>
+            <button class="btn btnSmall btnPrimary confirmButton">Confirm</button>
+        </div>
+
+        <template class="responseTemplate">
+            <div class="searchResponseItem" data-selected="false">
+                <input 
+                    id=""
+                    type="radio"
+                    name="" 
+                    value=""
+                    aria-labelledby=""
+                    aria-describedby=""
+                >
+        
+                <label for="">
+                    <span id="" class="labelHeading"></span>
+                    <span id="" class="labelSubheading"></span>
+                </label>
+        
+                <button 
+                    class="discardButton" 
+                    aria-label="Discard selection and search again"
+                    data-visible="false"
+                >
+                    <svg class="icon" aria-hidden="true">
+                        <use xlink:href="#icon-close"></use>
+                    </svg>
+                </button>
+            </div>
+        </template>
+    </div>
+</div>
