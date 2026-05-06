@@ -237,6 +237,7 @@ function makeField({ disabled = false, value = '', min = '', max = '', locale = 
         <button class="Trigger" type="button" aria-label="Öppna kalender"
           aria-expanded="false" aria-haspopup="dialog"></button>
       </div>
+      <div class="slideContainer">
       <template data-template="datefield-calendar">
         <div class="DateFieldCalendar" role="dialog" aria-modal="true">
           <div class="CalendarHeader">
@@ -258,8 +259,9 @@ function makeField({ disabled = false, value = '', min = '', max = '', locale = 
           </div>
         </div>
       </template>
+      <div class="arrow"></div>
+      </div>
     </div>
-    <div class="slideContainer"></div>
     <div class="Announce" aria-live="polite" aria-atomic="true"></div>
   `
   document.body.appendChild(el)
@@ -1073,6 +1075,60 @@ describe('DateField — calendar footer (Clear + Today)', () => {
     expect(instance.selectedDate!.getMonth()).toBe(today.getMonth())
     expect(instance.selectedDate!.getDate()).toBe(today.getDate())
     expect(instance.calendarEl).toBeNull()
+    el.remove()
+  })
+})
+
+describe('DateField — _updateLayout direction', () => {
+  it('sets data-direction="bottom" when trigger is near top of viewport', () => {
+    const { el, instance } = makeField()
+
+    vi.spyOn(instance.trigger, 'getBoundingClientRect').mockReturnValue({
+      top: 50, bottom: 80, left: 200, right: 250, width: 50, height: 30,
+      x: 200, y: 50, toJSON: () => {},
+    } as DOMRect)
+
+    vi.spyOn((instance as any).slideContainer, 'getBoundingClientRect').mockReturnValue({
+      top: 0, bottom: 0, left: 0, right: 1000, width: 1000, height: 0,
+      x: 0, y: 0, toJSON: () => {},
+    } as DOMRect)
+
+    instance._openCalendar()
+    Object.defineProperty(instance.calendarEl!, 'offsetWidth', { value: 300, configurable: true })
+    vi.stubGlobal('innerHeight', 1000)
+
+    ;(instance as any)._updateLayout()
+
+    expect(el.dataset.direction).toBe('bottom')
+    instance._closeCalendar()
+    vi.restoreAllMocks()
+    vi.unstubAllGlobals()
+    el.remove()
+  })
+
+  it('sets data-direction="top" when trigger is near bottom of viewport', () => {
+    const { el, instance } = makeField()
+
+    vi.spyOn(instance.trigger, 'getBoundingClientRect').mockReturnValue({
+      top: 800, bottom: 830, left: 200, right: 250, width: 50, height: 30,
+      x: 200, y: 800, toJSON: () => {},
+    } as DOMRect)
+
+    vi.spyOn((instance as any).slideContainer, 'getBoundingClientRect').mockReturnValue({
+      top: 0, bottom: 0, left: 0, right: 1000, width: 1000, height: 0,
+      x: 0, y: 0, toJSON: () => {},
+    } as DOMRect)
+
+    instance._openCalendar()
+    Object.defineProperty(instance.calendarEl!, 'offsetWidth', { value: 300, configurable: true })
+    vi.stubGlobal('innerHeight', 1000)
+
+    ;(instance as any)._updateLayout()
+
+    expect(el.dataset.direction).toBe('top')
+    instance._closeCalendar()
+    vi.restoreAllMocks()
+    vi.unstubAllGlobals()
     el.remove()
   })
 })
