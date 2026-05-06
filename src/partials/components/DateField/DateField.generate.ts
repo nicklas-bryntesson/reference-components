@@ -41,23 +41,26 @@ function canonical(id: string, label: string, rootAttrs: string, inputAttrs: str
         <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
       </button>
     </div>
-    <template data-template="datefield-calendar">
-      <div class="DateFieldCalendar" role="dialog" aria-modal="true">
-        <div class="CalendarHeader">
-          <button type="button">&#8249;</button>
-          <span aria-live="polite" aria-atomic="true"></span>
-          <button type="button">&#8250;</button>
+    <div class="slideContainer">
+      <template data-template="datefield-calendar">
+        <div class="DateFieldCalendar" role="dialog" aria-modal="true">
+          <div class="CalendarHeader">
+            <button type="button">&#8249;</button>
+            <span aria-live="polite" aria-atomic="true"></span>
+            <button type="button">&#8250;</button>
+          </div>
+          <table class="Grid" role="grid">
+            <thead><tr role="row"><th scope="col"></th><th scope="col"></th><th scope="col"></th><th scope="col"></th><th scope="col"></th><th scope="col"></th><th scope="col"></th></tr></thead>
+            <tbody></tbody>
+          </table>
+          <div class="CalendarFooter">
+            <button type="button" class="CalendarFooterClear"></button>
+            <button type="button" class="CalendarFooterToday"></button>
+          </div>
         </div>
-        <table class="Grid" role="grid">
-          <thead><tr role="row"><th scope="col"></th><th scope="col"></th><th scope="col"></th><th scope="col"></th><th scope="col"></th><th scope="col"></th><th scope="col"></th></tr></thead>
-          <tbody></tbody>
-        </table>
-        <div class="CalendarFooter">
-          <button type="button" class="CalendarFooterClear"></button>
-          <button type="button" class="CalendarFooterToday"></button>
-        </div>
-      </div>
-    </template>
+      </template>
+      <div class="arrow"></div>
+    </div>
   </div>
   <div class="Announce" aria-live="polite" aria-atomic="true"></div>
 </div>
