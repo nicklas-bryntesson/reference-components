@@ -1,0 +1,6 @@
+:root {
+  --content-padding: var(--SITE--PADDING);
+  --content-offset: var(--SITE--PADDING);
+
+  --block-vertical-distance: 2rem;
+}

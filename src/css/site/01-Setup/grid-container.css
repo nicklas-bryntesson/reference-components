@@ -1,0 +1,32 @@
+/* 
+* A centered grid with a fluid single content column.
+*/
+
+/* prettier-ignore */
+:where(:root) {
+  --grid-container-offset:     var(--SITE--PADDING);
+  --grid-container-maxWidth:   var(--MAX--WIDTH--SITE);
+  
+  --grid-container-columns:    [full-start] minmax(var(--grid-container-offset), 1fr) [main-start] minmax(0, var(--grid-container-maxWidth)) [main-end]minmax(var(--grid-container-offset), 1fr) [full-end];
+}
+
+/* prettier-ignore */
+.grid-container {
+  display: grid;
+  grid-template-columns: var(--grid-container-columns);
+
+  /* Place everything in grid-column main as default */
+  & > * {
+      grid-column: main;
+  }
+}
+
+/* Not really neccessary, but easier to understand wehne using tw classes perhaps? */
+.grid-container-main {
+  grid-column: main;
+}
+
+/* Span the full grid */
+.grid-container-full {
+  grid-column: full-start/full-end;
+}

@@ -1,0 +1,42 @@
+:root {
+  --SITE--PADDING--MOBILE: 16px;
+  --SITE--PADDING--MOBILE--NEGATIVE: calc(var(--SITE--PADDING--MOBILE) * -1);
+
+  /* fluid 400 - 1440px 16 - 80px */
+  --SITE--PADDING--TABLET: clamp(1rem, -0.538rem + 6.15vw, 5rem);
+  --SITE--PADDING--TABLET--NEGATIVE: calc(var(--SITE--PADDING--TABLET) * -1);
+
+  --SITE--PADDING--DESKTOP: 5rem;
+  --SITE--PADDING--DESKTOP--NEGATIVE: calc(var(--SITE--PADDING--DESKTOP) * -1);
+
+  --MOBILE--BREAKPOINT: 48.74rem;
+  --DESKTOP--BREAKPOINT: 75rem;
+
+  --MAX--WIDTH--SITE: 106rem;
+  --MAX--WIDTH--CONTENT: 64rem;
+
+  --GRID--GAP--BASE: 0;
+  --GRID--GAP--MOBILE: 0.5rem;
+  --GRID--GAP--TABLET: 1rem;
+  --GRID--GAP--DESKTOP: 2rem;
+
+  --GRID--COLUMNS--BASE: 1;
+  --GRID--COLUMNS--MOBILE: 4;
+  --GRID--COLUMNS--TABLET: 8;
+  --GRID--COLUMNS--DESKTOP: 12;
+
+  /* Mobile 0 - 399px */
+  @media (max-width: 24.99rem) {
+    --SITE--PADDING: var(--SITE--PADDING--MOBILE);
+  }
+
+  /* Tablet: 400px – 1439px */
+  @media (min-width: 25rem) and (max-width: 89.98rem) {
+    --SITE--PADDING: var(--SITE--PADDING--TABLET);
+  }
+
+  /* Desktop: 1440px and above */
+  @media (min-width: 90rem) {
+    --SITE--PADDING: var(--SITE--PADDING--DESKTOP);
+  }
+}

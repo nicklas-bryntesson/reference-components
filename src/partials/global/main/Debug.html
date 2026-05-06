@@ -1,0 +1,343 @@
+<style>    
+    body:has(#colorizeContainersToggle:checked) {
+      background-color: lime;
+    
+      & #app {
+        background-color: GreenYellow;
+    
+        & #headerContainer {
+          background-color: LightGreen;
+    
+          & header  {
+            background-color: MediumSpringGreen;
+
+            & #TopNav {
+              background-color: plum;
+
+              > ul {
+                background-color: tomato;
+
+                > li {
+                  background-color: lime;
+
+                  > a {
+                    background-color: red;
+                  }
+                }
+              }
+            }
+
+            & #LangNavDesktop {
+              background-color: pink;
+
+              > button {
+                background-color: fuchsia;
+
+
+                > #langGlobeIcon {
+                  background-color: blueviolet
+                }
+
+                > span {
+                  background-color: tomato;
+                }
+
+                > #langArrowIcon {
+                  background-color: royalblue;
+                }
+              }
+            }
+          }
+        }
+    
+        & .mainContainer {
+          background-color: Gold;
+    
+          & .Main {
+            background-color: Yellow;
+    
+            & .content {
+              background-color: LemonChiffon;
+            }
+          }
+        }
+
+        & .footerContainer {
+          background-color: LightGreen;
+    
+          & .Footer {
+            background-color: MediumSpringGreen;
+          }
+        }
+      }
+
+      .Cta {
+        background-color: pink;
+
+        & .thumbnail {
+          background-color: plum;
+
+          & figure {
+            background-color: fuchsia;
+          }
+
+          & .cellContainer {
+            background-color: royalblue;
+
+            & .cell {
+              background-color: blueviolet;
+            }
+          }
+        }
+
+        & .content {
+          background-color: green;
+
+          & h2 {
+            background-color: teal;
+          }
+
+          & .prose {
+            background-color: aquamarine;
+          }
+        }
+      }
+    }
+    
+    body:has(#colorizeToggle:checked) * {
+        --debugger-semi-transparent: hsla(330, 100%, 71%, 0.7);
+      --debugger-transparent: hsla(330, 100%, 71%, 0.2);
+      --debugger-text: rgba(0, 0, 0, 0.5);
+      --debugger-text-transparent: rgba(0, 0, 0, 0.3);
+      background: var(--debugger-transparent) !important;
+      background-color: var(--debugger-transparent) !important;
+      color: var(--debugger-text) !important;
+      outline: 2px solid rgb(255, 56, 243);
+      outline: 2px solid lch(62.1% 121 329.29);
+      outline: 2px solid oklch(69.71% 0.401 330.87);
+      border-color: var(--debugger-text) !important;
+    
+      &::after,
+      &::before {
+        background-color: var(--debugger-text-transparent);
+      }
+    }
+    
+    /* Center */
+    #app:not(:has(#centerRulerToggle:checked)) {
+      .centerRuler {
+        display: none;
+      }
+    }
+    #app:has(#centerRulerToggle:checked) {
+      --ui-border-color: rgb(136, 66, 211);
+
+      .centerRuler {
+        display: block;
+        position: fixed;
+        inset: 0;
+        block-size: 100%;
+        inline-size: 100%;
+        z-index: 99999999;
+        pointer-events: none;
+        
+        &::after {
+            position: absolute;
+            content: "";
+            width: 1px;
+            height: 100%;
+            inset-block: 0;
+            inset-inline-start: 50%;
+            translate: transformX(-50%);
+            z-index: 999999999;
+            border-left: 1px dashed var(--ui-border-color);
+        }
+      }
+    }
+
+#app:not(:has(#mediaQueryToggle:checked)) {
+  .ui-MediaOverlays {
+    display: none;
+  }
+}
+
+#app:has(#mediaQueryToggle:checked) {
+
+  .ui-MediaOverlays {
+    --media-query-color: rgb(136, 66, 211);
+    --media-query-transparent: rgba(136, 66, 211, 0.05);
+    --media-query-text: rgb(255, 255, 255);
+
+    display: block;
+    position: fixed;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    z-index: 99999999999;
+    pointer-events: none;
+    isolation: isolate;
+
+    & .ui-MediaOverlays-site {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      inline-size: 100%;
+      block-size: 100%;
+      max-width: var(--MAX--WIDTH--SITE);
+      margin-inline: auto;
+    }
+
+    & .ui-MediaOverlays-content {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      grid-template-columns: var(--CENTERED--GRID--COLUMNS);
+      inline-size: 100%;
+      block-size: 100%;
+      pointer-events: none;
+
+      & span {
+        position: relative;
+        grid-column: main;
+        inline-size: 100%;
+        block-size: 100%;
+        border-left: 1px dashed var(--media-query-color);
+        border-right: 1px dashed var(--media-query-color);
+
+
+        &::after {
+          position: absolute;
+          content: "content";
+          inset-inline-start: 4px;
+          inset-block-start: 20vh;
+          font-size: 8px;
+          font-weight: 400;
+          font-family: monospace;
+          padding: 0 7px;
+          border-radius: 10px;
+          background-color: var(--media-query-color);
+          color: var(--media-query-text);
+          z-index: 999999;
+        }
+      }
+    }
+  }
+
+  & .ui-MediaOverlays-mobile {
+    position: fixed;
+    inset: 0;
+    block-size: 100%;
+    inline-size: 100%;
+    max-inline-size: 76.5rem;
+    margin-inline: auto;
+    pointer-events: none;
+    border-left: 1px dashed var(--media-query-color);
+    border-right: 1px dashed var(--media-query-color);
+
+    &::after {
+      position: absolute;
+      content: "mobile";
+      inset-inline-start: 4px;
+      inset-block-start: 24vh;
+      font-size: 8px;
+      font-weight: 400;
+      font-family: monospace;
+      padding: 0 7px;
+      border-radius: 10px;
+      background-color: var(--media-query-color);
+      color: var(--media-query-text);
+      z-index: 999999;
+    }
+  }
+}
+</style>
+
+<span class="centerRuler"></span>
+<span class="ui-MediaOverlays">
+    <span class="ui-MediaOverlays-site"></span>
+    <span class="ui-MediaOverlays-content"><span></span></span>
+    <span class="ui-MediaOverlays-mobile"></span>
+</span>
+
+<div id="zoomReferenceElement" aria-hidden="true" style="position: absolute; width: 16px; height: 16px; left: -9999px;"></div>
+<div id="fontSizeChangeObserver" aria-hidden="true" style="position: absolute; width: 1rem; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; border: 0; padding: 0; margin: -1px; left: -9999px;"></div>
+
+<div style="display: flex; flex-direction: column; margin-bottom: 2rem;">
+  <div style=""><strong>Base Font Size: </strong><span id="baseFontSizeCalc" style="color: #e21111;"></span></div>
+  <!-- <div style=""><strong>Zoom Level: </strong></strong><span id="zoomLevelCalc" style="color: #e21111;"></span></div> -->
+  <div style=""><strong>Screen Width: </strong><span id="screenWidthCalc" style="color: #e21111;"></span></div>
+</div>
+
+<script>
+// Function to calculate and display the base font size
+function updateBaseFontSize() {
+  const observerElement = document.getElementById("fontSizeChangeObserver");
+  const oneRemInPixels = observerElement.getBoundingClientRect().width;
+  const standardBaseFontSize = 16; // Default browser base font size in pixels (1rem = 16px)
+  const remValue = oneRemInPixels / standardBaseFontSize;
+  const displayElement = document.getElementById("baseFontSizeCalc");
+  displayElement.textContent = `${oneRemInPixels.toFixed(0)}px | ${remValue.toFixed(2)}rem`;
+}
+
+function updateZoomLevel() {
+  const browserZoomLevel = Math.round(window.devicePixelRatio * 100);
+  console.log(browserZoomLevel)
+}
+// Function to calculate and display the window width
+function updateWidth() {
+  const pixelWidth = window.innerWidth;
+  const remWidth = (pixelWidth / 16).toFixed(3);
+  document.getElementById("screenWidthCalc").textContent = `${pixelWidth}px | ${remWidth}rem`;
+}
+
+// Initial function calls
+updateBaseFontSize();
+updateWidth();
+updateZoomLevel();
+// Observe for changes in base font size
+const resizeObserver = new ResizeObserver(() => {
+  updateBaseFontSize();
+});
+resizeObserver.observe(document.getElementById("fontSizeChangeObserver"));
+
+// Update functions on window resize
+window.addEventListener("resize", () => {
+  updateBaseFontSize();
+  updateWidth();
+  updateZoomLevel();
+});
+
+// Update zoom level on visibility change (in case user changes zoom in another tab)
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible") {
+    updateBaseFontSize();
+    updateWidth();
+    updateZoomLevel();
+  }
+});
+</script>
+
+
+
+<fieldset style="display: flex; flex-direction: column; flex-wrap: wrap; gap: 1rem; inline-size: 100%; border: 2px solid lightGrey; padding: 1rem 24px 1.5rem;">
+    <legend>Debug</legend>
+        <label style="display: flex; align-items: center; gap: 0.5rem;">
+            <input type="checkbox" id="centerRulerToggle">
+            Centerline
+        </label>
+
+        <label style="display: flex; align-items: center; gap: 0.5rem;">
+          <input type="checkbox" id="mediaQueryToggle">
+          Media Queries
+        </label>
+
+        <label style="display: flex; align-items: center; gap: 0.5rem;">
+            <input type="checkbox" id="colorizeToggle">
+            Colorize
+        </label>
+
+        <label style="display: flex; align-items: center; gap: 0.5rem;">
+            <input type="checkbox" id="colorizeContainersToggle">
+            Colorize Containers
+        </label>
+</fieldset>

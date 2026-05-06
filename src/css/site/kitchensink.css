@@ -1,0 +1,51 @@
+.state-table {
+  border-collapse: collapse;
+  margin-block-end: 1rem;
+
+  th, td {
+    border: 1px solid #e0e0e0;
+    padding: 0.75rem 1rem;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  thead th {
+    background: #f5f5f5;
+    font-weight: 600;
+    font-size: 0.8rem;
+    font-family: monospace;
+  }
+
+  tbody th {
+    background: #fafafa;
+    font-size: 0.8rem;
+    font-family: monospace;
+    white-space: nowrap;
+    font-weight: normal;
+  }
+}
+
+.kitchensink-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  .comparison-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-block-end: 2rem;
+  }
+
+  .comparison-col {
+    > label {
+      display: block;
+    }
+
+    > input {
+      border: 1px solid;
+      border-radius: 4px;
+      padding: 0.25rem 0.5rem;
+    }
+  }
+}

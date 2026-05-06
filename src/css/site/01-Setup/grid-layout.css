@@ -1,0 +1,55 @@
+/* prettier-ignore */
+:root { 
+  --grid-layout-columns-count-base:         var(--GRID--COLUMNS--BASE);
+  --grid-layout-columns-count-mobile:       var(--GRID--COLUMNS--MOBILE);
+  --grid-layout-columns-count-tablet:       var(--GRID--COLUMNS--TABLET);
+  --grid-layout-columns-count-desktop:      var(--GRID--COLUMNS--DESKTOP);
+
+  --grid-layout-gap-base:                   var(--GRID--GAP--BASE, 0); /* No gaps for a single column */
+  --grid-layout-gap-mobile:                 var(--GRID--GAP--MOBILE);
+  --grid-layout-gap-tablet:                 var(--GRID--GAP--TABLET);
+  --grid-layout-gap-desktop:                var(--GRID--GAP--DESKTOP);
+
+  --grid-layout-columns-base:               repeat(var(--grid-layout-columns-count-base), 1fr);
+  --grid-layout-columns-mobile:             repeat(var(--grid-layout-columns-count-mobile), 1fr);
+  --grid-layout-columns-tablet:             repeat(var(--grid-layout-columns-count-tablet), 1fr);
+  --grid-layout-columns-desktop:            repeat(var(--grid-layout-columns-count-desktop), 1fr);
+}
+
+/* prettier-ignore */
+@media (max-width: 39.9375rem) {
+  :where(:root) {
+      --grid-layout-gap:            var(--grid-layout-gap-base);
+      --grid-layout-columns:        var(--grid-layout-columns-base);
+  }
+}
+
+/* prettier-ignore */
+@media (min-width: 40rem) and (max-width: 47.9375rem) {
+  :where(:root) {
+      --grid-layout-gap:            var(--grid-layout-gap-mobile);
+      --grid-layout-columns:        var(--grid-layout-columns-mobile);
+  }
+}
+
+/* prettier-ignore */
+@media (min-width: 48rem) and (max-width: 79.9375rem) {
+  :where(:root) {
+      --grid-layout-gap:            var(--grid-layout-gap-tablet);
+      --grid-layout-columns:        var(--grid-layout-columns-tablet);
+  }
+}
+
+/* prettier-ignore */
+@media (min-width: 80rem) {
+  :where(:root) {
+      --grid-layout-gap:            var(--grid-layout-gap-desktop);
+      --grid-layout-columns:        var(--grid-layout-columns-desktop);
+  }
+}
+
+.grid-layout {
+  display: grid;
+  gap: var(--grid-layout-gap);
+  grid-template-columns: var(--grid-layout-columns);
+}

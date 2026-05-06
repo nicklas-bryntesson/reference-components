@@ -1,0 +1,89 @@
+/* 
+* Complex 14 column grid with 12 centered columns in the middle and a fluid first and last column.
+*/
+
+/* prettier-ignore */
+:where(:root) {
+  --grid-breakout-offset:                         var(--SITE--PADDING);
+  --grid-breakout-maxWidth:                       var(--MAX--WIDTH--SITE);
+
+  --grid-breakout-columns-count-base:             var(--GRID--COLUMNS--BASE);
+  --grid-breakout-columns-count-mobile:           var(--GRID--COLUMNS--MOBILE);
+  --grid-breakout-columns-count-tablet:           var(--GRID--COLUMNS--TABLET);
+  --grid-breakout-columns-count-desktop:          var(--GRID--COLUMNS--DESKTOP);
+
+  --grid-breakout-gap-base:                       var(--GRID--GAP--BASE, 0);
+  --grid-breakout-gap-mobile:                     var(--GRID--GAP--MOBILE);
+  --grid-breakout-gap-tablet:                     var(--GRID--GAP--TABLET);
+  --grid-breakout-gap-desktop:                    var(--GRID--GAP--DESKTOP);
+
+  /* calculate grids */
+  --grid-breakout-column-autoSize-mobile:         calc((var(--grid-breakout-maxWidth) - (calc(var(--grid-breakout-columns-count-mobile) - 1) * var(--grid-breakout-gap-mobile))) / var(--grid-breakout-columns-count-mobile));
+  --grid-breakout-content-autoPadding-mobile:     calc(var(--grid-breakout-offset, 0rem) - var(--grid-breakout-gap-mobile, 0rem));
+
+  --grid-breakout-column-autoSize-tablet:         calc((var(--grid-breakout-maxWidth) - (calc(var(--grid-breakout-columns-count-tablet) - 1) * var(--grid-breakout-gap-tablet))) / var(--grid-breakout-columns-count-tablet));
+  --grid-breakout-content-autoPadding-tablet:     calc(var(--grid-breakout-offset, 0rem) - var(--grid-breakout-gap-tablet, 0rem));
+
+  --grid-breakout-column-autoSize-desktop:        calc((var(--grid-breakout-maxWidth) - (calc(var(--grid-breakout-columns-count-desktop) - 1) * var(--grid-breakout-gap-desktop))) / var(--grid-breakout-columns-count-desktop));
+  --grid-breakout-content-autoPadding-desktop:    calc(var(--grid-breakout-offset, 0rem) - var(--grid-breakout-gap-desktop, 0rem));
+  
+  /* BASE: 1col (no autoSize/Column needed) */
+  --grid-breakout-columns-base:                   [full-start] var(--grid-breakout-offset) [main-start] repeat(1, [main] 1fr) [main-end] var(--grid-breakout-offset) [full-end];
+  
+  /* MOBILE: 4col */
+  --grid-breakout-columns-mobile:                 [full-start] minmax(var(--grid-breakout-content-autoPadding-mobile), 1fr) [main-start] repeat(var(--grid-breakout-columns-count-mobile), [main] minmax(0, var(--grid-breakout-column-autoSize-mobile))) [main-end] minmax(var(--grid-breakout-content-autoPadding-mobile), 1fr) [full-end];
+
+  /* DESKTOP: 8col */
+  --grid-breakout-columns-tablet:                 [full-start] minmax(var(--grid-breakout-content-autoPadding-tablet), 1fr) [main-start] repeat(var(--grid-breakout-columns-count-tablet), [main] minmax(0, var(--grid-breakout-column-autoSize-tablet))) [main-end] minmax(var(--grid-breakout-content-autoPadding-tablet), 1fr) [full-end];
+  
+  /* DESKTOP: 12col */
+  --grid-breakout-columns-desktop:                [full-start] minmax(var(--grid-breakout-content-autoPadding-desktop), 1fr) [main-start] repeat(var(--grid-breakout-columns-count-desktop), [main] minmax(0, var(--grid-breakout-column-autoSize-desktop))) [main-end] minmax(var(--grid-breakout-content-autoPadding-desktop), 1fr) [full-end];
+}
+
+/* prettier-ignore */
+@media (max-width: 39.9375rem) {
+  :where(:root) {
+      --grid-breakout-gap:            var(--grid-breakout-gap-base);
+      --grid-breakout-columns:        var(--grid-breakout-columns-base);
+  }
+}
+
+/* prettier-ignore */
+@media (min-width: 40rem) and (max-width: 47.9375rem) {
+  :where(:root) {
+      --grid-breakout-gap:            var(--grid-breakout-gap-mobile);
+      --grid-breakout-columns:        var(--grid-breakout-columns-mobile);
+  }
+}
+
+/* prettier-ignore */
+@media (min-width: 48rem) and (max-width: 79.9375rem) {
+  :where(:root) {
+      --grid-breakout-gap:            var(--grid-breakout-gap-tablet);
+      --grid-breakout-columns:        var(--grid-breakout-columns-tablet);
+  }
+}
+
+/* prettier-ignore */
+@media (min-width: 80rem) {
+  :where(:root) {
+      --grid-breakout-gap:            var(--grid-breakout-gap-desktop);
+      --grid-breakout-columns:        var(--grid-breakout-columns-desktop);
+  }
+}
+
+.grid-breakout {
+  display: grid;
+  grid-template-columns: var(--grid-breakout-columns);
+  gap: var(--grid-breakout-gap);
+
+  /* Place everything in main columns as default */
+  & > * {
+    grid-column: main-start / main-end;
+  }
+}
+
+/* Span the full grid (breakout) */
+.grid-breakout-full {
+  grid-column: full-start / full-end;
+}

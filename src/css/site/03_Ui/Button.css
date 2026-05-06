@@ -1,0 +1,118 @@
+/**
+ * @file
+ * Button component styles.
+ *
+ * Uses data attributes for variant styling.
+ * data-type: primary, secondary
+ * data-size: sm, md, lg
+ * data-theme: default (expandable)
+ * data-pill: true
+ * data-icon-only: true
+ * data-icon-position: left, right
+ */
+
+.Button {
+  @apply inline-flex items-center justify-center gap-2;
+  @apply font-medium no-underline;
+  @apply border border-transparent rounded-md;
+  @apply cursor-pointer;
+  @apply transition-colors duration-150;
+  @apply font-sans leading-none;
+
+  &:focus-visible {
+    @apply outline-2 outline-current outline-offset-2;
+  }
+
+  &:disabled {
+    @apply opacity-50 cursor-not-allowed;
+  }
+}
+
+/* ==========================================================================
+   Sizes
+   ========================================================================== */
+
+.Button[data-size="sm"] {
+  @apply py-2 px-3.5 text-sm;
+}
+
+.Button[data-size="md"] {
+  @apply py-2.5 px-5 text-base;
+}
+
+.Button[data-size="lg"] {
+  @apply py-3 px-6 text-lg;
+}
+
+/* ==========================================================================
+   Variants (default theme)
+   ========================================================================== */
+
+.Button[data-theme="default"] {
+  &[data-type="primary"] {
+    @apply bg-slate-800 text-white border-slate-800;
+
+    &:hover {
+      @apply bg-slate-700 border-slate-700;
+    }
+  }
+
+  &[data-type="secondary"] {
+    @apply bg-transparent text-slate-800 border-slate-300;
+
+    &:hover {
+      @apply bg-slate-100 border-slate-400;
+    }
+  }
+}
+
+/* ==========================================================================
+   Pill shape
+   ========================================================================== */
+
+.Button[data-pill="true"] {
+  @apply rounded-full;
+}
+
+/* ==========================================================================
+   Icon-only
+   ========================================================================== */
+
+.Button[data-icon-only="true"] {
+  @apply aspect-square p-0;
+
+  &[data-size="sm"] {
+    @apply w-8;
+  }
+
+  &[data-size="md"] {
+    @apply w-10;
+  }
+
+  &[data-size="lg"] {
+    @apply w-12;
+  }
+}
+
+/* ==========================================================================
+   Icon positioning
+   ========================================================================== */
+
+.Button[data-icon-position="left"] {
+  & .icon {
+    @apply -order-1;
+  }
+}
+
+.Button .icon {
+  @apply shrink-0;
+}
+
+.Button .buttonText {
+  /* Optical alignment available if needed */
+  overflow-wrap: anywhere; /* break long words if needed */
+  hyphens: auto; /* add hyphens at break points */
+  text-wrap: balance; /* distribute text evenly across lines */
+  min-width: 0;
+  text-align: center;
+}
