@@ -1,0 +1,16 @@
+{
+  "day":              "Day",
+  "month":            "Month",
+  "year":             "Year",
+  "openCalendar":     "Open calendar",
+  "closeCalendar":    "Close calendar",
+  "prevMonth":        "Previous month",
+  "nextMonth":        "Next month",
+  "today":            "today",
+  "selected":         "selected",
+  "notAvailable":     "not available",
+  "announceSelected": "Selected date:",
+  "dateField":        "date field",
+  "clearButton":      "Clear",
+  "todayButton":      "Today"
+}
