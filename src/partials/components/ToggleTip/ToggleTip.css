@@ -1,0 +1,195 @@
+/* ================================================================
+   ToggleTip — fully self-contained
+   No Tailwind, no framework reset, no external dependencies
+   ================================================================ */
+
+/* ── Public API (theme layer) ──────────────────────────────────── */
+:root {
+  --toggletip-gap: 0.75rem;
+  --toggletip-content-width: 20rem;
+  --toggletip-padding: 1.5rem;
+  --toggletip-border-radius: 1rem;
+  --toggletip-button-width: 1.5rem;
+  --toggletip-button-color: black;
+  --toggletip-surface-color: white;
+  --toggletip-text-color: black;
+  --toggletip-border-color: lightgrey;
+  --toggletip-site-max-width: 100rem;
+  --toggletip-site-padding: var(--SITE--PADDING, 1rem);
+}
+
+/* ── Component shell ───────────────────────────────────────────── */
+toggle-tip {
+  /* Connect public → internal with fallbacks */
+  --_tt-gap: var(--toggletip-gap, 0.75rem);
+  --_tt-content-width: var(--toggletip-content-width, 20rem);
+  --_tt-padding: var(--toggletip-padding, 1.5rem);
+  --_tt-border-radius: var(--toggletip-border-radius, 1rem);
+  --_tt-button-width: var(--toggletip-button-width, 1.5rem);
+  --_tt-button-color: var(--toggletip-button-color, black);
+  --_tt-surface-color: var(--toggletip-surface-color, white);
+  --_tt-text-color: var(--toggletip-text-color, black);
+  --_tt-border-color: var(--toggletip-border-color, lightgrey);
+  --_tt-site-max-width: var(--toggletip-site-max-width, 100rem);
+  --_tt-site-padding: var(--toggletip-site-padding, 1rem);
+
+  /* Derived */
+  --_tt-rail-max-width: calc(var(--_tt-site-max-width) + var(--_tt-content-width));
+  --_tt-arrow-size: calc(var(--_tt-button-width) / 2);
+  --_tt-arrow-corner-radius: calc(var(--_tt-border-radius) / 4);
+
+  /* JS-set — initialized to safe defaults */
+  --tt-popup-offset: 50%;
+  --tt-arrow-offset: 0px;
+
+  /* Layout */
+  display: inline-block;
+  position: relative;
+  width: var(--_tt-button-width);
+  height: var(--_tt-button-width);
+  overflow: hidden;
+  vertical-align: middle;
+
+  & > * {
+    opacity: 0; /* hide raw content before JS builds DOM */
+  }
+}
+
+toggle-tip[initialized] {
+  overflow: visible;
+
+  & > * {
+    opacity: 1;
+  }
+}
+
+/* ── Button ────────────────────────────────────────────────────── */
+toggle-tip button {
+  all: unset;
+  box-sizing: border-box;
+  display: inline-block;
+  position: absolute;
+  inset: 0;
+  width: var(--_tt-button-width);
+  height: var(--_tt-button-width);
+  cursor: pointer;
+  color: var(--_tt-button-color);
+
+  /* Enlarged hit area */
+  &::after {
+    --_click-area: 2rem;
+    --_offset: calc((var(--_tt-button-width) - var(--_click-area)) / 2);
+    position: absolute;
+    content: "";
+    width: var(--_click-area);
+    height: var(--_click-area);
+    inset: var(--_offset);
+  }
+
+  & .toggleTipIcon {
+    display: block;
+    width: var(--_tt-button-width);
+    height: var(--_tt-button-width);
+  }
+}
+
+/* ── Slide rail ────────────────────────────────────────────────── */
+/*
+ * Centered on the trigger button's vertical midpoint.
+ * left: 50% + transform: translateX(-50%) aligns rail center = trigger center.
+ * top: 50% = button center (toggle-tip height = button width).
+ * Width is capped at site max-width + content-width so it never exceeds
+ * what makes sense for the layout.
+ *
+ * Note: physical properties (left, top, bottom) are used intentionally here.
+ * The slider-rail model is left-to-right by design; RTL is not in scope.
+ */
+toggle-tip .slideContainer {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(100vw, var(--_tt-rail-max-width));
+  height: 0;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* ── Bubble ────────────────────────────────────────────────────── */
+toggle-tip .toggleTipContent {
+  position: absolute;
+  left: var(--tt-popup-offset);
+  transform: translateX(-50%);
+  inline-size: var(--_tt-content-width);
+  max-inline-size: calc(100vw - var(--_tt-site-padding) * 2);
+  min-inline-size: 20ch;
+  block-size: max-content;
+  pointer-events: auto;
+  padding-inline: var(--_tt-padding);
+  padding-block: var(--_tt-padding);
+  border-radius: var(--_tt-border-radius);
+  background-color: var(--_tt-surface-color);
+  color: var(--_tt-text-color);
+  font: inherit;
+
+  /* Force all descendant text to use the bubble's colour, not the page default */
+  & * {
+    color: inherit;
+  }
+  will-change: filter;
+  filter:
+    drop-shadow(0 0.1875rem 0.1875rem hsl(0 0% 0% / 20%))
+    drop-shadow(0 0.75rem 0.75rem hsl(0 0% 0% / 20%));
+
+  &[aria-hidden="true"] {
+    display: none;
+  }
+
+  &[aria-hidden="false"] {
+    display: block;
+    transition: opacity 0.15s;
+
+    @starting-style {
+      opacity: 0;
+    }
+  }
+}
+
+/* ── Title ─────────────────────────────────────────────────────── */
+toggle-tip .title {
+  display: block;
+  margin-block-end: 1rem;
+  padding-block-end: 1rem;
+  border-block-end: 0.125rem solid var(--_tt-border-color);
+}
+
+/* ── Arrow ─────────────────────────────────────────────────────── */
+toggle-tip .arrow {
+  position: absolute;
+  width: var(--_tt-arrow-size);
+  height: var(--_tt-arrow-size);
+  background-color: var(--_tt-surface-color);
+  left: 50%;
+}
+
+/* ── Direction: top (bubble above trigger) ─────────────────────── */
+toggle-tip[direction="top"] .toggleTipContent {
+  bottom: var(--_tt-gap);
+}
+
+toggle-tip[direction="top"] .arrow {
+  bottom: calc(var(--_tt-arrow-size) * -0.5);
+  transform: translateX(calc(-50% + var(--tt-arrow-offset))) rotate(45deg);
+  border-end-end-radius: var(--_tt-arrow-corner-radius);
+}
+
+/* ── Direction: bottom (bubble below trigger) ──────────────────── */
+toggle-tip[direction="bottom"] .toggleTipContent {
+  top: var(--_tt-gap);
+}
+
+toggle-tip[direction="bottom"] .arrow {
+  top: calc(var(--_tt-arrow-size) * -0.5);
+  transform: translateX(calc(-50% + var(--tt-arrow-offset))) rotate(45deg);
+  border-start-start-radius: var(--_tt-arrow-corner-radius);
+}

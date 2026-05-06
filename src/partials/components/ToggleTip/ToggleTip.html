@@ -1,0 +1,32 @@
+<div class="examplePanel">
+  <h2>ToggleTip</h2>
+
+  <p>Near the top of the page — should flip to below:
+    <toggle-tip data-id="near-top"></toggle-tip>
+  </p>
+
+  <p>
+    Inline with text
+    <toggle-tip data-id="inline">
+      <p>This is some content inside the toggle tip.</p>
+    </toggle-tip>
+    more text after.
+  </p>
+
+  <div style="display:flex; justify-content:flex-start; align-items:center; gap:0.5rem;">
+    <toggle-tip data-id="left-edge"></toggle-tip>
+    <span>Near left edge — bubble should clamp right</span>
+  </div>
+
+  <div style="display:flex; justify-content:flex-end; align-items:center; gap:0.5rem; margin-block-start:1rem;">
+    <span>Near right edge — bubble should clamp left</span>
+    <toggle-tip data-id="right-edge"></toggle-tip>
+  </div>
+
+  <div style="display:flex; justify-content:center; align-items:center; gap:0.5rem; margin-block-start:1rem;">
+    <toggle-tip data-id="center" icon="question" title="A title">
+      <p>Content with a title heading above it.</p>
+    </toggle-tip>
+    <span>Centered, question icon, with title</span>
+  </div>
+</div>
