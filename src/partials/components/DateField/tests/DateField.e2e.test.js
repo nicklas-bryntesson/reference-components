@@ -133,3 +133,11 @@ test('axe: zero violations with calendar open', async ({ page }) => {
   })
   await page.keyboard.press('Escape')
 })
+
+test('data-direction is set on root when calendar opens', async ({ page }) => {
+  await page.locator('[data-id="birthdate"]').scrollIntoViewIfNeeded()
+  await page.locator('[data-id="birthdate"] .Trigger').click()
+  const direction = await page.locator('[data-id="birthdate"]').getAttribute('data-direction')
+  expect(['top', 'bottom']).toContain(direction)
+  await page.keyboard.press('Escape')
+})
