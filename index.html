@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="se">
+  <head>
+    <title>Reference components</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="theme-color" content="Canvas" />
+    <meta name="description" content="Reference components" />
+    <link
+      rel="preload"
+      as="image"
+      href="/videos/poster.webp"
+      fetchpriority="high"
+      type="image/webp"
+    />
+
+  </head>
+
+  <body class="relative bg-stone-50">
+    <div 
+      id="app" 
+      class="Page relative flex flex-col min-h-screen bg-white"
+    >
+      <a href="#content" class="hidden skipToContent">Skip to content</a>
+
+      {{> global/header/Header }} 
+
+      {{> global/main/Main }}
+
+      {{> global/footer/Footer }}
+      
+    </div>
+    
+    <script type="module" src="/main.js"></script>
+    
+  </body>
+</html>
