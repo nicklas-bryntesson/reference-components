@@ -1,5 +1,7 @@
 // src/partials/components/DateField/DateField.ts
 
+import { calculatePopupOffset, calculateArrowOffset, detectDirection } from '../../../js/popup-position'
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type SegmentType = 'day' | 'month' | 'year'
@@ -139,6 +141,7 @@ class DateField {
   trigger: HTMLButtonElement
   announce: HTMLElement
   calendarTemplate: HTMLTemplateElement | null
+  private slideContainer!: HTMLElement
 
   // State
   calendarEl: HTMLElement | null
@@ -158,6 +161,7 @@ class DateField {
   _digitBuffer: string
   _digitTimer: ReturnType<typeof setTimeout> | null
   _outsideClickHandler: ((e: MouseEvent) => void) | null
+  private _rafHandle: number | null = null
   _handleTriggerClick: () => void
   _handleNativeChange: () => void
   _handleFormReset: () => void
@@ -238,14 +242,19 @@ class DateField {
     if (this.root.dataset.max) this.native.max = this.root.dataset.max
     this.announce.id = `${this.fieldId}-announce`
 
+    this.slideContainer = this.root.querySelector<HTMLElement>('.slideContainer')!
+
     const coarse = (typeof window.matchMedia === 'function')
       ? window.matchMedia('(pointer: coarse)').matches
       : false
     if (coarse) {
       this._initDisplay()
+      this.root.setAttribute('data-initialized', '')
       return
     }
     this._initInteractive()
+    window.addEventListener('resize', this._handleResize)
+    this.root.setAttribute('data-initialized', '')
   }
 
   _initInteractive(): void {
@@ -672,11 +681,8 @@ class DateField {
     this._renderWeekdays()
     this._renderMonth()
 
-    document.body.appendChild(this.calendarEl)
-
-    const rect = this.trigger.getBoundingClientRect()
-    this.calendarEl.style.top = `${rect.bottom + window.scrollY + 4}px`
-    this.calendarEl.style.left = `${rect.left + window.scrollX}px`
+    this.slideContainer.appendChild(this.calendarEl)
+    this._updateLayout()
 
     this.root.dataset.state = 'open'
     this.trigger.setAttribute('aria-expanded', 'true')
@@ -685,7 +691,7 @@ class DateField {
     this.calendarEl.addEventListener('keydown', e => this._handleCalendarKeydown(e))
 
     this._outsideClickHandler = (e: MouseEvent) => {
-      if (!this.root.contains(e.target as Node) && !this.calendarEl?.contains(e.target as Node)) {
+      if (!this.root.contains(e.target as Node)) {
         this._closeCalendar()
       }
     }
@@ -694,12 +700,64 @@ class DateField {
     this._moveFocusIntoCalendar()
   }
 
+  private _updateLayout(): void {
+    if (!this.calendarEl) return
+
+    const triggerRect = this.trigger.getBoundingClientRect()
+    const containerRect = this.slideContainer.getBoundingClientRect()
+    const calendarWidth = this.calendarEl.offsetWidth
+    if (!containerRect.width || !calendarWidth) return
+
+    const direction = detectDirection(triggerRect)
+    this.root.dataset.direction = direction
+
+    const triggerCenterX = triggerRect.left + triggerRect.width / 2
+
+    const offset = calculatePopupOffset(
+      triggerCenterX,
+      containerRect.left,
+      containerRect.width,
+      calendarWidth,
+    )
+    this.root.style.setProperty('--df-popup-offset', `${offset}%`)
+
+    const calendarLeft = containerRect.left + (offset / 100 * containerRect.width) - calendarWidth / 2
+    const arrowOffset = calculateArrowOffset(
+      triggerCenterX,
+      calendarLeft,
+      calendarWidth,
+      this._getCSSPx('--_df-arrow-corner-radius'),
+      this._getCSSPx('--_df-arrow-size'),
+    )
+    this.root.style.setProperty('--df-arrow-offset', `${arrowOffset}px`)
+  }
+
+  private _getCSSPx(property: string): number {
+    const probe = document.createElement('div')
+    probe.style.cssText = `position:absolute;visibility:hidden;pointer-events:none;width:var(${property},0px)`
+    this.root.appendChild(probe)
+    const px = probe.getBoundingClientRect().width
+    this.root.removeChild(probe)
+    return px
+  }
+
+  private _handleResize = (): void => {
+    if (this._rafHandle) cancelAnimationFrame(this._rafHandle)
+    this._rafHandle = requestAnimationFrame(() => {
+      if (this.calendarEl) this._updateLayout()
+    })
+  }
+
   _closeCalendar(refocusTrigger = true): void {
     if (!this.calendarEl) return
     this.calendarEl.remove()
     this.calendarEl = null
     document.removeEventListener('click', this._outsideClickHandler!)
     this._outsideClickHandler = null
+    if (this._rafHandle) {
+      cancelAnimationFrame(this._rafHandle)
+      this._rafHandle = null
+    }
 
     this.root.dataset.state = 'idle'
     this.trigger.setAttribute('aria-expanded', 'false')

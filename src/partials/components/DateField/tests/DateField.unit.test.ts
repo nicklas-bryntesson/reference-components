@@ -259,6 +259,7 @@ function makeField({ disabled = false, value = '', min = '', max = '', locale = 
         </div>
       </template>
     </div>
+    <div class="slideContainer"></div>
     <div class="Announce" aria-live="polite" aria-atomic="true"></div>
   `
   document.body.appendChild(el)
