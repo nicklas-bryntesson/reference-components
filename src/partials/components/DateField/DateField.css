@@ -191,7 +191,7 @@
 
     & th {
       border: 0;
-      font-size: 0.75em;
+      padding: 0;
       padding-block-end: 0.25rem;
       text-align: center;
       font-weight: normal;
