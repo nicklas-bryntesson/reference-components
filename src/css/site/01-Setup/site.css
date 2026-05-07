@@ -4,3 +4,69 @@
 
   --block-vertical-distance: 2rem;
 }
+
+body {
+  position: relative;
+  background-color: #f5f4f2;
+}
+
+.Page {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: white;
+}
+
+.skipToContent {
+  position: absolute;
+  inset-inline-start: 1rem;
+  inset-block-start: 1rem;
+  z-index: 9999;
+  padding: 0.5rem 1rem;
+  background: white;
+  border: 1px solid;
+  border-radius: 4px;
+
+  &:not(:focus) {
+    clip-path: inset(50%);
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+}
+
+#headerContainer {
+  border-block-end: 1px solid hsl(0 0% 0% / 10%);
+  background-color: #f5f4f2;
+}
+
+#headerContainer header {
+  padding-block: 1rem;
+}
+
+#headerContainer a,
+footer a {
+  font-family: monospace;
+  color: #475569;
+  text-decoration: none;
+}
+
+.page-main {
+  flex: 1;
+  background-color: white;
+}
+
+footer {
+  border-block-start: 1px solid hsl(0 0% 0% / 10%);
+  background-color: #f5f4f2;
+}
+
+footer .grid-container-main {
+  padding-block: 1rem;
+}
+
+.footer-wrapper {
+  margin-block-start: auto;
+}
