@@ -93,6 +93,12 @@ All other `.DateFieldCalendar` and `.arrow` blocks in `demo.css` are removed.
 
 The unused `--_df-calendar-dropshadow` variable and the duplicate `--_df-arrow-size` / `--_df-arrow-corner-radius` declarations in `demo.css` are also removed.
 
+## Future improvement: backdrop-filter bloom
+
+Josh Comeau's [backdrop-filter article](https://www.joshwcomeau.com/css/backdrop-filter/) describes a technique where the blurred surface extends slightly beyond its container so the frosted glass effect blooms naturally at the edges rather than clipping hard. One approach: add a `<span>` inside `.DateFieldCalendar` that bleeds out via negative inset (with `overflow: visible` on the parent) and apply `backdrop-filter` there instead of on the container itself.
+
+This is not part of the current token API work — it requires its own markup and layout decisions. Treat as a future iteration once the base token API is in place.
+
 ## Non-goals
 
 - No global token fallback chains (e.g. `var(--surface-overlay, Canvas)`) — added later if a project needs it
