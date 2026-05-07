@@ -326,7 +326,7 @@
   position: absolute;
   width: var(--_df-arrow-size);
   height: var(--_df-arrow-size);
-  background-color: var(--_df-surface-color);
+  background-color: var(--df-calendar-bg);
   left: 50%;
 }
 
