@@ -66,7 +66,9 @@ The internal `--_df-surface-color` is removed.
 
 ## Changes to demo.css
 
-After the token API is in place, `demo.css` only needs token assignments on `.DateField`:
+`demo.css` stays as the home for visual styling work — it is not deleted or emptied. The goal is to be able to have 1–2 swappable demo CSS files that each demonstrate a different design style using the same token API, making it easy to show other developers how the API works and gather feedback.
+
+After the token API is in place, each demo file only needs token assignments on `.DateField` — zero direct class overrides:
 
 ```css
 .DateField {
