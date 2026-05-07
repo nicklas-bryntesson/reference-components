@@ -163,13 +163,14 @@
 
 .DateFieldCalendar {
   position: absolute;
-  background: Canvas;
-  color: CanvasText;
-  border: 1px solid;
+  background: var(--df-calendar-bg);
+  color: var(--df-calendar-color);
+  border: 1px solid var(--df-calendar-border-color);
   padding: 0.75rem;
   z-index: 100;
-  border-radius: 4px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  border-radius: var(--df-calendar-radius);
+  filter: var(--df-calendar-shadow);
+  backdrop-filter: var(--df-calendar-backdrop);
 
   & .CalendarHeader {
     display: flex;
@@ -210,7 +211,7 @@
       padding-block-end: 0.25rem;
       text-align: center;
       font-weight: normal;
-      color: #6e6e6e;
+      color: var(--df-calendar-color-muted);
       min-inline-size: 2rem;
     }
 
@@ -252,7 +253,7 @@
     }
 
     & td[data-outside-month] button {
-      color: #6e6e6e;
+      color: var(--df-calendar-color-muted);
     }
   }
 
@@ -308,11 +309,7 @@
   transform: translateX(-50%);
   inline-size: var(--df-calendar-width);
   pointer-events: auto;
-  box-shadow: none;
   will-change: filter;
-/*   filter:
-    drop-shadow(0 0.1875rem 0.1875rem hsl(0 0% 0% / 20%))
-    drop-shadow(0 0.75rem 0.75rem hsl(0 0% 0% / 20%)); */
 }
 
 /* ── Direction gates ───────────────────────────────────────────────────── */
