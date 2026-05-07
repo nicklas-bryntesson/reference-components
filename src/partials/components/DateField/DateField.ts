@@ -707,19 +707,22 @@ class DateField {
 
     const triggerRect = this.trigger.getBoundingClientRect()
     const containerRect = this.slideContainer.getBoundingClientRect()
-    const calendarWidth = this.calendarEl.offsetWidth
+    const calendarWidth = this.calendarEl.getBoundingClientRect().width
     if (!containerRect.width || !calendarWidth) return
 
     const direction = detectDirection(triggerRect)
     this.root.dataset.direction = direction
 
     const triggerCenterX = triggerRect.left + triggerRect.width / 2
+    const viewportInset = this._getCSSPx('--df-site-padding') / 2
 
     const offset = calculatePopupOffset(
       triggerCenterX,
       containerRect.left,
       containerRect.width,
       calendarWidth,
+      window.innerWidth,
+      viewportInset,
     )
     this.root.style.setProperty('--df-popup-offset', `${offset}%`)
 

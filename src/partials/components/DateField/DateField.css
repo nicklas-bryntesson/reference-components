@@ -2,11 +2,16 @@
   position: relative;
   display: inline-block;
   overflow: hidden;
+  /* Public API */
+  --df-calendar-width: 18rem;
   --df-calendar-gap: 1.125rem;
+  --df-site-max-width: var(--MAX--WIDTH--SITE, 100rem);
+  --df-site-padding: var(--SITE--PADDING, 1rem);
+  /* Internal */
+  --_df-rail-max-width: calc(var(--df-site-max-width) + var(--df-calendar-width));
   --_df-arrow-size: 0.75rem;
   --_df-arrow-corner-radius: 0.25rem;
   --_df-surface-color: white;
-  --_df-rail-max-width: 80rem;
 
   & .Native {
     display: block;
@@ -285,6 +290,7 @@
   position: absolute;
   left: var(--df-popup-offset, 50%);
   transform: translateX(-50%);
+  inline-size: var(--df-calendar-width);
   pointer-events: auto;
   box-shadow: none;
   will-change: filter;

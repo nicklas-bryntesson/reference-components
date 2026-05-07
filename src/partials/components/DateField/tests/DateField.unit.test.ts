@@ -1094,7 +1094,10 @@ describe('DateField — _updateLayout direction', () => {
     } as DOMRect)
 
     instance._openCalendar()
-    Object.defineProperty(instance.calendarEl!, 'offsetWidth', { value: 300, configurable: true })
+    vi.spyOn(instance.calendarEl!, 'getBoundingClientRect').mockReturnValue({
+      top: 0, bottom: 0, left: 0, right: 300, width: 300, height: 0,
+      x: 0, y: 0, toJSON: () => {},
+    } as DOMRect)
     vi.stubGlobal('innerHeight', 1000)
 
     ;(instance as any)._updateLayout()
@@ -1120,7 +1123,10 @@ describe('DateField — _updateLayout direction', () => {
     } as DOMRect)
 
     instance._openCalendar()
-    Object.defineProperty(instance.calendarEl!, 'offsetWidth', { value: 300, configurable: true })
+    vi.spyOn(instance.calendarEl!, 'getBoundingClientRect').mockReturnValue({
+      top: 0, bottom: 0, left: 0, right: 300, width: 300, height: 0,
+      x: 0, y: 0, toJSON: () => {},
+    } as DOMRect)
     vi.stubGlobal('innerHeight', 1000)
 
     ;(instance as any)._updateLayout()
