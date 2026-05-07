@@ -184,6 +184,7 @@
     border-collapse: collapse;
 
     & th {
+      border: 0;
       font-size: 0.75em;
       padding-block-end: 0.25rem;
       text-align: center;
@@ -193,6 +194,7 @@
     }
 
     & td {
+      border: 0;
       padding: 0;
     }
 
