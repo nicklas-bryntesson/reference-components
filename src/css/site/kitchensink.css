@@ -2,7 +2,7 @@
   border-collapse: collapse;
   margin-block-end: 1rem;
 
-  th, td {
+  & th, & td {
     border: 1px solid #e0e0e0;
     padding: 0.75rem 1rem;
     text-align: left;
