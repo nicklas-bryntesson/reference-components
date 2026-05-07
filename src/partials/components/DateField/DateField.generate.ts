@@ -44,6 +44,7 @@ function canonical(id: string, label: string, rootAttrs: string, inputAttrs: str
     <div class="slideContainer">
       <template data-template="datefield-calendar">
         <div class="DateFieldCalendar" role="dialog" aria-modal="true">
+          <span class="CalendarSurface" aria-hidden="true"></span>
           <div class="CalendarHeader">
             <button type="button">&#8249;</button>
             <span aria-live="polite" aria-atomic="true"></span>

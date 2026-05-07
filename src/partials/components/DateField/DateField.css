@@ -21,7 +21,7 @@
   --df-calendar-color-muted: #6e6e6e;
   --df-calendar-border-color: currentColor;
   --df-calendar-radius: 4px;
-  --df-calendar-shadow: drop-shadow(0 4px 12px rgba(0,0,0,0.15));
+  --df-calendar-shadow: 0 4px 12px rgba(0,0,0,0.15);
   --df-calendar-backdrop: none;
   /* Internal */
   --_df-rail-max-width: calc(var(--df-site-max-width) + var(--df-calendar-width));
@@ -163,14 +163,13 @@
 
 .DateFieldCalendar {
   position: absolute;
-  background: var(--df-calendar-bg);
+  background: transparent;
   color: var(--df-calendar-color);
   border: 1px solid var(--df-calendar-border-color);
   padding: 0.75rem;
   z-index: 100;
   border-radius: var(--df-calendar-radius);
-  filter: var(--df-calendar-shadow);
-  backdrop-filter: var(--df-calendar-backdrop);
+  box-shadow: var(--df-calendar-shadow);
 
   & .CalendarHeader {
     display: flex;
@@ -285,6 +284,17 @@
   }
 }
 
+/* ── Calendar surface (backdrop-filter layer) ──────────────────────────── */
+.DateFieldCalendar .CalendarSurface {
+  position: absolute;
+  inset: 0;
+  background: var(--df-calendar-bg);
+  backdrop-filter: var(--df-calendar-backdrop);
+  border-radius: inherit;
+  z-index: -1;
+  pointer-events: none;
+}
+
 /* ── Initialisation gate ───────────────────────────────────────────────── */
 .DateField[data-initialized] {
   overflow: visible;
@@ -309,7 +319,6 @@
   transform: translateX(-50%);
   inline-size: var(--df-calendar-width);
   pointer-events: auto;
-  will-change: filter;
 }
 
 /* ── Direction gates ───────────────────────────────────────────────────── */
