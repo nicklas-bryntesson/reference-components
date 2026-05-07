@@ -71,19 +71,21 @@ The internal `--_df-surface-color` is removed.
 After the token API is in place, each demo file only needs token assignments on `.DateField` — zero direct class overrides:
 
 ```css
+/* https://smoothshadows.com/#djEsMSw5LDAuMDUsODQsMjIsMCwjMDMwNzEyLCNmM2Y0ZjYsI2ZmZmZmZiwy */
 .DateField {
   --df-calendar-bg: rgba(255, 255, 255, 0.8);
   --df-calendar-radius: 1rem;
   --df-calendar-backdrop: blur(4px);
   --df-calendar-shadow:
-    drop-shadow(0px 0px 2px rgba(3, 7, 18, 0.04))
-    drop-shadow(0px 2px 6px rgba(3, 7, 18, 0.08))
-    drop-shadow(0px 4px 14px rgba(3, 7, 18, 0.12))
-    drop-shadow(0px 8px 25px rgba(3, 7, 18, 0.17))
-    drop-shadow(0px 12px 39px rgba(3, 7, 18, 0.21))
-    drop-shadow(0px 17px 56px rgba(3, 7, 18, 0.25))
-    drop-shadow(0px 23px 77px rgba(3, 7, 18, 0.29))
-    drop-shadow(0px 30px 100px rgba(3, 7, 18, 0.33));
+    drop-shadow(0px 0px 1px rgba(3, 7, 18, 0.01))
+    drop-shadow(0px 1px 4px rgba(3, 7, 18, 0.01))
+    drop-shadow(0px 2px 9px rgba(3, 7, 18, 0.02))
+    drop-shadow(0px 4px 17px rgba(3, 7, 18, 0.02))
+    drop-shadow(0px 7px 26px rgba(3, 7, 18, 0.03))
+    drop-shadow(0px 10px 37px rgba(3, 7, 18, 0.03))
+    drop-shadow(0px 13px 51px rgba(3, 7, 18, 0.04))
+    drop-shadow(0px 17px 66px rgba(3, 7, 18, 0.04))
+    drop-shadow(0px 22px 84px rgba(3, 7, 18, 0.05));
 }
 ```
 
