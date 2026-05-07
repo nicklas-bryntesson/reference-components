@@ -283,6 +283,7 @@
   left: var(--df-popup-offset, 50%);
   transform: translateX(-50%);
   pointer-events: auto;
+  box-shadow: none;
   will-change: filter;
   filter:
     drop-shadow(0 0.1875rem 0.1875rem hsl(0 0% 0% / 20%))

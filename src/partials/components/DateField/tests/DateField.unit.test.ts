@@ -257,9 +257,9 @@ function makeField({ disabled = false, value = '', min = '', max = '', locale = 
             <button type="button" class="CalendarFooterClear"></button>
             <button type="button" class="CalendarFooterToday"></button>
           </div>
+          <div class="arrow"></div>
         </div>
       </template>
-      <div class="arrow"></div>
       </div>
     </div>
     <div class="Announce" aria-live="polite" aria-atomic="true"></div>
