@@ -2,7 +2,7 @@
   position: relative;
   display: inline-block;
   overflow: hidden;
-  --df-calendar-gap: 0.5rem;
+  --df-calendar-gap: 1.125rem;
   --_df-arrow-size: 0.75rem;
   --_df-arrow-corner-radius: 0.25rem;
   --_df-surface-color: white;
@@ -269,6 +269,7 @@
 /* ── Slide rail ────────────────────────────────────────────────────────── */
 .DateField .slideContainer {
   position: absolute;
+  top: 50%;
   left: 50%;
   transform: translateX(-50%);
   width: min(100vw, var(--_df-rail-max-width));
