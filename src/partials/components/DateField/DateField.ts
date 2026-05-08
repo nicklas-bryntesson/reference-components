@@ -846,6 +846,11 @@ class DateField {
     this.calendarEl.dataset.view = 'picker'
     monthYearTrigger.setAttribute('aria-expanded', 'true')
     monthYearTrigger.setAttribute('aria-label', this.t.closePicker)
+
+    // Scroll selected items into view after render
+    monthList.querySelector<HTMLElement>('[aria-selected="true"]')?.scrollIntoView({ block: 'center' })
+    yearList.querySelector<HTMLElement>('[aria-selected="true"]')?.scrollIntoView({ block: 'center' })
+
     monthList.focus()
   }
 
@@ -885,9 +890,32 @@ class DateField {
   }
 
   private _confirmPickerYear(year: number): void {
+    if (!this.calendarEl) return
     this.currentYear = year
-    // Re-render picker with new year so month disabled states update
-    this._openPicker()
+    const yearList = this.calendarEl.querySelector<HTMLElement>('.YearList')!
+    const monthList = this.calendarEl.querySelector<HTMLElement>('.MonthList')!
+
+    // Update year selection in-place (no full re-render — preserves scroll position)
+    yearList.querySelectorAll<HTMLElement>('[role="option"]').forEach(o => {
+      o.setAttribute('aria-selected', String(o.id === `${this.fieldId}-year-${year}`))
+    })
+    yearList.setAttribute('aria-activedescendant', `${this.fieldId}-year-${year}`)
+    yearList.querySelector<HTMLElement>('[aria-selected="true"]')?.scrollIntoView({ block: 'nearest' })
+
+    // Refresh month disabled states for new year
+    monthList.querySelectorAll<HTMLElement>('[role="option"]').forEach((o, i) => {
+      const disabled = this._isMonthDisabled(year, i)
+      if (disabled) {
+        o.setAttribute('aria-disabled', 'true')
+        o.onclick = null
+      } else {
+        o.removeAttribute('aria-disabled')
+        o.onclick = () => this._confirmPickerMonth(i)
+      }
+    })
+
+    // Keep focus in year list — user may want to refine the year before confirming month
+    yearList.focus()
   }
 
   _renderWeekdays(): void {
