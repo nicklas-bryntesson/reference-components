@@ -788,6 +788,94 @@ class DateField {
     this._renderMonth()
   }
 
+  _openPicker(): void {
+    if (!this.calendarEl) return
+    const monthList = this.calendarEl.querySelector<HTMLElement>('.MonthList')!
+    const yearList = this.calendarEl.querySelector<HTMLElement>('.YearList')!
+    const pickerGroup = this.calendarEl.querySelector<HTMLElement>('.YearMonthPicker')!
+    pickerGroup.setAttribute('aria-label', this.t.openPicker)
+    const monthYearTrigger = this.calendarEl.querySelector<HTMLButtonElement>('.MonthYearTrigger')!
+
+    // Render month options
+    monthList.setAttribute('aria-label', this.t.month)
+    monthList.innerHTML = ''
+    for (let i = 0; i < 12; i++) {
+      const name = getMonthName(this.currentYear, i, this.locale)
+      const li = document.createElement('li')
+      li.setAttribute('role', 'option')
+      li.id = `${this.fieldId}-month-${i}`
+      li.setAttribute('aria-selected', String(i === this.currentMonth))
+      const isDisabled = this._isMonthDisabled(this.currentYear, i)
+      if (isDisabled) li.setAttribute('aria-disabled', 'true')
+      li.textContent = name
+      if (!isDisabled) li.addEventListener('click', () => this._confirmPickerMonth(i))
+      monthList.appendChild(li)
+    }
+    monthList.setAttribute('aria-activedescendant', `${this.fieldId}-month-${this.currentMonth}`)
+
+    // Render year options
+    yearList.setAttribute('aria-label', this.t.year)
+    yearList.innerHTML = ''
+    const minYear = this.min ? this.min.getFullYear() : 1900
+    const maxYear = this.max ? this.max.getFullYear() : 2100
+    for (let y = minYear; y <= maxYear; y++) {
+      const li = document.createElement('li')
+      li.setAttribute('role', 'option')
+      li.id = `${this.fieldId}-year-${y}`
+      li.setAttribute('aria-selected', String(y === this.currentYear))
+      li.textContent = String(y)
+      li.addEventListener('click', () => this._confirmPickerYear(y))
+      yearList.appendChild(li)
+    }
+    yearList.setAttribute('aria-activedescendant', `${this.fieldId}-year-${this.currentYear}`)
+
+    this.calendarEl.dataset.view = 'picker'
+    monthYearTrigger.setAttribute('aria-expanded', 'true')
+    monthYearTrigger.setAttribute('aria-label', this.t.closePicker)
+    monthList.focus()
+  }
+
+  _closePicker(): void {
+    if (!this.calendarEl) return
+    const monthYearTrigger = this.calendarEl.querySelector<HTMLButtonElement>('.MonthYearTrigger')!
+    this.calendarEl.dataset.view = 'calendar'
+    monthYearTrigger.setAttribute('aria-expanded', 'false')
+    monthYearTrigger.setAttribute('aria-label', this.t.openPicker)
+    monthYearTrigger.focus()
+  }
+
+  private _isMonthDisabled(year: number, month: number): boolean {
+    if (this.min) {
+      if (year < this.min.getFullYear()) return true
+      if (year === this.min.getFullYear() && month < this.min.getMonth()) return true
+    }
+    if (this.max) {
+      if (year > this.max.getFullYear()) return true
+      if (year === this.max.getFullYear() && month > this.max.getMonth()) return true
+    }
+    return false
+  }
+
+  private _confirmPickerMonth(month: number): void {
+    this.currentMonth = month
+    if (this.selectedDate) {
+      const clamped = clampDayToMonth(this.currentYear, this.currentMonth, this.selectedDate.getDate())
+      this.selectedDate = new Date(this.currentYear, this.currentMonth, clamped)
+      this._syncingFromCustom = true
+      this.native.value = formatISO(this.selectedDate)
+      this.native.dispatchEvent(new Event('change', { bubbles: true }))
+      this._syncingFromCustom = false
+    }
+    this._closePicker()
+    this._renderMonth()
+  }
+
+  private _confirmPickerYear(year: number): void {
+    this.currentYear = year
+    // Re-render picker with new year so month disabled states update
+    this._openPicker()
+  }
+
   _renderWeekdays(): void {
     const names = getWeekdayNames(this.locale)
     const ths = this.calendarEl!.querySelectorAll('.Grid thead th')
