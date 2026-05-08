@@ -285,6 +285,41 @@
   }
 }
 
+/* ── Picker view ───────────────────────────────────────────────────────────── */
+.DateFieldCalendar .YearMonthPicker {
+  display: none;
+}
+
+.DateFieldCalendar[data-view="picker"] .YearMonthPicker {
+  display: flex;
+}
+
+.DateFieldCalendar[data-view="picker"] .Grid {
+  display: none;
+}
+
+.DateFieldCalendar[data-view="picker"] .CalendarFooter {
+  display: none;
+}
+
+.DateFieldCalendar[data-view="picker"] .PrevMonth,
+.DateFieldCalendar[data-view="picker"] .NextMonth {
+  visibility: hidden;
+}
+
+.DateFieldCalendar .MonthList,
+.DateFieldCalendar .YearList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.DateFieldCalendar .MonthList [role="option"]:focus-visible,
+.DateFieldCalendar .YearList [role="option"]:focus-visible {
+  outline: 2px solid;
+  outline-offset: 1px;
+}
+
 /* ── Calendar surface (backdrop-filter layer) ──────────────────────────── */
 .DateFieldCalendar .CalendarSurface {
   position: absolute;
