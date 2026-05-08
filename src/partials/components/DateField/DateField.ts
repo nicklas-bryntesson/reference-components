@@ -668,7 +668,13 @@ class DateField {
     this.calendarEl.setAttribute('aria-labelledby', monthId)
     monthYearTrigger.id = monthId
     monthYearTrigger.setAttribute('aria-label', this.t.openPicker)
-    monthYearTrigger.addEventListener('click', () => this._openPicker())
+    monthYearTrigger.addEventListener('click', () => {
+      if (this.calendarEl?.dataset.view === 'picker') {
+        this._confirmPickerMonth(this.currentMonth)
+      } else {
+        this._openPicker()
+      }
+    })
 
     // One-time picker setup: prevent mousedown from blurring list before click fires,
     // and track focus state for selected-item highlight colour

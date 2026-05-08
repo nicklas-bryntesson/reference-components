@@ -346,7 +346,13 @@
 }
 
 .DateFieldCalendar .MonthYearTrigger::after {
-  content: ' ▾';
+  content: '›';
+  display: inline-block;
+  transform: rotate(90deg);
+}
+
+.DateFieldCalendar .MonthYearTrigger[aria-expanded="true"]::after {
+  transform: rotate(-90deg);
 }
 
 /* ── Calendar surface (backdrop-filter layer) ──────────────────────────── */
