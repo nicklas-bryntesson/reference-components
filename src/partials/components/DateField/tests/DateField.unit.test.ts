@@ -260,9 +260,9 @@ function makeField({ disabled = false, value = '', min = '', max = '', locale = 
       <template data-template="datefield-calendar">
         <div class="DateFieldCalendar" role="dialog" aria-modal="true">
           <div class="CalendarHeader">
-            <button type="button">&#8249;</button>
-            <span aria-live="polite" aria-atomic="true"></span>
-            <button type="button">&#8250;</button>
+            <button type="button" class="PrevMonth">&#8249;</button>
+            <button type="button" class="MonthYearTrigger" aria-live="polite" aria-atomic="true"></button>
+            <button type="button" class="NextMonth">&#8250;</button>
           </div>
           <table class="Grid" role="grid">
             <thead><tr role="row">
@@ -673,9 +673,9 @@ describe('DateField — prop application from wrapper data attributes', () => {
         <template data-template="datefield-calendar">
           <div class="DateFieldCalendar" role="dialog" aria-modal="true">
             <div class="CalendarHeader">
-              <button type="button">&#8249;</button>
-              <span aria-live="polite" aria-atomic="true"></span>
-              <button type="button">&#8250;</button>
+              <button type="button" class="PrevMonth">&#8249;</button>
+              <button type="button" class="MonthYearTrigger" aria-live="polite" aria-atomic="true"></button>
+              <button type="button" class="NextMonth">&#8250;</button>
             </div>
             <table class="Grid" role="grid">
               <thead><tr role="row">
@@ -711,9 +711,9 @@ describe('DateField — prop application from wrapper data attributes', () => {
         <template data-template="datefield-calendar">
           <div class="DateFieldCalendar" role="dialog" aria-modal="true">
             <div class="CalendarHeader">
-              <button type="button">&#8249;</button>
-              <span aria-live="polite" aria-atomic="true"></span>
-              <button type="button">&#8250;</button>
+              <button type="button" class="PrevMonth">&#8249;</button>
+              <button type="button" class="MonthYearTrigger" aria-live="polite" aria-atomic="true"></button>
+              <button type="button" class="NextMonth">&#8250;</button>
             </div>
             <table class="Grid" role="grid">
               <thead><tr role="row">
@@ -751,9 +751,9 @@ describe('DateField — prop application from wrapper data attributes', () => {
         <template data-template="datefield-calendar">
           <div class="DateFieldCalendar" role="dialog" aria-modal="true">
             <div class="CalendarHeader">
-              <button type="button">&#8249;</button>
-              <span aria-live="polite" aria-atomic="true"></span>
-              <button type="button">&#8250;</button>
+              <button type="button" class="PrevMonth">&#8249;</button>
+              <button type="button" class="MonthYearTrigger" aria-live="polite" aria-atomic="true"></button>
+              <button type="button" class="NextMonth">&#8250;</button>
             </div>
             <table class="Grid" role="grid">
               <thead><tr role="row">
@@ -789,9 +789,9 @@ describe('DateField — prop application from wrapper data attributes', () => {
         <template data-template="datefield-calendar">
           <div class="DateFieldCalendar" role="dialog" aria-modal="true">
             <div class="CalendarHeader">
-              <button type="button">&#8249;</button>
-              <span aria-live="polite" aria-atomic="true"></span>
-              <button type="button">&#8250;</button>
+              <button type="button" class="PrevMonth">&#8249;</button>
+              <button type="button" class="MonthYearTrigger" aria-live="polite" aria-atomic="true"></button>
+              <button type="button" class="NextMonth">&#8250;</button>
             </div>
             <table class="Grid" role="grid">
               <thead><tr role="row">
@@ -827,9 +827,9 @@ describe('DateField — prop application from wrapper data attributes', () => {
         <template data-template="datefield-calendar">
           <div class="DateFieldCalendar" role="dialog" aria-modal="true">
             <div class="CalendarHeader">
-              <button type="button">&#8249;</button>
-              <span aria-live="polite" aria-atomic="true"></span>
-              <button type="button">&#8250;</button>
+              <button type="button" class="PrevMonth">&#8249;</button>
+              <button type="button" class="MonthYearTrigger" aria-live="polite" aria-atomic="true"></button>
+              <button type="button" class="NextMonth">&#8250;</button>
             </div>
             <table class="Grid" role="grid">
               <thead><tr role="row">

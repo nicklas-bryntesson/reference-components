@@ -656,18 +656,22 @@ class DateField {
     const clone = this.calendarTemplate.content.cloneNode(true) as DocumentFragment
     this.calendarEl = clone.querySelector<HTMLElement>('.DateFieldCalendar')!
 
-    const headingSpan = this.calendarEl.querySelector('.CalendarHeader span')
+    const monthYearTrigger = this.calendarEl.querySelector<HTMLButtonElement>('.MonthYearTrigger')!
+    const prevBtn = this.calendarEl.querySelector<HTMLButtonElement>('.PrevMonth')!
+    const nextBtn = this.calendarEl.querySelector<HTMLButtonElement>('.NextMonth')!
+
     const calId = `${this.fieldId}-calendar`
     const monthId = `${this.fieldId}-month`
     this.calendarEl.id = calId
     this.calendarEl.setAttribute('aria-labelledby', monthId)
-    if (headingSpan) headingSpan.id = monthId
+    monthYearTrigger.id = monthId
+    monthYearTrigger.setAttribute('aria-label', this.t.openPicker)
+    monthYearTrigger.addEventListener('click', () => this._openPicker())
 
-    const [prevBtn, nextBtn] = this.calendarEl.querySelectorAll<HTMLButtonElement>('.CalendarHeader button')
-    prevBtn?.setAttribute('aria-label', this.t.prevMonth)
-    nextBtn?.setAttribute('aria-label', this.t.nextMonth)
-    prevBtn?.addEventListener('click', () => this._navigateMonth(-1))
-    nextBtn?.addEventListener('click', () => this._navigateMonth(1))
+    prevBtn.setAttribute('aria-label', this.t.prevMonth)
+    nextBtn.setAttribute('aria-label', this.t.nextMonth)
+    prevBtn.addEventListener('click', () => this._navigateMonth(-1))
+    nextBtn.addEventListener('click', () => this._navigateMonth(1))
 
     const clearBtn = this.calendarEl.querySelector<HTMLButtonElement>('.CalendarFooterClear')!
     const todayBtn = this.calendarEl.querySelector<HTMLButtonElement>('.CalendarFooterToday')!
@@ -797,9 +801,9 @@ class DateField {
   }
 
   _renderMonth(): void {
-    const headingSpan = this.calendarEl!.querySelector('.CalendarHeader span')
+    const monthYearTrigger = this.calendarEl!.querySelector<HTMLButtonElement>('.MonthYearTrigger')
     const monthName = getMonthName(this.currentYear, this.currentMonth, this.locale)
-    if (headingSpan) headingSpan.textContent = `${monthName} ${this.currentYear}`
+    if (monthYearTrigger) monthYearTrigger.textContent = `${monthName} ${this.currentYear}`
 
     const tbody = this.calendarEl!.querySelector<HTMLTableSectionElement>('.Grid tbody')!
     tbody.innerHTML = ''
@@ -959,11 +963,14 @@ class DateField {
     }
 
     if (e.key === 'Tab') {
-      const [prevBtn, nextBtn] = this.calendarEl!.querySelectorAll<HTMLButtonElement>('.CalendarHeader button')
+      const prevBtn = this.calendarEl!.querySelector<HTMLButtonElement>('.PrevMonth')!
+      const monthYearTrigger = this.calendarEl!.querySelector<HTMLButtonElement>('.MonthYearTrigger')!
+      const nextBtn = this.calendarEl!.querySelector<HTMLButtonElement>('.NextMonth')!
       const clearBtn = this.calendarEl!.querySelector<HTMLButtonElement>('.CalendarFooterClear')
       const todayBtn = this.calendarEl!.querySelector<HTMLButtonElement>('.CalendarFooterToday')
       const tabbable = [
         prevBtn,
+        monthYearTrigger,
         ...Array.from(grid.querySelectorAll<HTMLButtonElement>('td:not([aria-disabled="true"]) button')),
         nextBtn,
         ...(clearBtn && !clearBtn.disabled ? [clearBtn] : []),
