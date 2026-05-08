@@ -1041,6 +1041,11 @@ class DateField {
   // ─── Calendar keyboard ───────────────────────────────────────────────────────
 
   _handleCalendarKeydown(e: KeyboardEvent): void {
+    if (this.calendarEl!.dataset.view === 'picker') {
+      this._handlePickerKeydown(e)
+      return
+    }
+
     const grid = this.calendarEl!.querySelector<HTMLElement>('.Grid')!
     const focusedBtn = grid.querySelector<HTMLButtonElement>('button:focus')
 
@@ -1114,6 +1119,83 @@ class DateField {
       const td = focusedBtn.closest('td')
       if (td && !td.hasAttribute('aria-disabled')) {
         this._selectDate(target)
+      }
+    }
+  }
+
+  _handlePickerKeydown(e: KeyboardEvent): void {
+    const monthList = this.calendarEl!.querySelector<HTMLElement>('.MonthList')!
+    const yearList = this.calendarEl!.querySelector<HTMLElement>('.YearList')!
+    const focused = document.activeElement
+
+    if (e.key === 'Escape') {
+      e.preventDefault()
+      this._closePicker()
+      return
+    }
+
+    if (e.key === 'Tab') {
+      e.preventDefault()
+      if (!e.shiftKey && focused === monthList) { yearList.focus(); return }
+      if (e.shiftKey && focused === yearList) { monthList.focus(); return }
+      if (!e.shiftKey && focused === yearList) { monthList.focus(); return }
+      if (e.shiftKey && focused === monthList) { yearList.focus(); return }
+      return
+    }
+
+    const isList = focused === monthList || focused === yearList
+    if (!isList) return
+
+    const list = focused as HTMLElement
+    const activeId = list.getAttribute('aria-activedescendant') ?? ''
+    const options = Array.from(list.querySelectorAll<HTMLElement>('[role="option"]:not([aria-disabled="true"])'))
+    const currentIndex = options.findIndex(o => o.id === activeId)
+
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault()
+      const next = e.key === 'ArrowDown'
+        ? (currentIndex + 1) % options.length
+        : (currentIndex - 1 + options.length) % options.length
+      const target = options[next]
+      list.setAttribute('aria-activedescendant', target.id)
+      list.querySelectorAll('[role="option"]').forEach(o => o.setAttribute('aria-selected', 'false'))
+      target.setAttribute('aria-selected', 'true')
+      target.scrollIntoView({ block: 'nearest' })
+      return
+    }
+
+    if (e.key === 'Home') {
+      e.preventDefault()
+      const first = options[0]
+      if (!first) return
+      list.setAttribute('aria-activedescendant', first.id)
+      list.querySelectorAll('[role="option"]').forEach(o => o.setAttribute('aria-selected', 'false'))
+      first.setAttribute('aria-selected', 'true')
+      first.scrollIntoView({ block: 'nearest' })
+      return
+    }
+
+    if (e.key === 'End') {
+      e.preventDefault()
+      const last = options[options.length - 1]
+      if (!last) return
+      list.setAttribute('aria-activedescendant', last.id)
+      list.querySelectorAll('[role="option"]').forEach(o => o.setAttribute('aria-selected', 'false'))
+      last.setAttribute('aria-selected', 'true')
+      last.scrollIntoView({ block: 'nearest' })
+      return
+    }
+
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault()
+      const selected = list.querySelector<HTMLElement>('[aria-selected="true"]')
+      if (!selected) return
+      if (list === monthList) {
+        const month = parseInt(selected.id.split('-month-')[1], 10)
+        this._confirmPickerMonth(month)
+      } else {
+        const year = parseInt(selected.id.split('-year-')[1], 10)
+        this._confirmPickerYear(year)
       }
     }
   }
