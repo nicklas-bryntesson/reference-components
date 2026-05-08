@@ -163,6 +163,8 @@ class DateField {
   max: Date | null
 
   // Internal
+  private _pickerEntryYear = 0
+  private _pickerEntryMonth = 0
   _syncingFromCustom: boolean
   _segmentEls: HTMLSpanElement[]
   _digitBuffer: string
@@ -804,6 +806,8 @@ class DateField {
 
   _openPicker(): void {
     if (!this.calendarEl) return
+    this._pickerEntryYear = this.currentYear
+    this._pickerEntryMonth = this.currentMonth
     const monthList = this.calendarEl.querySelector<HTMLElement>('.MonthList')!
     const yearList = this.calendarEl.querySelector<HTMLElement>('.YearList')!
     const pickerGroup = this.calendarEl.querySelector<HTMLElement>('.YearMonthPicker')!
@@ -860,6 +864,7 @@ class DateField {
     this.calendarEl.dataset.view = 'calendar'
     monthYearTrigger.setAttribute('aria-expanded', 'false')
     monthYearTrigger.setAttribute('aria-label', this.t.openPicker)
+    this._renderMonth()
     monthYearTrigger.focus()
   }
 
@@ -886,7 +891,6 @@ class DateField {
       this._syncingFromCustom = false
     }
     this._closePicker()
-    this._renderMonth()
   }
 
   private _confirmPickerYear(year: number): void {
@@ -1172,6 +1176,8 @@ class DateField {
 
     if (e.key === 'Escape') {
       e.preventDefault()
+      this.currentYear = this._pickerEntryYear
+      this.currentMonth = this._pickerEntryMonth
       this._closePicker()
       return
     }
