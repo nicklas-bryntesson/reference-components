@@ -46,14 +46,18 @@ function canonical(id: string, label: string, rootAttrs: string, inputAttrs: str
         <div class="DateFieldCalendar" role="dialog" aria-modal="true">
           <span class="CalendarSurface" aria-hidden="true"><span class="BackdropBlur"></span></span>
           <div class="CalendarHeader">
-            <button type="button">&#8249;</button>
-            <span aria-live="polite" aria-atomic="true"></span>
-            <button type="button">&#8250;</button>
+            <button type="button" class="PrevMonth">&#8249;</button>
+            <button type="button" class="MonthYearTrigger" aria-haspopup="listbox" aria-expanded="false"></button>
+            <button type="button" class="NextMonth">&#8250;</button>
           </div>
           <table class="Grid" role="grid">
             <thead><tr role="row"><th scope="col"></th><th scope="col"></th><th scope="col"></th><th scope="col"></th><th scope="col"></th><th scope="col"></th><th scope="col"></th></tr></thead>
             <tbody></tbody>
           </table>
+          <div class="YearMonthPicker" role="group">
+            <ul role="listbox" class="MonthList" tabindex="0"></ul>
+            <ul role="listbox" class="YearList" tabindex="0"></ul>
+          </div>
           <div class="CalendarFooter">
             <button type="button" class="CalendarFooterClear"></button>
             <button type="button" class="CalendarFooterToday"></button>
