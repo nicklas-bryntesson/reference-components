@@ -1,5 +1,6 @@
 .DateField {
   --df-calendar-border-color: transparent;
+  --df-calendar-link-color: #0066cc;
   --df-calendar-bg: rgba(255, 255, 255, 0.8);
   --df-calendar-radius: 1rem;
   --df-calendar-backdrop: blur(4px);

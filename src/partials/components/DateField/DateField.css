@@ -23,6 +23,7 @@
   --df-calendar-radius: 4px;
   --df-calendar-shadow: 0 4px 12px rgba(0,0,0,0.15);
   --df-calendar-backdrop: none;
+  --df-calendar-link-color: LinkText;
   /* Internal */
   --_df-rail-max-width: calc(var(--df-site-max-width) + var(--df-calendar-width));
   --_df-arrow-size: 0.75rem;
@@ -266,7 +267,7 @@
       background: none;
       border: none;
       cursor: pointer;
-      color: LinkText;
+      color: var(--df-calendar-link-color);
       font: inherit;
       padding: 0.25rem 0.5rem;
       border-radius: 2px;
@@ -288,11 +289,17 @@
 .DateFieldCalendar .CalendarSurface {
   position: absolute;
   inset: 0;
-  background: var(--df-calendar-bg);
-  backdrop-filter: var(--df-calendar-backdrop);
+  overflow: hidden;
   border-radius: inherit;
   z-index: -1;
   pointer-events: none;
+}
+
+.DateFieldCalendar .CalendarSurface .BackdropBlur {
+  position: absolute;
+  inset: -20px;
+  background: var(--df-calendar-bg);
+  backdrop-filter: var(--df-calendar-backdrop);
 }
 
 /* ── Initialisation gate ───────────────────────────────────────────────── */
