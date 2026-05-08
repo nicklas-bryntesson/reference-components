@@ -12,5 +12,7 @@
   "announceSelected": "Selected date:",
   "dateField":        "date field",
   "clearButton":      "Clear",
-  "todayButton":      "Today"
+  "todayButton":      "Today",
+  "openPicker":       "Choose month and year",
+  "closePicker":      "Close month and year picker"
 }

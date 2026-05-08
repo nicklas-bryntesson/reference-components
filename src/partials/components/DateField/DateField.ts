@@ -21,6 +21,8 @@ interface TranslationStrings {
   dateField: string
   clearButton: string
   todayButton: string
+  openPicker: string
+  closePicker: string
 }
 
 interface SegmentHandlers {
@@ -134,6 +136,7 @@ class DateField {
       today: 'today', selected: 'selected', notAvailable: 'not available',
       announceSelected: 'Selected date:', dateField: 'date field',
       clearButton: 'Clear', todayButton: 'Today',
+      openPicker: 'Choose month and year', closePicker: 'Close month and year picker',
     }
   }
 

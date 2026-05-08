@@ -12,5 +12,7 @@
   "announceSelected": "Valt datum:",
   "dateField":        "datumfält",
   "clearButton":      "Rensa",
-  "todayButton":      "I dag"
+  "todayButton":      "I dag",
+  "openPicker":       "Välj månad och år",
+  "closePicker":      "Stäng månads- och årsväljaren"
 }
