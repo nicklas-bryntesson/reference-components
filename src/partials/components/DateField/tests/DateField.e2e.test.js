@@ -141,3 +141,89 @@ test('data-direction is set on root when calendar opens', async ({ page }) => {
   expect(['top', 'bottom']).toContain(direction)
   await page.keyboard.press('Escape')
 })
+
+// ── Month/Year Picker ─────────────────────────────────────────────────────────
+
+test('MonthYearTrigger opens picker on click', async ({ page }) => {
+  await page.locator('[data-id="birthdate"] .Trigger').click()
+  await page.locator('[data-id="birthdate"] .MonthYearTrigger').click()
+  const calendar = page.locator('.DateFieldCalendar')
+  await expect(calendar).toHaveAttribute('data-view', 'picker')
+})
+
+test('MonthYearTrigger has aria-expanded true when picker open', async ({ page }) => {
+  await page.locator('[data-id="birthdate"] .Trigger').click()
+  await page.locator('[data-id="birthdate"] .MonthYearTrigger').click()
+  const trigger = page.locator('.MonthYearTrigger')
+  await expect(trigger).toHaveAttribute('aria-expanded', 'true')
+})
+
+test('MonthList receives focus when picker opens', async ({ page }) => {
+  await page.locator('[data-id="birthdate"] .Trigger').click()
+  await page.locator('[data-id="birthdate"] .MonthYearTrigger').click()
+  await expect(page.locator('.MonthList')).toBeFocused()
+})
+
+test('ArrowDown moves aria-activedescendant in MonthList', async ({ page }) => {
+  await page.locator('[data-id="birthdate"] .Trigger').click()
+  await page.locator('[data-id="birthdate"] .MonthYearTrigger').click()
+  const monthList = page.locator('.MonthList')
+  const initialId = await monthList.getAttribute('aria-activedescendant')
+  await page.keyboard.press('ArrowDown')
+  const nextId = await monthList.getAttribute('aria-activedescendant')
+  expect(nextId).not.toBe(initialId)
+})
+
+test('Tab moves focus from MonthList to YearList', async ({ page }) => {
+  await page.locator('[data-id="birthdate"] .Trigger').click()
+  await page.locator('[data-id="birthdate"] .MonthYearTrigger').click()
+  await page.keyboard.press('Tab')
+  await expect(page.locator('.YearList')).toBeFocused()
+})
+
+test('Enter on month option returns to calendar view', async ({ page }) => {
+  await page.locator('[data-id="birthdate"] .Trigger').click()
+  await page.locator('[data-id="birthdate"] .MonthYearTrigger').click()
+  await page.keyboard.press('Enter')
+  const calendar = page.locator('.DateFieldCalendar')
+  await expect(calendar).not.toHaveAttribute('data-view', 'picker')
+})
+
+test('Escape from picker returns to calendar view', async ({ page }) => {
+  await page.locator('[data-id="birthdate"] .Trigger').click()
+  await page.locator('[data-id="birthdate"] .MonthYearTrigger').click()
+  await page.keyboard.press('Escape')
+  const calendar = page.locator('.DateFieldCalendar')
+  await expect(calendar).not.toHaveAttribute('data-view', 'picker')
+})
+
+test('Escape from picker does not close calendar', async ({ page }) => {
+  await page.locator('[data-id="birthdate"] .Trigger').click()
+  await page.locator('[data-id="birthdate"] .MonthYearTrigger').click()
+  await page.keyboard.press('Escape')
+  await expect(page.locator('.DateFieldCalendar')).toBeVisible()
+})
+
+test('axe: no violations in picker view', async ({ page }) => {
+  await page.locator('[data-id="birthdate"] .Trigger').click()
+  await page.locator('[data-id="birthdate"] .MonthYearTrigger').click()
+  await checkA11y(page)
+})
+
+test('Home jumps to first enabled month option', async ({ page }) => {
+  await page.locator('[data-id="birthdate"] .Trigger').click()
+  await page.locator('[data-id="birthdate"] .MonthYearTrigger').click()
+  await page.keyboard.press('Home')
+  const monthList = page.locator('.MonthList')
+  const activeId = await monthList.getAttribute('aria-activedescendant')
+  expect(activeId).toMatch(/-month-0$/)
+})
+
+test('End jumps to last enabled month option', async ({ page }) => {
+  await page.locator('[data-id="birthdate"] .Trigger').click()
+  await page.locator('[data-id="birthdate"] .MonthYearTrigger').click()
+  await page.keyboard.press('End')
+  const monthList = page.locator('.MonthList')
+  const activeId = await monthList.getAttribute('aria-activedescendant')
+  expect(activeId).toMatch(/-month-11$/)
+})
