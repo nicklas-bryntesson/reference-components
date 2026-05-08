@@ -801,6 +801,8 @@ class DateField {
     this.currentMonth += direction
     if (this.currentMonth > 11) { this.currentMonth = 0; this.currentYear++ }
     if (this.currentMonth < 0) { this.currentMonth = 11; this.currentYear-- }
+    const refDay = this.selectedDate ? this.selectedDate.getDate() : new Date().getDate()
+    this._applyDate(new Date(this.currentYear, this.currentMonth, clampDayToMonth(this.currentYear, this.currentMonth, refDay)))
     this._renderMonth()
   }
 
@@ -882,14 +884,8 @@ class DateField {
 
   private _confirmPickerMonth(month: number): void {
     this.currentMonth = month
-    if (this.selectedDate) {
-      const clamped = clampDayToMonth(this.currentYear, this.currentMonth, this.selectedDate.getDate())
-      this.selectedDate = new Date(this.currentYear, this.currentMonth, clamped)
-      this._syncingFromCustom = true
-      this.native.value = formatISO(this.selectedDate)
-      this.native.dispatchEvent(new Event('change', { bubbles: true }))
-      this._syncingFromCustom = false
-    }
+    const refDay = this.selectedDate ? this.selectedDate.getDate() : new Date().getDate()
+    this._applyDate(new Date(this.currentYear, this.currentMonth, clampDayToMonth(this.currentYear, this.currentMonth, refDay)))
     this._closePicker()
   }
 
@@ -1056,21 +1052,23 @@ class DateField {
     target?.focus()
   }
 
-  _selectDate(date: Date): void {
+  private _applyDate(date: Date): void {
     this.selectedDate = date
-
     this._syncingFromCustom = true
     this.native.value = formatISO(date)
     this.native.dispatchEvent(new Event('change', { bubbles: true }))
     this._syncingFromCustom = false
-
     this._setSegmentValue(this._getSegmentEl('day')!, date.getDate())
     this._setSegmentValue(this._getSegmentEl('month')!, date.getMonth() + 1)
     this._setSegmentValue(this._getSegmentEl('year')!, date.getFullYear())
-
     const label = date.toLocaleDateString(this.locale, { dateStyle: 'long' })
     this.announce.textContent = `${this.t.announceSelected} ${label}`
+    const clearBtn = this.calendarEl?.querySelector<HTMLButtonElement>('.CalendarFooterClear')
+    if (clearBtn) clearBtn.disabled = false
+  }
 
+  _selectDate(date: Date): void {
+    this._applyDate(date)
     this._closeCalendar()
   }
 
