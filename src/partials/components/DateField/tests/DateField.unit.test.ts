@@ -8,6 +8,7 @@ import {
   getWeekdayNames,
   getMonthName,
   getSegmentOrder,
+  clampDayToMonth,
 } from '../DateField'
 import DateField from '../DateField'
 
@@ -64,6 +65,24 @@ describe('isDayDisabled', () => {
   })
   it('allows all dates when no min/max', () => {
     expect(isDayDisabled(new Date(2026, 0, 1), null, null)).toBe(false)
+  })
+})
+
+describe('clampDayToMonth', () => {
+  it('returns same day when day is within month', () => {
+    expect(clampDayToMonth(2026, 3, 15)).toBe(15) // April has 30 days
+  })
+  it('clamps march 31 to feb 28 in non-leap year', () => {
+    expect(clampDayToMonth(2026, 1, 31)).toBe(28)
+  })
+  it('clamps march 31 to feb 29 in leap year 2024', () => {
+    expect(clampDayToMonth(2024, 1, 31)).toBe(29)
+  })
+  it('clamps jan 31 to apr 30', () => {
+    expect(clampDayToMonth(2026, 3, 31)).toBe(30)
+  })
+  it('returns 28 for day 28 in february non-leap', () => {
+    expect(clampDayToMonth(2026, 1, 28)).toBe(28)
   })
 })
 

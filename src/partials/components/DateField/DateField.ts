@@ -44,6 +44,10 @@ export function getDaysInMonth(year: number, month: number): number {
   return new Date(year, month + 1, 0).getDate()
 }
 
+export function clampDayToMonth(year: number, month: number, day: number): number {
+  return Math.min(day, getDaysInMonth(year, month))
+}
+
 export function getFirstWeekdayOfMonth(year: number, month: number): number {
   const day = new Date(year, month, 1).getDay()
   return (day + 6) % 7 // 0=Mon, 6=Sun
