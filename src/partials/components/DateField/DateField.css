@@ -316,12 +316,37 @@
   padding: 0;
   overflow-y: auto;
   flex: 1;
+  outline: none;
 }
 
-.DateFieldCalendar .MonthList [role="option"]:focus-visible,
-.DateFieldCalendar .YearList [role="option"]:focus-visible {
+.DateFieldCalendar .MonthList [role="option"],
+.DateFieldCalendar .YearList [role="option"] {
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
+}
+
+.DateFieldCalendar .MonthList [role="option"][aria-selected="true"],
+.DateFieldCalendar .YearList [role="option"][aria-selected="true"] {
+  font-weight: bold;
   outline: 2px solid;
-  outline-offset: 1px;
+  outline-offset: -2px;
+}
+
+.DateFieldCalendar .MonthList[data-focused="true"] [role="option"][aria-selected="true"],
+.DateFieldCalendar .YearList[data-focused="true"] [role="option"][aria-selected="true"] {
+  background: SelectedItem;
+  color: SelectedItemText;
+  outline: none;
+}
+
+.DateFieldCalendar .MonthList [role="option"][aria-disabled="true"],
+.DateFieldCalendar .YearList [role="option"][aria-disabled="true"] {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.DateFieldCalendar .MonthYearTrigger::after {
+  content: ' ▾';
 }
 
 /* ── Calendar surface (backdrop-filter layer) ──────────────────────────── */

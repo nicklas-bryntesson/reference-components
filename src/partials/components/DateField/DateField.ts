@@ -668,6 +668,20 @@ class DateField {
     monthYearTrigger.setAttribute('aria-label', this.t.openPicker)
     monthYearTrigger.addEventListener('click', () => this._openPicker())
 
+    // One-time picker setup: prevent mousedown from blurring list before click fires,
+    // and track focus state for selected-item highlight colour
+    const pickerGroup = this.calendarEl.querySelector<HTMLElement>('.YearMonthPicker')
+    const monthList = this.calendarEl.querySelector<HTMLElement>('.MonthList')
+    const yearList = this.calendarEl.querySelector<HTMLElement>('.YearList')
+    if (pickerGroup && monthList && yearList) {
+      pickerGroup.addEventListener('mousedown', (e) => e.preventDefault())
+      const setFocused = (el: HTMLElement, val: boolean) => { el.dataset.focused = String(val) }
+      monthList.addEventListener('focus', () => setFocused(monthList, true))
+      monthList.addEventListener('blur', () => setFocused(monthList, false))
+      yearList.addEventListener('focus', () => setFocused(yearList, true))
+      yearList.addEventListener('blur', () => setFocused(yearList, false))
+    }
+
     prevBtn.setAttribute('aria-label', this.t.prevMonth)
     nextBtn.setAttribute('aria-label', this.t.nextMonth)
     prevBtn.addEventListener('click', () => this._navigateMonth(-1))
