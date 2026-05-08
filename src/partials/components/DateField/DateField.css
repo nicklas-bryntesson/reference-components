@@ -287,12 +287,20 @@
 /* ── Calendar surface (backdrop-filter layer) ──────────────────────────── */
 .DateFieldCalendar .CalendarSurface {
   position: absolute;
-  inset: 0;
+  --_bloom: 8px;
+  inset: calc(var(--_bloom) * -1);
   background: var(--df-calendar-bg);
   backdrop-filter: var(--df-calendar-backdrop);
   border-radius: inherit;
   z-index: -1;
   pointer-events: none;
+  mask-image:
+    linear-gradient(to right,  transparent, black var(--_bloom)),
+    linear-gradient(to left,   transparent, black var(--_bloom)),
+    linear-gradient(to bottom, transparent, black var(--_bloom)),
+    linear-gradient(to top,    transparent, black var(--_bloom));
+  mask-composite: intersect;
+  -webkit-mask-composite: destination-in;
 }
 
 /* ── Initialisation gate ───────────────────────────────────────────────── */
