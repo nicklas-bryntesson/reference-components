@@ -292,6 +292,8 @@
 
 .DateFieldCalendar[data-view="picker"] .YearMonthPicker {
   display: flex;
+  overflow: hidden;
+  height: 16rem;
 }
 
 .DateFieldCalendar[data-view="picker"] .Grid {
@@ -312,6 +314,8 @@
   list-style: none;
   margin: 0;
   padding: 0;
+  overflow-y: auto;
+  flex: 1;
 }
 
 .DateFieldCalendar .MonthList [role="option"]:focus-visible,
