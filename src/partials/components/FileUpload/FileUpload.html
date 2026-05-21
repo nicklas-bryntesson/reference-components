@@ -1,0 +1,117 @@
+<section class="kitchensink-section">
+
+  <h2>FileUpload</h2>
+
+  <!-- ─── Interaction states — empty ──────────────────────────────────── -->
+  <h3>Interaction states — empty</h3>
+  <table class="state-table">
+    <thead>
+      <tr>
+        <th></th>
+        <th scope="col">default</th>
+        <th scope="col">hover</th>
+        <th scope="col">focus</th>
+        <th scope="col">active</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th scope="row">empty</th>
+        <td>{{> components/FileUpload/states/_empty}}</td>
+        <td>{{> components/FileUpload/states/_empty-hover}}</td>
+        <td>{{> components/FileUpload/states/_empty-focus}}</td>
+        <td>{{> components/FileUpload/states/_empty-active}}</td>
+      </tr>
+      <tr>
+        <th scope="row">with files</th>
+        <td>{{> components/FileUpload/states/_with-files}}</td>
+        <td>{{> components/FileUpload/states/_with-files-hover}}</td>
+        <td>{{> components/FileUpload/states/_with-files-focus}}</td>
+        <td>{{> components/FileUpload/states/_with-files-active}}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- ─── Disabled ────────────────────────────────────────────────────── -->
+  <h3>Disabled</h3>
+  <table class="state-table">
+    <tbody>
+      <tr>
+        <th scope="row">empty</th>
+        <td>{{> components/FileUpload/states/_disabled-empty}}</td>
+      </tr>
+      <tr>
+        <th scope="row">with files</th>
+        <td>{{> components/FileUpload/states/_disabled-with-files}}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- ─── Validation states ───────────────────────────────────────────── -->
+  <h3>Validation</h3>
+  <table class="state-table">
+    <tbody>
+      <tr>
+        <th scope="row">invalid type</th>
+        <td>{{> components/FileUpload/states/_invalid-type}}</td>
+      </tr>
+      <tr>
+        <th scope="row">invalid size</th>
+        <td>{{> components/FileUpload/states/_invalid-size}}</td>
+      </tr>
+      <tr>
+        <th scope="row">mixed</th>
+        <td>{{> components/FileUpload/states/_invalid-mixed}}</td>
+      </tr>
+      <tr>
+        <th scope="row">required + empty</th>
+        <td>{{> components/FileUpload/states/_required-empty}}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- ─── Variants ────────────────────────────────────────────────────── -->
+  <h3>Variants</h3>
+  <table class="state-table">
+    <tbody>
+      <tr>
+        <th scope="row">multiple</th>
+        <td>{{> components/FileUpload/states/_multiple}}</td>
+      </tr>
+      <tr>
+        <th scope="row">drop-zone</th>
+        <td>{{> components/FileUpload/states/_drop-zone}}</td>
+      </tr>
+      <tr>
+        <th scope="row">drop-zone dragging</th>
+        <td>{{> components/FileUpload/states/_drop-zone-dragging}}</td>
+      </tr>
+      <tr>
+        <th scope="row">server files</th>
+        <td>{{> components/FileUpload/states/_server-files}}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- ─── Live demo (e2e test target) ─────────────────────────────────── -->
+  <h3>Live demo</h3>
+  <div>
+    {{> components/FileUpload/states/_live}}
+  </div>
+
+  <!-- ─── Native reference ────────────────────────────────────────────── -->
+  <h3>Native reference</h3>
+  <table class="state-table">
+    <tbody>
+      <tr>
+        <th scope="row">single</th>
+        <td>{{> components/FileUpload/states/_native-single}}</td>
+      </tr>
+      <tr>
+        <th scope="row">multiple</th>
+        <td>{{> components/FileUpload/states/_native-multiple}}</td>
+      </tr>
+    </tbody>
+  </table>
+
+</section>
