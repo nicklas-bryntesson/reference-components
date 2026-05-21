@@ -16,7 +16,7 @@ export interface FileEntry {
   status: FileStatus
 }
 
-interface TranslationStrings {
+export interface TranslationStrings {
   labelTrigger: string
   labelTriggerMultiple: string
   labelRemove: string
