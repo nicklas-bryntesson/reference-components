@@ -260,11 +260,62 @@ class FileUpload {
     this.trigger.textContent = isMultiple ? this._t.labelTriggerMultiple : this._t.labelTrigger
   }
 
+  private _handleChange = (e: Event): void => {
+    const newFiles = (e.target as HTMLInputElement).files
+    if (!newFiles || newFiles.length === 0) return
+
+    const newEntries: FileEntry[] = Array.from(newFiles).map(file => {
+      const raw: FileEntry = {
+        id: generateId(),
+        source: 'user',
+        file,
+        ref: null,
+        name: file.name,
+        size: file.size,
+        type: file.type,
+        status: 'valid',
+      }
+      return this._validateEntry(raw)
+    })
+
+    this._entries.push(...newEntries)
+    this._rebuildFileInput()
+    this._appendEntries(newEntries)
+  }
+
+  private _handleTriggerClick = (): void => {
+    this.input.click()
+  }
+
+  private _rebuildFileInput(): void {
+    const dt = new DataTransfer()
+    for (const entry of this._entries) {
+      if (entry.source === 'user' && entry.status === 'valid' && entry.file) {
+        dt.items.add(entry.file)
+      }
+    }
+    try {
+      this.input.files = dt.files
+    } catch {
+      // Some environments (e.g. jsdom) don't allow direct assignment to input.files
+    }
+  }
+
+  private _appendEntries(entries: FileEntry[]): void {
+    for (const entry of entries) {
+      this.list.appendChild(this._renderItem(entry))
+    }
+    this._updateRootState()
+  }
+
   private _bindEvents(): void {
-    // stub — filled in Task 4
+    this.input.addEventListener('change', this._handleChange)
+    this.trigger.addEventListener('click', this._handleTriggerClick)
   }
 
   destroy(): void {
+    this.input.removeEventListener('change', this._handleChange)
+    this.trigger.removeEventListener('click', this._handleTriggerClick)
     delete this.root.__fileUploadInstance
   }
 }
