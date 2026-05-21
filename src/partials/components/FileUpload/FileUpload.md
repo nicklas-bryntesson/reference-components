@@ -2,6 +2,34 @@
 
 Custom accessible file upload component wrapping a hidden native `input[type=file]`.
 
+## Contract
+
+```html
+<div
+  class="FileUpload"
+  data-component="FileUpload"
+  role="group"
+  aria-labelledby="LABEL_ID"
+>
+  <span id="LABEL_ID" class="FileUpload-label">Label text</span>
+  <input
+    class="FileUpload-input"
+    type="file"
+    aria-hidden="true"
+    tabindex="-1"
+  >
+  <ul
+    class="FileUpload-list"
+    aria-live="polite"
+    aria-relevant="additions removals"
+    aria-label="Selected files"
+  ></ul>
+  <button type="button" class="FileUpload-trigger">Add file</button>
+</div>
+```
+
+`LABEL_ID` must be unique on the page. The `aria-labelledby` value must match the `id` of the label element.
+
 ## Usage
 
 ```html

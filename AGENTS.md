@@ -22,7 +22,7 @@ Follow these steps to implement a component:
 | Component | Contract | Tests | Maturity |
 |-----------|----------|-------|----------|
 | DateField | — | `src/partials/components/DateField/tests/` | 🚧 stub — DateField.md not yet written |
-| FileUpload | `src/partials/components/FileUpload/FileUpload.md` | `src/partials/components/FileUpload/tests/` | ⚠ docs partial — Contract section pending |
+| FileUpload | `src/partials/components/FileUpload/FileUpload.md` | `src/partials/components/FileUpload/tests/` | ✅ complete |
 | ToggleTip | `src/partials/components/ToggleTip/ToggleTip.md` | `src/partials/components/ToggleTip/tests/` | ⚠ docs partial — Contract section pending |
 | Button | — | — | 🚧 stub |
 | Combobox | — | — | 🚧 stub |
