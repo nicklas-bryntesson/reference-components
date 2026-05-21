@@ -189,6 +189,40 @@ describe('FileUpload bootstrap from data-initial-files', () => {
   })
 })
 
+describe('FileUpload static pre-rendered items', () => {
+  it('preserves pre-rendered list items when there is no data source on init', () => {
+    const el = createFileUploadEl()
+    el.querySelector('.FileUpload-list')!.innerHTML = `
+      <li class="FileUpload-item" data-status="valid" data-entry-id="static-1">
+        <span class="FileUpload-item-name">report.pdf</span>
+        <span class="FileUpload-item-size">200 KB</span>
+        <button type="button" class="FileUpload-item-remove" aria-label="Remove report.pdf">×</button>
+      </li>`
+    new FileUpload(el)
+    expect(el.querySelectorAll('.FileUpload-item')).toHaveLength(1)
+    expect(el.querySelector('.FileUpload-item-name')!.textContent).toBe('report.pdf')
+    el.remove()
+  })
+
+  it('does not preserve pre-rendered items when data-initial-files is present', () => {
+    const el = createFileUploadEl({
+      rootAttrs: {
+        'data-initial-files': JSON.stringify([
+          { name: 'server.pdf', size: 100_000, type: 'application/pdf', ref: 'xyz' },
+        ]),
+      },
+    })
+    el.querySelector('.FileUpload-list')!.innerHTML = `
+      <li class="FileUpload-item" data-status="valid" data-entry-id="old-static">
+        <span class="FileUpload-item-name">old.pdf</span>
+      </li>`
+    new FileUpload(el)
+    expect(el.querySelectorAll('.FileUpload-item')).toHaveLength(1)
+    expect(el.querySelector('.FileUpload-item-name')!.textContent).toBe('server.pdf')
+    el.remove()
+  })
+})
+
 describe('FileUpload add files', () => {
   it('adds a valid file to the list on change', () => {
     const el = createFileUploadEl()
