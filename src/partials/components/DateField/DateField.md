@@ -21,7 +21,7 @@ An accessible date input that renders editable day, month, and year segments wit
       <button
         type="button"
         class="Trigger"
-        aria-label="Öppna kalender"
+        aria-label="Open calendar"
         aria-expanded="false"
         aria-haspopup="dialog"
       >
@@ -66,7 +66,7 @@ An accessible date input that renders editable day, month, and year segments wit
 </div>
 ```
 
-`FIELD_ID` must be unique on the page and must match both `data-id` and the `<label for>`. `data-locale` controls segment labels and calendar month/weekday names. `data-min` and `data-max` define the selectable date range (ISO 8601). JS injects the segment spans into `.Segments` and clones the calendar dialog from the `<template>` into `.slideContainer` — do not author the segment spans or the cloned calendar outside the template. The SVG icon, the `<template>` structure, and its contents are all authored markup.
+`FIELD_ID` must be unique on the page and must match both `data-id` and the `<label for>`. `data-locale` controls segment labels and calendar month/weekday names. `data-min` and `data-max` define the selectable date range (ISO 8601). JS injects the segment spans into `.Segments` and clones the calendar dialog from the `<template>` into `.slideContainer` — do not author the segment spans or the cloned calendar outside the template. The SVG icon, the `<template>` structure, and its contents are all authored markup. The `aria-label` on `.Trigger` is a placeholder; JS overwrites it with a localised string derived from `data-locale` — port it to your translation system rather than hardcoding a value.
 
 ## Behaviour
 

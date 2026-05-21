@@ -12,7 +12,7 @@ Follow these steps to implement a component:
 
 1. **Find the component** in the registry below.
 2. **Read its `.md` file** — the `## Contract` section defines the exact HTML structure the browser requires.
-3. **Read the `## Behaviour` section** — this is what the JavaScript must do, expressed as observable state changes on `data-*` attributes.
+3. **Read the behaviour section** — look for `## Behaviour` (DateField) or equivalent narrative sections in older docs. This is what the JavaScript must do, expressed as observable state changes on `data-*` attributes.
 4. **Read the `## Accessibility` section** — these are non-negotiable ARIA requirements.
 5. **Check the test files** — they are the proof. If your implementation passes the same behavioural assertions, it is correct.
 6. **Port the behaviour** to whatever your stack provides. Do not copy the TypeScript class — port the logic.
@@ -33,7 +33,7 @@ Follow these steps to implement a component:
 Every component `.md` file follows a standard structure:
 
 - **`## Contract`** — the minimum HTML structure a browser requires. This is what your server, template, or component must render. Nothing more is required; nothing less will work.
-- **`## Behaviour`** — what JS does, expressed as: event → observable outcome on `data-*` attributes or DOM changes. No implementation details, no code snippets.
+- **`## Behaviour`** — what JS does, expressed as: event → observable outcome on `data-*` attributes or DOM changes. No implementation details, no code snippets. Present in DateField; older components describe behaviour inline under their usage sections.
 - **`## Accessibility`** — ARIA roles, properties, live regions, and focus management. These are requirements, not suggestions.
-- **`## Attributes`** — the full public API: input attributes (configure the component), state attributes (set by JS, read by CSS and tests).
+- **`## Attributes`** — the full public API: input attributes (configure the component), state attributes (set by JS, read by CSS and tests). Section name may vary in older docs (`## HTML Authoring API` in ToggleTip).
 - **`## Non-goals`** — explicit scope boundaries. What this component deliberately does not do.
