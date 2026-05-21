@@ -25,12 +25,17 @@ An accessible date input that renders editable day, month, and year segments wit
         aria-expanded="false"
         aria-haspopup="dialog"
       >
-        <!-- calendar icon (SVG) injected by JS -->
+        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+          <rect x="3" y="4" width="18" height="18" rx="2"/>
+          <line x1="16" y1="2" x2="16" y2="6"/>
+          <line x1="8" y1="2" x2="8" y2="6"/>
+          <line x1="3" y1="10" x2="21" y2="10"/>
+        </svg>
       </button>
     </div>
     <div class="slideContainer">
       <template data-template="datefield-calendar">
-        <!-- calendar dialog injected by JS -->
+        <!-- calendar dialog structure — see DateField.generate.ts canonical() for full markup -->
       </template>
     </div>
   </div>
@@ -38,13 +43,13 @@ An accessible date input that renders editable day, month, and year segments wit
 </div>
 ```
 
-`FIELD_ID` must be unique on the page and must match both `data-id` and the `<label for>`. `data-locale` controls segment labels and calendar month/weekday names. `data-min` and `data-max` define the selectable date range (ISO 8601). JS injects the segment spans, the calendar SVG icon, and the full calendar dialog — do not author these.
+`FIELD_ID` must be unique on the page and must match both `data-id` and the `<label for>`. `data-locale` controls segment labels and calendar month/weekday names. `data-min` and `data-max` define the selectable date range (ISO 8601). JS injects the segment spans into `.Segments` and clones the full calendar dialog from the `<template>` into `.slideContainer` — do not author these. The SVG icon and `<template>` content are authored markup.
 
 ## Behaviour
 
 All observable outcomes are state changes on `data-*` attributes or DOM changes:
 
-- **Init:** JS reads `data-id`, `data-name`, `data-locale`, `data-min`, `data-max` from the root. It injects three editable segment spans (day, month, year) into `.Segments`, inserts the calendar SVG into `.Trigger`, and clones the calendar dialog from the `<template>` into `.slideContainer`.
+- **Init:** JS reads `data-id`, `data-name`, `data-locale`, `data-min`, `data-max` from the root. It injects three editable segment spans (day, month, year) into `.Segments` and clones the calendar dialog from the `<template>` into `.slideContainer`.
 - **Segment editing (keyboard):** Arrow Up/Down increments/decrements the focused segment value. Left/Right moves focus between segments. Digit keys fill the segment; when the segment is complete it advances focus to the next. Delete/Backspace clears the segment.
 - **Segment editing (commit):** When all three segments are valid, JS writes the ISO date to the native input (`input.value = "YYYY-MM-DD"`) and fires a native `change` event.
 - **Calendar open:** Clicking `.Trigger` sets `aria-expanded="true"` on the trigger and makes the calendar dialog visible. The calendar renders the month grid for the current or selected date.
