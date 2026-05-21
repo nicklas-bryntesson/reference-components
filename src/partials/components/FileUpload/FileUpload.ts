@@ -132,7 +132,12 @@ class FileUpload {
   private _init(): void {
     this._bootstrapFromInput()
     this._bootstrapFromDataAttribute()
-    this._renderList()
+    // Only re-render when we have entries from a data source (input.files or
+    // data-initial-files). When entries is empty, preserve any pre-rendered
+    // static markup — kitchensink states use this for visual-only states.
+    if (this._entries.length > 0) {
+      this._renderList()
+    }
     this._updateTriggerText()
     this._bindEvents()
     this.root.setAttribute('data-initialized', '')
