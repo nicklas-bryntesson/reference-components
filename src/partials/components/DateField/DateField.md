@@ -35,7 +35,30 @@ An accessible date input that renders editable day, month, and year segments wit
     </div>
     <div class="slideContainer">
       <template data-template="datefield-calendar">
-        <!-- calendar dialog structure — see DateField.generate.ts canonical() for full markup -->
+        <div class="DateFieldCalendar" role="dialog" aria-modal="true">
+          <span class="CalendarSurface" aria-hidden="true"><span class="BackdropBlur"></span></span>
+          <div class="CalendarHeader">
+            <button type="button" class="PrevMonth">&#8249;</button>
+            <button type="button" class="MonthYearTrigger" aria-haspopup="listbox" aria-expanded="false"></button>
+            <button type="button" class="NextMonth">&#8250;</button>
+          </div>
+          <table class="Grid" role="grid">
+            <thead><tr role="row">
+              <th scope="col"></th><th scope="col"></th><th scope="col"></th>
+              <th scope="col"></th><th scope="col"></th><th scope="col"></th><th scope="col"></th>
+            </tr></thead>
+            <tbody></tbody>
+          </table>
+          <div class="YearMonthPicker" role="group">
+            <ul role="listbox" class="MonthList" tabindex="0"></ul>
+            <ul role="listbox" class="YearList" tabindex="0"></ul>
+          </div>
+          <div class="CalendarFooter">
+            <button type="button" class="CalendarFooterClear"></button>
+            <button type="button" class="CalendarFooterToday"></button>
+          </div>
+          <div class="arrow"></div>
+        </div>
       </template>
     </div>
   </div>
@@ -43,7 +66,7 @@ An accessible date input that renders editable day, month, and year segments wit
 </div>
 ```
 
-`FIELD_ID` must be unique on the page and must match both `data-id` and the `<label for>`. `data-locale` controls segment labels and calendar month/weekday names. `data-min` and `data-max` define the selectable date range (ISO 8601). JS injects the segment spans into `.Segments` and clones the full calendar dialog from the `<template>` into `.slideContainer` — do not author these. The SVG icon and `<template>` content are authored markup.
+`FIELD_ID` must be unique on the page and must match both `data-id` and the `<label for>`. `data-locale` controls segment labels and calendar month/weekday names. `data-min` and `data-max` define the selectable date range (ISO 8601). JS injects the segment spans into `.Segments` and clones the calendar dialog from the `<template>` into `.slideContainer` — do not author the segment spans or the cloned calendar outside the template. The SVG icon, the `<template>` structure, and its contents are all authored markup.
 
 ## Behaviour
 
@@ -83,6 +106,7 @@ All observable outcomes are state changes on `data-*` attributes or DOM changes:
 | `data-max` | ISO 8601 date | yes | Latest selectable date (`YYYY-MM-DD`) |
 | `data-disabled` | boolean | no | Disables all interaction; renders CSS disabled state |
 | `data-invalid` | boolean | no | Renders CSS error state; does not block interaction |
+| `data-test-state` | `"hover"` / `"focus"` / `"active"` | no | Kitchensink / visual-test only — simulates CSS pseudo-state without user interaction |
 
 ### On native input (authored)
 
