@@ -2,6 +2,16 @@
 
 An accessible tooltip triggered by a button. The bubble positions itself above the trigger by default, flips below when there is insufficient space, and never overflows the viewport edges.
 
+## Contract
+
+```html
+<toggle-tip icon="info">
+  Content shown inside the bubble.
+</toggle-tip>
+```
+
+The `<toggle-tip>` custom element is the only required authored markup. The JS constructs the trigger button and bubble DOM automatically on initialisation. The `icon` attribute is required; all other attributes are optional. See `## Attributes` for the full list.
+
 ## Dependencies
 
 None. Fully self-contained — no shared utilities, no framework dependencies. Drop the three files (`ToggleTip.js`, `ToggleTip.css`, `ToggleTip.html`) into any project.
