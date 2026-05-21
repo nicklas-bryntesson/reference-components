@@ -188,3 +188,79 @@ describe('FileUpload bootstrap from data-initial-files', () => {
     el.remove()
   })
 })
+
+describe('FileUpload add files', () => {
+  it('adds a valid file to the list on change', () => {
+    const el = createFileUploadEl()
+    new FileUpload(el)
+
+    const file = new File(['data'], 'report.pdf', { type: 'application/pdf' })
+    const input = el.querySelector('.FileUpload-input') as HTMLInputElement
+    const dt = new DataTransfer()
+    dt.items.add(file)
+    Object.defineProperty(input, 'files', { value: dt.files, configurable: true })
+    input.dispatchEvent(new Event('change'))
+
+    const items = el.querySelectorAll('.FileUpload-item')
+    expect(items).toHaveLength(1)
+    expect(items[0].querySelector('.FileUpload-item-name')!.textContent).toBe('report.pdf')
+    expect(items[0].getAttribute('data-status')).toBe('valid')
+    expect(el.hasAttribute('data-has-files')).toBe(true)
+    el.remove()
+  })
+
+  it('marks file as invalid-type when it does not match accept', () => {
+    const el = createFileUploadEl({ inputAttrs: { accept: '.pdf' } })
+    new FileUpload(el)
+
+    const file = new File(['data'], 'image.exe', { type: 'application/x-msdownload' })
+    const input = el.querySelector('.FileUpload-input') as HTMLInputElement
+    const dt = new DataTransfer()
+    dt.items.add(file)
+    Object.defineProperty(input, 'files', { value: dt.files, configurable: true })
+    input.dispatchEvent(new Event('change'))
+
+    const item = el.querySelector('.FileUpload-item')!
+    expect(item.getAttribute('data-status')).toBe('invalid-type')
+    expect(item.querySelector('.FileUpload-item-error')!.textContent).toBe('File type not allowed')
+    expect(el.hasAttribute('data-has-errors')).toBe(true)
+    el.remove()
+  })
+
+  it('marks file as invalid-size when it exceeds data-max-size', () => {
+    const el = createFileUploadEl({ rootAttrs: { 'data-max-size': '1kb' } })
+    new FileUpload(el)
+
+    const file = new File([new Uint8Array(2000)], 'big.pdf', { type: 'application/pdf' })
+    const input = el.querySelector('.FileUpload-input') as HTMLInputElement
+    const dt = new DataTransfer()
+    dt.items.add(file)
+    Object.defineProperty(input, 'files', { value: dt.files, configurable: true })
+    input.dispatchEvent(new Event('change'))
+
+    const item = el.querySelector('.FileUpload-item')!
+    expect(item.getAttribute('data-status')).toBe('invalid-size')
+    expect(item.querySelector('.FileUpload-item-error')!.textContent).toBe('File exceeds maximum size')
+    el.remove()
+  })
+
+  it('appends new files to existing list without removing previous entries', () => {
+    const el = createFileUploadEl({ inputAttrs: { multiple: '' } })
+    new FileUpload(el)
+
+    const input = el.querySelector('.FileUpload-input') as HTMLInputElement
+
+    const dt1 = new DataTransfer()
+    dt1.items.add(new File(['a'], 'first.pdf', { type: 'application/pdf' }))
+    Object.defineProperty(input, 'files', { value: dt1.files, configurable: true })
+    input.dispatchEvent(new Event('change'))
+
+    const dt2 = new DataTransfer()
+    dt2.items.add(new File(['b'], 'second.pdf', { type: 'application/pdf' }))
+    Object.defineProperty(input, 'files', { value: dt2.files, configurable: true })
+    input.dispatchEvent(new Event('change'))
+
+    expect(el.querySelectorAll('.FileUpload-item')).toHaveLength(2)
+    el.remove()
+  })
+})
