@@ -21,8 +21,8 @@ interface StateDefinition {
 
 // ─── Item HTML helpers ────────────────────────────────────────────────────────
 
-const validItem = (name: string, size: string) =>
-  `\n    <li class="FileUpload-item" data-status="valid" data-entry-id="static-1">
+const validItem = (name: string, size: string, id = 'static-1') =>
+  `\n    <li class="FileUpload-item" data-status="valid" data-entry-id="${id}">
       <span class="FileUpload-item-name">${name}</span>
       <span class="FileUpload-item-size">${size}</span>
       <button type="button" class="FileUpload-item-remove" aria-label="Remove ${name}">&#215;</button>
@@ -92,7 +92,7 @@ function canonical(
 
 function attrs(obj: Attrs): string {
   return Object.entries(obj)
-    .map(([k, v]) => (v === '' ? `\n  ${k}` : `\n  ${k}="${v}"`))
+    .map(([k, v]) => (v === '' ? `\n    ${k}` : `\n    ${k}="${v}"`))
     .join('')
 }
 
@@ -118,11 +118,11 @@ const states: StateDefinition[] = [
   // Validation states
   { file: '_invalid-type',     label: 'File', root: { 'data-has-files': '', 'data-has-errors': '' }, input: { accept: '.pdf' },           items: invalidTypeItem('image.exe', '14 KB') },
   { file: '_invalid-size',     label: 'File', root: { 'data-has-files': '', 'data-has-errors': '', 'data-max-size': '5mb' }, input: {}, items: invalidSizeItem('video.mp4', '48 MB') },
-  { file: '_invalid-mixed',    label: 'File', root: { 'data-has-files': '', 'data-has-errors': '' }, input: { accept: '.pdf' },           items: validItem('report.pdf', '200 KB') + invalidTypeItem('image.exe', '14 KB') },
+  { file: '_invalid-mixed',    label: 'File', root: { 'data-has-files': '', 'data-has-errors': '' }, input: { accept: '.pdf' },           items: validItem('report.pdf', '200 KB', 'static-1') + invalidTypeItem('image.exe', '14 KB') },
   { file: '_required-empty',   label: 'File', root: { 'data-required': ''                         }, input: { required: '' },             items: '' },
 
   // Variants
-  { file: '_multiple',            label: 'Files', root: { 'data-has-files': '' }, input: { multiple: '' }, items: validItem('doc1.pdf', '200 KB') + validItem('doc2.pdf', '350 KB'), triggerText: 'Add files' },
+  { file: '_multiple',            label: 'Files', root: { 'data-has-files': '' }, input: { multiple: '' }, items: validItem('doc1.pdf', '200 KB', 'static-1') + validItem('doc2.pdf', '350 KB', 'static-2'), triggerText: 'Add files' },
   { file: '_drop-zone',           label: 'File',  root: { 'data-drop-zone': '' },                      input: {}, items: '' },
   { file: '_drop-zone-dragging',  label: 'File',  root: { 'data-drop-zone': '', 'data-dragging-over': '' }, input: {}, items: '' },
   { file: '_server-files',        label: 'CV',    root: { 'data-has-files': '' },
