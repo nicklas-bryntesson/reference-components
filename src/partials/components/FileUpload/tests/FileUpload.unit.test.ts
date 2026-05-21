@@ -9,19 +9,25 @@ import {
 
 describe('parseMaxSize', () => {
   it('parses mb suffix', () => {
-    expect(parseMaxSize('5mb')).toBe(5 * 1024 * 1024)
+    expect(parseMaxSize('5mb')).toBe(5 * 1_000_000)
   })
   it('parses MB suffix (case-insensitive)', () => {
-    expect(parseMaxSize('5MB')).toBe(5 * 1024 * 1024)
+    expect(parseMaxSize('5MB')).toBe(5 * 1_000_000)
   })
   it('parses kb suffix', () => {
-    expect(parseMaxSize('500kb')).toBe(500 * 1024)
+    expect(parseMaxSize('500kb')).toBe(500 * 1_000)
   })
   it('parses raw bytes string', () => {
     expect(parseMaxSize('2097152')).toBe(2097152)
   })
   it('parses decimal mb', () => {
-    expect(parseMaxSize('1.5mb')).toBe(1.5 * 1024 * 1024)
+    expect(parseMaxSize('1.5mb')).toBe(1.5 * 1_000_000)
+  })
+  it('handles raw decimal bytes', () => {
+    expect(parseMaxSize('5.5')).toBe(5.5)
+  })
+  it('returns 0 for "0"', () => {
+    expect(parseMaxSize('0')).toBe(0)
   })
 })
 
@@ -40,6 +46,9 @@ describe('formatFileSize', () => {
   })
   it('formats exactly 1000 bytes as 1 KB', () => {
     expect(formatFileSize(1000)).toBe('1 KB')
+  })
+  it('formats 0 bytes', () => {
+    expect(formatFileSize(0)).toBe('0 B')
   })
 })
 
@@ -61,6 +70,12 @@ describe('validateAccept', () => {
   })
   it('rejects MIME outside wildcard', () => {
     expect(validateAccept({ name: 'doc.pdf', type: 'application/pdf' }, 'image/*')).toBe(false)
+  })
+  it('returns false for file with no extension when accept has extensions', () => {
+    expect(validateAccept({ name: 'Makefile', type: '' }, '.pdf,.jpg')).toBe(false)
+  })
+  it('returns true for file with no extension when accept is empty', () => {
+    expect(validateAccept({ name: 'Makefile', type: '' }, '')).toBe(true)
   })
 })
 

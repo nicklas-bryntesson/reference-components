@@ -31,9 +31,9 @@ export interface TranslationStrings {
 
 export function parseMaxSize(value: string): number {
   const lower = value.toLowerCase().trim()
-  if (lower.endsWith('mb')) return parseFloat(lower) * 1024 * 1024
-  if (lower.endsWith('kb')) return parseFloat(lower) * 1024
-  return parseInt(lower, 10)
+  if (lower.endsWith('mb')) return parseFloat(lower) * 1_000_000
+  if (lower.endsWith('kb')) return parseFloat(lower) * 1_000
+  return parseFloat(lower)
 }
 
 export function formatFileSize(bytes: number): string {
@@ -44,11 +44,12 @@ export function formatFileSize(bytes: number): string {
 
 export function validateAccept(
   file: { name: string; type: string },
-  accept: string,
+  accept: string | undefined,
 ): boolean {
   if (!accept) return true
   const rules = accept.split(',').map(r => r.trim().toLowerCase())
-  const ext = '.' + file.name.split('.').pop()!.toLowerCase()
+  const nameParts = file.name.split('.')
+  const ext = nameParts.length > 1 ? '.' + nameParts[nameParts.length - 1].toLowerCase() : ''
   const mime = file.type.toLowerCase()
   return rules.some(rule => {
     if (rule.startsWith('.')) return ext === rule
