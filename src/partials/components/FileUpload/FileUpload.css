@@ -44,6 +44,14 @@
       cursor: pointer;
       pointer-events: all;
     }
+
+    /* List items and trigger must sit above the full-coverage input so that
+       remove buttons and the trigger remain clickable over the drop zone. */
+    & .FileUpload-list,
+    & .FileUpload-trigger {
+      position: relative;
+      z-index: 1;
+    }
   }
 
   &[data-drop-zone][data-dragging-over] {
