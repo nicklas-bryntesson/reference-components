@@ -131,7 +131,7 @@ class FileUpload {
   private _init(): void {
     this._bootstrapFromInput()
     this._bootstrapFromDataAttribute()
-    this._renderInit()
+    this._renderList()
     this._updateTriggerText()
     this._bindEvents()
     this.root.setAttribute('data-initialized', '')
@@ -190,7 +190,7 @@ class FileUpload {
     return entry
   }
 
-  private _renderInit(): void {
+  private _renderList(): void {
     this.list.innerHTML = ''
     for (const entry of this._entries) {
       this.list.appendChild(this._renderItem(entry))
