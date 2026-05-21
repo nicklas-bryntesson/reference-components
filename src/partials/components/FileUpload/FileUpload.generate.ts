@@ -15,7 +15,8 @@ interface StateDefinition {
   root: Attrs
   input: Attrs
   items: string
-  triggerText?: string   // defaults to 'Add file'
+  triggerText?: string    // defaults to 'Add file'
+  triggerDisabled?: boolean // adds disabled attribute to trigger button
   initialFiles?: string
 }
 
@@ -62,7 +63,9 @@ function canonical(
   items: string,
   initialFilesAttr: string,
   triggerText: string,
+  triggerDisabled = false,
 ): string {
+  const triggerDisabledAttr = triggerDisabled ? ' disabled' : ''
   return `<div
   class="FileUpload"
   data-component="FileUpload"
@@ -83,7 +86,7 @@ function canonical(
     aria-label="Selected files"
   >${items}
   </ul>
-  <button type="button" class="FileUpload-trigger">${triggerText}</button>
+  <button type="button" class="FileUpload-trigger"${triggerDisabledAttr}>${triggerText}</button>
 </div>
 `
 }
@@ -112,8 +115,8 @@ const states: StateDefinition[] = [
   { file: '_with-files-active', label: 'File', root: { 'data-has-files': '', 'data-test-state': 'active' }, input: {}, items: validItem('report.pdf', '200 KB') },
 
   // Disabled
-  { file: '_disabled-empty',      label: 'File', root: { 'data-disabled': ''                 }, input: { disabled: '' }, items: '' },
-  { file: '_disabled-with-files', label: 'File', root: { 'data-disabled': '', 'data-has-files': '' }, input: { disabled: '' }, items: validItem('report.pdf', '200 KB') },
+  { file: '_disabled-empty',      label: 'File', root: { 'data-disabled': '', 'aria-disabled': 'true'                     }, input: { disabled: '' }, items: '', triggerDisabled: true },
+  { file: '_disabled-with-files', label: 'File', root: { 'data-disabled': '', 'aria-disabled': 'true', 'data-has-files': '' }, input: { disabled: '' }, items: validItem('report.pdf', '200 KB'), triggerDisabled: true },
 
   // Validation states
   { file: '_invalid-type',     label: 'File', root: { 'data-has-files': '', 'data-has-errors': '' }, input: { accept: '.pdf' },           items: invalidTypeItem('image.exe', '14 KB') },
@@ -150,6 +153,7 @@ for (const state of states) {
     state.items,
     initialFilesAttr,
     state.triggerText ?? 'Add file',
+    state.triggerDisabled ?? false,
   )
   writeFileSync(out(`${state.file}.hbs`), content)
   console.log(`  ${state.file}.hbs`)
