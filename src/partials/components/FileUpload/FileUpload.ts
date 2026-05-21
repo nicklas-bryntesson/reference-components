@@ -1,5 +1,7 @@
 // src/partials/components/FileUpload/FileUpload.ts
 
+import './FileUpload.css'
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 export type FileSource = 'user' | 'server'
