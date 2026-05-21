@@ -264,3 +264,95 @@ describe('FileUpload add files', () => {
     el.remove()
   })
 })
+
+describe('FileUpload remove files', () => {
+  function addFileToInstance(el: HTMLElement, name: string): void {
+    const input = el.querySelector('.FileUpload-input') as HTMLInputElement
+    const dt = new DataTransfer()
+    dt.items.add(new File(['data'], name, { type: 'application/pdf' }))
+    Object.defineProperty(input, 'files', { value: dt.files, configurable: true })
+    input.dispatchEvent(new Event('change'))
+  }
+
+  it('removes a file when its remove button is clicked', () => {
+    const el = createFileUploadEl()
+    new FileUpload(el)
+    addFileToInstance(el, 'report.pdf')
+    expect(el.querySelectorAll('.FileUpload-item')).toHaveLength(1)
+
+    const removeBtn = el.querySelector('.FileUpload-item-remove') as HTMLButtonElement
+    removeBtn.click()
+
+    expect(el.querySelectorAll('.FileUpload-item')).toHaveLength(0)
+    expect(el.hasAttribute('data-has-files')).toBe(false)
+    el.remove()
+  })
+
+  it('removes data-has-errors when last invalid file is removed', () => {
+    const el = createFileUploadEl({ inputAttrs: { accept: '.pdf' } })
+    new FileUpload(el)
+
+    const input = el.querySelector('.FileUpload-input') as HTMLInputElement
+    const dt = new DataTransfer()
+    dt.items.add(new File(['x'], 'bad.exe', { type: 'application/x-msdownload' }))
+    Object.defineProperty(input, 'files', { value: dt.files, configurable: true })
+    input.dispatchEvent(new Event('change'))
+
+    expect(el.hasAttribute('data-has-errors')).toBe(true)
+
+    const removeBtn = el.querySelector('.FileUpload-item-remove') as HTMLButtonElement
+    removeBtn.click()
+
+    expect(el.hasAttribute('data-has-errors')).toBe(false)
+    el.remove()
+  })
+
+  it('aria-label of remove button includes the filename', () => {
+    const el = createFileUploadEl()
+    new FileUpload(el)
+    addFileToInstance(el, 'my-doc.pdf')
+
+    const removeBtn = el.querySelector('.FileUpload-item-remove') as HTMLButtonElement
+    expect(removeBtn.getAttribute('aria-label')).toBe('Remove my-doc.pdf')
+    el.remove()
+  })
+
+  it('focuses next remove button after removal when one exists', () => {
+    const el = createFileUploadEl({ inputAttrs: { multiple: '' } })
+    document.body.appendChild(el)
+    new FileUpload(el)
+
+    const input = el.querySelector('.FileUpload-input') as HTMLInputElement
+    const dt = new DataTransfer()
+    dt.items.add(new File(['a'], 'first.pdf', { type: 'application/pdf' }))
+    dt.items.add(new File(['b'], 'second.pdf', { type: 'application/pdf' }))
+    Object.defineProperty(input, 'files', { value: dt.files, configurable: true })
+    input.dispatchEvent(new Event('change'))
+
+    const btns = el.querySelectorAll<HTMLButtonElement>('.FileUpload-item-remove')
+    btns[0].focus()
+    btns[0].click()
+
+    expect(document.activeElement).toBe(el.querySelector('.FileUpload-item-remove'))
+    el.remove()
+  })
+
+  it('focuses trigger button when last file is removed', () => {
+    const el = createFileUploadEl()
+    document.body.appendChild(el)
+    new FileUpload(el)
+
+    const input = el.querySelector('.FileUpload-input') as HTMLInputElement
+    const dt = new DataTransfer()
+    dt.items.add(new File(['a'], 'only.pdf', { type: 'application/pdf' }))
+    Object.defineProperty(input, 'files', { value: dt.files, configurable: true })
+    input.dispatchEvent(new Event('change'))
+
+    const removeBtn = el.querySelector<HTMLButtonElement>('.FileUpload-item-remove')!
+    removeBtn.focus()
+    removeBtn.click()
+
+    expect(document.activeElement).toBe(el.querySelector('.FileUpload-trigger'))
+    el.remove()
+  })
+})

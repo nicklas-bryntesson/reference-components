@@ -287,6 +287,33 @@ class FileUpload {
     this.input.click()
   }
 
+  private _handleListClick = (e: MouseEvent): void => {
+    const btn = (e.target as HTMLElement).closest<HTMLButtonElement>('.FileUpload-item-remove')
+    if (!btn) return
+    const li = btn.closest<HTMLElement>('[data-entry-id]')!
+    const entryId = li.dataset.entryId!
+    this._moveFocusAfterRemoval(li)
+    this._removeEntry(entryId)
+  }
+
+  private _removeEntry(entryId: string): void {
+    this._entries = this._entries.filter(e => e.id !== entryId)
+    this._rebuildFileInput()
+    const li = this.list.querySelector(`[data-entry-id="${entryId}"]`)
+    li?.remove()
+    this._updateRootState()
+  }
+
+  private _moveFocusAfterRemoval(removedLi: HTMLElement): void {
+    const nextLi = removedLi.nextElementSibling ?? removedLi.previousElementSibling
+    const nextBtn = nextLi?.querySelector<HTMLButtonElement>('.FileUpload-item-remove')
+    if (nextBtn) {
+      nextBtn.focus()
+    } else {
+      this.trigger.focus()
+    }
+  }
+
   private _rebuildFileInput(): void {
     const dt = new DataTransfer()
     for (const entry of this._entries) {
@@ -311,11 +338,13 @@ class FileUpload {
   private _bindEvents(): void {
     this.input.addEventListener('change', this._handleChange)
     this.trigger.addEventListener('click', this._handleTriggerClick)
+    this.list.addEventListener('click', this._handleListClick)
   }
 
   destroy(): void {
     this.input.removeEventListener('change', this._handleChange)
     this.trigger.removeEventListener('click', this._handleTriggerClick)
+    this.list.removeEventListener('click', this._handleListClick)
     delete this.root.__fileUploadInstance
   }
 }
