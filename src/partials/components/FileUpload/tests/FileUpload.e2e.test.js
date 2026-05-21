@@ -201,6 +201,7 @@ test('file exceeding max size shows invalid-size error', async ({ page }) => {
   const invalidItem = liveRoot.locator('.FileUpload-item[data-status="invalid-size"]')
   await expect(invalidItem).toHaveCount(1)
   await expect(invalidItem.locator('.FileUpload-item-error')).toBeVisible()
+  await expect(invalidItem.locator('.FileUpload-item-error')).toHaveAttribute('role', 'alert')
 })
 
 // ─── Server files (data-initial-files) ───────────────────────────────────────
