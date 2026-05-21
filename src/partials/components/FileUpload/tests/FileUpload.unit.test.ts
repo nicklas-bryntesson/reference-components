@@ -6,6 +6,7 @@ import {
   validateAccept,
   interpolate,
 } from '../FileUpload'
+import FileUpload from '../FileUpload'
 
 describe('parseMaxSize', () => {
   it('parses mb suffix', () => {
@@ -88,5 +89,102 @@ describe('interpolate', () => {
   })
   it('handles template with no placeholders', () => {
     expect(interpolate('Add file', {})).toBe('Add file')
+  })
+})
+
+// ─── DOM helper ──────────────────────────────────────────────────────────────
+
+function createFileUploadEl(overrides: {
+  rootAttrs?: Record<string, string>
+  inputAttrs?: Record<string, string>
+} = {}): HTMLElement {
+  const el = document.createElement('div')
+  el.className = 'FileUpload'
+  el.setAttribute('data-component', 'FileUpload')
+  for (const [k, v] of Object.entries(overrides.rootAttrs ?? {})) {
+    el.setAttribute(k, v)
+  }
+  el.innerHTML = `
+    <input class="FileUpload-input" type="file" aria-hidden="true" tabindex="-1"${
+      Object.entries(overrides.inputAttrs ?? {}).map(([k, v]) => ` ${k}="${v}"`).join('')
+    }>
+    <ul class="FileUpload-list" aria-live="polite" aria-relevant="additions removals" aria-label="Selected files"></ul>
+    <button type="button" class="FileUpload-trigger">Add file</button>
+  `
+  document.body.appendChild(el)
+  return el
+}
+
+describe('FileUpload.attach', () => {
+  it('instantiates on elements with data-component="FileUpload"', () => {
+    const el = createFileUploadEl()
+    FileUpload.attach()
+    expect((el as any).__fileUploadInstance).toBeInstanceOf(FileUpload)
+    el.remove()
+  })
+
+  it('does not re-instantiate already attached elements', () => {
+    const el = createFileUploadEl()
+    FileUpload.attach()
+    const first = (el as any).__fileUploadInstance
+    FileUpload.attach()
+    expect((el as any).__fileUploadInstance).toBe(first)
+    el.remove()
+  })
+})
+
+describe('FileUpload translations', () => {
+  it('uses default trigger label when no data attribute', () => {
+    const el = createFileUploadEl()
+    const instance = new FileUpload(el)
+    const trigger = el.querySelector('.FileUpload-trigger') as HTMLButtonElement
+    expect(trigger.textContent).toBe('Add file')
+    el.remove()
+  })
+
+  it('uses data-label-trigger when present', () => {
+    const el = createFileUploadEl({ rootAttrs: { 'data-label-trigger': 'Välj fil' } })
+    new FileUpload(el)
+    const trigger = el.querySelector('.FileUpload-trigger') as HTMLButtonElement
+    expect(trigger.textContent).toBe('Välj fil')
+    el.remove()
+  })
+
+  it('uses data-label-trigger-multiple when input has multiple attribute', () => {
+    const el = createFileUploadEl({
+      rootAttrs: { 'data-label-trigger-multiple': 'Lägg till filer' },
+      inputAttrs: { multiple: '' },
+    })
+    new FileUpload(el)
+    const trigger = el.querySelector('.FileUpload-trigger') as HTMLButtonElement
+    expect(trigger.textContent).toBe('Lägg till filer')
+    el.remove()
+  })
+})
+
+describe('FileUpload bootstrap from data-initial-files', () => {
+  it('renders server files from data-initial-files on init', () => {
+    const el = createFileUploadEl({
+      rootAttrs: {
+        'data-initial-files': JSON.stringify([
+          { name: 'contract.pdf', size: 200_000, type: 'application/pdf', ref: 'abc123' },
+        ]),
+      },
+    })
+    new FileUpload(el)
+    const items = el.querySelectorAll('.FileUpload-item')
+    expect(items).toHaveLength(1)
+    expect(items[0].querySelector('.FileUpload-item-name')!.textContent).toBe('contract.pdf')
+    expect(items[0].querySelector('.FileUpload-item-size')!.textContent).toBe('200 KB')
+    expect(items[0].querySelector('input[type="hidden"]')!.getAttribute('value')).toBe('abc123')
+    expect(el.hasAttribute('data-has-files')).toBe(true)
+    el.remove()
+  })
+
+  it('silently ignores malformed data-initial-files JSON', () => {
+    const el = createFileUploadEl({ rootAttrs: { 'data-initial-files': 'not-json' } })
+    expect(() => new FileUpload(el)).not.toThrow()
+    expect(el.querySelectorAll('.FileUpload-item')).toHaveLength(0)
+    el.remove()
   })
 })
