@@ -356,3 +356,43 @@ describe('FileUpload remove files', () => {
     el.remove()
   })
 })
+
+describe('FileUpload drop-zone', () => {
+  it('sets data-dragging-over on dragenter when data-drop-zone is present', () => {
+    const el = createFileUploadEl({ rootAttrs: { 'data-drop-zone': '' } })
+    new FileUpload(el)
+
+    el.dispatchEvent(new Event('dragenter', { bubbles: true }))
+    expect(el.hasAttribute('data-dragging-over')).toBe(true)
+    el.remove()
+  })
+
+  it('removes data-dragging-over on dragleave when depth returns to zero', () => {
+    const el = createFileUploadEl({ rootAttrs: { 'data-drop-zone': '' } })
+    new FileUpload(el)
+
+    el.dispatchEvent(new Event('dragenter', { bubbles: true }))
+    el.dispatchEvent(new Event('dragleave', { bubbles: true }))
+    expect(el.hasAttribute('data-dragging-over')).toBe(false)
+    el.remove()
+  })
+
+  it('removes data-dragging-over on drop', () => {
+    const el = createFileUploadEl({ rootAttrs: { 'data-drop-zone': '' } })
+    new FileUpload(el)
+
+    el.dispatchEvent(new Event('dragenter', { bubbles: true }))
+    el.dispatchEvent(new Event('drop', { bubbles: true }))
+    expect(el.hasAttribute('data-dragging-over')).toBe(false)
+    el.remove()
+  })
+
+  it('does not set data-dragging-over when data-drop-zone is absent', () => {
+    const el = createFileUploadEl()
+    new FileUpload(el)
+
+    el.dispatchEvent(new Event('dragenter', { bubbles: true }))
+    expect(el.hasAttribute('data-dragging-over')).toBe(false)
+    el.remove()
+  })
+})

@@ -96,6 +96,7 @@ class FileUpload {
   private trigger: HTMLButtonElement
   private _entries: FileEntry[]
   private _t: TranslationStrings
+  private _dragDepth = 0
 
   static attach(parent: Document | HTMLElement = document): void {
     parent.querySelectorAll<HTMLElement>('[data-component="FileUpload"]').forEach(el => {
@@ -296,6 +297,24 @@ class FileUpload {
     this._removeEntry(entryId)
   }
 
+  private _handleDragEnter = (): void => {
+    this._dragDepth++
+    this.root.setAttribute('data-dragging-over', '')
+  }
+
+  private _handleDragLeave = (): void => {
+    this._dragDepth--
+    if (this._dragDepth <= 0) {
+      this._dragDepth = 0
+      this.root.removeAttribute('data-dragging-over')
+    }
+  }
+
+  private _handleDrop = (): void => {
+    this._dragDepth = 0
+    this.root.removeAttribute('data-dragging-over')
+  }
+
   private _removeEntry(entryId: string): void {
     this._entries = this._entries.filter(e => e.id !== entryId)
     this._rebuildFileInput()
@@ -339,12 +358,21 @@ class FileUpload {
     this.input.addEventListener('change', this._handleChange)
     this.trigger.addEventListener('click', this._handleTriggerClick)
     this.list.addEventListener('click', this._handleListClick)
+
+    if (this.root.hasAttribute('data-drop-zone')) {
+      this.root.addEventListener('dragenter', this._handleDragEnter)
+      this.root.addEventListener('dragleave', this._handleDragLeave)
+      this.root.addEventListener('drop', this._handleDrop)
+    }
   }
 
   destroy(): void {
     this.input.removeEventListener('change', this._handleChange)
     this.trigger.removeEventListener('click', this._handleTriggerClick)
     this.list.removeEventListener('click', this._handleListClick)
+    this.root.removeEventListener('dragenter', this._handleDragEnter)
+    this.root.removeEventListener('dragleave', this._handleDragLeave)
+    this.root.removeEventListener('drop', this._handleDrop)
     delete this.root.__fileUploadInstance
   }
 }
