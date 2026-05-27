@@ -204,6 +204,116 @@ test('file exceeding max size shows invalid-size error', async ({ page }) => {
   await expect(invalidItem.locator('.FileUpload-item-error')).toHaveAttribute('role', 'alert')
 })
 
+// ── atomica11y: button + alert-notification + text-input §1 ──────────────────
+
+test('file list has aria-live="polite" and aria-relevant="additions removals"', async ({ page }) => {
+  const liveRoot = page.locator('[data-component="FileUpload"][data-initialized]').last()
+  const list = liveRoot.locator('.FileUpload-list')
+  await expect(list).toHaveAttribute('aria-live', 'polite')
+  await expect(list).toHaveAttribute('aria-relevant', 'additions removals')
+})
+
+test('remove button has aria-label containing the filename', async ({ page }) => {
+  const tmpFile = path.join(__dir, 'fixtures', 'test.pdf')
+  const liveRoot = page.locator('[data-component="FileUpload"][data-initialized]').last()
+  await liveRoot.locator('.FileUpload-input').setInputFiles(tmpFile)
+
+  const removeBtn = liveRoot.locator('.FileUpload-item-remove')
+  const label = await removeBtn.getAttribute('aria-label')
+  expect(label).toContain('test.pdf')
+})
+
+test('Enter on remove button removes the file', async ({ page }) => {
+  const tmpFile = path.join(__dir, 'fixtures', 'test.pdf')
+  const liveRoot = page.locator('[data-component="FileUpload"][data-initialized]').last()
+  await liveRoot.locator('.FileUpload-input').setInputFiles(tmpFile)
+
+  const removeBtn = liveRoot.locator('.FileUpload-item-remove')
+  await removeBtn.focus()
+  await page.keyboard.press('Enter')
+
+  await expect(liveRoot.locator('.FileUpload-item')).toHaveCount(0)
+})
+
+test('Space on remove button removes the file', async ({ page }) => {
+  const tmpFile = path.join(__dir, 'fixtures', 'test.pdf')
+  const liveRoot = page.locator('[data-component="FileUpload"][data-initialized]').last()
+  await liveRoot.locator('.FileUpload-input').setInputFiles(tmpFile)
+
+  const removeBtn = liveRoot.locator('.FileUpload-item-remove')
+  await removeBtn.focus()
+  await page.keyboard.press('Space')
+
+  await expect(liveRoot.locator('.FileUpload-item')).toHaveCount(0)
+})
+
+test('error alert does not steal focus when invalid file is added', async ({ page }) => {
+  const liveRoot = page.locator('[data-component="FileUpload"][data-initialized]').last()
+
+  // Focus trigger first so we have a known focus position
+  await liveRoot.locator('.FileUpload-trigger').focus()
+
+  await page.evaluate(() => {
+    const el = Array.from(document.querySelectorAll('[data-component="FileUpload"][data-initialized]')).at(-1)
+    el.querySelector('.FileUpload-input').setAttribute('accept', '.pdf')
+  })
+
+  await liveRoot.locator('.FileUpload-input').setInputFiles({
+    name: 'document.txt',
+    mimeType: 'text/plain',
+    buffer: Buffer.from('hello'),
+  })
+
+  // Error alert should be present
+  await expect(liveRoot.locator('.FileUpload-item-error[role="alert"]')).toBeVisible()
+
+  // Focus must NOT be on the error span — it should remain on trigger or move naturally
+  const focused = await page.evaluate(() => document.activeElement?.getAttribute('role'))
+  expect(focused).not.toBe('alert')
+})
+
+test('focus moves to next sibling remove button when removing first of multiple files', async ({ page }) => {
+  const liveRoot = page.locator('[data-component="FileUpload"][data-initialized]').last()
+
+  // Enable multiple
+  await page.evaluate(() => {
+    const el = Array.from(document.querySelectorAll('[data-component="FileUpload"][data-initialized]')).at(-1)
+    el.querySelector('.FileUpload-input').setAttribute('multiple', '')
+  })
+
+  await liveRoot.locator('.FileUpload-input').setInputFiles([
+    { name: 'first.pdf', mimeType: 'application/pdf', buffer: Buffer.from('a') },
+    { name: 'second.pdf', mimeType: 'application/pdf', buffer: Buffer.from('b') },
+  ])
+
+  await expect(liveRoot.locator('.FileUpload-item')).toHaveCount(2)
+
+  // Focus and remove the first item
+  const firstRemove = liveRoot.locator('.FileUpload-item-remove').first()
+  await firstRemove.focus()
+  await firstRemove.click()
+
+  // Focus should move to the remaining item's remove button
+  await expect(liveRoot.locator('.FileUpload-item-remove')).toBeFocused()
+})
+
+test('data-has-errors on root when invalid file type is added', async ({ page }) => {
+  const liveRoot = page.locator('[data-component="FileUpload"][data-initialized]').last()
+
+  await page.evaluate(() => {
+    const el = Array.from(document.querySelectorAll('[data-component="FileUpload"][data-initialized]')).at(-1)
+    el.querySelector('.FileUpload-input').setAttribute('accept', '.pdf')
+  })
+
+  await liveRoot.locator('.FileUpload-input').setInputFiles({
+    name: 'document.txt',
+    mimeType: 'text/plain',
+    buffer: Buffer.from('hello'),
+  })
+
+  await expect(liveRoot).toHaveAttribute('data-has-errors')
+})
+
 // ─── Server files (data-initial-files) ───────────────────────────────────────
 
 test('server files state has data-source=server and hidden input', async ({ page }) => {
