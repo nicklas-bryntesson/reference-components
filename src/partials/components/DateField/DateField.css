@@ -248,7 +248,7 @@
     }
 
     & td[data-disabled] button {
-      color: GrayText;
+      color: #767676;
       cursor: not-allowed;
     }
 

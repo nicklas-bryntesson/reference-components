@@ -123,6 +123,42 @@ All observable outcomes are state changes on `data-*` attributes or DOM changes:
 |-----------|----------|
 | `data-initialized` | Component has been mounted |
 
+## Manual accessibility testing
+
+Test with a real screenreader before shipping. Sources: `docs/atomica11y/form/date-picker-dialog.md`, `docs/atomica11y/form/text-input.md`, `docs/atomica11y/form/hint-help-or-error.md`.
+
+### Desktop screenreader (NVDA, JAWS, VoiceOver)
+
+**Segments**
+- [ ] Purpose of each segment is clear (label read: "dag", "månad", "år")
+- [ ] Each segment identifies itself as an editable input (spinbutton)
+- [ ] Disabled/required state is expressed if applicable
+
+**Calendar trigger**
+- [ ] Purpose is clear ("Öppna kalender" or localised equivalent)
+- [ ] Identifies as a button with popup/dialog indicator
+- [ ] Expresses expanded/collapsed state
+
+**Calendar dialog**
+- [ ] Dialog title or purpose is announced on open
+- [ ] Identifies itself as a dialog/modal
+- [ ] When closed, focus returns to the trigger
+- [ ] Content behind the dialog is inert (not reachable) while open
+- [ ] Each day cell is announced with day number, month, and year
+- [ ] Day cells express state (selected, disabled/dimmed)
+- [ ] Prev/next month buttons have clear purpose
+
+**Invalid state**
+- [ ] When `data-invalid` is set, the error is announced automatically
+- [ ] Error is read after the input name, role, and state
+
+### Mobile screenreader (VoiceOver iOS, TalkBack Android)
+
+- [ ] Swipe to trigger — purpose is clear, identifies as button with dialog popup
+- [ ] Double-tap opens dialog
+- [ ] Swipe within dialog — day cells and navigation controls come into focus
+- [ ] Double-tap on a day — date is selected, dialog closes, focus returns to trigger
+
 ## Non-goals
 
 - No time picker (hours, minutes, seconds)

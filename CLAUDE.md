@@ -73,6 +73,21 @@ Read [`.claude/philosophy.md`](.claude/philosophy.md) before writing any CSS or 
 - **Mechanical tasks (migrations, renames, type annotations):** inline execution, skip brainstorming
 - **TypeScript migrations:** one component per session; no logic changes
 
+## Accessibility
+
+When creating or reviewing a component, read the relevant `docs/atomica11y/<html-element>/<component>.md`
+file(s) for WCAG acceptance criteria. Folders mirror HTML context: `html/`, `header/`, `nav/`,
+`main/`, `form/`, `footer/`.
+
+Apply criteria in two layers:
+
+- **Section 1 – Keyboard** → write automated Playwright e2e tests. Tab order, focus visibility,
+  keyboard activation (space/enter/escape), no focus traps. Also assert the ARIA structure that
+  enables correct screenreader behaviour (roles, states, live regions).
+- **Sections 2–3 – Desktop/Mobile screenreader ("I HEAR")** → add a `## Manual accessibility testing`
+  section to the component's `<Name>.md` with the screenreader scenarios as a checklist. These are
+  the definition-of-done criteria before a component ships.
+
 ## Constraints
 
 - No framework code — vanilla JS/TS only

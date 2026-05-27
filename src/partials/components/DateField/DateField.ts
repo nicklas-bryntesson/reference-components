@@ -365,7 +365,10 @@ class DateField {
     }
 
     if (this.native.disabled) {
-      this._segmentEls.forEach(seg => seg.setAttribute('tabindex', '-1'))
+      this._segmentEls.forEach(seg => {
+        seg.setAttribute('tabindex', '-1')
+        seg.setAttribute('aria-disabled', 'true')
+      })
     }
   }
 
@@ -1160,10 +1163,16 @@ class DateField {
       this._focusCalendarDate(target)
     } else if (e.key === 'PageUp') {
       e.preventDefault()
-      this._focusCalendarDate(new Date(fy, fm - 2, fd))
+      this.currentMonth -= 1
+      if (this.currentMonth < 0) { this.currentMonth = 11; this.currentYear-- }
+      this._renderMonth()
+      this._focusCalendarDate(new Date(this.currentYear, this.currentMonth, clampDayToMonth(this.currentYear, this.currentMonth, fd)))
     } else if (e.key === 'PageDown') {
       e.preventDefault()
-      this._focusCalendarDate(new Date(fy, fm, fd))
+      this.currentMonth += 1
+      if (this.currentMonth > 11) { this.currentMonth = 0; this.currentYear++ }
+      this._renderMonth()
+      this._focusCalendarDate(new Date(this.currentYear, this.currentMonth, clampDayToMonth(this.currentYear, this.currentMonth, fd)))
     } else if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault()
       const td = focusedBtn.closest('td')

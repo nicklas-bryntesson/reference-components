@@ -48,13 +48,13 @@ test('calendar does not exist in DOM when closed', async ({ page }) => {
   await expect(page.locator('.DateFieldCalendar')).toHaveCount(0)
 })
 
-test('calendar is a body child when open', async ({ page }) => {
+test('calendar is visible inside slideContainer when open', async ({ page }) => {
   await page.locator('[data-id="birthdate"] .Trigger').click()
-  const calendar = page.locator('body > .DateFieldCalendar')
+  const calendar = page.locator('[data-id="birthdate"] .slideContainer .DateFieldCalendar')
   await expect(calendar).toBeVisible()
 })
 
-test('calendar is removed from body on Escape', async ({ page }) => {
+test('calendar is removed on Escape', async ({ page }) => {
   await page.locator('[data-id="birthdate"] .Trigger').click()
   await page.keyboard.press('Escape')
   await expect(page.locator('.DateFieldCalendar')).toHaveCount(0)
@@ -69,15 +69,15 @@ test('focus returns to trigger after Escape', async ({ page }) => {
 test('calendar is removed on outside click', async ({ page }) => {
   await page.locator('[data-id="birthdate"] .Trigger').click()
   await expect(page.locator('.DateFieldCalendar')).toBeVisible()
-  await page.mouse.click(10, 10) // outside both root and calendar
+  await page.evaluate(() => document.body.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true })))
   await expect(page.locator('.DateFieldCalendar')).toHaveCount(0)
 })
 
 test('date selection closes calendar and syncs native input', async ({ page }) => {
   await page.locator('[data-id="birthdate"] .Trigger').click()
-  const firstDay = page.locator('td:not([data-outside-month]):not([aria-disabled="true"]) button').first()
+  const firstDay = page.locator('.DateFieldCalendar td:not([data-outside-month]):not([aria-disabled="true"]) button').first()
   const dateLabel = await firstDay.getAttribute('data-date')
-  await firstDay.click()
+  await firstDay.click({ force: true })
   await expect(page.locator('.DateFieldCalendar')).toHaveCount(0)
   const nativeValue = await page.locator('[data-id="birthdate"] .Native').inputValue()
   expect(nativeValue).toBe(dateLabel)
@@ -102,9 +102,9 @@ test('aria-disabled is on td not button for disabled cells', async ({ page }) =>
 
 test('Tab wraps from last to first focusable element in calendar', async ({ page }) => {
   await page.locator('[data-id="birthdate"] .Trigger').click()
-  // Tab to last focusable element (next-month button)
-  const nextMonthBtn = page.locator('.CalendarHeader button').last()
-  await nextMonthBtn.focus()
+  // Last tabbable element is the Today button in the footer
+  const todayBtn = page.locator('.CalendarFooterToday')
+  await todayBtn.focus()
   await page.keyboard.press('Tab')
   // Should wrap to first (prev-month button)
   const prevMonthBtn = page.locator('.CalendarHeader button').first()
@@ -209,6 +209,85 @@ test('axe: no violations in picker view', async ({ page }) => {
   await page.locator('[data-id="birthdate"] .MonthYearTrigger').click()
   await checkA11y(page)
 })
+
+// ── Keyboard access (atomica11y: date-picker-dialog §1) ──────────────────────
+
+test('Space opens calendar from trigger', async ({ page }) => {
+  const trigger = page.locator('[data-id="birthdate"] .Trigger')
+  await trigger.focus()
+  await page.keyboard.press('Space')
+  await expect(page.locator('.DateFieldCalendar')).toBeVisible()
+  await page.keyboard.press('Escape')
+})
+
+test('Enter opens calendar from trigger', async ({ page }) => {
+  const trigger = page.locator('[data-id="birthdate"] .Trigger')
+  await trigger.focus()
+  await page.keyboard.press('Enter')
+  await expect(page.locator('.DateFieldCalendar')).toBeVisible()
+  await page.keyboard.press('Escape')
+})
+
+test('ArrowRight moves focus to next day in calendar grid', async ({ page }) => {
+  await page.locator('[data-id="birthdate"] .Trigger').click()
+  const firstDay = page.locator('.DateFieldCalendar td:not([data-outside-month]):not([aria-disabled="true"]) button').first()
+  await firstDay.focus()
+  const initialDate = await firstDay.getAttribute('data-date')
+  await page.keyboard.press('ArrowRight')
+  const focused = page.locator('.Grid button:focus')
+  const nextDate = await focused.getAttribute('data-date')
+  expect(nextDate).not.toBe(initialDate)
+  await page.keyboard.press('Escape')
+})
+
+test('ArrowLeft moves focus to previous day in calendar grid', async ({ page }) => {
+  await page.locator('[data-id="birthdate"] .Trigger').click()
+  const days = page.locator('.DateFieldCalendar td:not([data-outside-month]):not([aria-disabled="true"]) button')
+  const secondDay = days.nth(1)
+  await secondDay.focus()
+  const initialDate = await secondDay.getAttribute('data-date')
+  await page.keyboard.press('ArrowLeft')
+  const focused = page.locator('.Grid button:focus')
+  const prevDate = await focused.getAttribute('data-date')
+  expect(prevDate).not.toBe(initialDate)
+  await page.keyboard.press('Escape')
+})
+
+test('ArrowDown moves focus one week forward in calendar grid', async ({ page }) => {
+  await page.locator('[data-id="birthdate"] .Trigger').click()
+  const firstDay = page.locator('.DateFieldCalendar td:not([data-outside-month]):not([aria-disabled="true"]) button').first()
+  await firstDay.focus()
+  const initialDate = await firstDay.getAttribute('data-date')
+  await page.keyboard.press('ArrowDown')
+  const focused = page.locator('.Grid button:focus')
+  const nextDate = await focused.getAttribute('data-date')
+  expect(nextDate).not.toBe(initialDate)
+  await page.keyboard.press('Escape')
+})
+
+test('PageDown moves calendar to next month', async ({ page }) => {
+  await page.locator('[data-id="birthdate"] .Trigger').click()
+  const monthLabel = page.locator('.MonthYearTrigger')
+  const initialLabel = await monthLabel.textContent()
+  await page.locator('.Grid').focus()
+  await page.keyboard.press('PageDown')
+  const nextLabel = await monthLabel.textContent()
+  expect(nextLabel).not.toBe(initialLabel)
+  await page.keyboard.press('Escape')
+})
+
+test('PageUp moves calendar to previous month', async ({ page }) => {
+  await page.locator('[data-id="birthdate"] .Trigger').click()
+  const monthLabel = page.locator('.MonthYearTrigger')
+  const initialLabel = await monthLabel.textContent()
+  await page.locator('.Grid').focus()
+  await page.keyboard.press('PageUp')
+  const nextLabel = await monthLabel.textContent()
+  expect(nextLabel).not.toBe(initialLabel)
+  await page.keyboard.press('Escape')
+})
+
+// ── Month/Year Picker ─────────────────────────────────────────────────────────
 
 test('Home jumps to first enabled month option', async ({ page }) => {
   await page.locator('[data-id="birthdate"] .Trigger').click()

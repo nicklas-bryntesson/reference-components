@@ -130,6 +130,10 @@ writeFileSync(
   out('_native-disabled.hbs'),
   `<label for="state-native-disabled">Datum</label>\n<input type="date" id="state-native-disabled" name="state-native-disabled" min="1900-01-01" max="2100-12-31" value="1990-06-15" disabled />\n`,
 )
+writeFileSync(
+  out('_native-readonly.hbs'),
+  `<label for="state-native-readonly">Datum</label>\n<input type="date" id="state-native-readonly" name="state-native-readonly" min="1900-01-01" max="2100-12-31" value="1990-06-15" readonly />\n`,
+)
 
 console.log('  _native-default.hbs')
 console.log('  _native-disabled.hbs')
