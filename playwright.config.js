@@ -1,5 +1,9 @@
 import { defineConfig, devices } from '@playwright/test'
 
+// When BASE_URL is set, tests run against an external server (e.g. a porting
+// project's dev server). The built-in webServer is skipped entirely.
+const externalBase = process.env.BASE_URL
+
 export default defineConfig({
   testDir: '.',
   testMatch: [
@@ -7,10 +11,10 @@ export default defineConfig({
     'src/partials/components/**/tests/*.e2e.test.js',
   ],
   use: {
-    baseURL: 'http://localhost:5173',
+    baseURL: externalBase ?? 'http://localhost:5173',
     ...devices['Desktop Chrome'],
   },
-  webServer: {
+  webServer: externalBase ? undefined : {
     command: 'npm run dev',
     url: 'http://localhost:5173',
     reuseExistingServer: !process.env.CI,
