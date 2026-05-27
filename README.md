@@ -1,6 +1,6 @@
 # Reference Components
 
-This repo is a **living library of accessible UI components** — not a published package, not a framework, not a theme. It is a set of reference implementations that define what each component should look like, how it should behave, and what accessibility guarantees it must meet.
+This repo is a **living library of accessible UI components** — not a published package, not a framework, not a theme. It is a set of reference implementations that define the minimum HTML structure, JS behaviour, and CSS a component needs to work correctly under real user conditions — keyboard, screen reader, touch, and form submission included.
 
 ## What this is for
 
