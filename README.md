@@ -11,7 +11,7 @@ When building a product UI, the hard problems are rarely visual. They are:
 - What edge cases exist (disabled, invalid, empty, prefilled, multi-step forms)?
 - What should never be in scope?
 
-This repo answers those questions in tested, runnable code. Each component is a **contract** — a baseline your team can inspect, run, and then port into whatever framework or Web Component layer you are using.
+This repo answers those questions in tested, runnable code. Each component is a **contract** — a baseline your team can inspect, run, and then port into whatever tech stack of your choice.
 
 ## How to read a component
 
