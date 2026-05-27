@@ -1,10 +1,20 @@
 // src/partials/components/DateField/DateField.ts
 
 import { calculatePopupOffset, calculateArrowOffset, detectDirection } from '../../../js/popup-position'
+import {
+  getDaysInMonth,
+  clampDayToMonth,
+  getFirstWeekdayOfMonth,
+  getISOWeek,
+  isDayDisabled,
+  formatISO,
+  getWeekdayNames,
+  getMonthName,
+  getSegmentOrder,
+  type DateSegmentType,
+} from '../../../utils/dates'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
-
-type SegmentType = 'day' | 'month' | 'year'
 
 interface TranslationStrings {
   day: string
@@ -38,90 +48,6 @@ declare global {
   interface HTMLSpanElement {
     __dateFieldHandlers?: SegmentHandlers
   }
-}
-
-// ─── Date helpers (exported for testing) ─────────────────────────────────────
-
-export function getDaysInMonth(year: number, month: number): number {
-  return new Date(year, month + 1, 0).getDate()
-}
-
-export function clampDayToMonth(year: number, month: number, day: number): number {
-  return Math.min(day, getDaysInMonth(year, month))
-}
-
-export function getFirstWeekdayOfMonth(year: number, month: number): number {
-  const day = new Date(year, month, 1).getDay()
-  return (day + 6) % 7 // 0=Mon, 6=Sun
-}
-
-export function getISOWeek(date: Date): number {
-  const d = new Date(date)
-  d.setHours(0, 0, 0, 0)
-  d.setDate(d.getDate() + 3 - ((d.getDay() + 6) % 7))
-  const week1 = new Date(d.getFullYear(), 0, 4)
-  return 1 + Math.round(
-    ((d.getTime() - week1.getTime()) / 86400000 - 3 + ((week1.getDay() + 6) % 7)) / 7
-  )
-}
-
-export function isDayDisabled(date: Date, min: Date | null, max: Date | null): boolean {
-  const d = new Date(date.getFullYear(), date.getMonth(), date.getDate())
-  if (min) {
-    const minDay = new Date(min.getFullYear(), min.getMonth(), min.getDate())
-    if (d < minDay) return true
-  }
-  if (max) {
-    const maxDay = new Date(max.getFullYear(), max.getMonth(), max.getDate())
-    if (d > maxDay) return true
-  }
-  return false
-}
-
-export function formatISO(date: Date): string {
-  const y = date.getFullYear()
-  const m = String(date.getMonth() + 1).padStart(2, '0')
-  const d = String(date.getDate()).padStart(2, '0')
-  return `${y}-${m}-${d}`
-}
-
-export function getWeekdayNames(locale: string): string[] {
-  const monday = new Date(2024, 0, 1)
-  return Array.from({ length: 7 }, (_, i) => {
-    const d = new Date(monday)
-    d.setDate(monday.getDate() + i)
-    return new Intl.DateTimeFormat(locale, { weekday: 'short' }).format(d)
-  })
-}
-
-export function getMonthName(year: number, month: number, locale: string): string {
-  return new Intl.DateTimeFormat(locale, { month: 'long' }).format(new Date(year, month, 1))
-}
-
-export function getSegmentOrder(locale: string): { order: SegmentType[]; separator: string } {
-  try {
-    const parts = new Intl.DateTimeFormat(locale, {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-    }).formatToParts(new Date(2026, 0, 15))
-
-    const order: SegmentType[] = []
-    let separator = '/'
-
-    for (const part of parts) {
-      if (part.type === 'day' || part.type === 'month' || part.type === 'year') {
-        order.push(part.type)
-      } else if (part.type === 'literal' && order.length > 0 && order.length < 3) {
-        const stripped = part.value.replace(/[\u200B-\u200F\u202A-\u202E\uFEFF]/g, '').trim()
-        if (stripped) separator = stripped
-      }
-    }
-
-    if (order.length === 3) return { order, separator }
-  } catch (_) {}
-
-  return { order: ['day', 'month', 'year'], separator: '/' }
 }
 
 // ─── DateField class ──────────────────────────────────────────────────────────
@@ -323,7 +249,7 @@ class DateField {
 
   // ─── Segments ───────────────────────────────────────────────────────────────
 
-  _createSegmentEl(type: SegmentType): HTMLSpanElement {
+  _createSegmentEl(type: DateSegmentType): HTMLSpanElement {
     const span = document.createElement('span')
     span.className = 'Segment'
     span.setAttribute('role', 'spinbutton')
@@ -458,16 +384,16 @@ class DateField {
     return seg.hasAttribute('data-placeholder') ? null : Number(seg.getAttribute('aria-valuenow'))
   }
 
-  _getSegmentEl(type: SegmentType): HTMLSpanElement | null {
+  _getSegmentEl(type: DateSegmentType): HTMLSpanElement | null {
     return this._segmentEls.find(s => s.dataset.segment === type) ?? null
   }
 
-  _getSegmentValueByType(type: SegmentType): number | null {
+  _getSegmentValueByType(type: DateSegmentType): number | null {
     const seg = this._getSegmentEl(type)
     return seg ? this._getCurrentSegmentValue(seg) : null
   }
 
-  _getSegmentLimits(type: SegmentType): { min: number; max: number } {
+  _getSegmentLimits(type: DateSegmentType): { min: number; max: number } {
     if (type === 'day') {
       const year = this._getSegmentValueByType('year') ?? new Date().getFullYear()
       const month = this._getSegmentValueByType('month')
@@ -482,7 +408,7 @@ class DateField {
   }
 
   _incrementSegment(seg: HTMLSpanElement, delta: number): void {
-    const type = seg.dataset.segment as SegmentType
+    const type = seg.dataset.segment as DateSegmentType
     const current = this._getCurrentSegmentValue(seg)
     const limits = this._getSegmentLimits(type)
     const start = current ?? (delta > 0 ? limits.min - 1 : limits.max + 1)
@@ -493,7 +419,7 @@ class DateField {
   }
 
   _setSegmentValue(seg: HTMLSpanElement, numericValue: number): void {
-    const type = seg.dataset.segment as SegmentType
+    const type = seg.dataset.segment as DateSegmentType
     seg.removeAttribute('data-placeholder')
     seg.setAttribute('aria-valuenow', String(numericValue))
 
@@ -523,7 +449,7 @@ class DateField {
   }
 
   _clearSegment(seg: HTMLSpanElement): void {
-    const type = seg.dataset.segment as SegmentType
+    const type = seg.dataset.segment as DateSegmentType
     seg.setAttribute('data-placeholder', '')
     seg.removeAttribute('aria-valuenow')
     const placeholder = type === 'day' ? 'dd' : type === 'month' ? 'mm' : 'yyyy'
@@ -532,7 +458,7 @@ class DateField {
   }
 
   _handleDigit(seg: HTMLSpanElement, digit: string): void {
-    const type = seg.dataset.segment as SegmentType
+    const type = seg.dataset.segment as DateSegmentType
     clearTimeout(this._digitTimer ?? undefined)
     this._digitBuffer += digit
     const num = Number(this._digitBuffer)
@@ -582,7 +508,7 @@ class DateField {
     if (!this._digitBuffer) return
     clearTimeout(this._digitTimer ?? undefined)
     this._digitTimer = null
-    const type = seg.dataset.segment as SegmentType
+    const type = seg.dataset.segment as DateSegmentType
     const num = Number(this._digitBuffer)
     if (type === 'year' && this._digitBuffer.length < 4) {
       this._clearSegment(seg)

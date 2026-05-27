@@ -9,7 +9,7 @@ import {
   getMonthName,
   getSegmentOrder,
   clampDayToMonth,
-} from '../DateField'
+} from '../../../../utils/dates'
 import DateField from '../DateField'
 
 describe('getDaysInMonth', () => {
