@@ -440,9 +440,9 @@ export class DateTimeField {
   }
 
   _syncSegmentsFromDatetime(dt: Date): void {
-    this._setSegmentValue(this._getSegmentEl('day'), dt.getDate())
-    this._setSegmentValue(this._getSegmentEl('month'), dt.getMonth() + 1)
     this._setSegmentValue(this._getSegmentEl('year'), dt.getFullYear())
+    this._setSegmentValue(this._getSegmentEl('month'), dt.getMonth() + 1)
+    this._setSegmentValue(this._getSegmentEl('day'), dt.getDate())
 
     if (this._is12h()) {
       const h = dt.getHours()

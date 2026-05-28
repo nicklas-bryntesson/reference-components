@@ -92,6 +92,19 @@ describe('_syncSegmentsFromDatetime()', () => {
     expect(instance._getSegmentValueByType('minute')).toBe(35)
     root.remove()
   })
+
+  it('correctly syncs leap-year Feb 29', async () => {
+    const { DateTimeField } = await import('../DateTimeField.ts')
+    const root = makeRoot('data-locale="sv"')
+    document.body.appendChild(root)
+    DateTimeField.attach(document.body)
+    const instance = root.__dateTimeFieldInstance
+    instance._syncSegmentsFromDatetime(new Date(2024, 1, 29, 10, 0)) // Feb 29 2024
+    expect(instance._getSegmentValueByType('year')).toBe(2024)
+    expect(instance._getSegmentValueByType('month')).toBe(2)
+    expect(instance._getSegmentValueByType('day')).toBe(29)
+    root.remove()
+  })
 })
 
 describe('_trySyncToNative()', () => {
@@ -118,5 +131,27 @@ describe('_trySyncToNative()', () => {
     instance._setSegmentValue(instance._getSegmentEl('day'), 27)
     expect(instance.native.value).toBe('')
     root.remove()
+  })
+
+  it('correctly round-trips midnight and noon in 12h locale', async () => {
+    const { DateTimeField } = await import('../DateTimeField.ts')
+    // midnight
+    const root1 = makeRoot() // en = 12h locale
+    document.body.appendChild(root1)
+    DateTimeField.attach(document.body)
+    const inst1 = root1.__dateTimeFieldInstance
+    inst1._syncSegmentsFromDatetime(new Date(2026, 0, 1, 0, 0))
+    expect(inst1.native.value).toBe('2026-01-01T00:00')
+    expect(inst1._getSegmentValueByType('ampm')).toBe(0) // 0 = AM
+    root1.remove()
+    // noon
+    const root2 = makeRoot()
+    document.body.appendChild(root2)
+    DateTimeField.attach(document.body)
+    const inst2 = root2.__dateTimeFieldInstance
+    inst2._syncSegmentsFromDatetime(new Date(2026, 0, 1, 12, 0))
+    expect(inst2.native.value).toBe('2026-01-01T12:00')
+    expect(inst2._getSegmentValueByType('ampm')).toBe(1) // 1 = PM
+    root2.remove()
   })
 })
