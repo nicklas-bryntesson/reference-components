@@ -175,6 +175,11 @@ class TimeField {
   _initInteractiveMode(): void {
     this.root.dataset.inputMode = 'custom'
 
+    // In interactive mode, the overlay is the real UI — remove aria-hidden so
+    // screen readers can reach the spinbutton segments and trigger button.
+    // The native input remains aria-hidden (tabindex="-1") and is only a value carrier.
+    this.overlay.removeAttribute('aria-hidden')
+
     // Wire label association
     const labelEl = document.querySelector<HTMLLabelElement>(`label[for="${this.fieldId}"]`)
     if (labelEl) {
