@@ -736,7 +736,9 @@ export class DateTimeField {
     const tbody = document.createElement('tbody')
     const firstDay = getFirstWeekdayOfMonth(this.currentYear, this.currentMonth)
     const daysInMonth = getDaysInMonth(this.currentYear, this.currentMonth)
-    const prevDays = getDaysInMonth(this.currentYear, this.currentMonth - 1)
+    const prevMonth = this.currentMonth === 0 ? 11 : this.currentMonth - 1
+    const prevYear = this.currentMonth === 0 ? this.currentYear - 1 : this.currentYear
+    const prevDays = getDaysInMonth(prevYear, prevMonth)
 
     let row = document.createElement('tr')
     let cellCount = 0
@@ -916,13 +918,13 @@ export class DateTimeField {
       this.currentMonth -= 1
       if (this.currentMonth < 0) { this.currentMonth = 11; this.currentYear-- }
       this._renderMonth()
-      this._focusCalendarDate(new Date(this.currentYear, this.currentMonth, current.getDate()))
+      this._focusCalendarDate(new Date(this.currentYear, this.currentMonth, clampDayToMonth(this.currentYear, this.currentMonth, current.getDate())))
     } else if (e.key === 'PageDown') {
       e.preventDefault()
       this.currentMonth += 1
       if (this.currentMonth > 11) { this.currentMonth = 0; this.currentYear++ }
       this._renderMonth()
-      this._focusCalendarDate(new Date(this.currentYear, this.currentMonth, current.getDate()))
+      this._focusCalendarDate(new Date(this.currentYear, this.currentMonth, clampDayToMonth(this.currentYear, this.currentMonth, current.getDate())))
     } else if (e.key === 'Home') {
       e.preventDefault()
       this._focusCalendarDate(new Date(this.currentYear, this.currentMonth, 1))
@@ -965,7 +967,14 @@ export class DateTimeField {
       li.id = `${this.fieldId}-month-${i}`
       li.setAttribute('aria-selected', String(i === this.currentMonth))
       li.textContent = getMonthName(this.currentYear, i, this.locale)
-      li.addEventListener('click', () => this._confirmPickerMonth(i))
+      const monthDate = new Date(this.currentYear, i, 1)
+      const monthEnd = new Date(this.currentYear, i + 1, 0)
+      const isDisabled = (this.min && monthEnd < this.min) || (this.max && monthDate > this.max)
+      if (isDisabled) {
+        li.setAttribute('aria-disabled', 'true')
+      } else {
+        li.addEventListener('click', () => this._confirmPickerMonth(i))
+      }
       monthList.appendChild(li)
     }
     monthList.setAttribute('aria-activedescendant', `${this.fieldId}-month-${this.currentMonth}`)
@@ -986,6 +995,8 @@ export class DateTimeField {
     yearList.setAttribute('aria-activedescendant', `${this.fieldId}-year-${this.currentYear}`)
 
     this.calendarEl.dataset.view = 'picker'
+    const pickerGroup = this.calendarEl.querySelector<HTMLElement>('.YearMonthPicker')
+    pickerGroup?.addEventListener('mousedown', e => e.preventDefault())
     monthList.querySelector<HTMLElement>('[aria-selected="true"]')?.scrollIntoView({ block: 'center' })
     yearList.querySelector<HTMLElement>('[aria-selected="true"]')?.scrollIntoView({ block: 'center' })
     monthList.focus()
