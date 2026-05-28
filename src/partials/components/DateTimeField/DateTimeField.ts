@@ -255,13 +255,158 @@ export class DateTimeField {
     delete this.root.__dateTimeFieldInstance
   }
 
+  _buildSegments(): void {
+    this.segments.innerHTML = ''
+    this._segmentEls = []
+
+    const { order, separator } = getSegmentOrder(this.locale)
+
+    // Date segments (locale-ordered)
+    order.forEach((type, i) => {
+      if (i > 0) this._appendSep(separator)
+      const seg = this._createSegment(type)
+      this.segments.appendChild(seg)
+      this._segmentEls.push(seg)
+    })
+
+    // Time separator
+    this._appendSep(', ')
+
+    // Hour segment
+    const hourSeg = this._createSegment('hour')
+    this.segments.appendChild(hourSeg)
+    this._segmentEls.push(hourSeg)
+
+    this._appendSep(':')
+
+    // Minute segment
+    const minSeg = this._createSegment('minute')
+    this.segments.appendChild(minSeg)
+    this._segmentEls.push(minSeg)
+
+    // Second segment — only when step < 60
+    if (this._showSeconds()) {
+      this._appendSep(':')
+      const secSeg = this._createSegment('second')
+      this.segments.appendChild(secSeg)
+      this._segmentEls.push(secSeg)
+    }
+
+    // AM/PM segment — only for 12h locales
+    if (this._is12h()) {
+      this._appendSep(' ')
+      const ampmSeg = this._createSegment('ampm')
+      this.segments.appendChild(ampmSeg)
+      this._segmentEls.push(ampmSeg)
+    }
+
+    // ARIA group label
+    this.segments.setAttribute('aria-label', this.t.dateTimeField)
+
+    // Roving tabindex — first segment is initially tabbable
+    this._segmentEls.forEach((seg, i) => {
+      seg.setAttribute('tabindex', i === 0 ? '0' : '-1')
+    })
+  }
+
+  _appendSep(text: string): void {
+    const sep = document.createElement('span')
+    sep.className = 'Segment-sep'
+    sep.setAttribute('aria-hidden', 'true')
+    sep.textContent = text
+    this.segments.appendChild(sep)
+  }
+
+  _createSegment(type: SegmentType): HTMLSpanElement {
+    const seg = document.createElement('span')
+    seg.className = 'Segment'
+    seg.setAttribute('role', 'spinbutton')
+    seg.dataset.segment = type
+
+    if (type === 'ampm') {
+      const label = this._is12h()
+        ? `${this.t.am}/${this.t.pm}`
+        : this.t.hour
+      seg.setAttribute('aria-label', label)
+      seg.setAttribute('aria-valuetext', this.t.am)
+      seg.setAttribute('aria-valuenow', '0') // 0 = AM, 1 = PM
+      seg.textContent = this.t.am
+      return seg
+    }
+
+    const limits = this._getSegmentLimits(type)
+    const placeholders: Record<string, string> = {
+      day: 'dd', month: 'mm', year: 'yyyy',
+      hour: '--', minute: '--', second: '--',
+    }
+    const labels: Record<string, string> = {
+      day: this.t.day, month: this.t.month, year: this.t.year,
+      hour: this.t.hour, minute: this.t.minute, second: this.t.second,
+    }
+
+    seg.setAttribute('aria-label', labels[type])
+    seg.setAttribute('aria-valuemin', String(limits.min))
+    seg.setAttribute('aria-valuemax', String(limits.max))
+    seg.setAttribute('data-placeholder', '')
+    seg.setAttribute('aria-valuetext', placeholders[type])
+    seg.textContent = placeholders[type]
+
+    return seg
+  }
+
+  _getSegmentLimits(type: SegmentType): { min: number; max: number } {
+    if (type === 'day') {
+      const year = this._getSegmentValueByType('year') ?? new Date().getFullYear()
+      const month = this._getSegmentValueByType('month')
+      return { min: 1, max: month != null ? getDaysInMonth(year, month - 1) : 31 }
+    }
+    if (type === 'month') return { min: 1, max: 12 }
+    if (type === 'year') return {
+      min: this.min ? this.min.getFullYear() : 1900,
+      max: this.max ? this.max.getFullYear() : 2100,
+    }
+    if (type === 'hour') return { min: this._is12h() ? 1 : 0, max: this._is12h() ? 12 : 23 }
+    if (type === 'minute') return { min: 0, max: 59 }
+    if (type === 'second') return { min: 0, max: 59 }
+    return { min: 0, max: 1 } // ampm
+  }
+
+  _getSegmentEl(type: SegmentType): HTMLSpanElement | null {
+    return this._segmentEls.find(s => s.dataset.segment === type) ?? null
+  }
+
+  _getSegmentValueByType(type: SegmentType): number | null {
+    const seg = this._getSegmentEl(type)
+    return seg ? this._getCurrentSegmentValue(seg) : null
+  }
+
+  _getCurrentSegmentValue(seg: HTMLSpanElement): number | null {
+    return seg.hasAttribute('data-placeholder') ? null : Number(seg.getAttribute('aria-valuenow'))
+  }
+
+  _clearSegment(seg: HTMLSpanElement): void {
+    const type = seg.dataset.segment as SegmentType
+    if (type === 'ampm') {
+      seg.setAttribute('aria-valuenow', '0')
+      seg.setAttribute('aria-valuetext', this.t.am)
+      seg.textContent = this.t.am
+      return
+    }
+    const placeholders: Record<string, string> = {
+      day: 'dd', month: 'mm', year: 'yyyy',
+      hour: '--', minute: '--', second: '--',
+    }
+    seg.setAttribute('data-placeholder', '')
+    seg.removeAttribute('aria-valuenow')
+    seg.setAttribute('aria-valuetext', placeholders[type] ?? '--')
+    seg.textContent = placeholders[type] ?? '--'
+  }
+
   // Stubs — implemented in later tasks
-  _buildSegments(): void {}
   _bindSegmentEvents(): void {}
   _bindTrigger(): void {}
   _syncSegmentsFromDatetime(_dt: Date): void {}
   _toggleCalendar(): void {}
   _closeCalendar(_restoreFocus = true): void {}
   _renderTimeColumns(): void {}
-  _clearSegment(_seg: HTMLSpanElement): void {}
 }
