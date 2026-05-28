@@ -1,0 +1,306 @@
+.TimeField {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  /* Public API */
+  --tf-popup-width: 12rem;
+  --tf-popup-gap: 1.5rem;
+  /* Design tokens — segments */
+  --tf-border-color: currentColor;
+  --tf-border-color-hover: #333;
+  --tf-bg-hover: #f8f8f8;
+  --tf-border-color-invalid: #c00;
+  --tf-color-muted: #6e6e6e;
+  --tf-trigger-bg-hover: #f0f0f0;
+  --tf-trigger-bg-active: #e0e0e0;
+  /* Design tokens — popup */
+  --tf-popup-bg: Canvas;
+  --tf-popup-color: CanvasText;
+  --tf-popup-border-color: currentColor;
+  --tf-popup-radius: 4px;
+  --tf-popup-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  --tf-popup-backdrop: none;
+  --tf-option-bg-selected: Highlight;
+  --tf-option-color-selected: HighlightText;
+  /* Internal */
+  --_tf-arrow-size: 0.75rem;
+  --_tf-arrow-corner-radius: 0.25rem;
+
+  & .TimeField-native {
+    display: block;
+  }
+
+  & .TimeField-overlay {
+    display: none;
+  }
+
+  &[data-disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+
+    & * {
+      pointer-events: none;
+    }
+  }
+
+  &[data-input-mode="custom"] {
+    & .TimeField-native {
+      position: absolute;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      inline-size: 1px;
+      block-size: 1px;
+      overflow: hidden;
+    }
+
+    & .TimeField-overlay {
+      display: inline-flex;
+      align-items: center;
+      gap: 0;
+    }
+  }
+
+  &[data-input-mode="native"] {
+    & .TimeField-native {
+      display: block;
+    }
+
+    & .TimeField-overlay {
+      display: none;
+    }
+  }
+
+  & .TimeField-segments {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid var(--tf-border-color);
+    padding-inline: 0.5rem;
+    padding-block: 0.25rem;
+    gap: 0.125rem;
+    border-radius: 4px;
+  }
+
+  & .TimeField-segment {
+    font-variant-numeric: tabular-nums;
+    min-inline-size: 2ch;
+    text-align: center;
+    outline: none;
+    border-radius: 2px;
+    cursor: default;
+
+    &[data-focused] {
+      background-color: Highlight;
+      color: HighlightText;
+    }
+
+    &[data-placeholder] {
+      color: var(--tf-color-muted);
+    }
+  }
+
+  & .TimeField-sep {
+    user-select: none;
+    color: GrayText;
+  }
+
+  & .TimeField-segments:hover,
+  &[data-test-state="hover"] .TimeField-segments {
+    border-color: var(--tf-border-color-hover);
+    background-color: var(--tf-bg-hover);
+  }
+
+  & .TimeField-segments:focus-within,
+  &[data-test-state="focus"] .TimeField-segments {
+    outline: 2px solid;
+    outline-offset: 1px;
+  }
+
+  &[data-invalid] .TimeField-segments {
+    border-color: var(--tf-border-color-invalid);
+  }
+
+  & .TimeField-trigger {
+    margin-inline-start: 0.25rem;
+    background: none;
+    border: none;
+    padding: 0.25rem;
+    cursor: pointer;
+    border-radius: 2px;
+    vertical-align: middle;
+
+    &:hover,
+    .TimeField[data-test-state="hover"] & {
+      background-color: var(--tf-trigger-bg-hover);
+    }
+
+    &:active,
+    .TimeField[data-test-state="active"] & {
+      background-color: var(--tf-trigger-bg-active);
+    }
+
+    &:focus-visible {
+      outline: 2px solid;
+      outline-offset: 2px;
+    }
+  }
+
+  & .TimeField-announce {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+/* ── Initialisation gate ───────────────────────────────────────────────────── */
+.TimeField[data-initialized] {
+  overflow: visible;
+}
+
+/* ── Slide rail ────────────────────────────────────────────────────────────── */
+.TimeField .TimeField-slideContainer {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(100vw, calc(100vw - 2rem));
+  height: 0;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* ── Popup bubble ──────────────────────────────────────────────────────────── */
+.TimeFieldPopup {
+  position: absolute;
+  left: var(--tf-popup-offset, 50%);
+  transform: translateX(-50%);
+  inline-size: var(--tf-popup-width);
+  pointer-events: auto;
+  background: transparent;
+  color: var(--tf-popup-color);
+  border: 1px solid var(--tf-popup-border-color);
+  border-radius: var(--tf-popup-radius);
+  box-shadow: var(--tf-popup-shadow);
+  z-index: 100;
+  padding: 0.5rem;
+}
+
+/* ── Direction gates ───────────────────────────────────────────────────────── */
+.TimeField[data-direction="bottom"] .TimeFieldPopup {
+  top: var(--tf-popup-gap);
+}
+
+.TimeField[data-direction="top"] .TimeFieldPopup {
+  bottom: var(--tf-popup-gap);
+}
+
+/* ── Popup surface (backdrop-filter layer) ─────────────────────────────────── */
+.TimeFieldPopup-surface {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.TimeFieldPopup-backdropBlur {
+  position: absolute;
+  inset: -20px;
+  background: var(--tf-popup-bg);
+  backdrop-filter: var(--tf-popup-backdrop);
+}
+
+/* ── Popup columns ─────────────────────────────────────────────────────────── */
+.TimeFieldPopup-columns {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  gap: 0.25rem;
+  justify-content: center;
+}
+
+.TimeFieldPopup-column {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  max-block-size: 10rem;
+  scrollbar-width: thin;
+  flex: 1;
+  text-align: center;
+
+  & [role="option"] {
+    padding-block: 0.375rem;
+    cursor: pointer;
+    border-radius: 2px;
+    font-variant-numeric: tabular-nums;
+
+    &:hover {
+      background-color: var(--tf-bg-hover);
+    }
+
+    &[aria-selected="true"] {
+      background-color: var(--tf-option-bg-selected);
+      color: var(--tf-option-color-selected);
+    }
+  }
+}
+
+/* ── Popup footer ──────────────────────────────────────────────────────────── */
+.TimeFieldPopup-footer {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  margin-block-start: 0.5rem;
+  gap: 0.5rem;
+
+  & button {
+    background: none;
+    border: 1px solid currentColor;
+    padding: 0.25rem 0.5rem;
+    cursor: pointer;
+    border-radius: 2px;
+    font-size: 0.875rem;
+
+    &:hover {
+      background-color: var(--tf-bg-hover);
+    }
+
+    &:focus-visible {
+      outline: 2px solid;
+      outline-offset: 2px;
+    }
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+  }
+}
+
+/* ── Arrow ─────────────────────────────────────────────────────────────────── */
+.TimeFieldPopup-arrow {
+  position: absolute;
+  width: var(--_tf-arrow-size);
+  height: var(--_tf-arrow-size);
+  background-color: var(--tf-popup-bg);
+  left: 50%;
+  z-index: 3;
+}
+
+.TimeField[data-direction="top"] .TimeFieldPopup-arrow {
+  bottom: calc(var(--_tf-arrow-size) * -0.5);
+  transform: translateX(calc(-50% + var(--tf-arrow-offset, 0px))) rotate(45deg);
+  border-end-end-radius: var(--_tf-arrow-corner-radius);
+}
+
+.TimeField[data-direction="bottom"] .TimeFieldPopup-arrow {
+  top: calc(var(--_tf-arrow-size) * -0.5);
+  transform: translateX(calc(-50% + var(--tf-arrow-offset, 0px))) rotate(45deg);
+  border-start-start-radius: var(--_tf-arrow-corner-radius);
+}
