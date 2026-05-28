@@ -253,6 +253,15 @@ export class DateTimeField {
   }
 
   destroy(): void {
+    this._segmentEls.forEach(seg => {
+      const h = seg.__dateTimeFieldHandlers
+      if (h) {
+        seg.removeEventListener('keydown', h.keydown)
+        seg.removeEventListener('focus', h.focus)
+        seg.removeEventListener('blur', h.blur)
+        delete seg.__dateTimeFieldHandlers
+      }
+    })
     this.trigger.removeEventListener('click', this._handleTriggerClick)
     this.native.removeEventListener('change', this._handleNativeChange)
     this.native.form?.removeEventListener('reset', this._handleFormReset)
@@ -570,14 +579,12 @@ export class DateTimeField {
   _bindSegmentEvents(): void {
     this._segmentEls.forEach(seg => {
       const keydownHandler = (e: KeyboardEvent) => this._handleSegmentKey(e, seg)
-      const focusHandler = () => {
-        this._setSegmentFocused(seg)
-        seg.setAttribute('data-focused', '')
-      }
+      const focusHandler = () => this._setSegmentFocused(seg)
       const blurHandler = () => {
         seg.removeAttribute('data-focused')
         this._flushDigitBuffer(seg)
       }
+      seg.__dateTimeFieldHandlers = { keydown: keydownHandler, focus: focusHandler, blur: blurHandler }
       seg.addEventListener('keydown', keydownHandler)
       seg.addEventListener('focus', focusHandler)
       seg.addEventListener('blur', blurHandler)
@@ -595,6 +602,14 @@ export class DateTimeField {
     const { min, max } = this._getSegmentLimits(type)
 
     this._showBuffer(seg, this._digitBuffer)
+
+    // If first digit already exceeds max/10, no valid 2-digit completion exists — commit immediately
+    if (len === 1 && num * 10 > max) {
+      this._setSegmentValue(seg, Math.max(min, Math.min(max, num)))
+      this._digitBuffer = ''
+      this._moveSegmentFocus(seg, 1)
+      return
+    }
 
     if (type === 'year') {
       if (len === 4) {
