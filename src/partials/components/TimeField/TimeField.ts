@@ -881,6 +881,27 @@ class TimeField {
   }
 
   private _handlePopupKeydown(e: KeyboardEvent): void {
+    if (e.key === 'Tab') {
+      const col = (e.target as HTMLElement).closest<HTMLElement>('[role="listbox"]')
+      if (!col || !this.popupEl) return
+      const allCols = [...this.popupEl.querySelectorAll<HTMLElement>('[role="listbox"]')]
+      const isLastCol = allCols[allCols.length - 1] === col
+      const isFirstCol = allCols[0] === col
+      if (!e.shiftKey && isLastCol) {
+        e.preventDefault()
+        this.popupEl.querySelector<HTMLButtonElement>('.TimeFieldPopup-clear')?.focus()
+      } else if (e.shiftKey && isFirstCol) {
+        e.preventDefault()
+        this.trigger.focus()
+        this._closePopup()
+      } else if (!e.shiftKey && !isLastCol) {
+        e.preventDefault()
+        allCols[allCols.indexOf(col) + 1]?.focus()
+      } else if (e.shiftKey && !isFirstCol) {
+        e.preventDefault()
+        allCols[allCols.indexOf(col) - 1]?.focus()
+      }
+    }
     if (e.key === 'Escape') {
       e.preventDefault()
       this._closePopup()
