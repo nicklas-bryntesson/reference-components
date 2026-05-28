@@ -266,6 +266,10 @@ export class DateTimeField {
     this.native.removeEventListener('change', this._handleNativeChange)
     this.native.form?.removeEventListener('reset', this._handleFormReset)
     this._closeCalendar(false)
+    if ((this as any)._timeColumnsAbort) {
+      (this as any)._timeColumnsAbort.abort()
+      delete (this as any)._timeColumnsAbort
+    }
     delete this.root.__dateTimeFieldInstance
   }
 
@@ -1022,6 +1026,13 @@ export class DateTimeField {
   _renderTimeColumns(): void {
     if (!this.calendarEl) return
 
+    // Clean up listeners from previous render
+    if ((this as any)._timeColumnsAbort) {
+      (this as any)._timeColumnsAbort.abort()
+    }
+    const timeAbort = new AbortController()
+    ;(this as any)._timeColumnsAbort = timeAbort
+
     const hourList = this.calendarEl.querySelector<HTMLElement>('.HourList')!
     const minuteList = this.calendarEl.querySelector<HTMLElement>('.MinuteList')!
     const secondList = this.calendarEl.querySelector<HTMLElement>('.SecondList')
@@ -1058,11 +1069,11 @@ export class DateTimeField {
         list.setAttribute('aria-activedescendant', activeId)
         list.querySelector<HTMLElement>('[aria-selected="true"]')?.scrollIntoView({ block: 'center' })
       }
-      list.addEventListener('keydown', (e) => this._handleTimeListKey(e, list, idPrefix as 'hour' | 'minute' | 'second' | 'ampm'))
+      list.addEventListener('keydown', (e) => this._handleTimeListKey(e, list, idPrefix as 'hour' | 'minute' | 'second' | 'ampm'), { signal: timeAbort.signal })
     }
 
-    const maxH = this._is12h() ? 11 : 23
-    const minH = 0
+    const maxH = this._is12h() ? 12 : 23
+    const minH = this._is12h() ? 1 : 0
 
     renderList(
       hourList,
@@ -1070,7 +1081,7 @@ export class DateTimeField {
         value: minH + i,
         label: String(minH + i).padStart(2, '0'),
       })),
-      this._is12h() ? (currentH > 12 ? currentH - 12 : currentH === 0 ? 0 : currentH) : currentH,
+      this._is12h() ? (currentH === 0 ? 12 : currentH > 12 ? currentH - 12 : currentH) : currentH,
       'hour',
       this.t.hours
     )
@@ -1132,13 +1143,6 @@ export class DateTimeField {
     this.selectedDatetime = base
     this._syncSegmentsFromDatetime(base)
     this._renderTimeColumns()
-
-    // Update aria-activedescendant on the list
-    const listClass = type === 'hour' ? 'HourList' : type === 'minute' ? 'MinuteList' : type === 'second' ? 'SecondList' : 'AmPmList'
-    const list = this.calendarEl?.querySelector<HTMLElement>(`.${listClass}`)
-    if (list) {
-      list.setAttribute('aria-activedescendant', `${this.fieldId}-${type}-${value}`)
-    }
   }
 
   _handleTimeListKey(e: KeyboardEvent, list: HTMLElement, type: 'hour' | 'minute' | 'second' | 'ampm'): void {
