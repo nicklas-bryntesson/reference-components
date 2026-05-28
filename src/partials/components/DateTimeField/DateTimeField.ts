@@ -64,6 +64,11 @@ declare global {
   }
 }
 
+const SEGMENT_PLACEHOLDERS: Record<string, string> = {
+  day: 'dd', month: 'mm', year: 'yyyy',
+  hour: '--', minute: '--', second: '--',
+}
+
 // ─── DateTimeField class ──────────────────────────────────────────────────────
 
 export class DateTimeField {
@@ -300,8 +305,7 @@ export class DateTimeField {
       this._segmentEls.push(ampmSeg)
     }
 
-    // ARIA group label
-    this.segments.setAttribute('aria-label', this.t.dateTimeField)
+    this.segments.setAttribute('aria-roledescription', this.t.dateTimeField)
 
     // Roving tabindex — first segment is initially tabbable
     this._segmentEls.forEach((seg, i) => {
@@ -324,10 +328,7 @@ export class DateTimeField {
     seg.dataset.segment = type
 
     if (type === 'ampm') {
-      const label = this._is12h()
-        ? `${this.t.am}/${this.t.pm}`
-        : this.t.hour
-      seg.setAttribute('aria-label', label)
+      seg.setAttribute('aria-label', `${this.t.am}/${this.t.pm}`)
       seg.setAttribute('aria-valuetext', this.t.am)
       seg.setAttribute('aria-valuenow', '0') // 0 = AM, 1 = PM
       seg.textContent = this.t.am
@@ -335,10 +336,6 @@ export class DateTimeField {
     }
 
     const limits = this._getSegmentLimits(type)
-    const placeholders: Record<string, string> = {
-      day: 'dd', month: 'mm', year: 'yyyy',
-      hour: '--', minute: '--', second: '--',
-    }
     const labels: Record<string, string> = {
       day: this.t.day, month: this.t.month, year: this.t.year,
       hour: this.t.hour, minute: this.t.minute, second: this.t.second,
@@ -348,8 +345,8 @@ export class DateTimeField {
     seg.setAttribute('aria-valuemin', String(limits.min))
     seg.setAttribute('aria-valuemax', String(limits.max))
     seg.setAttribute('data-placeholder', '')
-    seg.setAttribute('aria-valuetext', placeholders[type])
-    seg.textContent = placeholders[type]
+    seg.setAttribute('aria-valuetext', SEGMENT_PLACEHOLDERS[type])
+    seg.textContent = SEGMENT_PLACEHOLDERS[type]
 
     return seg
   }
@@ -392,14 +389,10 @@ export class DateTimeField {
       seg.textContent = this.t.am
       return
     }
-    const placeholders: Record<string, string> = {
-      day: 'dd', month: 'mm', year: 'yyyy',
-      hour: '--', minute: '--', second: '--',
-    }
     seg.setAttribute('data-placeholder', '')
     seg.removeAttribute('aria-valuenow')
-    seg.setAttribute('aria-valuetext', placeholders[type] ?? '--')
-    seg.textContent = placeholders[type] ?? '--'
+    seg.setAttribute('aria-valuetext', SEGMENT_PLACEHOLDERS[type] ?? '--')
+    seg.textContent = SEGMENT_PLACEHOLDERS[type] ?? '--'
   }
 
   // Stubs — implemented in later tasks
