@@ -42,12 +42,21 @@ export function wrapValue(n: number, min: number, max: number): number {
 
 // ─── Locale helpers ───────────────────────────────────────────────────────────
 
-const LABELS: Record<string, Record<TimeSegmentType, string>> = {
-  'sv-SE': { hour: 'Timmar', minute: 'Minuter', second: 'Sekunder', ampm: 'FM eller EM' },
-  en: { hour: 'Hour', minute: 'Minute', second: 'Second', ampm: 'AM or PM' },
+interface LocaleLabels {
+  hour: string
+  minute: string
+  second: string
+  ampm: string
+  ampmAm: string
+  ampmPm: string
 }
 
-function getLabels(locale: string): Record<TimeSegmentType, string> {
+const LABELS: Record<string, LocaleLabels> = {
+  'sv-SE': { hour: 'Timmar', minute: 'Minuter', second: 'Sekunder', ampm: 'FM eller EM', ampmAm: 'FM', ampmPm: 'EM' },
+  en: { hour: 'Hour', minute: 'Minute', second: 'Second', ampm: 'AM or PM', ampmAm: 'AM', ampmPm: 'PM' },
+}
+
+function getLabels(locale: string): LocaleLabels {
   if (LABELS[locale]) return LABELS[locale]
   // Match by language tag prefix
   const lang = locale.split('-')[0]
@@ -83,7 +92,8 @@ class TimeField {
   _segmentEls: HTMLSpanElement[]
   _digitBuffer: string
   _digitTimer: ReturnType<typeof setTimeout> | null
-  private _labels: Record<TimeSegmentType, string>
+  private _labels: LocaleLabels
+  private _suppressEvents = false
 
   static attach(parent: Document | HTMLElement = document): void {
     parent.querySelectorAll('[data-component="TimeField"]').forEach(el => {
@@ -236,8 +246,8 @@ class TimeField {
 
     if (type === 'ampm') {
       span.setAttribute('aria-valuenow', '0')
-      span.setAttribute('aria-valuetext', 'FM')
-      span.textContent = 'FM'
+      span.setAttribute('aria-valuetext', this._labels.ampmAm)
+      span.textContent = this._labels.ampmAm
     } else {
       const { min, max } = this._getSegmentLimits(type)
       span.setAttribute('aria-valuemin', String(min))
@@ -260,7 +270,7 @@ class TimeField {
       case 'second':
         return { min: 0, max: 59 }
       default:
-        return { min: 0, max: 1 }
+        throw new Error(`Unknown segment type: ${type}`)
     }
   }
 
@@ -396,8 +406,8 @@ class TimeField {
   }
 
   _setAmpm(seg: HTMLSpanElement, value: number): void {
-    // value: 0 = FM/AM, 1 = EM/PM
-    const label = value === 0 ? 'FM' : 'EM'
+    // value: 0 = AM/FM, 1 = PM/EM
+    const label = value === 0 ? this._labels.ampmAm : this._labels.ampmPm
     seg.setAttribute('aria-valuenow', String(value))
     seg.setAttribute('aria-valuetext', label)
     seg.textContent = label
@@ -570,8 +580,10 @@ class TimeField {
     this.native.value = timeStr
     this.root.dataset.hasValue = ''
 
-    this.native.dispatchEvent(new Event('input', { bubbles: true }))
-    this.native.dispatchEvent(new Event('change', { bubbles: true }))
+    if (!this._suppressEvents) {
+      this.native.dispatchEvent(new Event('input', { bubbles: true }))
+      this.native.dispatchEvent(new Event('change', { bubbles: true }))
+    }
 
     // Announce the complete time value briefly
     this._announceTime(timeStr)
@@ -586,8 +598,11 @@ class TimeField {
 
   _bindValueSync(): void {
     this.native.addEventListener('change', () => {
+      if (this._suppressEvents) return
       if (this.native.value) {
+        this._suppressEvents = true
         this._syncFromNative(this.native.value)
+        this._suppressEvents = false
       }
     })
   }
@@ -610,7 +625,9 @@ class TimeField {
     // Check data-value on root or native.value
     const initialValue = this.root.dataset.value || this.native.value
     if (!initialValue) return
+    this._suppressEvents = true
     this._syncFromNative(initialValue)
+    this._suppressEvents = false
   }
 
   _syncFromNative(value: string): void {
@@ -655,6 +672,11 @@ class TimeField {
   // ─── Destroy ──────────────────────────────────────────────────────────────
 
   destroy(): void {
+    if (this._digitTimer !== null) {
+      clearTimeout(this._digitTimer)
+      this._digitTimer = null
+    }
+
     this._segmentEls.forEach(seg => {
       const handlers = seg.__timeFieldHandlers
       if (handlers) {
