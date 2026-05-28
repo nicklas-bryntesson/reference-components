@@ -104,11 +104,14 @@ function createFileUploadEl(overrides: {
   for (const [k, v] of Object.entries(overrides.rootAttrs ?? {})) {
     el.setAttribute(k, v)
   }
+  const isMultiple = 'multiple' in (overrides.inputAttrs ?? {})
+  const inputAttrsStr = Object.entries(overrides.inputAttrs ?? {}).map(([k, v]) => ` ${k}="${v}"`).join('')
+  const fileContainer = isMultiple
+    ? `<ul class="FileUpload-list" aria-live="polite" aria-relevant="additions removals" aria-label="Selected files"></ul>`
+    : `<div class="FileUpload-selected" aria-live="polite" aria-atomic="true"></div>`
   el.innerHTML = `
-    <input class="FileUpload-input" type="file" aria-hidden="true" tabindex="-1"${
-      Object.entries(overrides.inputAttrs ?? {}).map(([k, v]) => ` ${k}="${v}"`).join('')
-    }>
-    <ul class="FileUpload-list" aria-live="polite" aria-relevant="additions removals" aria-label="Selected files"></ul>
+    <input class="FileUpload-input" type="file" aria-hidden="true" tabindex="-1"${inputAttrsStr}>
+    ${fileContainer}
     <button type="button" class="FileUpload-trigger">Add file</button>
   `
   document.body.appendChild(el)
@@ -163,7 +166,7 @@ describe('FileUpload translations', () => {
 })
 
 describe('FileUpload bootstrap from data-initial-files', () => {
-  it('renders server files from data-initial-files on init', () => {
+  it('renders server files from data-initial-files on init (single mode)', () => {
     const el = createFileUploadEl({
       rootAttrs: {
         'data-initial-files': JSON.stringify([
@@ -172,11 +175,10 @@ describe('FileUpload bootstrap from data-initial-files', () => {
       },
     })
     new FileUpload(el)
-    const items = el.querySelectorAll('.FileUpload-item')
-    expect(items).toHaveLength(1)
-    expect(items[0].querySelector('.FileUpload-item-name')!.textContent).toBe('contract.pdf')
-    expect(items[0].querySelector('.FileUpload-item-size')!.textContent).toBe('200 KB')
-    expect(items[0].querySelector('input[type="hidden"]')!.getAttribute('value')).toBe('abc123')
+    const container = el.querySelector('.FileUpload-selected')!
+    expect(container.querySelector('.FileUpload-item-name')!.textContent).toBe('contract.pdf')
+    expect(container.querySelector('.FileUpload-item-size')!.textContent).toBe('200 KB')
+    expect(container.querySelector('input[type="hidden"]')!.getAttribute('value')).toBe('abc123')
     expect(el.hasAttribute('data-has-files')).toBe(true)
     el.remove()
   })
@@ -184,14 +186,14 @@ describe('FileUpload bootstrap from data-initial-files', () => {
   it('silently ignores malformed data-initial-files JSON', () => {
     const el = createFileUploadEl({ rootAttrs: { 'data-initial-files': 'not-json' } })
     expect(() => new FileUpload(el)).not.toThrow()
-    expect(el.querySelectorAll('.FileUpload-item')).toHaveLength(0)
+    expect(el.querySelector('.FileUpload-selected .FileUpload-item-name')).toBeNull()
     el.remove()
   })
 })
 
 describe('FileUpload static pre-rendered items', () => {
-  it('preserves pre-rendered list items when there is no data source on init', () => {
-    const el = createFileUploadEl()
+  it('preserves pre-rendered list items when there is no data source on init (multiple mode)', () => {
+    const el = createFileUploadEl({ inputAttrs: { multiple: '' } })
     el.querySelector('.FileUpload-list')!.innerHTML = `
       <li class="FileUpload-item" data-status="valid" data-entry-id="static-1">
         <span class="FileUpload-item-name">report.pdf</span>
@@ -204,8 +206,9 @@ describe('FileUpload static pre-rendered items', () => {
     el.remove()
   })
 
-  it('does not preserve pre-rendered items when data-initial-files is present', () => {
+  it('does not preserve pre-rendered items when data-initial-files is present (multiple mode)', () => {
     const el = createFileUploadEl({
+      inputAttrs: { multiple: '' },
       rootAttrs: {
         'data-initial-files': JSON.stringify([
           { name: 'server.pdf', size: 100_000, type: 'application/pdf', ref: 'xyz' },
@@ -219,6 +222,53 @@ describe('FileUpload static pre-rendered items', () => {
     new FileUpload(el)
     expect(el.querySelectorAll('.FileUpload-item')).toHaveLength(1)
     expect(el.querySelector('.FileUpload-item-name')!.textContent).toBe('server.pdf')
+    el.remove()
+  })
+})
+
+describe('FileUpload container semantics', () => {
+  it('uses FileUpload-selected div (not ul) for single-file mode', () => {
+    const el = createFileUploadEl()
+    new FileUpload(el)
+    expect(el.querySelector('.FileUpload-selected')).not.toBeNull()
+    expect(el.querySelector('.FileUpload-list')).toBeNull()
+    el.remove()
+  })
+
+  it('uses FileUpload-list ul for multiple-file mode', () => {
+    const el = createFileUploadEl({ inputAttrs: { multiple: '' } })
+    new FileUpload(el)
+    expect(el.querySelector('.FileUpload-list')).not.toBeNull()
+    expect(el.querySelector('.FileUpload-selected')).toBeNull()
+    el.remove()
+  })
+
+  it('adds file as inline spans (no li) in single-file mode', () => {
+    const el = createFileUploadEl()
+    new FileUpload(el)
+    const input = el.querySelector('.FileUpload-input') as HTMLInputElement
+    const dt = new DataTransfer()
+    dt.items.add(new File(['data'], 'photo.jpg', { type: 'image/jpeg' }))
+    Object.defineProperty(input, 'files', { value: dt.files, configurable: true })
+    input.dispatchEvent(new Event('change'))
+
+    const container = el.querySelector('.FileUpload-selected')!
+    expect(container.querySelector('li')).toBeNull()
+    expect(container.querySelector('.FileUpload-item-name')!.textContent).toBe('photo.jpg')
+    el.remove()
+  })
+
+  it('adds file as li inside ul in multiple-file mode', () => {
+    const el = createFileUploadEl({ inputAttrs: { multiple: '' } })
+    new FileUpload(el)
+    const input = el.querySelector('.FileUpload-input') as HTMLInputElement
+    const dt = new DataTransfer()
+    dt.items.add(new File(['data'], 'doc.pdf', { type: 'application/pdf' }))
+    Object.defineProperty(input, 'files', { value: dt.files, configurable: true })
+    input.dispatchEvent(new Event('change'))
+
+    const list = el.querySelector('.FileUpload-list')!
+    expect(list.querySelector('li.FileUpload-item')).not.toBeNull()
     el.remove()
   })
 })
@@ -241,9 +291,9 @@ describe('FileUpload add files', () => {
     Object.defineProperty(input, 'files', { value: dt2.files, configurable: true })
     input.dispatchEvent(new Event('change'))
 
-    const items = el.querySelectorAll('.FileUpload-item')
-    expect(items).toHaveLength(1)
-    expect(items[0].querySelector('.FileUpload-item-name')!.textContent).toBe('second.pdf')
+    const container = el.querySelector('.FileUpload-selected')!
+    expect(container.querySelectorAll('.FileUpload-item-name')).toHaveLength(1)
+    expect(container.querySelector('.FileUpload-item-name')!.textContent).toBe('second.pdf')
     el.remove()
   })
 
@@ -258,10 +308,9 @@ describe('FileUpload add files', () => {
     Object.defineProperty(input, 'files', { value: dt.files, configurable: true })
     input.dispatchEvent(new Event('change'))
 
-    const items = el.querySelectorAll('.FileUpload-item')
-    expect(items).toHaveLength(1)
-    expect(items[0].querySelector('.FileUpload-item-name')!.textContent).toBe('report.pdf')
-    expect(items[0].getAttribute('data-status')).toBe('valid')
+    const container = el.querySelector('.FileUpload-selected')!
+    expect(container.querySelector('.FileUpload-item-name')!.textContent).toBe('report.pdf')
+    expect(container.getAttribute('data-status')).toBe('valid')
     expect(el.hasAttribute('data-has-files')).toBe(true)
     el.remove()
   })
@@ -277,9 +326,9 @@ describe('FileUpload add files', () => {
     Object.defineProperty(input, 'files', { value: dt.files, configurable: true })
     input.dispatchEvent(new Event('change'))
 
-    const item = el.querySelector('.FileUpload-item')!
-    expect(item.getAttribute('data-status')).toBe('invalid-type')
-    expect(item.querySelector('.FileUpload-item-error')!.textContent).toBe('File type not allowed')
+    const container = el.querySelector('.FileUpload-selected')!
+    expect(container.getAttribute('data-status')).toBe('invalid-type')
+    expect(container.querySelector('.FileUpload-item-error')!.textContent).toBe('File type not allowed')
     expect(el.hasAttribute('data-has-errors')).toBe(true)
     el.remove()
   })
@@ -295,9 +344,9 @@ describe('FileUpload add files', () => {
     Object.defineProperty(input, 'files', { value: dt.files, configurable: true })
     input.dispatchEvent(new Event('change'))
 
-    const item = el.querySelector('.FileUpload-item')!
-    expect(item.getAttribute('data-status')).toBe('invalid-size')
-    expect(item.querySelector('.FileUpload-item-error')!.textContent).toBe('File exceeds maximum size')
+    const container = el.querySelector('.FileUpload-selected')!
+    expect(container.getAttribute('data-status')).toBe('invalid-size')
+    expect(container.querySelector('.FileUpload-item-error')!.textContent).toBe('File exceeds maximum size')
     el.remove()
   })
 
@@ -335,12 +384,12 @@ describe('FileUpload remove files', () => {
     const el = createFileUploadEl()
     new FileUpload(el)
     addFileToInstance(el, 'report.pdf')
-    expect(el.querySelectorAll('.FileUpload-item')).toHaveLength(1)
+    expect(el.querySelector('.FileUpload-selected .FileUpload-item-name')).not.toBeNull()
 
     const removeBtn = el.querySelector('.FileUpload-item-remove') as HTMLButtonElement
     removeBtn.click()
 
-    expect(el.querySelectorAll('.FileUpload-item')).toHaveLength(0)
+    expect(el.querySelector('.FileUpload-selected .FileUpload-item-name')).toBeNull()
     expect(el.hasAttribute('data-has-files')).toBe(false)
     el.remove()
   })

@@ -15,12 +15,13 @@ interface StateDefinition {
   root: Attrs
   input: Attrs
   items: string
-  triggerText?: string    // defaults to 'Add file'
-  triggerDisabled?: boolean // adds disabled attribute to trigger button
+  isMultiple?: boolean
+  triggerText?: string
+  triggerDisabled?: boolean
   initialFiles?: string
 }
 
-// ─── Item HTML helpers ────────────────────────────────────────────────────────
+// ─── Item HTML helpers — multiple mode (<li>) ─────────────────────────────────
 
 const validItem = (name: string, size: string, id = 'static-1') =>
   `\n    <li class="FileUpload-item" data-status="valid" data-entry-id="${id}">
@@ -37,21 +38,30 @@ const invalidTypeItem = (name: string, size: string) =>
       <button type="button" class="FileUpload-item-remove" aria-label="Remove ${name}">&#215;</button>
     </li>`
 
-const invalidSizeItem = (name: string, size: string) =>
-  `\n    <li class="FileUpload-item" data-status="invalid-size" data-entry-id="static-3">
-      <span class="FileUpload-item-name">${name}</span>
-      <span class="FileUpload-item-size">${size}</span>
-      <span class="FileUpload-item-error" role="alert">File exceeds maximum size</span>
-      <button type="button" class="FileUpload-item-remove" aria-label="Remove ${name}">&#215;</button>
-    </li>`
+// ─── Item HTML helpers — single mode (inline spans in FileUpload-selected) ───
 
-const serverItem = (name: string, size: string, ref: string) =>
-  `\n    <li class="FileUpload-item" data-status="valid" data-source="server" data-entry-id="static-s1">
-      <span class="FileUpload-item-name">${name}</span>
-      <span class="FileUpload-item-size">${size}</span>
-      <button type="button" class="FileUpload-item-remove" aria-label="Remove ${name}">&#215;</button>
-      <input type="hidden" name="uploaded-ref" value="${ref}">
-    </li>`
+const validSingleFile = (name: string, size: string) =>
+  `\n    <span class="FileUpload-item-name">${name}</span>
+    <span class="FileUpload-item-size">${size}</span>
+    <button type="button" class="FileUpload-item-remove" aria-label="Remove ${name}">&#215;</button>`
+
+const invalidTypeSingleFile = (name: string, size: string) =>
+  `\n    <span class="FileUpload-item-name">${name}</span>
+    <span class="FileUpload-item-size">${size}</span>
+    <span class="FileUpload-item-error" role="alert">File type not allowed</span>
+    <button type="button" class="FileUpload-item-remove" aria-label="Remove ${name}">&#215;</button>`
+
+const invalidSizeSingleFile = (name: string, size: string) =>
+  `\n    <span class="FileUpload-item-name">${name}</span>
+    <span class="FileUpload-item-size">${size}</span>
+    <span class="FileUpload-item-error" role="alert">File exceeds maximum size</span>
+    <button type="button" class="FileUpload-item-remove" aria-label="Remove ${name}">&#215;</button>`
+
+const serverSingleFile = (name: string, size: string, ref: string) =>
+  `\n    <span class="FileUpload-item-name">${name}</span>
+    <span class="FileUpload-item-size">${size}</span>
+    <button type="button" class="FileUpload-item-remove" aria-label="Remove ${name}">&#215;</button>
+    <input type="hidden" name="uploaded-ref" value="${ref}">`
 
 // ─── Canonical markup ─────────────────────────────────────────────────────────
 
@@ -64,8 +74,23 @@ function canonical(
   initialFilesAttr: string,
   triggerText: string,
   triggerDisabled = false,
+  isMultiple = false,
 ): string {
   const triggerDisabledAttr = triggerDisabled ? ' disabled' : ''
+  const fileContainer = isMultiple
+    ? `<ul
+    class="FileUpload-list"
+    aria-live="polite"
+    aria-relevant="additions removals"
+    aria-label="Selected files"
+  >${items}
+  </ul>`
+    : `<div
+    class="FileUpload-selected"
+    aria-live="polite"
+    aria-atomic="true"
+  >${items}
+  </div>`
   return `<div
   class="FileUpload"
   data-component="FileUpload"
@@ -79,13 +104,7 @@ function canonical(
     aria-hidden="true"
     tabindex="-1"${inputAttrs}
   >
-  <ul
-    class="FileUpload-list"
-    aria-live="polite"
-    aria-relevant="additions removals"
-    aria-label="Selected files"
-  >${items}
-  </ul>
+  ${fileContainer}
   <button type="button" class="FileUpload-trigger"${triggerDisabledAttr}>${triggerText}</button>
 </div>
 `
@@ -108,29 +127,29 @@ const states: StateDefinition[] = [
   { file: '_empty-focus',  label: 'File', root: { 'data-test-state': 'focus'  }, input: {}, items: '' },
   { file: '_empty-active', label: 'File', root: { 'data-test-state': 'active' }, input: {}, items: '' },
 
-  // Interaction states — with files
-  { file: '_with-files',        label: 'File', root: { 'data-has-files': ''                            }, input: {}, items: validItem('report.pdf', '200 KB') },
-  { file: '_with-files-hover',  label: 'File', root: { 'data-has-files': '', 'data-test-state': 'hover'  }, input: {}, items: validItem('report.pdf', '200 KB') },
-  { file: '_with-files-focus',  label: 'File', root: { 'data-has-files': '', 'data-test-state': 'focus'  }, input: {}, items: validItem('report.pdf', '200 KB') },
-  { file: '_with-files-active', label: 'File', root: { 'data-has-files': '', 'data-test-state': 'active' }, input: {}, items: validItem('report.pdf', '200 KB') },
+  // Interaction states — with files (single mode → FileUpload-selected)
+  { file: '_with-files',        label: 'File', root: { 'data-has-files': ''                            }, input: {}, items: validSingleFile('report.pdf', '200 KB') },
+  { file: '_with-files-hover',  label: 'File', root: { 'data-has-files': '', 'data-test-state': 'hover'  }, input: {}, items: validSingleFile('report.pdf', '200 KB') },
+  { file: '_with-files-focus',  label: 'File', root: { 'data-has-files': '', 'data-test-state': 'focus'  }, input: {}, items: validSingleFile('report.pdf', '200 KB') },
+  { file: '_with-files-active', label: 'File', root: { 'data-has-files': '', 'data-test-state': 'active' }, input: {}, items: validSingleFile('report.pdf', '200 KB') },
 
   // Disabled
   { file: '_disabled-empty',      label: 'File', root: { 'data-disabled': '', 'aria-disabled': 'true'                     }, input: { disabled: '' }, items: '', triggerDisabled: true },
-  { file: '_disabled-with-files', label: 'File', root: { 'data-disabled': '', 'aria-disabled': 'true', 'data-has-files': '' }, input: { disabled: '' }, items: validItem('report.pdf', '200 KB'), triggerDisabled: true },
+  { file: '_disabled-with-files', label: 'File', root: { 'data-disabled': '', 'aria-disabled': 'true', 'data-has-files': '' }, input: { disabled: '' }, items: validSingleFile('report.pdf', '200 KB'), triggerDisabled: true },
 
   // Validation states
-  { file: '_invalid-type',     label: 'File', root: { 'data-has-files': '', 'data-has-errors': '' }, input: { accept: '.pdf' },           items: invalidTypeItem('image.exe', '14 KB') },
-  { file: '_invalid-size',     label: 'File', root: { 'data-has-files': '', 'data-has-errors': '', 'data-max-size': '5mb' }, input: {}, items: invalidSizeItem('video.mp4', '48 MB') },
-  { file: '_invalid-mixed',    label: 'File', root: { 'data-has-files': '', 'data-has-errors': '' }, input: { accept: '.pdf' },           items: validItem('report.pdf', '200 KB', 'static-1') + invalidTypeItem('image.exe', '14 KB') },
-  { file: '_required-empty',   label: 'File', root: { 'data-required': ''                         }, input: { required: '' },             items: '' },
+  { file: '_invalid-type',   label: 'File', root: { 'data-has-files': '', 'data-has-errors': '' }, input: { accept: '.pdf' }, items: invalidTypeSingleFile('image.exe', '14 KB') },
+  { file: '_invalid-size',   label: 'File', root: { 'data-has-files': '', 'data-has-errors': '', 'data-max-size': '5mb' }, input: {}, items: invalidSizeSingleFile('video.mp4', '48 MB') },
+  { file: '_invalid-mixed',  label: 'File', root: { 'data-has-files': '', 'data-has-errors': '' }, input: { accept: '.pdf', multiple: '' }, isMultiple: true, items: validItem('report.pdf', '200 KB', 'static-1') + invalidTypeItem('image.exe', '14 KB') },
+  { file: '_required-empty', label: 'File', root: { 'data-required': '' }, input: { required: '' }, items: '' },
 
   // Variants
-  { file: '_multiple',            label: 'Files', root: { 'data-has-files': '' }, input: { multiple: '' }, items: validItem('doc1.pdf', '200 KB', 'static-1') + validItem('doc2.pdf', '350 KB', 'static-2'), triggerText: 'Add files' },
-  { file: '_drop-zone',           label: 'File',  root: { 'data-drop-zone': '' },                      input: {}, items: '' },
-  { file: '_drop-zone-dragging',  label: 'File',  root: { 'data-drop-zone': '', 'data-dragging-over': '' }, input: {}, items: '' },
-  { file: '_server-files',        label: 'CV',    root: { 'data-has-files': '' },
+  { file: '_multiple',           label: 'Files', root: { 'data-has-files': '' }, input: { multiple: '' }, isMultiple: true, items: validItem('doc1.pdf', '200 KB', 'static-1') + validItem('doc2.pdf', '350 KB', 'static-2'), triggerText: 'Add files' },
+  { file: '_drop-zone',          label: 'File',  root: { 'data-drop-zone': '' }, input: {}, items: '' },
+  { file: '_drop-zone-dragging', label: 'File',  root: { 'data-drop-zone': '', 'data-dragging-over': '' }, input: {}, items: '' },
+  { file: '_server-files',       label: 'CV',    root: { 'data-has-files': '' },
     input: {},
-    items: serverItem('contract.pdf', '200 KB', 'abc123'),
+    items: serverSingleFile('contract.pdf', '200 KB', 'abc123'),
     initialFiles: '[{"name":"contract.pdf","size":204800,"type":"application/pdf","ref":"abc123"}]',
   },
 
@@ -154,6 +173,7 @@ for (const state of states) {
     initialFilesAttr,
     state.triggerText ?? 'Add file',
     state.triggerDisabled ?? false,
+    state.isMultiple ?? false,
   )
   writeFileSync(out(`${state.file}.hbs`), content)
   console.log(`  ${state.file}.hbs`)

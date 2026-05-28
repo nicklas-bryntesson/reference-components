@@ -92,8 +92,9 @@ declare global {
 class FileUpload {
   private root: HTMLElement
   private input: HTMLInputElement
-  private list: HTMLUListElement
+  private fileContainer: HTMLElement
   private trigger: HTMLButtonElement
+  private isMultiple: boolean
   private _entries: FileEntry[]
   private _t: TranslationStrings
   private _dragDepth = 0
@@ -108,7 +109,10 @@ class FileUpload {
   constructor(el: HTMLElement) {
     this.root = el
     this.input = el.querySelector<HTMLInputElement>('.FileUpload-input')!
-    this.list = el.querySelector<HTMLUListElement>('.FileUpload-list')!
+    this.isMultiple = this.input.hasAttribute('multiple')
+    this.fileContainer = el.querySelector<HTMLElement>(
+      this.isMultiple ? '.FileUpload-list' : '.FileUpload-selected'
+    )!
     this.trigger = el.querySelector<HTMLButtonElement>('.FileUpload-trigger')!
     this._entries = []
     this._t = this._readTranslations()
@@ -197,11 +201,60 @@ class FileUpload {
   }
 
   private _renderList(): void {
-    this.list.innerHTML = ''
-    for (const entry of this._entries) {
-      this.list.appendChild(this._renderItem(entry))
+    if (this.isMultiple) {
+      this.fileContainer.innerHTML = ''
+      for (const entry of this._entries) {
+        this.fileContainer.appendChild(this._renderItem(entry))
+      }
+    } else {
+      this._renderSingleContainer()
     }
     this._updateRootState()
+  }
+
+  private _renderSingleContainer(): void {
+    this.fileContainer.innerHTML = ''
+    this.fileContainer.removeAttribute('data-status')
+    if (this._entries[0]) this._appendSingleContent(this._entries[0])
+  }
+
+  private _appendSingleContent(entry: FileEntry): void {
+    this.fileContainer.setAttribute('data-status', entry.status)
+
+    const nameSpan = document.createElement('span')
+    nameSpan.className = 'FileUpload-item-name'
+    nameSpan.textContent = entry.name
+
+    const sizeSpan = document.createElement('span')
+    sizeSpan.className = 'FileUpload-item-size'
+    sizeSpan.textContent = formatFileSize(entry.size)
+
+    this.fileContainer.appendChild(nameSpan)
+    this.fileContainer.appendChild(sizeSpan)
+
+    if (entry.status !== 'valid') {
+      const errorSpan = document.createElement('span')
+      errorSpan.className = 'FileUpload-item-error'
+      errorSpan.setAttribute('role', 'alert')
+      errorSpan.textContent =
+        entry.status === 'invalid-type' ? this._t.errorAccept : this._t.errorSize
+      this.fileContainer.appendChild(errorSpan)
+    }
+
+    const removeBtn = document.createElement('button')
+    removeBtn.type = 'button'
+    removeBtn.className = 'FileUpload-item-remove'
+    removeBtn.setAttribute('aria-label', interpolate(this._t.labelRemove, { name: entry.name }))
+    removeBtn.textContent = '×'
+    this.fileContainer.appendChild(removeBtn)
+
+    if (entry.source === 'server' && entry.ref) {
+      const hidden = document.createElement('input')
+      hidden.type = 'hidden'
+      hidden.name = 'uploaded-ref'
+      hidden.value = entry.ref
+      this.fileContainer.appendChild(hidden)
+    }
   }
 
   private _renderItem(entry: FileEntry): HTMLLIElement {
@@ -262,8 +315,7 @@ class FileUpload {
   }
 
   private _updateTriggerText(): void {
-    const isMultiple = this.input.hasAttribute('multiple')
-    this.trigger.textContent = isMultiple ? this._t.labelTriggerMultiple : this._t.labelTrigger
+    this.trigger.textContent = this.isMultiple ? this._t.labelTriggerMultiple : this._t.labelTrigger
   }
 
   private _handleChange = (e: Event): void => {
@@ -284,11 +336,10 @@ class FileUpload {
       return this._validateEntry(raw)
     })
 
-    if (this.input.hasAttribute('multiple')) {
+    if (this.isMultiple) {
       this._entries.push(...newEntries)
     } else {
       this._entries = newEntries
-      this.list.innerHTML = ''
     }
     this._rebuildFileInput()
     this._appendEntries(newEntries)
@@ -301,6 +352,14 @@ class FileUpload {
   private _handleListClick = (e: MouseEvent): void => {
     const btn = (e.target as HTMLElement).closest<HTMLButtonElement>('.FileUpload-item-remove')
     if (!btn) return
+    if (!this.isMultiple) {
+      const entryId = this._entries[0]?.id
+      if (entryId) {
+        this._removeEntry(entryId)
+        this.trigger.focus()
+      }
+      return
+    }
     const li = btn.closest<HTMLElement>('[data-entry-id]')!
     const entryId = li.dataset.entryId!
     this._moveFocusAfterRemoval(li)
@@ -328,8 +387,12 @@ class FileUpload {
   private _removeEntry(entryId: string): void {
     this._entries = this._entries.filter(e => e.id !== entryId)
     this._rebuildFileInput()
-    const li = this.list.querySelector(`[data-entry-id="${entryId}"]`)
-    li?.remove()
+    if (this.isMultiple) {
+      this.fileContainer.querySelector(`[data-entry-id="${entryId}"]`)?.remove()
+    } else {
+      this.fileContainer.innerHTML = ''
+      this.fileContainer.removeAttribute('data-status')
+    }
     this._updateRootState()
   }
 
@@ -358,8 +421,14 @@ class FileUpload {
   }
 
   private _appendEntries(entries: FileEntry[]): void {
-    for (const entry of entries) {
-      this.list.appendChild(this._renderItem(entry))
+    if (this.isMultiple) {
+      for (const entry of entries) {
+        this.fileContainer.appendChild(this._renderItem(entry))
+      }
+    } else {
+      this.fileContainer.innerHTML = ''
+      this.fileContainer.removeAttribute('data-status')
+      if (entries[0]) this._appendSingleContent(entries[0])
     }
     this._updateRootState()
   }
@@ -367,7 +436,7 @@ class FileUpload {
   private _bindEvents(): void {
     this.input.addEventListener('change', this._handleChange)
     this.trigger.addEventListener('click', this._handleTriggerClick)
-    this.list.addEventListener('click', this._handleListClick)
+    this.fileContainer.addEventListener('click', this._handleListClick)
 
     if (this.root.hasAttribute('data-drop-zone')) {
       this.root.addEventListener('dragenter', this._handleDragEnter)
@@ -379,7 +448,7 @@ class FileUpload {
   destroy(): void {
     this.input.removeEventListener('change', this._handleChange)
     this.trigger.removeEventListener('click', this._handleTriggerClick)
-    this.list.removeEventListener('click', this._handleListClick)
+    this.fileContainer.removeEventListener('click', this._handleListClick)
     this.root.removeEventListener('dragenter', this._handleDragEnter)
     this.root.removeEventListener('dragleave', this._handleDragLeave)
     this.root.removeEventListener('drop', this._handleDrop)
