@@ -284,7 +284,12 @@ class FileUpload {
       return this._validateEntry(raw)
     })
 
-    this._entries.push(...newEntries)
+    if (this.input.hasAttribute('multiple')) {
+      this._entries.push(...newEntries)
+    } else {
+      this._entries = newEntries
+      this.list.innerHTML = ''
+    }
     this._rebuildFileInput()
     this._appendEntries(newEntries)
   }
