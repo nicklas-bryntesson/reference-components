@@ -43,6 +43,7 @@ Components are built against [atomica11y](https://www.atomica11y.com) acceptance
 | Component | Status |
 |-----------|--------|
 | DateField | Reference implementation + full test suite |
+| DateTimeField | Reference implementation + full test suite |
 | FileUpload | Reference implementation + full test suite |
 | ToggleTip | Reference implementation |
 | Combobox | In progress |
