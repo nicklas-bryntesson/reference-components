@@ -1019,6 +1019,153 @@ export class DateTimeField {
     this._closePicker()
   }
 
-  // Stub — implemented in Task 7
-  _renderTimeColumns(): void {}
+  _renderTimeColumns(): void {
+    if (!this.calendarEl) return
+
+    const hourList = this.calendarEl.querySelector<HTMLElement>('.HourList')!
+    const minuteList = this.calendarEl.querySelector<HTMLElement>('.MinuteList')!
+    const secondList = this.calendarEl.querySelector<HTMLElement>('.SecondList')
+    const ampmList = this.calendarEl.querySelector<HTMLElement>('.AmPmList')
+
+    const currentH = this.selectedDatetime ? this.selectedDatetime.getHours() : -1
+    const currentM = this.selectedDatetime ? this.selectedDatetime.getMinutes() : -1
+    const currentS = this.selectedDatetime ? this.selectedDatetime.getSeconds() : -1
+
+    const renderList = (
+      list: HTMLElement,
+      values: { value: number; label: string }[],
+      selectedValue: number,
+      idPrefix: string,
+      ariaLabel: string
+    ) => {
+      list.setAttribute('role', 'listbox')
+      list.setAttribute('aria-label', ariaLabel)
+      list.setAttribute('tabindex', '0')
+      list.innerHTML = ''
+      let activeId = ''
+      values.forEach(({ value, label }) => {
+        const li = document.createElement('li')
+        li.setAttribute('role', 'option')
+        li.id = `${this.fieldId}-${idPrefix}-${value}`
+        const isSelected = value === selectedValue
+        li.setAttribute('aria-selected', String(isSelected))
+        li.textContent = label
+        if (isSelected) activeId = li.id
+        li.addEventListener('click', () => this._selectTimeValue(idPrefix as 'hour' | 'minute' | 'second' | 'ampm', value))
+        list.appendChild(li)
+      })
+      if (activeId) {
+        list.setAttribute('aria-activedescendant', activeId)
+        list.querySelector<HTMLElement>('[aria-selected="true"]')?.scrollIntoView({ block: 'center' })
+      }
+      list.addEventListener('keydown', (e) => this._handleTimeListKey(e, list, idPrefix as 'hour' | 'minute' | 'second' | 'ampm'))
+    }
+
+    const maxH = this._is12h() ? 11 : 23
+    const minH = 0
+
+    renderList(
+      hourList,
+      Array.from({ length: maxH - minH + 1 }, (_, i) => ({
+        value: minH + i,
+        label: String(minH + i).padStart(2, '0'),
+      })),
+      this._is12h() ? (currentH > 12 ? currentH - 12 : currentH === 0 ? 0 : currentH) : currentH,
+      'hour',
+      this.t.hours
+    )
+
+    renderList(
+      minuteList,
+      Array.from({ length: 60 }, (_, i) => ({ value: i, label: String(i).padStart(2, '0') })),
+      currentM,
+      'minute',
+      this.t.minutes
+    )
+
+    if (secondList && this._showSeconds()) {
+      secondList.style.display = ''
+      renderList(
+        secondList,
+        Array.from({ length: 60 }, (_, i) => ({ value: i, label: String(i).padStart(2, '0') })),
+        currentS,
+        'second',
+        this.t.seconds
+      )
+    } else if (secondList) {
+      secondList.style.display = 'none'
+    }
+
+    if (ampmList && this._is12h()) {
+      ampmList.style.display = ''
+      const ampmValue = currentH >= 12 ? 1 : 0
+      renderList(
+        ampmList,
+        [{ value: 0, label: this.t.am }, { value: 1, label: this.t.pm }],
+        ampmValue,
+        'ampm',
+        `${this.t.am}/${this.t.pm}`
+      )
+    } else if (ampmList) {
+      ampmList.style.display = 'none'
+    }
+  }
+
+  _selectTimeValue(type: 'hour' | 'minute' | 'second' | 'ampm', value: number): void {
+    const base = this.selectedDatetime ? new Date(this.selectedDatetime) : new Date()
+    if (type === 'hour') {
+      if (this._is12h()) {
+        const ampm = this.selectedDatetime && this.selectedDatetime.getHours() >= 12 ? 1 : 0
+        base.setHours(value === 12 ? (ampm === 1 ? 12 : 0) : ampm === 1 ? value + 12 : value)
+      } else {
+        base.setHours(value)
+      }
+    } else if (type === 'minute') {
+      base.setMinutes(value)
+    } else if (type === 'second') {
+      base.setSeconds(value)
+    } else if (type === 'ampm') {
+      const h = base.getHours()
+      if (value === 0 && h >= 12) base.setHours(h - 12)
+      if (value === 1 && h < 12) base.setHours(h + 12)
+    }
+    this.selectedDatetime = base
+    this._syncSegmentsFromDatetime(base)
+    this._renderTimeColumns()
+
+    // Update aria-activedescendant on the list
+    const listClass = type === 'hour' ? 'HourList' : type === 'minute' ? 'MinuteList' : type === 'second' ? 'SecondList' : 'AmPmList'
+    const list = this.calendarEl?.querySelector<HTMLElement>(`.${listClass}`)
+    if (list) {
+      list.setAttribute('aria-activedescendant', `${this.fieldId}-${type}-${value}`)
+    }
+  }
+
+  _handleTimeListKey(e: KeyboardEvent, list: HTMLElement, type: 'hour' | 'minute' | 'second' | 'ampm'): void {
+    const items = Array.from(list.querySelectorAll<HTMLElement>('[role="option"]'))
+    const activeId = list.getAttribute('aria-activedescendant') ?? ''
+    const currentIdx = items.findIndex(li => li.id === activeId)
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault()
+      const next = items[(currentIdx + 1) % items.length]
+      if (next) {
+        list.setAttribute('aria-activedescendant', next.id)
+        next.scrollIntoView({ block: 'nearest' })
+        const value = Number(next.id.split('-').at(-1))
+        this._selectTimeValue(type, value)
+      }
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault()
+      const prev = items[(currentIdx - 1 + items.length) % items.length]
+      if (prev) {
+        list.setAttribute('aria-activedescendant', prev.id)
+        prev.scrollIntoView({ block: 'nearest' })
+        const value = Number(prev.id.split('-').at(-1))
+        this._selectTimeValue(type, value)
+      }
+    } else if (e.key === 'Escape') {
+      this._closeCalendar()
+    }
+  }
 }
