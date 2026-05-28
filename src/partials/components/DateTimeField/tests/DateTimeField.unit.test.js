@@ -74,3 +74,49 @@ describe('_buildSegments() — date segments', () => {
     root.remove()
   })
 })
+
+describe('_syncSegmentsFromDatetime()', () => {
+  it('fills all date and time segments from a Date object', async () => {
+    const { DateTimeField } = await import('../DateTimeField.ts')
+    const root = makeRoot()
+    root.dataset.locale = 'sv' // sv uses 24h so hour=14 stays 14
+    document.body.appendChild(root)
+    DateTimeField.attach(document.body)
+    const instance = root.__dateTimeFieldInstance
+    const dt = new Date(2026, 4, 27, 14, 35) // 2026-05-27T14:35
+    instance._syncSegmentsFromDatetime(dt)
+    expect(instance._getSegmentValueByType('year')).toBe(2026)
+    expect(instance._getSegmentValueByType('month')).toBe(5)
+    expect(instance._getSegmentValueByType('day')).toBe(27)
+    expect(instance._getSegmentValueByType('hour')).toBe(14)
+    expect(instance._getSegmentValueByType('minute')).toBe(35)
+    root.remove()
+  })
+})
+
+describe('_trySyncToNative()', () => {
+  it('writes YYYY-MM-DDTHH:mm to native when all segments filled', async () => {
+    const { DateTimeField } = await import('../DateTimeField.ts')
+    const root = makeRoot()
+    document.body.appendChild(root)
+    DateTimeField.attach(document.body)
+    const instance = root.__dateTimeFieldInstance
+    instance._syncSegmentsFromDatetime(new Date(2026, 4, 27, 9, 5))
+    expect(instance.native.value).toBe('2026-05-27T09:05')
+    root.remove()
+  })
+
+  it('does not write native when any segment is empty', async () => {
+    const { DateTimeField } = await import('../DateTimeField.ts')
+    const root = makeRoot()
+    document.body.appendChild(root)
+    DateTimeField.attach(document.body)
+    const instance = root.__dateTimeFieldInstance
+    // Only set date segments, leave time empty
+    instance._setSegmentValue(instance._getSegmentEl('year'), 2026)
+    instance._setSegmentValue(instance._getSegmentEl('month'), 5)
+    instance._setSegmentValue(instance._getSegmentEl('day'), 27)
+    expect(instance.native.value).toBe('')
+    root.remove()
+  })
+})

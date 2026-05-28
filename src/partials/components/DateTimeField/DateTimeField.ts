@@ -395,10 +395,99 @@ export class DateTimeField {
     seg.textContent = SEGMENT_PLACEHOLDERS[type] ?? '--'
   }
 
+  _setSegmentValue(seg: HTMLSpanElement | null, numericValue: number): void {
+    if (!seg) return
+    const type = seg.dataset.segment as SegmentType
+    seg.removeAttribute('data-placeholder')
+    seg.setAttribute('aria-valuenow', String(numericValue))
+
+    if (type === 'ampm') {
+      const label = numericValue === 0 ? this.t.am : this.t.pm
+      seg.setAttribute('aria-valuetext', label)
+      seg.textContent = label
+      this._trySyncToNative()
+      return
+    }
+
+    if (type === 'month') {
+      const year = this._getSegmentValueByType('year') ?? new Date().getFullYear()
+      seg.setAttribute('aria-valuetext', getMonthName(year, numericValue - 1, this.locale))
+      seg.textContent = String(numericValue).padStart(2, '0')
+      // Clamp the day if needed after month change
+      const daySeg = this._getSegmentEl('day')
+      if (daySeg) {
+        const daysInMonth = getDaysInMonth(year, numericValue - 1)
+        daySeg.setAttribute('aria-valuemax', String(daysInMonth))
+        const currentDay = this._getCurrentSegmentValue(daySeg)
+        if (currentDay !== null && currentDay > daysInMonth) {
+          this._setSegmentValue(daySeg, daysInMonth)
+        }
+      }
+    } else if (type === 'day') {
+      seg.setAttribute('aria-valuetext', String(numericValue))
+      seg.textContent = String(numericValue).padStart(2, '0')
+      seg.setAttribute('aria-valuemax', String(this._getSegmentLimits('day').max))
+    } else if (type === 'year') {
+      seg.setAttribute('aria-valuetext', String(numericValue))
+      seg.textContent = String(numericValue)
+    } else {
+      // hour, minute, second
+      seg.setAttribute('aria-valuetext', String(numericValue).padStart(2, '0'))
+      seg.textContent = String(numericValue).padStart(2, '0')
+    }
+
+    this._trySyncToNative()
+  }
+
+  _syncSegmentsFromDatetime(dt: Date): void {
+    this._setSegmentValue(this._getSegmentEl('day'), dt.getDate())
+    this._setSegmentValue(this._getSegmentEl('month'), dt.getMonth() + 1)
+    this._setSegmentValue(this._getSegmentEl('year'), dt.getFullYear())
+
+    if (this._is12h()) {
+      const h = dt.getHours()
+      const h12 = h === 0 ? 12 : h > 12 ? h - 12 : h
+      this._setSegmentValue(this._getSegmentEl('hour'), h12)
+      this._setSegmentValue(this._getSegmentEl('ampm'), h >= 12 ? 1 : 0)
+    } else {
+      this._setSegmentValue(this._getSegmentEl('hour'), dt.getHours())
+    }
+    this._setSegmentValue(this._getSegmentEl('minute'), dt.getMinutes())
+    if (this._showSeconds()) {
+      this._setSegmentValue(this._getSegmentEl('second'), dt.getSeconds())
+    }
+  }
+
+  _trySyncToNative(): void {
+    const d = this._getSegmentValueByType('day')
+    const mo = this._getSegmentValueByType('month')
+    const y = this._getSegmentValueByType('year')
+    const min = this._getSegmentValueByType('minute')
+
+    let h = this._getSegmentValueByType('hour')
+    if (this._is12h() && h !== null) {
+      const ampm = this._getSegmentValueByType('ampm') ?? 0
+      h = h === 12 ? (ampm === 0 ? 0 : 12) : (ampm === 1 ? h + 12 : h)
+    }
+
+    if (d == null || mo == null || y == null || h == null || min == null) return
+
+    const dt = new Date(y, mo - 1, d, h, min)
+    if (this._showSeconds()) {
+      const s = this._getSegmentValueByType('second')
+      if (s == null) return
+      dt.setSeconds(s)
+    }
+
+    this._syncingFromCustom = true
+    this.native.value = formatDatetimeISO(dt, this._showSeconds())
+    this.selectedDatetime = dt
+    this._syncingFromCustom = false
+  }
+
   // Stubs — implemented in later tasks
   _bindSegmentEvents(): void {}
   _bindTrigger(): void {}
-  _syncSegmentsFromDatetime(_dt: Date): void {}
   _toggleCalendar(): void {}
   _closeCalendar(_restoreFocus = true): void {}
   _renderTimeColumns(): void {}
