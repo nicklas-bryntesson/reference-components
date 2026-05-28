@@ -84,7 +84,7 @@ export function getSegmentOrder(locale: string): { order: DateSegmentType[]; sep
       if (part.type === 'day' || part.type === 'month' || part.type === 'year') {
         order.push(part.type)
       } else if (part.type === 'literal' && order.length > 0 && order.length < 3) {
-        const stripped = part.value.replace(/[​-‏‪-‮﻿]/g, '').trim()
+        const stripped = part.value.replace(/[\u200B-\u200F\u202A-\u202E\uFEFF]/g, '').trim()
         if (stripped) separator = stripped
       }
     }

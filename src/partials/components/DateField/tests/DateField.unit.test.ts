@@ -5,6 +5,7 @@ import {
   getISOWeek,
   isDayDisabled,
   formatISO,
+  formatDatetimeISO,
   getWeekdayNames,
   getMonthName,
   getSegmentOrder,
@@ -92,6 +93,21 @@ describe('formatISO', () => {
   })
   it('pads single-digit month and day', () => {
     expect(formatISO(new Date(2026, 0, 1))).toBe('2026-01-01')
+  })
+})
+
+describe('formatDatetimeISO', () => {
+  it('formats without seconds by default', () => {
+    const d = new Date(2026, 4, 27, 14, 35, 0)
+    expect(formatDatetimeISO(d)).toBe('2026-05-27T14:35')
+  })
+  it('zero-pads single-digit hours and minutes', () => {
+    const d = new Date(2026, 0, 5, 9, 5, 0)
+    expect(formatDatetimeISO(d)).toBe('2026-01-05T09:05')
+  })
+  it('includes seconds when includeSeconds=true', () => {
+    const d = new Date(2026, 4, 27, 14, 35, 8)
+    expect(formatDatetimeISO(d, true)).toBe('2026-05-27T14:35:08')
   })
 })
 
