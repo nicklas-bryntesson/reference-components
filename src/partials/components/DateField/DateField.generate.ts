@@ -1,9 +1,11 @@
-import { writeFileSync } from 'node:fs'
+import { writeFileSync, mkdirSync } from 'node:fs'
 import { resolve, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const __dir = dirname(fileURLToPath(import.meta.url))
-const out = (file: string) => resolve(__dir, 'states', file)
+const statesDir = resolve(__dir, 'states')
+mkdirSync(statesDir, { recursive: true })
+const out = (file: string) => resolve(statesDir, file)
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
