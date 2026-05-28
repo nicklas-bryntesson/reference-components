@@ -247,6 +247,14 @@ export class DateTimeField {
     this._slideContainer = container
   }
 
+  destroy(): void {
+    this.trigger.removeEventListener('click', this._handleTriggerClick)
+    this.native.removeEventListener('change', this._handleNativeChange)
+    this.native.form?.removeEventListener('reset', this._handleFormReset)
+    this._closeCalendar(false)
+    delete this.root.__dateTimeFieldInstance
+  }
+
   // Stubs — implemented in later tasks
   _buildSegments(): void {}
   _bindSegmentEvents(): void {}
