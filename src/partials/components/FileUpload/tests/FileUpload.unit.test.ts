@@ -224,6 +224,29 @@ describe('FileUpload static pre-rendered items', () => {
 })
 
 describe('FileUpload add files', () => {
+  it('replaces existing file when a second file is added in single-file mode', () => {
+    const el = createFileUploadEl()
+    new FileUpload(el)
+    const input = el.querySelector('.FileUpload-input') as HTMLInputElement
+
+    const file1 = new File(['a'], 'first.pdf', { type: 'application/pdf' })
+    const dt1 = new DataTransfer()
+    dt1.items.add(file1)
+    Object.defineProperty(input, 'files', { value: dt1.files, configurable: true })
+    input.dispatchEvent(new Event('change'))
+
+    const file2 = new File(['b'], 'second.pdf', { type: 'application/pdf' })
+    const dt2 = new DataTransfer()
+    dt2.items.add(file2)
+    Object.defineProperty(input, 'files', { value: dt2.files, configurable: true })
+    input.dispatchEvent(new Event('change'))
+
+    const items = el.querySelectorAll('.FileUpload-item')
+    expect(items).toHaveLength(1)
+    expect(items[0].querySelector('.FileUpload-item-name')!.textContent).toBe('second.pdf')
+    el.remove()
+  })
+
   it('adds a valid file to the list on change', () => {
     const el = createFileUploadEl()
     new FileUpload(el)
