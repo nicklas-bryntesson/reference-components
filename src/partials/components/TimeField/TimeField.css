@@ -36,11 +36,7 @@
 
   &[data-disabled] {
     opacity: 0.5;
-    cursor: not-allowed;
-
-    & * {
-      pointer-events: none;
-    }
+    pointer-events: none;
   }
 
   &[data-input-mode="custom"] {
@@ -129,20 +125,20 @@
     border-radius: 2px;
     vertical-align: middle;
 
-    &:hover,
-    .TimeField[data-test-state="hover"] & {
-      background-color: var(--tf-trigger-bg-hover);
-    }
-
-    &:active,
-    .TimeField[data-test-state="active"] & {
-      background-color: var(--tf-trigger-bg-active);
-    }
-
     &:focus-visible {
       outline: 2px solid;
       outline-offset: 2px;
     }
+  }
+
+  & .TimeField-trigger:hover,
+  &[data-test-state="hover"] .TimeField-trigger {
+    background-color: var(--tf-trigger-bg-hover);
+  }
+
+  & .TimeField-trigger:active,
+  &[data-test-state="active"] .TimeField-trigger {
+    background-color: var(--tf-trigger-bg-active);
   }
 
   & .TimeField-announce {
@@ -153,23 +149,23 @@
     clip-path: inset(50%);
     white-space: nowrap;
   }
-}
 
-/* ── Initialisation gate ───────────────────────────────────────────────────── */
-.TimeField[data-initialized] {
-  overflow: visible;
-}
+  /* ── Initialisation gate ─────────────────────────────────────────────────── */
+  &[data-initialized] {
+    overflow: visible;
+  }
 
-/* ── Slide rail ────────────────────────────────────────────────────────────── */
-.TimeField .TimeField-slideContainer {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: min(100vw, calc(100vw - 2rem));
-  height: 0;
-  pointer-events: none;
-  z-index: 9999;
+  /* ── Slide rail ──────────────────────────────────────────────────────────── */
+  & .TimeField-slideContainer {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(100vw, calc(100vw - 2rem));
+    height: 0;
+    pointer-events: none;
+    z-index: 9999;
+  }
 }
 
 /* ── Popup bubble ──────────────────────────────────────────────────────────── */
@@ -189,12 +185,14 @@
 }
 
 /* ── Direction gates ───────────────────────────────────────────────────────── */
-.TimeField[data-direction="bottom"] .TimeFieldPopup {
-  top: var(--tf-popup-gap);
-}
+.TimeField {
+  &[data-direction="bottom"] .TimeFieldPopup {
+    top: var(--tf-popup-gap);
+  }
 
-.TimeField[data-direction="top"] .TimeFieldPopup {
-  bottom: var(--tf-popup-gap);
+  &[data-direction="top"] .TimeFieldPopup {
+    bottom: var(--tf-popup-gap);
+  }
 }
 
 /* ── Popup surface (backdrop-filter layer) ─────────────────────────────────── */
@@ -293,14 +291,16 @@
   z-index: 3;
 }
 
-.TimeField[data-direction="top"] .TimeFieldPopup-arrow {
-  bottom: calc(var(--_tf-arrow-size) * -0.5);
-  transform: translateX(calc(-50% + var(--tf-arrow-offset, 0px))) rotate(45deg);
-  border-end-end-radius: var(--_tf-arrow-corner-radius);
-}
+.TimeField {
+  &[data-direction="top"] .TimeFieldPopup-arrow {
+    bottom: calc(var(--_tf-arrow-size) * -0.5);
+    transform: translateX(calc(-50% + var(--tf-arrow-offset, 0px))) rotate(45deg);
+    border-end-end-radius: var(--_tf-arrow-corner-radius);
+  }
 
-.TimeField[data-direction="bottom"] .TimeFieldPopup-arrow {
-  top: calc(var(--_tf-arrow-size) * -0.5);
-  transform: translateX(calc(-50% + var(--tf-arrow-offset, 0px))) rotate(45deg);
-  border-start-start-radius: var(--_tf-arrow-corner-radius);
+  &[data-direction="bottom"] .TimeFieldPopup-arrow {
+    top: calc(var(--_tf-arrow-size) * -0.5);
+    transform: translateX(calc(-50% + var(--tf-arrow-offset, 0px))) rotate(45deg);
+    border-start-start-radius: var(--_tf-arrow-corner-radius);
+  }
 }

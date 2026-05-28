@@ -212,14 +212,11 @@ class TimeField {
 
     segmentTypes.forEach((type, i) => {
       if (type === 'ampm') {
-        const sep = this._createSep(' ')
-        this.trigger.before(sep)
+        this.segments.appendChild(this._createSep(' '))
       } else if (i > 0) {
-        const sep = this._createSep(':')
-        this.trigger.before(sep)
+        this.segments.appendChild(this._createSep(':'))
       }
-      const seg = this._createSegmentEl(type)
-      this.trigger.before(seg)
+      this.segments.appendChild(this._createSegmentEl(type))
     })
 
     this._segmentEls = [...this.segments.querySelectorAll<HTMLSpanElement>('[data-segment]')]

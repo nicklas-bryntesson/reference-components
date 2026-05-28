@@ -51,9 +51,8 @@ function createTimeFieldEl(options: {
         ${options.disabled ? 'disabled' : ''}
       />
       <div class="TimeField-overlay" aria-hidden="true">
-        <div class="TimeField-segments" role="group">
-          <button type="button" class="TimeField-trigger" aria-label="Öppna tidsväljare" aria-expanded="false" aria-haspopup="dialog"></button>
-        </div>
+        <div class="TimeField-segments" role="group"></div>
+        <button type="button" class="TimeField-trigger" aria-label="Öppna tidsväljare" aria-expanded="false" aria-haspopup="dialog"></button>
         <div class="TimeField-slideContainer">
           <template data-template="timefield-popup">
             <div class="TimeFieldPopup" role="dialog" aria-modal="true" aria-label="Välj tid">
