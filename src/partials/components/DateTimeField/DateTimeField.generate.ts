@@ -53,7 +53,7 @@ function canonical(attrs: Record<string, string> = {}): string {
       </div>
     </div>
   </template>
-  <div class="slideContainer" style="position:relative"></div>
+  <div class="slideContainer"></div>
 </div>`
 }
 
