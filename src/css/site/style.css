@@ -14,6 +14,7 @@
 @import "./../../partials/components/ToggleTip/ToggleTip.css";
 @import "./../../partials/components/FileUpload/FileUpload.css";
 @import "./../../partials/components/DateTimeField/DateTimeField.css";
+@import "./../../partials/components/TimeField/TimeField.css";
 
 
 @import "demo.css";
