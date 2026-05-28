@@ -1,0 +1,478 @@
+.DateTimeField {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  /* Public API */
+  --df-calendar-width: 18rem;
+  --df-calendar-gap: 1.5rem;
+  --df-site-max-width: var(--MAX--WIDTH--SITE, 100rem);
+  --df-site-padding: var(--SITE--PADDING, 1rem);
+  /* Design tokens — segments */
+  --df-segments-border-color: currentColor;
+  --df-segments-border-color-hover: #333;
+  --df-segments-bg-hover: #f8f8f8;
+  --df-segments-border-color-invalid: #c00;
+  --df-segments-color-muted: #6e6e6e;
+  --df-trigger-bg-hover: #f0f0f0;
+  --df-trigger-bg-active: #e0e0e0;
+  /* Design tokens — calendar */
+  --df-calendar-bg: Canvas;
+  --df-calendar-color: CanvasText;
+  --df-calendar-color-muted: #6e6e6e;
+  --df-calendar-border-color: currentColor;
+  --df-calendar-radius: 4px;
+  --df-calendar-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  --df-calendar-backdrop: none;
+  --df-calendar-link-color: LinkText;
+  /* Internal */
+  --_df-rail-max-width: calc(var(--df-site-max-width) + var(--df-calendar-width));
+  --_df-arrow-size: 0.75rem;
+  --_df-arrow-corner-radius: 0.25rem;
+
+  & .Native {
+    display: block;
+  }
+
+  & .Custom {
+    display: none;
+  }
+
+  &[data-disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+
+    & * {
+      pointer-events: none;
+    }
+  }
+
+  &[data-input-mode="custom"] {
+    & .Native {
+      position: absolute;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      inline-size: 1px;
+      block-size: 1px;
+      overflow: hidden;
+    }
+
+    & .Custom {
+      display: block;
+    }
+  }
+
+  &[data-input-mode="display"] {
+    & .Native {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    & .Custom {
+      display: block;
+      pointer-events: none;
+    }
+  }
+
+  & .Segments {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid var(--df-segments-border-color);
+    padding-inline: 0.5rem;
+    padding-block: 0.25rem;
+    gap: 0.125rem;
+    border-radius: 4px;
+  }
+
+  & .Segment {
+    font-variant-numeric: tabular-nums;
+    min-inline-size: 2ch;
+    text-align: center;
+    outline: none;
+    border-radius: 2px;
+    cursor: default;
+
+    &[data-focused] {
+      background-color: Highlight;
+      color: HighlightText;
+    }
+
+    &[data-placeholder] {
+      color: var(--df-segments-color-muted);
+    }
+  }
+
+  & .Separator {
+    user-select: none;
+    color: GrayText;
+  }
+
+  & .Segments:hover,
+  &[data-test-state="hover"] .Segments {
+    border-color: var(--df-segments-border-color-hover);
+    background-color: var(--df-segments-bg-hover);
+  }
+
+  & .Segments:focus-within,
+  &[data-test-state="focus"] .Segments {
+    outline: 2px solid;
+    outline-offset: 1px;
+  }
+
+  &[data-invalid] .Segments {
+    border-color: var(--df-segments-border-color-invalid);
+  }
+
+  & .Trigger {
+    margin-inline-start: 0.25rem;
+    background: none;
+    border: none;
+    padding: 0.25rem;
+    cursor: pointer;
+    border-radius: 2px;
+    vertical-align: middle;
+
+    &:hover,
+    .DateTimeField[data-test-state="hover"] & {
+      background-color: var(--df-trigger-bg-hover);
+    }
+
+    &:active,
+    .DateTimeField[data-test-state="active"] & {
+      background-color: var(--df-trigger-bg-active);
+    }
+
+    &:focus-visible {
+      outline: 2px solid;
+      outline-offset: 2px;
+    }
+  }
+
+  & .Announce {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+.DateTimeFieldCalendar {
+  position: absolute;
+  background: transparent;
+  color: var(--df-calendar-color);
+  border: 1px solid var(--df-calendar-border-color);
+  padding: 0.75rem;
+  z-index: 100;
+  border-radius: var(--df-calendar-radius);
+  box-shadow: var(--df-calendar-shadow);
+
+  & .CalendarHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-block-end: 0.5rem;
+    gap: 0.5rem;
+
+    & button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0.25rem 0.5rem;
+      border-radius: 2px;
+      font-size: 1.25rem;
+      line-height: 1;
+
+      &:focus-visible {
+        outline: 2px solid;
+        outline-offset: 2px;
+      }
+    }
+
+    & span {
+      font-weight: 600;
+      flex: 1;
+      text-align: center;
+    }
+  }
+
+  & .Grid {
+    width: 100%;
+    border-collapse: collapse;
+
+    & th {
+      border: 0;
+      padding: 0;
+      padding-block-end: 0.25rem;
+      text-align: center;
+      font-weight: normal;
+      color: var(--df-calendar-color-muted);
+      min-inline-size: 2rem;
+    }
+
+    & td {
+      border: 0;
+      padding: 0;
+    }
+
+    & td button {
+      display: block;
+      inline-size: 2rem;
+      block-size: 2rem;
+      background: none;
+      border: none;
+      cursor: pointer;
+      border-radius: 2px;
+      font-variant-numeric: tabular-nums;
+      font-size: 0.875rem;
+
+      &:focus-visible {
+        outline: 2px solid;
+        outline-offset: 2px;
+      }
+    }
+
+    & td[data-today] button {
+      font-weight: bold;
+      text-decoration: underline;
+    }
+
+    & td[data-selected] button {
+      background-color: Highlight;
+      color: HighlightText;
+    }
+
+    & td[data-disabled] button {
+      color: #767676;
+      cursor: not-allowed;
+    }
+
+    & td[data-outside-month] button {
+      color: var(--df-calendar-color-muted);
+    }
+  }
+
+  & .CalendarFooter {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem;
+    border-top: 1px solid;
+
+    & button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--df-calendar-link-color);
+      font: inherit;
+      padding: 0.25rem 0.5rem;
+      border-radius: 2px;
+
+      &:focus-visible {
+        outline: 2px solid;
+        outline-offset: 2px;
+      }
+
+      &:disabled {
+        color: GrayText;
+        cursor: not-allowed;
+      }
+    }
+  }
+}
+
+/* ── Picker view ───────────────────────────────────────────────────────────── */
+.DateTimeFieldCalendar .YearMonthPicker {
+  display: none;
+}
+
+.DateTimeFieldCalendar[data-view="picker"] .YearMonthPicker {
+  display: flex;
+  overflow: hidden;
+  height: 16rem;
+}
+
+.DateTimeFieldCalendar[data-view="picker"] .Grid {
+  display: none;
+}
+
+.DateTimeFieldCalendar[data-view="picker"] .CalendarFooter {
+  display: none;
+}
+
+.DateTimeFieldCalendar[data-view="picker"] .PrevMonth,
+.DateTimeFieldCalendar[data-view="picker"] .NextMonth {
+  visibility: hidden;
+}
+
+.DateTimeFieldCalendar .MonthList,
+.DateTimeFieldCalendar .YearList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  flex: 1;
+  outline: none;
+}
+
+.DateTimeFieldCalendar .MonthList [role="option"],
+.DateTimeFieldCalendar .YearList [role="option"] {
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
+}
+
+.DateTimeFieldCalendar .MonthList [role="option"][aria-selected="true"],
+.DateTimeFieldCalendar .YearList [role="option"][aria-selected="true"] {
+  font-weight: bold;
+  outline: 2px solid;
+  outline-offset: -2px;
+}
+
+.DateTimeFieldCalendar .MonthList[data-focused="true"] [role="option"][aria-selected="true"],
+.DateTimeFieldCalendar .YearList[data-focused="true"] [role="option"][aria-selected="true"] {
+  background: SelectedItem;
+  color: SelectedItemText;
+  outline: none;
+}
+
+.DateTimeFieldCalendar .MonthList [role="option"][aria-disabled="true"],
+.DateTimeFieldCalendar .YearList [role="option"][aria-disabled="true"] {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.DateTimeFieldCalendar .MonthYearTrigger::after {
+  content: '›';
+  display: inline-block;
+  transform: rotate(90deg);
+}
+
+.DateTimeFieldCalendar .MonthYearTrigger[aria-expanded="true"]::after {
+  transform: rotate(-90deg);
+}
+
+/* ── Calendar surface (backdrop-filter layer) ──────────────────────────── */
+.DateTimeFieldCalendar .CalendarSurface {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.DateTimeFieldCalendar .CalendarSurface .BackdropBlur {
+  position: absolute;
+  inset: -20px;
+  background: var(--df-calendar-bg);
+  backdrop-filter: var(--df-calendar-backdrop);
+}
+
+/* ── Initialisation gate ───────────────────────────────────────────────── */
+.DateTimeField[data-initialized] {
+  overflow: visible;
+}
+
+/* ── Slide rail ────────────────────────────────────────────────────────── */
+.DateTimeField .slideContainer {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(100vw, var(--_df-rail-max-width));
+  height: 0;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* ── Calendar bubble ───────────────────────────────────────────────────── */
+.DateTimeField .DateTimeFieldCalendar {
+  position: absolute;
+  left: var(--df-popup-offset, 50%);
+  transform: translateX(-50%);
+  inline-size: var(--df-calendar-width);
+  pointer-events: auto;
+}
+
+/* ── Direction gates ───────────────────────────────────────────────────── */
+.DateTimeField[data-direction="bottom"] .DateTimeFieldCalendar {
+  top: var(--df-calendar-gap);
+}
+
+.DateTimeField[data-direction="top"] .DateTimeFieldCalendar {
+  bottom: var(--df-calendar-gap);
+}
+
+/* ── Arrow ─────────────────────────────────────────────────────────────── */
+.DateTimeField .arrow {
+  position: absolute;
+  width: var(--_df-arrow-size);
+  height: var(--_df-arrow-size);
+  background-color: var(--df-calendar-bg);
+  left: 50%;
+}
+
+.DateTimeField[data-direction="top"] .arrow {
+  bottom: calc(var(--_df-arrow-size) * -0.5);
+  transform: translateX(calc(-50% + var(--df-arrow-offset, 0px))) rotate(45deg);
+  border-end-end-radius: var(--_df-arrow-corner-radius);
+}
+
+.DateTimeField[data-direction="bottom"] .arrow {
+  top: calc(var(--_df-arrow-size) * -0.5);
+  transform: translateX(calc(-50% + var(--df-arrow-offset, 0px))) rotate(45deg);
+  border-start-start-radius: var(--_df-arrow-corner-radius);
+}
+
+/* ─── Time columns ─────────────────────────────────────────────────────────── */
+
+.DateTimeFieldCalendar .CalendarInner {
+  display: flex;
+  gap: 0;
+}
+
+.DateTimeFieldCalendar .CalendarLeft {
+  flex: 1;
+}
+
+.DateTimeFieldCalendar .TimeColumns {
+  display: flex;
+  gap: 0;
+  border-left: 1px solid var(--color-border, #e0e0e0);
+}
+
+.DateTimeFieldCalendar .TimeList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  max-height: 220px;
+  min-width: 48px;
+  scroll-snap-type: y mandatory;
+}
+
+.DateTimeFieldCalendar .TimeList:focus {
+  outline: 2px solid var(--color-focus, #005fcc);
+  outline-offset: -2px;
+}
+
+.DateTimeFieldCalendar .TimeList [role="option"] {
+  padding: 6px 12px;
+  cursor: pointer;
+  text-align: center;
+  scroll-snap-align: center;
+}
+
+.DateTimeFieldCalendar .TimeList [role="option"][aria-selected="true"] {
+  background-color: var(--color-selected-bg, #005fcc);
+  color: var(--color-selected-text, #fff);
+  font-weight: 600;
+}
+
+.DateTimeFieldCalendar .TimeList [role="option"]:hover:not([aria-selected="true"]) {
+  background-color: var(--color-hover-bg, #f0f0f0);
+}
