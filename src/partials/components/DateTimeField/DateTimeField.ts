@@ -485,8 +485,162 @@ export class DateTimeField {
     this._syncingFromCustom = false
   }
 
+  _incrementSegment(seg: HTMLSpanElement, delta: number): void {
+    const type = seg.dataset.segment as SegmentType
+
+    if (type === 'ampm') {
+      const current = this._getCurrentSegmentValue(seg) ?? 0
+      this._setSegmentValue(seg, current === 0 ? 1 : 0)
+      return
+    }
+
+    const current = this._getCurrentSegmentValue(seg)
+    const limits = this._getSegmentLimits(type)
+    const start = current ?? (delta > 0 ? limits.min - 1 : limits.max + 1)
+    let next = start + delta
+    if (next > limits.max) next = limits.min
+    if (next < limits.min) next = limits.max
+    this._setSegmentValue(seg, next)
+  }
+
+  _handleSegmentKey(e: KeyboardEvent, seg: HTMLSpanElement): void {
+    if (this.native.disabled) return
+    const type = seg.dataset.segment as SegmentType
+
+    switch (e.key) {
+      case 'ArrowUp':
+        e.preventDefault()
+        this._incrementSegment(seg, 1)
+        break
+      case 'ArrowDown':
+        e.preventDefault()
+        this._incrementSegment(seg, -1)
+        break
+      case 'ArrowLeft':
+        e.preventDefault()
+        this._moveSegmentFocus(seg, -1)
+        break
+      case 'ArrowRight':
+        e.preventDefault()
+        this._moveSegmentFocus(seg, 1)
+        break
+      case 'Backspace':
+        e.preventDefault()
+        clearTimeout(this._digitTimer ?? undefined)
+        this._digitTimer = null
+        this._digitBuffer = ''
+        this._clearSegment(seg)
+        this._moveSegmentFocus(seg, -1)
+        break
+      case 'Escape':
+        if (this.calendarEl) { e.preventDefault(); this._closeCalendar() }
+        break
+      case 'a':
+      case 'A':
+        if (type === 'ampm') { e.preventDefault(); this._setSegmentValue(seg, 0) }
+        break
+      case 'p':
+      case 'P':
+        if (type === 'ampm') { e.preventDefault(); this._setSegmentValue(seg, 1) }
+        break
+      default:
+        if (e.key >= '0' && e.key <= '9' && type !== 'ampm') {
+          e.preventDefault()
+          this._handleDigit(seg, e.key)
+        }
+    }
+  }
+
+  _setSegmentFocused(seg: HTMLSpanElement): void {
+    if (this.calendarEl) this._closeCalendar(false)
+    this._segmentEls.forEach(s => {
+      s.removeAttribute('data-focused')
+      s.setAttribute('tabindex', '-1')
+    })
+    seg.setAttribute('data-focused', '')
+    seg.setAttribute('tabindex', '0')
+  }
+
+  _moveSegmentFocus(current: HTMLSpanElement, direction: number): void {
+    const idx = this._segmentEls.indexOf(current)
+    const next = this._segmentEls[idx + direction]
+    if (next) { this._setSegmentFocused(next); next.focus() }
+  }
+
+  _bindSegmentEvents(): void {
+    this._segmentEls.forEach(seg => {
+      const keydownHandler = (e: KeyboardEvent) => this._handleSegmentKey(e, seg)
+      const focusHandler = () => {
+        this._setSegmentFocused(seg)
+        seg.setAttribute('data-focused', '')
+      }
+      const blurHandler = () => {
+        seg.removeAttribute('data-focused')
+        this._flushDigitBuffer(seg)
+      }
+      seg.addEventListener('keydown', keydownHandler)
+      seg.addEventListener('focus', focusHandler)
+      seg.addEventListener('blur', blurHandler)
+    })
+  }
+
+  _handleDigit(seg: HTMLSpanElement, digit: string): void {
+    const type = seg.dataset.segment as SegmentType
+    if (type === 'ampm') return
+
+    clearTimeout(this._digitTimer ?? undefined)
+    this._digitBuffer += digit
+    const num = Number(this._digitBuffer)
+    const len = this._digitBuffer.length
+    const { min, max } = this._getSegmentLimits(type)
+
+    this._showBuffer(seg, this._digitBuffer)
+
+    if (type === 'year') {
+      if (len === 4) {
+        this._setSegmentValue(seg, Math.max(min, Math.min(max, num)))
+        this._digitBuffer = ''
+        this._moveSegmentFocus(seg, 1)
+      }
+      return
+    }
+
+    if (len === 2) {
+      if (num >= min && num <= max) {
+        this._setSegmentValue(seg, num)
+        this._digitBuffer = ''
+        this._moveSegmentFocus(seg, 1)
+      }
+    } else {
+      this._digitTimer = setTimeout(() => {
+        this._setSegmentValue(seg, Math.max(min, Math.min(max, num)))
+        this._digitBuffer = ''
+        this._moveSegmentFocus(seg, 1)
+      }, 1000)
+    }
+  }
+
+  _showBuffer(seg: HTMLSpanElement, buffer: string): void {
+    seg.textContent = buffer
+    seg.setAttribute('aria-valuetext', buffer)
+  }
+
+  _flushDigitBuffer(seg: HTMLSpanElement): void {
+    if (!this._digitBuffer) return
+    clearTimeout(this._digitTimer ?? undefined)
+    this._digitTimer = null
+    const type = seg.dataset.segment as SegmentType
+    const num = Number(this._digitBuffer)
+    if (type === 'year' && this._digitBuffer.length < 4) {
+      this._clearSegment(seg)
+    } else {
+      const { min, max } = this._getSegmentLimits(type)
+      this._setSegmentValue(seg, Math.max(min, Math.min(max, num)))
+    }
+    this._digitBuffer = ''
+  }
+
   // Stubs — implemented in later tasks
-  _bindSegmentEvents(): void {}
   _bindTrigger(): void {}
   _toggleCalendar(): void {}
   _closeCalendar(_restoreFocus = true): void {}

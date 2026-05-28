@@ -155,3 +155,79 @@ describe('_trySyncToNative()', () => {
     root2.remove()
   })
 })
+
+describe('_incrementSegment()', () => {
+  it('increments hour ArrowUp', async () => {
+    const { DateTimeField } = await import('../DateTimeField.ts')
+    const root = makeRoot()
+    root.dataset.locale = 'sv' // sv = 24h; must set before attach
+    document.body.appendChild(root)
+    DateTimeField.attach(document.body)
+    const inst = root.__dateTimeFieldInstance
+    const hourSeg = inst._getSegmentEl('hour')
+    inst._setSegmentValue(hourSeg, 10)
+    inst._incrementSegment(hourSeg, 1)
+    expect(inst._getSegmentValueByType('hour')).toBe(11)
+    root.remove()
+  })
+
+  it('wraps hour from 23 to 0 in 24h mode', async () => {
+    const { DateTimeField } = await import('../DateTimeField.ts')
+    const root = makeRoot()
+    root.dataset.locale = 'sv' // sv = 24h; must set before attach
+    document.body.appendChild(root)
+    DateTimeField.attach(document.body)
+    const inst = root.__dateTimeFieldInstance
+    const hourSeg = inst._getSegmentEl('hour')
+    inst._setSegmentValue(hourSeg, 23)
+    inst._incrementSegment(hourSeg, 1)
+    expect(inst._getSegmentValueByType('hour')).toBe(0)
+    root.remove()
+  })
+
+  it('wraps minute from 59 to 0', async () => {
+    const { DateTimeField } = await import('../DateTimeField.ts')
+    const root = makeRoot()
+    root.dataset.locale = 'sv' // sv = 24h; must set before attach
+    document.body.appendChild(root)
+    DateTimeField.attach(document.body)
+    const inst = root.__dateTimeFieldInstance
+    const minSeg = inst._getSegmentEl('minute')
+    inst._setSegmentValue(minSeg, 59)
+    inst._incrementSegment(minSeg, 1)
+    expect(inst._getSegmentValueByType('minute')).toBe(0)
+    root.remove()
+  })
+
+  it('toggles ampm segment with ArrowUp', async () => {
+    const { DateTimeField } = await import('../DateTimeField.ts')
+    const root = makeRoot() // en = 12h locale, has ampm segment
+    document.body.appendChild(root)
+    DateTimeField.attach(document.body)
+    const inst = root.__dateTimeFieldInstance
+    const ampmSeg = inst._getSegmentEl('ampm')
+    if (!ampmSeg) { root.remove(); return } // skip if 24h locale
+    inst._incrementSegment(ampmSeg, 1) // AM → PM
+    expect(inst._getSegmentValueByType('ampm')).toBe(1)
+    inst._incrementSegment(ampmSeg, 1) // PM → AM
+    expect(inst._getSegmentValueByType('ampm')).toBe(0)
+    root.remove()
+  })
+})
+
+describe('_handleDigit() — time segments', () => {
+  it('accepts two-digit minute entry', async () => {
+    const { DateTimeField } = await import('../DateTimeField.ts')
+    const root = makeRoot()
+    root.dataset.locale = 'sv' // sv = 24h; must set before attach
+    document.body.appendChild(root)
+    DateTimeField.attach(document.body)
+    const inst = root.__dateTimeFieldInstance
+    const minSeg = inst._getSegmentEl('minute')
+    inst._setSegmentFocused(minSeg)
+    inst._handleDigit(minSeg, '3')
+    inst._handleDigit(minSeg, '5')
+    expect(inst._getSegmentValueByType('minute')).toBe(35)
+    root.remove()
+  })
+})
