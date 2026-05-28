@@ -29,12 +29,27 @@
   --_df-arrow-size: 0.75rem;
   --_df-arrow-corner-radius: 0.25rem;
 
-  & .Native {
+  & .DateTimeField-native {
     display: block;
   }
 
-  & .Custom {
+  & .DateTimeField-overlay {
     display: none;
+  }
+
+  &[data-initialized] .DateTimeField-native {
+    position: absolute;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+  }
+
+  &[data-initialized] .DateTimeField-overlay {
+    display: inline-flex;
+    align-items: center;
   }
 
   &[data-disabled] {
@@ -42,38 +57,6 @@
     cursor: not-allowed;
 
     & * {
-      pointer-events: none;
-    }
-  }
-
-  &[data-input-mode="custom"] {
-    & .Native {
-      position: absolute;
-      opacity: 0;
-      visibility: hidden;
-      pointer-events: none;
-      inline-size: 1px;
-      block-size: 1px;
-      overflow: hidden;
-    }
-
-    & .Custom {
-      display: block;
-    }
-  }
-
-  &[data-input-mode="display"] {
-    & .Native {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      opacity: 0;
-      cursor: pointer;
-    }
-
-    & .Custom {
-      display: block;
       pointer-events: none;
     }
   }
@@ -127,7 +110,7 @@
     border-color: var(--df-segments-border-color-invalid);
   }
 
-  & .Trigger {
+  & .DateTimeField-trigger {
     margin-inline-start: 0.25rem;
     background: none;
     border: none;
@@ -164,7 +147,7 @@
 
 .DateTimeFieldCalendar {
   position: absolute;
-  background: transparent;
+  background: var(--df-calendar-bg);
   color: var(--df-calendar-color);
   border: 1px solid var(--df-calendar-border-color);
   padding: 0.75rem;
@@ -201,7 +184,7 @@
     }
   }
 
-  & .Grid {
+  & .CalendarGrid {
     width: 100%;
     border-collapse: collapse;
 
@@ -394,7 +377,7 @@
   position: absolute;
   left: var(--df-popup-offset, 50%);
   transform: translateX(-50%);
-  inline-size: var(--df-calendar-width);
+  min-inline-size: var(--df-calendar-width);
   pointer-events: auto;
 }
 
