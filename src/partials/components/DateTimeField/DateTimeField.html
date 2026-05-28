@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <title>DateTimeField kitchensink</title>
+</head>
+<body>
+  <!-- LIVE DEMO INSTANCE — e2e tests target [data-component="DateTimeField"][data-initialized] -->
+  <div
+    class="DateTimeField"
+    data-component="DateTimeField"
+    data-id="meeting-time"
+    data-name="meeting-time"
+    data-locale="sv-SE"
+  >
+    <input type="datetime-local" class="DateTimeField-native" tabindex="-1" aria-hidden="true">
+    <div class="DateTimeField-overlay">
+      <div class="Segments" role="group"></div>
+      <button class="DateTimeField-trigger" type="button">
+        <!-- calendar SVG icon -->
+        <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="16" y1="2" x2="16" y2="6"></line>
+          <line x1="8" y1="2" x2="8" y2="6"></line>
+          <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
+      </button>
+    </div>
+
+    <template class="DateTimeField-calendarTemplate">
+      <div class="DateTimeFieldCalendar" role="dialog" aria-modal="true">
+        <div class="CalendarInner">
+
+          <!-- Left: date calendar (identical to DateField) -->
+          <div class="CalendarLeft">
+            <div class="CalendarHeader">
+              <button class="CalendarPrev" type="button"></button>
+              <button class="MonthYearTrigger" type="button" aria-expanded="false">
+                <span class="CalendarMonthYear"></span>
+              </button>
+              <button class="CalendarNext" type="button"></button>
+            </div>
+
+            <div class="CalendarGridWrapper">
+              <table class="CalendarGrid" role="grid"></table>
+            </div>
+
+            <!-- Month/year picker (same as DateField) -->
+            <div class="YearMonthPicker" hidden>
+              <ul class="MonthList" role="listbox" tabindex="0"></ul>
+              <ul class="YearList" role="listbox" tabindex="0"></ul>
+            </div>
+          </div>
+
+          <!-- Right: time columns -->
+          <div class="TimeColumns">
+            <ul class="TimeList HourList" role="listbox" tabindex="0"></ul>
+            <ul class="TimeList MinuteList" role="listbox" tabindex="0"></ul>
+            <ul class="TimeList SecondList" role="listbox" tabindex="0" style="display:none"></ul>
+            <ul class="TimeList AmPmList" role="listbox" tabindex="0" style="display:none"></ul>
+          </div>
+
+        </div>
+
+        <div class="CalendarFooter">
+          <button type="button" class="CalendarFooterClear"></button>
+          <button type="button" class="CalendarFooterToday"></button>
+          <button type="button" class="CalendarFooterNow"></button>
+        </div>
+      </div>
+    </template>
+
+    <div class="slideContainer" style="position:relative"></div>
+  </div>
+
+  <script type="module" src="/src/js/script.js"></script>
+</body>
+</html>
