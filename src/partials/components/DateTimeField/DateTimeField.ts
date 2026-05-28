@@ -655,9 +655,359 @@ export class DateTimeField {
     this._digitBuffer = ''
   }
 
-  // Stubs — implemented in later tasks
-  _bindTrigger(): void {}
-  _toggleCalendar(): void {}
-  _closeCalendar(_restoreFocus = true): void {}
+  _bindTrigger(): void {
+    this.trigger.setAttribute('aria-label', this.t.openCalendar)
+    if (this.native.disabled) {
+      this.trigger.disabled = true
+      return
+    }
+    this.trigger.addEventListener('click', this._handleTriggerClick)
+  }
+
+  _toggleCalendar(): void {
+    if (this.calendarEl) {
+      this._closeCalendar()
+    } else {
+      this._openCalendar()
+    }
+  }
+
+  _openCalendar(): void {
+    if (!this.calendarTemplate || this.calendarEl) return
+
+    const clone = this.calendarTemplate.content.cloneNode(true) as DocumentFragment
+    this.calendarEl = clone.querySelector<HTMLElement>('.DateTimeFieldCalendar')!
+    this._slideContainer.appendChild(this.calendarEl)
+
+    this.calendarEl.setAttribute('aria-label', this.t.openCalendar)
+    this.root.dataset.open = ''
+    this.trigger.setAttribute('aria-label', this.t.closeCalendar)
+
+    if (this.selectedDatetime) {
+      this.currentYear = this.selectedDatetime.getFullYear()
+      this.currentMonth = this.selectedDatetime.getMonth()
+    }
+
+    this._renderMonth()
+    this._renderTimeColumns()
+    this._bindCalendarEvents()
+
+    this.calendarEl.querySelector<HTMLElement>('.CalendarGrid td:not([data-outside-month]):not([aria-disabled]) button, .CalendarFooterToday')?.focus()
+  }
+
+  _closeCalendar(restoreFocus = true): void {
+    if (!this.calendarEl) return
+    if (this._outsideClickHandler) {
+      document.removeEventListener('click', this._outsideClickHandler)
+      this._outsideClickHandler = null
+    }
+    this.calendarEl.remove()
+    this.calendarEl = null
+    this.root.removeAttribute('data-open')
+    this.trigger.setAttribute('aria-label', this.t.openCalendar)
+    if (restoreFocus) this.trigger.focus()
+  }
+
+  _renderMonth(): void {
+    if (!this.calendarEl) return
+
+    const header = this.calendarEl.querySelector<HTMLElement>('.CalendarMonthYear')
+    if (header) {
+      header.textContent = `${getMonthName(this.currentYear, this.currentMonth, this.locale)} ${this.currentYear}`
+    }
+
+    const grid = this.calendarEl.querySelector<HTMLElement>('.CalendarGrid')
+    if (!grid) return
+    grid.innerHTML = ''
+
+    // Weekday header row
+    const headerRow = document.createElement('tr')
+    getWeekdayNames(this.locale).forEach(name => {
+      const th = document.createElement('th')
+      th.setAttribute('scope', 'col')
+      th.textContent = name
+      headerRow.appendChild(th)
+    })
+    const thead = document.createElement('thead')
+    thead.appendChild(headerRow)
+    grid.appendChild(thead)
+
+    // Day grid
+    const tbody = document.createElement('tbody')
+    const firstDay = getFirstWeekdayOfMonth(this.currentYear, this.currentMonth)
+    const daysInMonth = getDaysInMonth(this.currentYear, this.currentMonth)
+    const prevDays = getDaysInMonth(this.currentYear, this.currentMonth - 1)
+
+    let row = document.createElement('tr')
+    let cellCount = 0
+
+    // Leading outside-month cells
+    for (let i = firstDay - 1; i >= 0; i--) {
+      const td = document.createElement('td')
+      td.setAttribute('data-outside-month', '')
+      const btn = document.createElement('button')
+      btn.type = 'button'
+      btn.setAttribute('tabindex', '-1')
+      btn.textContent = String(prevDays - i)
+      td.appendChild(btn)
+      row.appendChild(td)
+      cellCount++
+    }
+
+    // Current month days
+    for (let d = 1; d <= daysInMonth; d++) {
+      const date = new Date(this.currentYear, this.currentMonth, d)
+      const td = document.createElement('td')
+      const btn = document.createElement('button')
+      btn.type = 'button'
+      btn.dataset.date = formatISO(date)
+
+      const disabled = isDayDisabled(date, this.min, this.max)
+      if (disabled) {
+        td.setAttribute('aria-disabled', 'true')
+        btn.setAttribute('tabindex', '-1')
+      } else {
+        btn.setAttribute('tabindex', '-1')
+        btn.addEventListener('click', () => this._selectDate(date))
+      }
+
+      const isSelected = this.selectedDatetime &&
+        formatISO(date) === formatISO(this.selectedDatetime)
+      if (isSelected) {
+        btn.setAttribute('aria-pressed', 'true')
+        btn.setAttribute('tabindex', '0')
+      }
+
+      btn.textContent = String(d)
+      td.appendChild(btn)
+      row.appendChild(td)
+      cellCount++
+
+      if (cellCount % 7 === 0) {
+        tbody.appendChild(row)
+        row = document.createElement('tr')
+      }
+    }
+
+    // Trailing outside-month cells
+    if (cellCount % 7 !== 0) {
+      let nextDay = 1
+      while (cellCount % 7 !== 0) {
+        const td = document.createElement('td')
+        td.setAttribute('data-outside-month', '')
+        const btn = document.createElement('button')
+        btn.type = 'button'
+        btn.setAttribute('tabindex', '-1')
+        btn.textContent = String(nextDay++)
+        td.appendChild(btn)
+        row.appendChild(td)
+        cellCount++
+      }
+      tbody.appendChild(row)
+    }
+
+    grid.appendChild(tbody)
+
+    // Ensure one button is focusable when none selected
+    const focusable = grid.querySelector<HTMLButtonElement>('td:not([data-outside-month]):not([aria-disabled]) button')
+    if (focusable && !grid.querySelector('[aria-pressed="true"]')) {
+      focusable.setAttribute('tabindex', '0')
+    }
+  }
+
+  _selectDate(date: Date): void {
+    // Preserve existing time when selecting a new date
+    const time = this.selectedDatetime ?? new Date()
+    const merged = new Date(
+      date.getFullYear(), date.getMonth(), date.getDate(),
+      time.getHours(), time.getMinutes(), time.getSeconds()
+    )
+    this.selectedDatetime = merged
+    this._syncSegmentsFromDatetime(merged)
+    this._renderMonth()
+  }
+
+  _bindCalendarEvents(): void {
+    if (!this.calendarEl) return
+
+    const prevBtn = this.calendarEl.querySelector<HTMLButtonElement>('.CalendarPrev')
+    const nextBtn = this.calendarEl.querySelector<HTMLButtonElement>('.CalendarNext')
+    const todayBtn = this.calendarEl.querySelector<HTMLButtonElement>('.CalendarFooterToday')
+    const nowBtn = this.calendarEl.querySelector<HTMLButtonElement>('.CalendarFooterNow')
+    const clearBtn = this.calendarEl.querySelector<HTMLButtonElement>('.CalendarFooterClear')
+    const monthYearTrigger = this.calendarEl.querySelector<HTMLButtonElement>('.MonthYearTrigger')
+
+    prevBtn?.addEventListener('click', () => {
+      this.currentMonth -= 1
+      if (this.currentMonth < 0) { this.currentMonth = 11; this.currentYear-- }
+      this._renderMonth()
+    })
+
+    nextBtn?.addEventListener('click', () => {
+      this.currentMonth += 1
+      if (this.currentMonth > 11) { this.currentMonth = 0; this.currentYear++ }
+      this._renderMonth()
+    })
+
+    todayBtn?.addEventListener('click', () => {
+      const today = new Date()
+      this._selectDate(today)
+    })
+
+    nowBtn?.addEventListener('click', () => {
+      const now = new Date()
+      this.selectedDatetime = now
+      this._syncSegmentsFromDatetime(now)
+      this._renderTimeColumns()
+      this._closeCalendar()
+    })
+
+    clearBtn?.addEventListener('click', () => {
+      this.selectedDatetime = null
+      this._segmentEls.forEach(seg => this._clearSegment(seg))
+      this.native.value = ''
+      this._closeCalendar()
+    })
+
+    monthYearTrigger?.addEventListener('click', () => {
+      if (this.calendarEl?.dataset.view === 'picker') {
+        this._closePicker()
+      } else {
+        this._openPicker()
+      }
+    })
+
+    this.calendarEl.addEventListener('keydown', (e: KeyboardEvent) => {
+      this._handleCalendarKeydown(e)
+    })
+
+    this._outsideClickHandler = (e: MouseEvent) => {
+      if (!this.root.contains(e.target as Node)) this._closeCalendar()
+    }
+    setTimeout(() => document.addEventListener('click', this._outsideClickHandler!), 0)
+  }
+
+  _handleCalendarKeydown(e: KeyboardEvent): void {
+    if (e.key === 'Escape') {
+      e.preventDefault()
+      this._closeCalendar()
+      return
+    }
+
+    const focused = document.activeElement as HTMLButtonElement | null
+    if (!focused?.dataset.date) return
+
+    const current = new Date(focused.dataset.date + 'T00:00')
+
+    if (e.key === 'ArrowRight') {
+      e.preventDefault()
+      this._focusCalendarDate(new Date(current.getTime() + 86400000))
+    } else if (e.key === 'ArrowLeft') {
+      e.preventDefault()
+      this._focusCalendarDate(new Date(current.getTime() - 86400000))
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault()
+      this._focusCalendarDate(new Date(current.getTime() + 7 * 86400000))
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault()
+      this._focusCalendarDate(new Date(current.getTime() - 7 * 86400000))
+    } else if (e.key === 'PageUp') {
+      e.preventDefault()
+      this.currentMonth -= 1
+      if (this.currentMonth < 0) { this.currentMonth = 11; this.currentYear-- }
+      this._renderMonth()
+      this._focusCalendarDate(new Date(this.currentYear, this.currentMonth, current.getDate()))
+    } else if (e.key === 'PageDown') {
+      e.preventDefault()
+      this.currentMonth += 1
+      if (this.currentMonth > 11) { this.currentMonth = 0; this.currentYear++ }
+      this._renderMonth()
+      this._focusCalendarDate(new Date(this.currentYear, this.currentMonth, current.getDate()))
+    } else if (e.key === 'Home') {
+      e.preventDefault()
+      this._focusCalendarDate(new Date(this.currentYear, this.currentMonth, 1))
+    } else if (e.key === 'End') {
+      e.preventDefault()
+      this._focusCalendarDate(new Date(this.currentYear, this.currentMonth, getDaysInMonth(this.currentYear, this.currentMonth)))
+    }
+  }
+
+  _focusCalendarDate(date: Date): void {
+    if (!this.calendarEl) return
+    const iso = formatISO(date)
+    const btn = this.calendarEl.querySelector<HTMLButtonElement>(`[data-date="${iso}"]`)
+    if (btn) {
+      this.calendarEl.querySelectorAll<HTMLButtonElement>('[data-date]').forEach(b => b.setAttribute('tabindex', '-1'))
+      btn.setAttribute('tabindex', '0')
+      btn.focus()
+    } else {
+      // Navigate to the correct month first
+      this.currentYear = date.getFullYear()
+      this.currentMonth = date.getMonth()
+      this._renderMonth()
+      const newBtn = this.calendarEl.querySelector<HTMLButtonElement>(`[data-date="${iso}"]`)
+      if (newBtn) { newBtn.setAttribute('tabindex', '0'); newBtn.focus() }
+    }
+  }
+
+  _openPicker(): void {
+    if (!this.calendarEl) return
+    this._pickerEntryYear = this.currentYear
+    this._pickerEntryMonth = this.currentMonth
+    const monthList = this.calendarEl.querySelector<HTMLElement>('.MonthList')!
+    const yearList = this.calendarEl.querySelector<HTMLElement>('.YearList')!
+
+    monthList.setAttribute('aria-label', this.t.month)
+    monthList.innerHTML = ''
+    for (let i = 0; i < 12; i++) {
+      const li = document.createElement('li')
+      li.setAttribute('role', 'option')
+      li.id = `${this.fieldId}-month-${i}`
+      li.setAttribute('aria-selected', String(i === this.currentMonth))
+      li.textContent = getMonthName(this.currentYear, i, this.locale)
+      li.addEventListener('click', () => this._confirmPickerMonth(i))
+      monthList.appendChild(li)
+    }
+    monthList.setAttribute('aria-activedescendant', `${this.fieldId}-month-${this.currentMonth}`)
+
+    yearList.setAttribute('aria-label', this.t.year)
+    yearList.innerHTML = ''
+    const minYear = this.min ? this.min.getFullYear() : 1900
+    const maxYear = this.max ? this.max.getFullYear() : 2100
+    for (let y = minYear; y <= maxYear; y++) {
+      const li = document.createElement('li')
+      li.setAttribute('role', 'option')
+      li.id = `${this.fieldId}-year-${y}`
+      li.setAttribute('aria-selected', String(y === this.currentYear))
+      li.textContent = String(y)
+      li.addEventListener('click', () => this._confirmPickerYear(y))
+      yearList.appendChild(li)
+    }
+    yearList.setAttribute('aria-activedescendant', `${this.fieldId}-year-${this.currentYear}`)
+
+    this.calendarEl.dataset.view = 'picker'
+    monthList.querySelector<HTMLElement>('[aria-selected="true"]')?.scrollIntoView({ block: 'center' })
+    yearList.querySelector<HTMLElement>('[aria-selected="true"]')?.scrollIntoView({ block: 'center' })
+    monthList.focus()
+  }
+
+  _closePicker(): void {
+    if (!this.calendarEl) return
+    this.calendarEl.dataset.view = 'calendar'
+    this._renderMonth()
+    this.calendarEl.querySelector<HTMLButtonElement>('.MonthYearTrigger')?.focus()
+  }
+
+  _confirmPickerMonth(month: number): void {
+    this.currentMonth = month
+    this._closePicker()
+  }
+
+  _confirmPickerYear(year: number): void {
+    this.currentYear = year
+    this._closePicker()
+  }
+
+  // Stub — implemented in Task 7
   _renderTimeColumns(): void {}
 }
