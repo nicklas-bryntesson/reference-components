@@ -1,6 +1,7 @@
 // src/partials/components/TimeField/TimeField.ts
 
 import { calculatePopupOffset, calculateArrowOffset, detectDirection } from '../../../js/popup-position'
+import WheelColumn, { type WheelColumnOptions } from './WheelColumn'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -97,6 +98,7 @@ class TimeField {
   private _labels: LocaleLabels
   private _suppressEvents = false
   private popupEl: HTMLElement | null = null
+  private _wheels: Map<string, WheelColumn> = new Map()
   private _slideContainer!: HTMLElement
   private _outsideClickHandler: ((e: MouseEvent) => void) | null = null
   private _rafHandle: number | null = null
@@ -693,16 +695,6 @@ class TimeField {
     const clone = this._popupTemplate.content.cloneNode(true) as DocumentFragment
     this.popupEl = clone.querySelector<HTMLElement>('.TimeFieldPopup')!
 
-    // Populate columns
-    this._populateColumn('hour')
-    this._populateColumn('minute')
-    if (this.showSeconds) {
-      this._populateColumn('second')
-    } else {
-      // Hide the second column if not needed
-      this.popupEl.querySelector('[data-segment="second"]')?.remove()
-    }
-
     // Footer button states
     this._updateClearButton()
 
@@ -711,16 +703,6 @@ class TimeField {
     const nowBtn = this.popupEl.querySelector<HTMLButtonElement>('.TimeFieldPopup-now')!
     clearBtn.addEventListener('click', () => this._handleClear())
     nowBtn.addEventListener('click', () => this._handleNow())
-
-    // Wire column click
-    this.popupEl.querySelector('.TimeFieldPopup-columns')!.addEventListener('click', (e) => {
-      const option = (e.target as HTMLElement).closest<HTMLElement>('[role="option"]')
-      if (!option) return
-      const col = option.closest<HTMLElement>('[data-segment]')!
-      const segType = col.dataset.segment as 'hour' | 'minute' | 'second'
-      const value = parseInt(option.dataset.value!, 10)
-      this._selectPopupOption(segType, value)
-    })
 
     // Wire keyboard
     this.popupEl.addEventListener('keydown', (e) => this._handlePopupKeydown(e))
@@ -731,8 +713,32 @@ class TimeField {
 
     this._updateLayout()
 
-    // Scroll selected options into view
-    this._scrollColumnsToSelected()
+    // Instantiate wheel columns (must be after DOM insertion so CSS is computed)
+    this._wheels.clear()
+    const wheelSegments: Array<'hour' | 'minute' | 'second'> = ['hour', 'minute']
+    if (this.showSeconds) wheelSegments.push('second')
+
+    // Remove second column if not needed (before wheel setup)
+    if (!this.showSeconds) {
+      this.popupEl.querySelector('[data-segment="second"]')?.remove()
+    }
+
+    wheelSegments.forEach(segType => {
+      const col = this.popupEl!.querySelector<HTMLElement>(`[data-segment="${segType}"]`)
+      if (!col) return
+      const { min, max } = this._getSegmentLimits(segType)
+      const currentValue = this._getSegmentValueByType(segType)
+      const opts: WheelColumnOptions = {
+        min,
+        max,
+        value: currentValue,
+        onChange: (value: number) => {
+          this._selectPopupOption(segType, value)
+        },
+      }
+      const wheel = new WheelColumn(col, opts)
+      this._wheels.set(segType, wheel)
+    })
 
     // Outside click to close
     this._outsideClickHandler = (e: MouseEvent) => {
@@ -747,6 +753,8 @@ class TimeField {
 
   private _closePopup(): void {
     if (this.popupEl) {
+      this._wheels.forEach(wheel => wheel.destroy())
+      this._wheels.clear()
       this.popupEl.remove()
       this.popupEl = null
     }
@@ -762,52 +770,7 @@ class TimeField {
     }
   }
 
-  private _populateColumn(segType: 'hour' | 'minute' | 'second'): void {
-    const col = this.popupEl!.querySelector<HTMLElement>(`[data-segment="${segType}"]`)
-    if (!col) return
-    col.innerHTML = ''
-
-    const { min, max } = this._getSegmentLimits(segType)
-    const currentValue = this._getSegmentValueByType(segType)
-
-    for (let i = min; i <= max; i++) {
-      const li = document.createElement('li')
-      li.setAttribute('role', 'option')
-      li.dataset.value = String(i)
-      li.textContent = formatSegment(i)
-      const isSelected = currentValue !== null && currentValue === i
-      li.setAttribute('aria-selected', isSelected ? 'true' : 'false')
-      if (isSelected) li.setAttribute('data-selected', '')
-      col.appendChild(li)
-    }
-  }
-
-  private _scrollColumnsToSelected(): void {
-    if (!this.popupEl) return
-    const cols = this.popupEl.querySelectorAll<HTMLElement>('.TimeFieldPopup-column')
-    cols.forEach(col => {
-      const selected = col.querySelector<HTMLElement>('[data-selected]') ?? col.querySelector<HTMLElement>('[role="option"]')
-      if (selected) {
-        selected.scrollIntoView({ block: 'center', behavior: 'instant' })
-      }
-    })
-  }
-
   private _selectPopupOption(segType: 'hour' | 'minute' | 'second', value: number): void {
-    // Update aria-selected in the column
-    const col = this.popupEl?.querySelector<HTMLElement>(`[data-segment="${segType}"]`)
-    if (col) {
-      col.querySelectorAll('[role="option"]').forEach(opt => {
-        opt.setAttribute('aria-selected', 'false')
-        opt.removeAttribute('data-selected')
-      })
-      const selected = col.querySelector<HTMLElement>(`[data-value="${value}"]`)
-      if (selected) {
-        selected.setAttribute('aria-selected', 'true')
-        selected.setAttribute('data-selected', '')
-      }
-    }
-
     // Update the segment in the overlay
     const seg = this._getSegmentEl(segType)
     if (seg) this._setSegmentValue(seg, value)
@@ -834,8 +797,7 @@ class TimeField {
     this.root.removeAttribute('data-has-value')
     this._suppressEvents = false
     this._updateClearButton()
-    // Refresh columns to deselect options
-    this._refreshColumnSelections()
+    this._syncWheelsFromSegments(false)
   }
 
   private _handleNow(): void {
@@ -859,34 +821,26 @@ class TimeField {
     this.root.dataset.hasValue = ''
     this._suppressEvents = false
 
-    this._refreshColumnSelections()
+    this._syncWheelsFromSegments(false)
     this._updateClearButton()
-    this._scrollColumnsToSelected()
   }
 
   private _refreshColumnSelections(): void {
-    if (!this.popupEl) return
-    const segTypes: Array<'hour' | 'minute' | 'second'> = ['hour', 'minute']
-    if (this.showSeconds) segTypes.push('second')
-    segTypes.forEach(type => {
-      const col = this.popupEl!.querySelector<HTMLElement>(`[data-segment="${type}"]`)
-      if (!col) return
-      const currentValue = this._getSegmentValueByType(type)
-      col.querySelectorAll('[role="option"]').forEach(opt => {
-        const optEl = opt as HTMLElement
-        const isSelected = currentValue !== null && parseInt(optEl.dataset.value!, 10) === currentValue
-        optEl.setAttribute('aria-selected', isSelected ? 'true' : 'false')
-        if (isSelected) optEl.setAttribute('data-selected', '')
-        else optEl.removeAttribute('data-selected')
-      })
+    this._syncWheelsFromSegments(false)
+  }
+
+  private _syncWheelsFromSegments(animate: boolean): void {
+    this._wheels.forEach((wheel, segType) => {
+      const value = this._getSegmentValueByType(segType as 'hour' | 'minute' | 'second')
+      wheel.setValue(value, animate)
     })
   }
 
   private _handlePopupKeydown(e: KeyboardEvent): void {
     if (e.key === 'Tab') {
-      const col = (e.target as HTMLElement).closest<HTMLElement>('[role="listbox"]')
+      const col = (e.target as HTMLElement).closest<HTMLElement>('[role="spinbutton"]')
       if (!col || !this.popupEl) return
-      const allCols = [...this.popupEl.querySelectorAll<HTMLElement>('[role="listbox"]')]
+      const allCols = [...this.popupEl.querySelectorAll<HTMLElement>('[role="spinbutton"]')]
       const isLastCol = allCols[allCols.length - 1] === col
       const isFirstCol = allCols[0] === col
       if (!e.shiftKey && isLastCol) {
@@ -911,20 +865,13 @@ class TimeField {
       return
     }
     if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
-      const col = (e.target as HTMLElement).closest<HTMLElement>('[role="listbox"]')
+      const col = (e.target as HTMLElement).closest<HTMLElement>('[role="spinbutton"]')
       if (!col) return
       e.preventDefault()
-      const options = [...col.querySelectorAll<HTMLElement>('[role="option"]')]
-      const currentSelected = col.querySelector<HTMLElement>('[data-selected]')
-      const currentIdx = currentSelected ? options.indexOf(currentSelected) : -1
-      const nextIdx = e.key === 'ArrowUp'
-        ? Math.max(0, currentIdx - 1)
-        : Math.min(options.length - 1, currentIdx + 1)
-      if (options[nextIdx]) {
-        const segType = col.dataset.segment as 'hour' | 'minute' | 'second'
-        const value = parseInt(options[nextIdx].dataset.value!, 10)
-        this._selectPopupOption(segType, value)
-        options[nextIdx].scrollIntoView({ block: 'nearest', behavior: 'smooth' })
+      const segType = col.dataset.segment as 'hour' | 'minute' | 'second'
+      const wheel = this._wheels.get(segType)
+      if (wheel) {
+        wheel.stepBy(e.key === 'ArrowUp' ? -1 : 1)
       }
     }
   }
