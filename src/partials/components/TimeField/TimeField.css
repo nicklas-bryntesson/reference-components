@@ -3,7 +3,7 @@
   display: inline-block;
   overflow: hidden;
   /* Public API */
-  --tf-popup-width: 12rem;
+  --tf-popup-width: 14rem;
   --tf-popup-gap: 1.5rem;
   /* Design tokens — segments */
   --tf-border-color: currentColor;
@@ -22,6 +22,15 @@
   --tf-popup-backdrop: none;
   --tf-option-bg-selected: Highlight;
   --tf-option-color-selected: HighlightText;
+  /* Design tokens — wheel column */
+  --tf-wheel-row-height: 38px;
+  --tf-wheel-rows: 5;
+  --tf-wheel-curve: 20deg;          /* grader per rad — bestämmer radien i JS */
+  --tf-wheel-focus-bg: rgba(0,0,0,0.08);
+  --tf-wheel-color: CanvasText;
+  --tf-wheel-color-muted: GrayText;
+  --tf-wheel-color-selected: Highlight;
+  --tf-wheel-fade: 0.6;             /* gradient-opacitet i fade-mask */
   /* Internal */
   --_tf-arrow-size: 0.75rem;
   --_tf-arrow-corner-radius: 0.25rem;
@@ -220,30 +229,79 @@
 }
 
 .TimeFieldPopup-column {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  overflow-y: auto;
-  max-block-size: 10rem;
-  scrollbar-width: thin;
-  flex: 1;
-  text-align: center;
+  position: relative;
+  width: 64px;
+  height: calc(var(--tf-wheel-row-height) * var(--tf-wheel-rows));
+  overflow: hidden;
+  perspective: 700px;
+  touch-action: none;
+  user-select: none;
+  flex-shrink: 0;
+  outline: none;
 
-  & [role="option"] {
-    padding-block: 0.375rem;
-    cursor: pointer;
-    border-radius: 2px;
-    font-variant-numeric: tabular-nums;
-
-    &:hover {
-      background-color: var(--tf-bg-hover);
-    }
-
-    &[aria-selected="true"] {
-      background-color: var(--tf-option-bg-selected);
-      color: var(--tf-option-color-selected);
-    }
+  &:focus-visible .TimeFieldPopup-band {
+    box-shadow: 0 0 0 2px Highlight;
   }
+
+  /* Fade-mask topp/botten */
+  &::before, &::after {
+    content: "";
+    position: absolute;
+    left: 0; right: 0;
+    height: calc((100% - var(--tf-wheel-row-height)) / 2);
+    pointer-events: none;
+    z-index: 2;
+  }
+  &::before {
+    top: 0;
+    background: linear-gradient(Canvas, rgba(255,255,255,0));
+  }
+  &::after {
+    bottom: 0;
+    background: linear-gradient(rgba(255,255,255,0), Canvas);
+  }
+}
+
+.TimeFieldPopup-ring {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.TimeFieldPopup-option {
+  position: absolute;
+  left: 0; right: 0;
+  top: 50%;
+  height: var(--tf-wheel-row-height);
+  margin-top: calc(var(--tf-wheel-row-height) / -2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  font-variant-numeric: tabular-nums;
+  backface-visibility: hidden;
+  will-change: opacity, transform;
+  color: var(--tf-wheel-color);
+  cursor: pointer;
+}
+
+.TimeFieldPopup-option[aria-selected="true"] {
+  color: var(--tf-wheel-color-selected);
+  font-weight: 600;
+}
+
+/* Center-band (fokus-highlight) */
+.TimeFieldPopup-band {
+  position: absolute;
+  left: 4px; right: 4px;
+  top: 50%;
+  height: var(--tf-wheel-row-height);
+  margin-top: calc(var(--tf-wheel-row-height) / -2);
+  border-radius: 9px;
+  background: var(--tf-wheel-focus-bg);
+  pointer-events: none;
+  z-index: 1;
 }
 
 /* ── Popup footer ──────────────────────────────────────────────────────────── */
