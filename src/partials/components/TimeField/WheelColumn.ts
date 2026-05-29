@@ -15,11 +15,12 @@ const SNAP_THRESHOLD = 4.5
 const STALE_IDLE_MS = 70
 const WHEEL_SNAP_DELAY_MS = 100
 
-// Prevents trackpad inertia bleed-over: once a column claims wheel focus,
-// other columns ignore wheel events until the active one releases it.
+// Prevents trackpad inertia bleed-over.
+// Lock is claimed when a column starts scrolling and released only after
+// the column snaps to rest. A min-delta gate then filters the inertia tail
+// that arrives on adjacent columns right after the lock releases.
 let _activeWheelCol: WheelColumn | null = null
-let _activeWheelReleaseTimer: ReturnType<typeof setTimeout> | null = null
-const WHEEL_LOCK_MS = 300
+const WHEEL_MIN_DELTA = 15  // rows/event — below this we treat it as inertia tail
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -209,13 +210,13 @@ class WheelColumn {
     // Block inertia bleed-over: if another column owns wheel focus, ignore
     if (_activeWheelCol && _activeWheelCol !== this) return
 
-    // Claim wheel focus for this column
+    // After lock releases, require a meaningful delta before accepting events.
+    // This filters the inertia tail that arrives on this column once the
+    // previous column's lock expires.
+    if (!_activeWheelCol && Math.abs(e.deltaY) < WHEEL_MIN_DELTA) return
+
+    // Claim wheel focus — released in _commit() after snap completes
     _activeWheelCol = this
-    if (_activeWheelReleaseTimer !== null) clearTimeout(_activeWheelReleaseTimer)
-    _activeWheelReleaseTimer = setTimeout(() => {
-      if (_activeWheelCol === this) _activeWheelCol = null
-      _activeWheelReleaseTimer = null
-    }, WHEEL_LOCK_MS)
 
     this._stop()
     this._velocity = 0
@@ -334,12 +335,18 @@ class WheelColumn {
   private _commit(): void {
     const index = this._mod(Math.round(this.pos))
     const value = this.opts.min + index
-    // Normalize pos to avoid unbounded growth
     this.pos = index + (this.pos - Math.round(this.pos))
     this._currentValue = value
 
     if (!this._externalSet) {
       this.opts.onChange(value)
+    }
+
+    // Release wheel lock now that this column has snapped to rest.
+    // Short grace period so the snap animation fully settles before
+    // adjacent columns can accept new wheel events.
+    if (_activeWheelCol === this) {
+      setTimeout(() => { if (_activeWheelCol === this) _activeWheelCol = null }, 150)
     }
   }
 
