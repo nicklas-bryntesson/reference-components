@@ -15,6 +15,12 @@ const SNAP_THRESHOLD = 4.5
 const STALE_IDLE_MS = 70
 const WHEEL_SNAP_DELAY_MS = 100
 
+// Prevents trackpad inertia bleed-over: once a column claims wheel focus,
+// other columns ignore wheel events until the active one releases it.
+let _activeWheelCol: WheelColumn | null = null
+let _activeWheelReleaseTimer: ReturnType<typeof setTimeout> | null = null
+const WHEEL_LOCK_MS = 300
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function readRowHeight(el: HTMLElement): number {
@@ -61,7 +67,6 @@ class WheelColumn {
   private _lastMoveTime: number = 0
 
   private _wheelTimer: ReturnType<typeof setTimeout> | null = null
-  private _wheelAccum: number = 0
 
   private _abortController: AbortController
 
@@ -201,21 +206,27 @@ class WheelColumn {
     if (this._destroyed) return
     e.preventDefault()
 
+    // Block inertia bleed-over: if another column owns wheel focus, ignore
+    if (_activeWheelCol && _activeWheelCol !== this) return
+
+    // Claim wheel focus for this column
+    _activeWheelCol = this
+    if (_activeWheelReleaseTimer !== null) clearTimeout(_activeWheelReleaseTimer)
+    _activeWheelReleaseTimer = setTimeout(() => {
+      if (_activeWheelCol === this) _activeWheelCol = null
+      _activeWheelReleaseTimer = null
+    }, WHEEL_LOCK_MS)
+
     this._stop()
     this._velocity = 0
     this._externalSet = false
 
-    // deltaY positive = scroll down = lower value in center
-    this._wheelAccum += e.deltaY / 120
     this.pos -= e.deltaY / 120
     this.render()
 
-    if (this._wheelTimer !== null) {
-      clearTimeout(this._wheelTimer)
-    }
+    if (this._wheelTimer !== null) clearTimeout(this._wheelTimer)
     this._wheelTimer = setTimeout(() => {
       this._wheelTimer = null
-      this._wheelAccum = 0
       this._startSnap()
     }, WHEEL_SNAP_DELAY_MS)
   }
