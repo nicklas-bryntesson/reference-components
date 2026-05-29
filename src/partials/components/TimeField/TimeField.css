@@ -235,9 +235,12 @@
   overflow: hidden;
   perspective: 700px;
   touch-action: none;
+  cursor: grab;
   user-select: none;
   flex-shrink: 0;
   outline: none;
+
+  &:active { cursor: grabbing; }
 
   &:focus-visible .TimeFieldPopup-band {
     box-shadow: 0 0 0 2px Highlight;
@@ -278,7 +281,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.25rem;
+  font-size: 1.4rem;
   font-variant-numeric: tabular-nums;
   backface-visibility: hidden;
   will-change: opacity, transform;

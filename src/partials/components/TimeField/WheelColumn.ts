@@ -31,6 +31,8 @@ interface Slot {
   o: number
 }
 
+const MOMENTUM_THRESHOLD = 7  // rows/s — above this, use momentum; below, snap directly
+
 class WheelColumn {
   private opts: WheelColumnOptions
   private el: HTMLElement
@@ -55,7 +57,6 @@ class WheelColumn {
   private _dragActive: boolean = false
   private _dragLastY: number = 0
   private _dragLastTime: number = 0
-  private _dragVelocitySamples: Array<{ v: number; t: number }> = []
 
   private _lastMoveTime: number = 0
 
@@ -139,7 +140,6 @@ class WheelColumn {
     this._dragActive = true
     this._dragLastY = e.clientY
     this._dragLastTime = performance.now()
-    this._dragVelocitySamples = []
     this._velocity = 0
     this._lastMoveTime = this._dragLastTime
 
@@ -156,19 +156,12 @@ class WheelColumn {
 
     const now = performance.now()
     const dy = e.clientY - this._dragLastY
-    // iOS-native direction: drag up increases pos (higher value in center)
+    const dtm = now - this._dragLastTime || 16  // ms, avoid division by zero
     const dPos = -dy * this.rowsPerPx
 
     this.pos += dPos
-
-    const dt = (now - this._dragLastTime) / 1000
-    if (dt > 0) {
-      const v = dPos / dt
-      this._dragVelocitySamples.push({ v, t: now })
-      // Keep only recent samples for velocity averaging
-      const cutoff = now - 100
-      this._dragVelocitySamples = this._dragVelocitySamples.filter(s => s.t > cutoff)
-    }
+    // Rolling average matches prototype exactly: weight recent move 60%, history 40%
+    this._velocity = this._velocity * 0.4 + (dPos / dtm * 1000) * 0.6
 
     this._dragLastY = e.clientY
     this._dragLastTime = now
@@ -190,18 +183,18 @@ class WheelColumn {
     const now = performance.now()
     const idle = now - this._lastMoveTime
 
-    if (idle > STALE_IDLE_MS) {
-      this._velocity = 0
-    } else if (this._dragVelocitySamples.length > 0) {
-      const recent = this._dragVelocitySamples.slice(-3)
-      this._velocity = recent.reduce((sum, s) => sum + s.v, 0) / recent.length
-      this._velocity = Math.max(-MAX_V, Math.min(MAX_V, this._velocity))
-    } else {
-      this._velocity = 0
-    }
+    // Stale velocity guard: held still before release → no flick
+    const v = idle > STALE_IDLE_MS ? 0 : this._velocity
+    // Dampen and cap, matching prototype exactly
+    this._velocity = Math.max(-MAX_V, Math.min(MAX_V, v * 0.4))
 
     this._externalSet = false
-    this._startMomentum()
+
+    if (Math.abs(this._velocity) > MOMENTUM_THRESHOLD && !this._prefersReducedMotion()) {
+      this._startMomentum()
+    } else {
+      this._startSnap()
+    }
   }
 
   private _onWheel = (e: WheelEvent): void => {
@@ -359,6 +352,8 @@ class WheelColumn {
     }
     this.el.setAttribute('aria-valuetext', ariaText)
 
+    const frontId = `${this.el.id || 'wheel'}-front`
+
     for (const slot of this.slots) {
       const valRow = base + slot.o
       const angle = (valRow - this.pos) * STEP_DEG
@@ -378,7 +373,13 @@ class WheelColumn {
       const displayIndex = this._mod(valRow)
       const displayValue = this.opts.min + displayIndex
       slot.el.textContent = String(displayValue).padStart(2, '0')
+
+      const isFront = slot.o === 0
+      slot.el.setAttribute('aria-selected', isFront ? 'true' : 'false')
+      slot.el.id = isFront ? frontId : ''
     }
+
+    this.el.setAttribute('aria-activedescendant', frontId)
   }
 
   // ─── Mod helper ──────────────────────────────────────────────────────────────
