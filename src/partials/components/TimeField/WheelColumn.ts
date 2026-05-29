@@ -1,0 +1,456 @@
+export interface WheelColumnOptions {
+  min: number
+  max: number
+  value: number | null
+  onChange: (value: number) => void
+  disabled?: (value: number) => boolean
+}
+
+// ─── Constants ────────────────────────────────────────────────────────────────
+
+const STEP_DEG = 20
+const HALF = 4
+const MAX_V = 21
+const SNAP_THRESHOLD = 4.5
+const STALE_IDLE_MS = 70
+const WHEEL_SNAP_DELAY_MS = 100
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+function readRowHeight(el: HTMLElement): number {
+  let raw = getComputedStyle(el).getPropertyValue('--tf-wheel-row-height').trim()
+  if (!raw) {
+    raw = getComputedStyle(document.documentElement).getPropertyValue('--tf-wheel-row-height').trim()
+  }
+  const parsed = parseFloat(raw)
+  return isNaN(parsed) ? 38 : parsed
+}
+
+interface Slot {
+  el: HTMLDivElement
+  o: number
+}
+
+class WheelColumn {
+  private opts: WheelColumnOptions
+  private el: HTMLElement
+  private ring!: HTMLDivElement
+  private slots: Slot[] = []
+
+  pos: number = 0
+  private _currentValue: number | null
+  private _externalSet: boolean = false
+  private _destroyed: boolean = false
+
+  private rowH: number
+  private radius: number
+  private rowsPerPx: number
+  readonly count: number
+
+  private _rafId: number | null = null
+  private _velocity: number = 0
+  private _snapping: boolean = false
+  private _snapTarget: number = 0
+
+  private _dragActive: boolean = false
+  private _dragLastY: number = 0
+  private _dragLastTime: number = 0
+  private _dragVelocitySamples: Array<{ v: number; t: number }> = []
+
+  private _lastMoveTime: number = 0
+
+  private _wheelTimer: ReturnType<typeof setTimeout> | null = null
+  private _wheelAccum: number = 0
+
+  private _abortController: AbortController
+
+  constructor(el: HTMLElement, opts: WheelColumnOptions) {
+    this.el = el
+    this.opts = opts
+    this._currentValue = opts.value
+    this.count = opts.max - opts.min + 1
+
+    this.rowH = readRowHeight(el)
+    this.radius = (this.rowH / 2) / Math.tan((STEP_DEG / 2) * Math.PI / 180)
+    this.rowsPerPx = 1 / this.rowH
+
+    this._abortController = new AbortController()
+
+    this._buildDOM()
+    this._bindEvents()
+
+    // Set initial position without triggering onChange
+    this._externalSet = true
+    if (opts.value !== null) {
+      const i = this._mod(opts.value - opts.min)
+      this.pos = i
+    } else {
+      this.pos = 0
+    }
+    this.render()
+    this._externalSet = false
+  }
+
+  // ─── DOM ────────────────────────────────────────────────────────────────────
+
+  private _buildDOM(): void {
+    this.el.setAttribute('role', 'spinbutton')
+    this.el.setAttribute('aria-valuemin', String(this.opts.min))
+    this.el.setAttribute('aria-valuemax', String(this.opts.max))
+    if (!this.el.hasAttribute('tabindex')) {
+      this.el.setAttribute('tabindex', '0')
+    }
+
+    this.ring = document.createElement('div')
+    this.ring.className = 'TimeFieldPopup-ring'
+    this.ring.style.transformStyle = 'preserve-3d'
+    this.ring.style.transform = `translateZ(${-this.radius}px)`
+
+    for (let o = -HALF; o <= HALF; o++) {
+      const slotEl = document.createElement('div')
+      slotEl.className = 'TimeFieldPopup-option'
+      slotEl.setAttribute('aria-hidden', 'true')
+      this.ring.appendChild(slotEl)
+      this.slots.push({ el: slotEl, o })
+    }
+
+    const band = document.createElement('div')
+    band.className = 'TimeFieldPopup-band'
+
+    this.el.appendChild(this.ring)
+    this.el.appendChild(band)
+  }
+
+  // ─── Events ─────────────────────────────────────────────────────────────────
+
+  private _bindEvents(): void {
+    const signal = this._abortController.signal
+
+    this.el.addEventListener('pointerdown', this._onPointerDown, { signal })
+    this.el.addEventListener('wheel', this._onWheel as EventListener, { passive: false, signal })
+    this.el.addEventListener('click', this._onClick, { signal })
+  }
+
+  private _onPointerDown = (e: PointerEvent): void => {
+    if (this._destroyed) return
+    e.preventDefault()
+    this._stop()
+
+    this._dragActive = true
+    this._dragLastY = e.clientY
+    this._dragLastTime = performance.now()
+    this._dragVelocitySamples = []
+    this._velocity = 0
+    this._lastMoveTime = this._dragLastTime
+
+    this.el.setPointerCapture(e.pointerId)
+
+    const signal = this._abortController.signal
+    this.el.addEventListener('pointermove', this._onPointerMove, { signal })
+    this.el.addEventListener('pointerup', this._onPointerUp, { signal })
+    this.el.addEventListener('pointercancel', this._onPointerUp, { signal })
+  }
+
+  private _onPointerMove = (e: PointerEvent): void => {
+    if (!this._dragActive || this._destroyed) return
+
+    const now = performance.now()
+    const dy = e.clientY - this._dragLastY
+    // iOS-native direction: drag up increases pos (higher value in center)
+    const dPos = -dy * this.rowsPerPx
+
+    this.pos += dPos
+
+    const dt = (now - this._dragLastTime) / 1000
+    if (dt > 0) {
+      const v = dPos / dt
+      this._dragVelocitySamples.push({ v, t: now })
+      // Keep only recent samples for velocity averaging
+      const cutoff = now - 100
+      this._dragVelocitySamples = this._dragVelocitySamples.filter(s => s.t > cutoff)
+    }
+
+    this._dragLastY = e.clientY
+    this._dragLastTime = now
+    this._lastMoveTime = now
+
+    this._externalSet = false
+    this.render()
+  }
+
+  private _onPointerUp = (e: PointerEvent): void => {
+    if (!this._dragActive || this._destroyed) return
+    this._dragActive = false
+
+    this.el.releasePointerCapture(e.pointerId)
+    this.el.removeEventListener('pointermove', this._onPointerMove)
+    this.el.removeEventListener('pointerup', this._onPointerUp)
+    this.el.removeEventListener('pointercancel', this._onPointerUp)
+
+    const now = performance.now()
+    const idle = now - this._lastMoveTime
+
+    if (idle > STALE_IDLE_MS) {
+      this._velocity = 0
+    } else if (this._dragVelocitySamples.length > 0) {
+      const recent = this._dragVelocitySamples.slice(-3)
+      this._velocity = recent.reduce((sum, s) => sum + s.v, 0) / recent.length
+      this._velocity = Math.max(-MAX_V, Math.min(MAX_V, this._velocity))
+    } else {
+      this._velocity = 0
+    }
+
+    this._externalSet = false
+    this._startMomentum()
+  }
+
+  private _onWheel = (e: WheelEvent): void => {
+    if (this._destroyed) return
+    e.preventDefault()
+
+    this._stop()
+    this._velocity = 0
+    this._externalSet = false
+
+    // deltaY positive = scroll down = lower value in center
+    this._wheelAccum += e.deltaY / 120
+    this.pos -= e.deltaY / 120
+    this.render()
+
+    if (this._wheelTimer !== null) {
+      clearTimeout(this._wheelTimer)
+    }
+    this._wheelTimer = setTimeout(() => {
+      this._wheelTimer = null
+      this._wheelAccum = 0
+      this._startSnap()
+    }, WHEEL_SNAP_DELAY_MS)
+  }
+
+  private _onClick = (e: MouseEvent): void => {
+    if (this._destroyed) return
+    const option = (e.target as HTMLElement).closest<HTMLElement>('.TimeFieldPopup-option')
+    if (!option) return
+
+    const text = option.textContent?.trim()
+    if (!text) return
+    const displayValue = parseInt(text, 10)
+    if (isNaN(displayValue)) return
+
+    this._externalSet = false
+    const i = this._mod(displayValue - this.opts.min)
+    const target = i + this.count * Math.round((this.pos - i) / this.count)
+    this._animateTo(target)
+    this._currentValue = displayValue
+  }
+
+  // ─── Physics loop ────────────────────────────────────────────────────────────
+
+  private _startMomentum(): void {
+    if (this._rafId !== null) return
+
+    let last = performance.now()
+
+    const loop = (now: number): void => {
+      if (this._destroyed) return
+
+      const dt = (now - last) / 1000
+      last = now
+
+      if (this._snapping) {
+        const diff = this._snapTarget - this.pos
+        // Ease toward snap target
+        this.pos += diff * Math.min(1, dt * 16)
+        this.render()
+
+        if (Math.abs(diff) < 0.005) {
+          this.pos = this._snapTarget
+          this.render()
+          this._commit()
+          this._rafId = null
+          this._snapping = false
+          return
+        }
+      } else {
+        // Apply friction
+        this._velocity *= Math.pow(0.0004, dt)
+        this.pos += this._velocity * dt
+
+        this.render()
+
+        if (Math.abs(this._velocity) < SNAP_THRESHOLD) {
+          this._startSnap()
+          this._rafId = requestAnimationFrame(loop)
+          return
+        }
+      }
+
+      this._rafId = requestAnimationFrame(loop)
+    }
+
+    this._rafId = requestAnimationFrame(loop)
+  }
+
+  private _startSnap(): void {
+    this._snapping = true
+    this._snapTarget = Math.round(this.pos)
+    this._velocity = 0
+
+    if (this._rafId === null) {
+      this._startMomentum()
+    }
+  }
+
+  private _animateTo(target: number): void {
+    this._stop()
+    this._snapping = true
+    this._snapTarget = target
+
+    if (this._prefersReducedMotion()) {
+      this.pos = target
+      this.render()
+      this._commit()
+      return
+    }
+
+    this._startMomentum()
+  }
+
+  private _stop(): void {
+    if (this._rafId !== null) {
+      cancelAnimationFrame(this._rafId)
+      this._rafId = null
+    }
+    this._snapping = false
+    this._velocity = 0
+  }
+
+  // ─── Commit ──────────────────────────────────────────────────────────────────
+
+  private _commit(): void {
+    const index = this._mod(Math.round(this.pos))
+    const value = this.opts.min + index
+    // Normalize pos to avoid unbounded growth
+    this.pos = index + (this.pos - Math.round(this.pos))
+    this._currentValue = value
+
+    if (!this._externalSet) {
+      this.opts.onChange(value)
+    }
+  }
+
+  // ─── Render ──────────────────────────────────────────────────────────────────
+
+  render(): void {
+    const base = Math.round(this.pos)
+
+    let ariaNow: number | null = null
+    let ariaText = '--'
+
+    if (this._currentValue !== null) {
+      ariaNow = this._currentValue
+      ariaText = String(this._currentValue).padStart(2, '0')
+    }
+
+    if (ariaNow !== null) {
+      this.el.setAttribute('aria-valuenow', String(ariaNow))
+    } else {
+      this.el.removeAttribute('aria-valuenow')
+    }
+    this.el.setAttribute('aria-valuetext', ariaText)
+
+    for (const slot of this.slots) {
+      const valRow = base + slot.o
+      const angle = (valRow - this.pos) * STEP_DEG
+      const abs = Math.abs(angle)
+
+      slot.el.style.transform = `rotateX(${angle}deg) translateZ(${this.radius}px)`
+
+      if (abs > 90) {
+        slot.el.style.opacity = '0'
+        slot.el.style.visibility = 'hidden'
+      } else {
+        slot.el.style.visibility = ''
+        const opacity = Math.max(0.10, Math.pow(Math.cos(abs * Math.PI / 180), 1.1))
+        slot.el.style.opacity = String(opacity)
+      }
+
+      const displayIndex = this._mod(valRow)
+      const displayValue = this.opts.min + displayIndex
+      slot.el.textContent = String(displayValue).padStart(2, '0')
+    }
+  }
+
+  // ─── Mod helper ──────────────────────────────────────────────────────────────
+
+  private _mod(i: number): number {
+    return ((i % this.count) + this.count) % this.count
+  }
+
+  // ─── prefersReducedMotion ────────────────────────────────────────────────────
+
+  _prefersReducedMotion(): boolean {
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  }
+
+  // ─── Public API ──────────────────────────────────────────────────────────────
+
+  setValue(value: number | null, animate = true): void {
+    this._externalSet = true
+
+    if (value === null) {
+      this._currentValue = null
+      this._stop()
+      this.pos = 0
+      this.render()
+      this._externalSet = false
+      return
+    }
+
+    const i = this._mod(value - this.opts.min)
+    const target = i + this.count * Math.round((this.pos - i) / this.count)
+
+    if (animate && !this._prefersReducedMotion()) {
+      this._animateTo(target)
+    } else {
+      this._stop()
+      this.pos = target
+      this.render()
+    }
+
+    // _commit is not called here — _externalSet prevents onChange if it were
+    this._currentValue = value
+    this._externalSet = false
+  }
+
+  stepBy(delta: number): void {
+    const base = this._currentValue ?? this.opts.min
+    const nextIndex = this._mod(base - this.opts.min + delta)
+    const nextValue = this.opts.min + nextIndex
+
+    this._externalSet = false
+
+    const i = nextIndex
+    const target = i + this.count * Math.round((this.pos - i) / this.count)
+    this._animateTo(target)
+    this._currentValue = nextValue
+  }
+
+  get value(): number | null {
+    return this._currentValue
+  }
+
+  destroy(): void {
+    this._destroyed = true
+    this._stop()
+
+    if (this._wheelTimer !== null) {
+      clearTimeout(this._wheelTimer)
+      this._wheelTimer = null
+    }
+
+    this._abortController.abort()
+  }
+}
+
+export default WheelColumn
