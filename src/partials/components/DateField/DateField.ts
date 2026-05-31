@@ -656,7 +656,10 @@ class DateField {
 
     this._outsideClickHandler = (e: MouseEvent) => {
       if (!this.root.contains(e.target as Node)) {
-        this._closeCalendar()
+        // Light dismiss: don't refocus the trigger — that would scroll the
+        // viewport back to an off-screen trigger and steal focus from whatever
+        // the user clicked. Focus restoration is only for keyboard/Escape close.
+        this._closeCalendar(false)
       }
     }
     setTimeout(() => document.addEventListener('click', this._outsideClickHandler!), 0)
