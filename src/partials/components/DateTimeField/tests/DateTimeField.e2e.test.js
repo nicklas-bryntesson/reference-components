@@ -2,11 +2,15 @@
 import { test, expect } from '@playwright/test'
 import { checkA11y, injectAxe } from 'axe-playwright'
 
-const ROOT = '[data-component="DateTimeField"][data-initialized]'
+// Scope to the live-demo instance; the kitchensink renders many DateTimeFields,
+// only this one carries data-id="meeting-time". The standalone partial page has
+// no bootstrap script, so the component is exercised via the full app at '/'.
+const ROOT = '[data-component="DateTimeField"][data-id="meeting-time"]'
 
 test.beforeEach(async ({ page }) => {
-  await page.goto('/src/partials/components/DateTimeField/DateTimeField.html')
-  await page.locator(ROOT).waitFor()
+  await page.goto('/')
+  await page.locator(ROOT).scrollIntoViewIfNeeded()
+  await page.locator(`${ROOT}[data-initialized]`).waitFor()
   await injectAxe(page)
 })
 
