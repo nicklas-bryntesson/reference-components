@@ -127,7 +127,7 @@
     border-color: var(--df-segments-border-color-invalid);
   }
 
-  & .Trigger {
+  & .DateField-trigger {
     margin-inline-start: 0.25rem;
     background: none;
     border: none;

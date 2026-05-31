@@ -37,7 +37,7 @@ test('ArrowUp increments day segment', async ({ page }) => {
 })
 
 test('no aria-controls on trigger at any time', async ({ page }) => {
-  const trigger = page.locator('[data-id="birthdate"] .Trigger')
+  const trigger = page.locator('[data-id="birthdate"] .DateField-trigger')
   expect(await trigger.getAttribute('aria-controls')).toBeNull()
   await trigger.click()
   expect(await trigger.getAttribute('aria-controls')).toBeNull()
@@ -49,32 +49,32 @@ test('calendar does not exist in DOM when closed', async ({ page }) => {
 })
 
 test('calendar is visible inside slideContainer when open', async ({ page }) => {
-  await page.locator('[data-id="birthdate"] .Trigger').click()
+  await page.locator('[data-id="birthdate"] .DateField-trigger').click()
   const calendar = page.locator('[data-id="birthdate"] .slideContainer .DateField-popup')
   await expect(calendar).toBeVisible()
 })
 
 test('calendar is removed on Escape', async ({ page }) => {
-  await page.locator('[data-id="birthdate"] .Trigger').click()
+  await page.locator('[data-id="birthdate"] .DateField-trigger').click()
   await page.keyboard.press('Escape')
   await expect(page.locator('.DateField-popup')).toHaveCount(0)
 })
 
 test('focus returns to trigger after Escape', async ({ page }) => {
-  await page.locator('[data-id="birthdate"] .Trigger').click()
+  await page.locator('[data-id="birthdate"] .DateField-trigger').click()
   await page.keyboard.press('Escape')
-  await expect(page.locator('[data-id="birthdate"] .Trigger')).toBeFocused()
+  await expect(page.locator('[data-id="birthdate"] .DateField-trigger')).toBeFocused()
 })
 
 test('calendar is removed on outside click', async ({ page }) => {
-  await page.locator('[data-id="birthdate"] .Trigger').click()
+  await page.locator('[data-id="birthdate"] .DateField-trigger').click()
   await expect(page.locator('.DateField-popup')).toBeVisible()
   await page.evaluate(() => document.body.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true })))
   await expect(page.locator('.DateField-popup')).toHaveCount(0)
 })
 
 test('date selection closes calendar and syncs native input', async ({ page }) => {
-  await page.locator('[data-id="birthdate"] .Trigger').click()
+  await page.locator('[data-id="birthdate"] .DateField-trigger').click()
   const firstDay = page.locator('.DateField-popup td:not([data-outside-month]):not([aria-disabled="true"]) button').first()
   const dateLabel = await firstDay.getAttribute('data-date')
   await firstDay.click({ force: true })
@@ -84,7 +84,7 @@ test('date selection closes calendar and syncs native input', async ({ page }) =
 })
 
 test('aria-selected is on td not button', async ({ page }) => {
-  await page.locator('[data-id="birthdate"] .Trigger').click()
+  await page.locator('[data-id="birthdate"] .DateField-trigger').click()
   // All td elements in grid should have aria-selected
   const tdsWithAriaSelected = page.locator('.Grid td[aria-selected]')
   const count = await tdsWithAriaSelected.count()
@@ -94,14 +94,14 @@ test('aria-selected is on td not button', async ({ page }) => {
 })
 
 test('aria-disabled is on td not button for disabled cells', async ({ page }) => {
-  await page.locator('[data-id="birthdate"] .Trigger').click()
+  await page.locator('[data-id="birthdate"] .DateField-trigger').click()
   const disabledButtons = page.locator('.Grid button[aria-disabled="true"]')
   expect(await disabledButtons.count()).toBe(0) // aria-disabled never on button — only on td
   await page.keyboard.press('Escape')
 })
 
 test('Tab wraps from last to first focusable element in calendar', async ({ page }) => {
-  await page.locator('[data-id="birthdate"] .Trigger').click()
+  await page.locator('[data-id="birthdate"] .DateField-trigger').click()
   // Last tabbable element is the Today button in the footer
   const todayBtn = page.locator('.CalendarFooterToday')
   await todayBtn.focus()
@@ -113,7 +113,7 @@ test('Tab wraps from last to first focusable element in calendar', async ({ page
 })
 
 test('data-state="open" on root when calendar open', async ({ page }) => {
-  await page.locator('[data-id="birthdate"] .Trigger').click()
+  await page.locator('[data-id="birthdate"] .DateField-trigger').click()
   await expect(page.locator('[data-id="birthdate"][data-state="open"]')).toHaveCount(1)
   await page.keyboard.press('Escape')
   await expect(page.locator('[data-id="birthdate"][data-state="idle"]')).toHaveCount(1)
@@ -126,7 +126,7 @@ test('axe: zero violations on initial render', async ({ page }) => {
 })
 
 test('axe: zero violations with calendar open', async ({ page }) => {
-  await page.locator('[data-id="birthdate"] .Trigger').click()
+  await page.locator('[data-id="birthdate"] .DateField-trigger').click()
   await expect(page.locator('.DateField-popup')).toBeVisible()
   await checkA11y(page, undefined, {
     axeOptions: { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa'] } }
@@ -136,7 +136,7 @@ test('axe: zero violations with calendar open', async ({ page }) => {
 
 test('data-direction is set on root when calendar opens', async ({ page }) => {
   await page.locator('[data-id="birthdate"]').scrollIntoViewIfNeeded()
-  await page.locator('[data-id="birthdate"] .Trigger').click()
+  await page.locator('[data-id="birthdate"] .DateField-trigger').click()
   const direction = await page.locator('[data-id="birthdate"]').getAttribute('data-direction')
   expect(['top', 'bottom']).toContain(direction)
   await page.keyboard.press('Escape')
@@ -145,27 +145,27 @@ test('data-direction is set on root when calendar opens', async ({ page }) => {
 // ── Month/Year Picker ─────────────────────────────────────────────────────────
 
 test('MonthYearTrigger opens picker on click', async ({ page }) => {
-  await page.locator('[data-id="birthdate"] .Trigger').click()
+  await page.locator('[data-id="birthdate"] .DateField-trigger').click()
   await page.locator('[data-id="birthdate"] .MonthYearTrigger').click()
   const calendar = page.locator('.DateField-popup')
   await expect(calendar).toHaveAttribute('data-view', 'picker')
 })
 
 test('MonthYearTrigger has aria-expanded true when picker open', async ({ page }) => {
-  await page.locator('[data-id="birthdate"] .Trigger').click()
+  await page.locator('[data-id="birthdate"] .DateField-trigger').click()
   await page.locator('[data-id="birthdate"] .MonthYearTrigger').click()
   const trigger = page.locator('.MonthYearTrigger')
   await expect(trigger).toHaveAttribute('aria-expanded', 'true')
 })
 
 test('MonthList receives focus when picker opens', async ({ page }) => {
-  await page.locator('[data-id="birthdate"] .Trigger').click()
+  await page.locator('[data-id="birthdate"] .DateField-trigger').click()
   await page.locator('[data-id="birthdate"] .MonthYearTrigger').click()
   await expect(page.locator('.MonthList')).toBeFocused()
 })
 
 test('ArrowDown moves aria-activedescendant in MonthList', async ({ page }) => {
-  await page.locator('[data-id="birthdate"] .Trigger').click()
+  await page.locator('[data-id="birthdate"] .DateField-trigger').click()
   await page.locator('[data-id="birthdate"] .MonthYearTrigger').click()
   const monthList = page.locator('.MonthList')
   const initialId = await monthList.getAttribute('aria-activedescendant')
@@ -175,14 +175,14 @@ test('ArrowDown moves aria-activedescendant in MonthList', async ({ page }) => {
 })
 
 test('Tab moves focus from MonthList to YearList', async ({ page }) => {
-  await page.locator('[data-id="birthdate"] .Trigger').click()
+  await page.locator('[data-id="birthdate"] .DateField-trigger').click()
   await page.locator('[data-id="birthdate"] .MonthYearTrigger').click()
   await page.keyboard.press('Tab')
   await expect(page.locator('.YearList')).toBeFocused()
 })
 
 test('Enter on month option returns to calendar view', async ({ page }) => {
-  await page.locator('[data-id="birthdate"] .Trigger').click()
+  await page.locator('[data-id="birthdate"] .DateField-trigger').click()
   await page.locator('[data-id="birthdate"] .MonthYearTrigger').click()
   await page.keyboard.press('Enter')
   const calendar = page.locator('.DateField-popup')
@@ -190,7 +190,7 @@ test('Enter on month option returns to calendar view', async ({ page }) => {
 })
 
 test('Escape from picker returns to calendar view', async ({ page }) => {
-  await page.locator('[data-id="birthdate"] .Trigger').click()
+  await page.locator('[data-id="birthdate"] .DateField-trigger').click()
   await page.locator('[data-id="birthdate"] .MonthYearTrigger').click()
   await page.keyboard.press('Escape')
   const calendar = page.locator('.DateField-popup')
@@ -198,14 +198,14 @@ test('Escape from picker returns to calendar view', async ({ page }) => {
 })
 
 test('Escape from picker does not close calendar', async ({ page }) => {
-  await page.locator('[data-id="birthdate"] .Trigger').click()
+  await page.locator('[data-id="birthdate"] .DateField-trigger').click()
   await page.locator('[data-id="birthdate"] .MonthYearTrigger').click()
   await page.keyboard.press('Escape')
   await expect(page.locator('.DateField-popup')).toBeVisible()
 })
 
 test('axe: no violations in picker view', async ({ page }) => {
-  await page.locator('[data-id="birthdate"] .Trigger').click()
+  await page.locator('[data-id="birthdate"] .DateField-trigger').click()
   await page.locator('[data-id="birthdate"] .MonthYearTrigger').click()
   await checkA11y(page)
 })
@@ -213,7 +213,7 @@ test('axe: no violations in picker view', async ({ page }) => {
 // ── Keyboard access (atomica11y: date-picker-dialog §1) ──────────────────────
 
 test('Space opens calendar from trigger', async ({ page }) => {
-  const trigger = page.locator('[data-id="birthdate"] .Trigger')
+  const trigger = page.locator('[data-id="birthdate"] .DateField-trigger')
   await trigger.focus()
   await page.keyboard.press('Space')
   await expect(page.locator('.DateField-popup')).toBeVisible()
@@ -221,7 +221,7 @@ test('Space opens calendar from trigger', async ({ page }) => {
 })
 
 test('Enter opens calendar from trigger', async ({ page }) => {
-  const trigger = page.locator('[data-id="birthdate"] .Trigger')
+  const trigger = page.locator('[data-id="birthdate"] .DateField-trigger')
   await trigger.focus()
   await page.keyboard.press('Enter')
   await expect(page.locator('.DateField-popup')).toBeVisible()
@@ -229,7 +229,7 @@ test('Enter opens calendar from trigger', async ({ page }) => {
 })
 
 test('ArrowRight moves focus to next day in calendar grid', async ({ page }) => {
-  await page.locator('[data-id="birthdate"] .Trigger').click()
+  await page.locator('[data-id="birthdate"] .DateField-trigger').click()
   const firstDay = page.locator('.DateField-popup td:not([data-outside-month]):not([aria-disabled="true"]) button').first()
   await firstDay.focus()
   const initialDate = await firstDay.getAttribute('data-date')
@@ -241,7 +241,7 @@ test('ArrowRight moves focus to next day in calendar grid', async ({ page }) => 
 })
 
 test('ArrowLeft moves focus to previous day in calendar grid', async ({ page }) => {
-  await page.locator('[data-id="birthdate"] .Trigger').click()
+  await page.locator('[data-id="birthdate"] .DateField-trigger').click()
   const days = page.locator('.DateField-popup td:not([data-outside-month]):not([aria-disabled="true"]) button')
   const secondDay = days.nth(1)
   await secondDay.focus()
@@ -254,7 +254,7 @@ test('ArrowLeft moves focus to previous day in calendar grid', async ({ page }) 
 })
 
 test('ArrowDown moves focus one week forward in calendar grid', async ({ page }) => {
-  await page.locator('[data-id="birthdate"] .Trigger').click()
+  await page.locator('[data-id="birthdate"] .DateField-trigger').click()
   const firstDay = page.locator('.DateField-popup td:not([data-outside-month]):not([aria-disabled="true"]) button').first()
   await firstDay.focus()
   const initialDate = await firstDay.getAttribute('data-date')
@@ -266,7 +266,7 @@ test('ArrowDown moves focus one week forward in calendar grid', async ({ page })
 })
 
 test('PageDown moves calendar to next month', async ({ page }) => {
-  await page.locator('[data-id="birthdate"] .Trigger').click()
+  await page.locator('[data-id="birthdate"] .DateField-trigger').click()
   const monthLabel = page.locator('.MonthYearTrigger')
   const initialLabel = await monthLabel.textContent()
   await page.locator('.Grid').focus()
@@ -277,7 +277,7 @@ test('PageDown moves calendar to next month', async ({ page }) => {
 })
 
 test('PageUp moves calendar to previous month', async ({ page }) => {
-  await page.locator('[data-id="birthdate"] .Trigger').click()
+  await page.locator('[data-id="birthdate"] .DateField-trigger').click()
   const monthLabel = page.locator('.MonthYearTrigger')
   const initialLabel = await monthLabel.textContent()
   await page.locator('.Grid').focus()
@@ -290,7 +290,7 @@ test('PageUp moves calendar to previous month', async ({ page }) => {
 // ── Month/Year Picker ─────────────────────────────────────────────────────────
 
 test('Home jumps to first enabled month option', async ({ page }) => {
-  await page.locator('[data-id="birthdate"] .Trigger').click()
+  await page.locator('[data-id="birthdate"] .DateField-trigger').click()
   await page.locator('[data-id="birthdate"] .MonthYearTrigger').click()
   await page.keyboard.press('Home')
   const monthList = page.locator('.MonthList')
@@ -299,7 +299,7 @@ test('Home jumps to first enabled month option', async ({ page }) => {
 })
 
 test('End jumps to last enabled month option', async ({ page }) => {
-  await page.locator('[data-id="birthdate"] .Trigger').click()
+  await page.locator('[data-id="birthdate"] .DateField-trigger').click()
   await page.locator('[data-id="birthdate"] .MonthYearTrigger').click()
   await page.keyboard.press('End')
   const monthList = page.locator('.MonthList')

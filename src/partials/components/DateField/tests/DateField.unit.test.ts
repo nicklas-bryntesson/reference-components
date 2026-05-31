@@ -163,7 +163,7 @@ describe('DateField locale resolution', () => {
       <input class="Native" type="date" />
       <div class="Custom" aria-hidden="true">
         <div class="Segments" role="group"></div>
-        <button class="Trigger" type="button"></button>
+        <button class="DateField-trigger" type="button"></button>
         <template data-template="datefield-calendar"></template>
       </div>
       <div class="Announce" aria-live="polite" aria-atomic="true"></div>
@@ -183,7 +183,7 @@ describe('DateField locale resolution', () => {
       <input class="Native" type="date" />
       <div class="Custom" aria-hidden="true">
         <div class="Segments" role="group"></div>
-        <button class="Trigger" type="button"></button>
+        <button class="DateField-trigger" type="button"></button>
         <template data-template="datefield-calendar"></template>
       </div>
       <div class="Announce" aria-live="polite" aria-atomic="true"></div>
@@ -205,7 +205,7 @@ describe('DateField locale resolution', () => {
       <input class="Native" type="date" />
       <div class="Custom" aria-hidden="true">
         <div class="Segments" role="group"></div>
-        <button class="Trigger" type="button"></button>
+        <button class="DateField-trigger" type="button"></button>
         <template data-template="datefield-calendar"></template>
       </div>
       <div class="Announce" aria-live="polite" aria-atomic="true"></div>
@@ -228,7 +228,7 @@ describe('registerLocale fallback', () => {
       <input class="Native" type="date" />
       <div class="Custom" aria-hidden="true">
         <div class="Segments" role="group"></div>
-        <button class="Trigger" type="button"></button>
+        <button class="DateField-trigger" type="button"></button>
         <template data-template="datefield-calendar"></template>
       </div>
       <div class="Announce" aria-live="polite" aria-atomic="true"></div>
@@ -269,7 +269,7 @@ function makeField({ disabled = false, value = '', min = '', max = '', locale = 
     <label for="${fieldId}">Test label</label>
     <div class="Custom" aria-hidden="true">
       <div class="Segments" role="group">
-        <button class="Trigger" type="button" aria-label="Öppna kalender"
+        <button class="DateField-trigger" type="button" aria-label="Öppna kalender"
           aria-expanded="false" aria-haspopup="dialog"></button>
       </div>
       <div class="slideContainer">
@@ -640,7 +640,7 @@ describe('DateField — display mode (pointer: coarse)', () => {
       <input class="Native" type="date" value="2026-03-26" />
       <div class="Custom" aria-hidden="true">
         <div class="Segments" role="group">
-          <button class="Trigger" type="button"></button>
+          <button class="DateField-trigger" type="button"></button>
         </div>
         <template data-template="datefield-calendar"></template>
       </div>
@@ -684,7 +684,7 @@ describe('DateField — prop application from wrapper data attributes', () => {
       <input class="Native" type="date" />
       <div class="Custom" aria-hidden="true">
         <div class="Segments" role="group">
-          <button class="Trigger" type="button" aria-expanded="false" aria-haspopup="dialog"></button>
+          <button class="DateField-trigger" type="button" aria-expanded="false" aria-haspopup="dialog"></button>
         </div>
         <template data-template="datefield-calendar">
           <div class="DateField-popup" role="dialog" aria-modal="true">
@@ -722,7 +722,7 @@ describe('DateField — prop application from wrapper data attributes', () => {
       <input class="Native" type="date" />
       <div class="Custom" aria-hidden="true">
         <div class="Segments" role="group">
-          <button class="Trigger" type="button" aria-expanded="false" aria-haspopup="dialog"></button>
+          <button class="DateField-trigger" type="button" aria-expanded="false" aria-haspopup="dialog"></button>
         </div>
         <template data-template="datefield-calendar">
           <div class="DateField-popup" role="dialog" aria-modal="true">
@@ -762,7 +762,7 @@ describe('DateField — prop application from wrapper data attributes', () => {
       <input class="Native" type="date" />
       <div class="Custom" aria-hidden="true">
         <div class="Segments" role="group">
-          <button class="Trigger" type="button" aria-expanded="false" aria-haspopup="dialog"></button>
+          <button class="DateField-trigger" type="button" aria-expanded="false" aria-haspopup="dialog"></button>
         </div>
         <template data-template="datefield-calendar">
           <div class="DateField-popup" role="dialog" aria-modal="true">
@@ -800,7 +800,7 @@ describe('DateField — prop application from wrapper data attributes', () => {
       <input class="Native" type="date" />
       <div class="Custom" aria-hidden="true">
         <div class="Segments" role="group">
-          <button class="Trigger" type="button" aria-expanded="false" aria-haspopup="dialog"></button>
+          <button class="DateField-trigger" type="button" aria-expanded="false" aria-haspopup="dialog"></button>
         </div>
         <template data-template="datefield-calendar">
           <div class="DateField-popup" role="dialog" aria-modal="true">
@@ -838,7 +838,7 @@ describe('DateField — prop application from wrapper data attributes', () => {
       <input class="Native" type="date" />
       <div class="Custom" aria-hidden="true">
         <div class="Segments" role="group">
-          <button class="Trigger" type="button" aria-expanded="false" aria-haspopup="dialog"></button>
+          <button class="DateField-trigger" type="button" aria-expanded="false" aria-haspopup="dialog"></button>
         </div>
         <template data-template="datefield-calendar">
           <div class="DateField-popup" role="dialog" aria-modal="true">

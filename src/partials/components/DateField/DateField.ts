@@ -119,7 +119,7 @@ class DateField {
     this.native = el.querySelector<HTMLInputElement>('.Native')!
     this.custom = el.querySelector<HTMLElement>('.Custom')!
     this.segments = el.querySelector<HTMLElement>('.Segments')!
-    this.trigger = el.querySelector<HTMLButtonElement>('.Trigger')!
+    this.trigger = el.querySelector<HTMLButtonElement>('.DateField-trigger')!
     this.announce = el.querySelector<HTMLElement>('.Announce')!
     this.calendarTemplate = el.querySelector<HTMLTemplateElement>('[data-template="datefield-calendar"]')
 
