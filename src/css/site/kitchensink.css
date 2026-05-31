@@ -25,6 +25,14 @@
   }
 }
 
+.kitchensink-divider {
+  width: 100%;
+  border: 0;
+  border-top: 1px solid #e0e0e0;
+  margin-block: 4rem;
+  margin-inline: 0;
+}
+
 .kitchensink-section {
   display: flex;
   flex-direction: column;
