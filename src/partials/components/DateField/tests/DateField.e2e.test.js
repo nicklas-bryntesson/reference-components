@@ -147,8 +147,8 @@ test('data-direction is set on root when calendar opens', async ({ page }) => {
 test('MonthYearTrigger opens picker on click', async ({ page }) => {
   await page.locator('[data-id="birthdate"] .DateField-trigger').click()
   await page.locator('[data-id="birthdate"] .MonthYearTrigger').click()
-  const calendar = page.locator('.DateField-popup')
-  await expect(calendar).toHaveAttribute('data-view', 'picker')
+  const picker = page.locator('.DateField-popup [data-panel="picker"]')
+  await expect(picker).toHaveAttribute('data-active', 'true')
 })
 
 test('MonthYearTrigger has aria-expanded true when picker open', async ({ page }) => {
@@ -185,16 +185,16 @@ test('Enter on month option returns to calendar view', async ({ page }) => {
   await page.locator('[data-id="birthdate"] .DateField-trigger').click()
   await page.locator('[data-id="birthdate"] .MonthYearTrigger').click()
   await page.keyboard.press('Enter')
-  const calendar = page.locator('.DateField-popup')
-  await expect(calendar).not.toHaveAttribute('data-view', 'picker')
+  const picker = page.locator('.DateField-popup [data-panel="picker"]')
+  await expect(picker).toHaveAttribute('data-active', 'false')
 })
 
 test('Escape from picker returns to calendar view', async ({ page }) => {
   await page.locator('[data-id="birthdate"] .DateField-trigger').click()
   await page.locator('[data-id="birthdate"] .MonthYearTrigger').click()
   await page.keyboard.press('Escape')
-  const calendar = page.locator('.DateField-popup')
-  await expect(calendar).not.toHaveAttribute('data-view', 'picker')
+  const picker = page.locator('.DateField-popup [data-panel="picker"]')
+  await expect(picker).toHaveAttribute('data-active', 'false')
 })
 
 test('Escape from picker does not close calendar', async ({ page }) => {

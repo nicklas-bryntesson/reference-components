@@ -286,28 +286,21 @@
   }
 }
 
-/* ── Picker view ───────────────────────────────────────────────────────────── */
-.DateTimeField-popup .YearMonthPicker {
+/* ── Panels (deterministic boolean switch) ──────────────────────────────────── */
+/* Exactly one [data-panel] sibling carries data-active="true"; header, footer
+   and the time-columns are always-visible chrome. */
+.DateTimeField-popup [data-panel][data-active="false"] {
   display: none;
 }
 
-.DateTimeField-popup[data-view="picker"] .YearMonthPicker {
+.DateTimeField-popup [data-panel="calendar"][data-active="true"] {
+  display: block;
+}
+
+.DateTimeField-popup [data-panel="picker"][data-active="true"] {
   display: flex;
   overflow: hidden;
   height: 16rem;
-}
-
-.DateTimeField-popup[data-view="picker"] .Grid {
-  display: none;
-}
-
-.DateTimeField-popup[data-view="picker"] .CalendarFooter {
-  display: none;
-}
-
-.DateTimeField-popup[data-view="picker"] .PrevMonth,
-.DateTimeField-popup[data-view="picker"] .NextMonth {
-  visibility: hidden;
 }
 
 .DateTimeField-popup .MonthList,

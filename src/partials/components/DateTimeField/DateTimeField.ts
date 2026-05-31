@@ -979,7 +979,7 @@ export class DateTimeField {
     })
 
     monthYearTrigger?.addEventListener('click', () => {
-      if (this.calendarEl?.dataset.view === 'picker') {
+      if (this._isPickerActive()) {
         this._closePicker()
       } else {
         this._openPicker()
@@ -1104,7 +1104,7 @@ export class DateTimeField {
     }
     yearList.setAttribute('aria-activedescendant', `${this.fieldId}-year-${this.currentYear}`)
 
-    this.calendarEl.dataset.view = 'picker'
+    this._setPanel('picker')
     const pickerGroup = this.calendarEl.querySelector<HTMLElement>('.YearMonthPicker')
     pickerGroup?.addEventListener('mousedown', e => e.preventDefault())
     monthList.querySelector<HTMLElement>('[aria-selected="true"]')?.scrollIntoView({ block: 'center' })
@@ -1114,9 +1114,21 @@ export class DateTimeField {
 
   _closePicker(): void {
     if (!this.calendarEl) return
-    this.calendarEl.dataset.view = 'calendar'
+    this._setPanel('calendar')
     this._renderMonth()
     this.calendarEl.querySelector<HTMLButtonElement>('.MonthYearTrigger')?.focus()
+  }
+
+  // Deterministic panel switch: set data-active="true" on the named panel and
+  // "false" on its siblings. Exactly one body panel is active at a time.
+  _setPanel(active: 'calendar' | 'picker'): void {
+    this.calendarEl?.querySelectorAll<HTMLElement>('[data-panel]').forEach(panel => {
+      panel.setAttribute('data-active', String(panel.dataset.panel === active))
+    })
+  }
+
+  _isPickerActive(): boolean {
+    return this.calendarEl?.querySelector('[data-panel="picker"]')?.getAttribute('data-active') === 'true'
   }
 
   _confirmPickerMonth(month: number): void {

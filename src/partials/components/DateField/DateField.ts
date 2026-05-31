@@ -598,7 +598,7 @@ class DateField {
     monthYearTrigger.id = monthId
     monthYearTrigger.setAttribute('aria-label', this.t.openPicker)
     monthYearTrigger.addEventListener('click', () => {
-      if (this.calendarEl?.dataset.view === 'picker') {
+      if (this._isPickerActive()) {
         this._confirmPickerMonth(this.currentMonth)
       } else {
         this._openPicker()
@@ -787,7 +787,7 @@ class DateField {
     }
     yearList.setAttribute('aria-activedescendant', `${this.fieldId}-year-${this.currentYear}`)
 
-    this.calendarEl.dataset.view = 'picker'
+    this._setPanel('picker')
     monthYearTrigger.setAttribute('aria-expanded', 'true')
     monthYearTrigger.setAttribute('aria-label', this.t.closePicker)
 
@@ -801,11 +801,23 @@ class DateField {
   _closePicker(): void {
     if (!this.calendarEl) return
     const monthYearTrigger = this.calendarEl.querySelector<HTMLButtonElement>('.MonthYearTrigger')!
-    this.calendarEl.dataset.view = 'calendar'
+    this._setPanel('calendar')
     monthYearTrigger.setAttribute('aria-expanded', 'false')
     monthYearTrigger.setAttribute('aria-label', this.t.openPicker)
     this._renderMonth()
     monthYearTrigger.focus()
+  }
+
+  // Deterministic panel switch: set data-active="true" on the named panel and
+  // "false" on its siblings. Exactly one body panel is active at a time.
+  _setPanel(active: 'calendar' | 'picker'): void {
+    this.calendarEl?.querySelectorAll<HTMLElement>('[data-panel]').forEach(panel => {
+      panel.setAttribute('data-active', String(panel.dataset.panel === active))
+    })
+  }
+
+  _isPickerActive(): boolean {
+    return this.calendarEl?.querySelector('[data-panel="picker"]')?.getAttribute('data-active') === 'true'
   }
 
   private _isMonthDisabled(year: number, month: number): boolean {
@@ -1023,7 +1035,7 @@ class DateField {
   // ─── Calendar keyboard ───────────────────────────────────────────────────────
 
   _handleCalendarKeydown(e: KeyboardEvent): void {
-    if (this.calendarEl!.dataset.view === 'picker') {
+    if (this._isPickerActive()) {
       this._handlePickerKeydown(e)
       return
     }

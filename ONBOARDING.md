@@ -70,6 +70,30 @@ Segment fields keep their custom look on touch but defer interaction to the nati
 
 To verify: emulate a touch viewport, then `document.elementFromPoint(center)` should return the native `<input>` in display mode.
 
+### Internal view switching (panels)
+
+When a popup has multiple swappable body views (DateField & DateTimeField: the date **grid** vs the month/year **picker**), each view is wrapped in a `[data-panel="<name>"]` container carrying an explicit boolean `data-active="true|false"`. Exactly one sibling panel is `"true"`. CSS keys on **both** states (deterministic, greppable, no `:not()` / presence-absence):
+
+```css
+.<Component>-popup [data-panel][data-active="false"]        { display: none; }
+.<Component>-popup [data-panel="calendar"][data-active="true"] { display: block; }
+.<Component>-popup [data-panel="picker"][data-active="true"]   { display: flex; … }
+```
+
+JS switches with a small helper that sets the attribute on every panel:
+
+```ts
+_setPanel(active) {
+  this.calendarEl.querySelectorAll('[data-panel]').forEach(p =>
+    p.setAttribute('data-active', String(p.dataset.panel === active)))
+}
+_isPickerActive() {
+  return this.calendarEl?.querySelector('[data-panel="picker"]')?.getAttribute('data-active') === 'true'
+}
+```
+
+The DOM attribute is the single source of truth — read it (`_isPickerActive()`) rather than tracking view state in a separate field. Header, footer, arrow (and DateTimeField's time-columns) are **persistent chrome** outside the panels and never toggle.
+
 ### One deliberate difference (not drift)
 
 ToggleTip **keeps** its popup in the DOM and toggles visibility via `aria-hidden` + `display:none`; the three fields **remove + clone** from a `<template>` on each open (their content is rebuilt anyway). ToggleTip also has no Escape/focus-management (it's a tooltip, not a dialog) — that's correct, not drift.

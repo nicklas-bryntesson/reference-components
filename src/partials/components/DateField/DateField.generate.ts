@@ -52,11 +52,13 @@ function canonical(id: string, label: string, rootAttrs: string, inputAttrs: str
             <button type="button" class="MonthYearTrigger" aria-haspopup="listbox" aria-expanded="false"></button>
             <button type="button" class="NextMonth">&#8250;</button>
           </div>
-          <table class="Grid" role="grid">
-            <thead><tr role="row"><th scope="col"></th><th scope="col"></th><th scope="col"></th><th scope="col"></th><th scope="col"></th><th scope="col"></th><th scope="col"></th></tr></thead>
-            <tbody></tbody>
-          </table>
-          <div class="YearMonthPicker" role="group">
+          <div class="Panel" data-panel="calendar" data-active="true">
+            <table class="Grid" role="grid">
+              <thead><tr role="row"><th scope="col"></th><th scope="col"></th><th scope="col"></th><th scope="col"></th><th scope="col"></th><th scope="col"></th><th scope="col"></th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <div class="Panel YearMonthPicker" role="group" data-panel="picker" data-active="false">
             <ul role="listbox" class="MonthList" tabindex="0"></ul>
             <ul role="listbox" class="YearList" tabindex="0"></ul>
           </div>

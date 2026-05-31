@@ -33,8 +33,10 @@ function canonical(id: string, attrs: Record<string, string> = {}): string {
             <button class="MonthYearTrigger" type="button" aria-expanded="false"><span class="CalendarMonthYear"></span></button>
             <button class="CalendarNext" type="button"></button>
           </div>
-          <table class="CalendarGrid" role="grid"></table>
-          <div class="YearMonthPicker" hidden>
+          <div class="Panel" data-panel="calendar" data-active="true">
+            <table class="CalendarGrid" role="grid"></table>
+          </div>
+          <div class="Panel YearMonthPicker" data-panel="picker" data-active="false">
             <ul class="MonthList" role="listbox" tabindex="0"></ul>
             <ul class="YearList" role="listbox" tabindex="0"></ul>
           </div>
