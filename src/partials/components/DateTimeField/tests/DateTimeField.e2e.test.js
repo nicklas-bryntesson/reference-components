@@ -88,12 +88,12 @@ test('native input is aria-hidden and tabindex -1', async ({ page }) => {
 test('trigger button opens the calendar popup', async ({ page }) => {
   const trigger = page.locator(`${ROOT} .DateTimeField-trigger`)
   await trigger.click()
-  await expect(page.locator(`${ROOT} .DateTimeFieldCalendar`)).toBeVisible()
+  await expect(page.locator(`${ROOT} .DateTimeField-popup`)).toBeVisible()
 })
 
 test('popup has role=dialog and aria-modal=true', async ({ page }) => {
   await page.locator(`${ROOT} .DateTimeField-trigger`).click()
-  const dialog = page.locator(`${ROOT} .DateTimeFieldCalendar`)
+  const dialog = page.locator(`${ROOT} .DateTimeField-popup`)
   await expect(dialog).toHaveAttribute('role', 'dialog')
   await expect(dialog).toHaveAttribute('aria-modal', 'true')
 })
@@ -101,15 +101,15 @@ test('popup has role=dialog and aria-modal=true', async ({ page }) => {
 test('Escape closes the calendar and restores focus to trigger', async ({ page }) => {
   const trigger = page.locator(`${ROOT} .DateTimeField-trigger`)
   await trigger.click()
-  await expect(page.locator(`${ROOT} .DateTimeFieldCalendar`)).toBeVisible()
+  await expect(page.locator(`${ROOT} .DateTimeField-popup`)).toBeVisible()
   await page.keyboard.press('Escape')
-  await expect(page.locator(`${ROOT} .DateTimeFieldCalendar`)).not.toBeAttached()
+  await expect(page.locator(`${ROOT} .DateTimeField-popup`)).not.toBeAttached()
   await expect(trigger).toBeFocused()
 })
 
 test('clicking a date closes the popup and updates segments', async ({ page }) => {
   await page.locator(`${ROOT} .DateTimeField-trigger`).click()
-  const dateBtn = page.locator(`${ROOT} .DateTimeFieldCalendar td:not([data-outside-month]):not([aria-disabled]) button`).first()
+  const dateBtn = page.locator(`${ROOT} .DateTimeField-popup td:not([data-outside-month]):not([aria-disabled]) button`).first()
   await dateBtn.click({ force: true })
   // Date segments should now be filled
   const daySeg = page.locator(`${ROOT} .Segment[data-segment="day"]`)
@@ -164,7 +164,7 @@ test('ArrowDown in hour listbox moves selection', async ({ page }) => {
 test('"Nu" button sets current datetime and closes popup', async ({ page }) => {
   await page.locator(`${ROOT} .DateTimeField-trigger`).click()
   await page.locator(`${ROOT} .CalendarFooterNow`).click()
-  await expect(page.locator(`${ROOT} .DateTimeFieldCalendar`)).not.toBeAttached()
+  await expect(page.locator(`${ROOT} .DateTimeField-popup`)).not.toBeAttached()
   const hourSeg = page.locator(`${ROOT} .Segment[data-segment="hour"]`)
   const val = await hourSeg.getAttribute('aria-valuenow')
   expect(val).not.toBeNull()
@@ -185,7 +185,7 @@ test('clear button empties all segments', async ({ page }) => {
 
 test('ArrowRight moves focus to next day', async ({ page }) => {
   await page.locator(`${ROOT} .DateTimeField-trigger`).click()
-  const firstBtn = page.locator(`${ROOT} .DateTimeFieldCalendar td:not([data-outside-month]):not([aria-disabled]) button`).first()
+  const firstBtn = page.locator(`${ROOT} .DateTimeField-popup td:not([data-outside-month]):not([aria-disabled]) button`).first()
   await firstBtn.focus()
   const firstDate = await firstBtn.getAttribute('data-date')
   await page.keyboard.press('ArrowRight')
@@ -195,7 +195,7 @@ test('ArrowRight moves focus to next day', async ({ page }) => {
 
 test('PageDown navigates to next month', async ({ page }) => {
   await page.locator(`${ROOT} .DateTimeField-trigger`).click()
-  const firstBtn = page.locator(`${ROOT} .DateTimeFieldCalendar td:not([data-outside-month]):not([aria-disabled]) button`).first()
+  const firstBtn = page.locator(`${ROOT} .DateTimeField-popup td:not([data-outside-month]):not([aria-disabled]) button`).first()
   await firstBtn.focus()
   const before = await page.locator(`${ROOT} .CalendarMonthYear`).textContent()
   await page.keyboard.press('PageDown')

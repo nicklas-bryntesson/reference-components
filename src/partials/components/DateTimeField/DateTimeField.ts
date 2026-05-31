@@ -315,7 +315,7 @@ export class DateTimeField {
     this.root.dataset.direction = detectDirection(triggerRect)
 
     const triggerCenterX = triggerRect.left + triggerRect.width / 2
-    const viewportInset = this._getCSSPx('--df-site-padding') / 2
+    const viewportInset = this._getCSSPx('--dtf-site-padding') / 2
 
     const offset = calculatePopupOffset(
       triggerCenterX,
@@ -325,17 +325,17 @@ export class DateTimeField {
       window.innerWidth,
       viewportInset,
     )
-    this.root.style.setProperty('--df-popup-offset', `${offset}%`)
+    this.root.style.setProperty('--dtf-popup-offset', `${offset}%`)
 
     const calendarLeft = containerRect.left + (offset / 100 * containerRect.width) - calendarWidth / 2
     const arrowOffset = calculateArrowOffset(
       triggerCenterX,
       calendarLeft,
       calendarWidth,
-      this._getCSSPx('--_df-arrow-corner-radius'),
-      this._getCSSPx('--_df-arrow-size'),
+      this._getCSSPx('--_dtf-arrow-corner-radius'),
+      this._getCSSPx('--_dtf-arrow-size'),
     )
-    this.root.style.setProperty('--df-arrow-offset', `${arrowOffset}px`)
+    this.root.style.setProperty('--dtf-arrow-offset', `${arrowOffset}px`)
   }
 
   _getCSSPx(property: string): number {
@@ -777,7 +777,7 @@ export class DateTimeField {
     if (!this.calendarTemplate || this.calendarEl) return
 
     const clone = this.calendarTemplate.content.cloneNode(true) as DocumentFragment
-    this.calendarEl = clone.querySelector<HTMLElement>('.DateTimeFieldCalendar')!
+    this.calendarEl = clone.querySelector<HTMLElement>('.DateTimeField-popup')!
     this._slideContainer.appendChild(this.calendarEl)
     this._updateLayout()
 
@@ -797,7 +797,7 @@ export class DateTimeField {
     this.calendarEl.querySelector<HTMLElement>('.CalendarGrid td:not([data-outside-month]):not([aria-disabled]) button, .CalendarFooterToday')?.focus()
   }
 
-  _closeCalendar(restoreFocus = true): void {
+  _closeCalendar(refocusTrigger = true): void {
     if (!this.calendarEl) return
     if (this._outsideClickHandler) {
       document.removeEventListener('click', this._outsideClickHandler)
@@ -807,7 +807,7 @@ export class DateTimeField {
     this.calendarEl = null
     this.root.removeAttribute('data-open')
     this.trigger.setAttribute('aria-label', this.t.openCalendar)
-    if (restoreFocus) this.trigger.focus()
+    if (refocusTrigger) this.trigger.focus()
   }
 
   _renderMonth(): void {

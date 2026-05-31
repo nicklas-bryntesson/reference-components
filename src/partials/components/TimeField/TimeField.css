@@ -175,7 +175,7 @@
   }
 
   /* ── Slide rail ──────────────────────────────────────────────────────────── */
-  & .TimeField-slideContainer {
+  & .slideContainer {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -188,7 +188,7 @@
 }
 
 /* ── Popup bubble ──────────────────────────────────────────────────────────── */
-.TimeFieldPopup {
+.TimeField-popup {
   position: absolute;
   left: var(--tf-popup-offset, 50%);
   transform: translateX(-50%);
@@ -205,17 +205,17 @@
 
 /* ── Direction gates ───────────────────────────────────────────────────────── */
 .TimeField {
-  &[data-direction="bottom"] .TimeFieldPopup {
+  &[data-direction="bottom"] .TimeField-popup {
     top: var(--tf-popup-gap);
   }
 
-  &[data-direction="top"] .TimeFieldPopup {
+  &[data-direction="top"] .TimeField-popup {
     bottom: var(--tf-popup-gap);
   }
 }
 
 /* ── Popup surface (backdrop-filter layer) ─────────────────────────────────── */
-.TimeFieldPopup-surface {
+.TimeField-popup-surface {
   position: absolute;
   inset: 0;
   overflow: hidden;
@@ -224,7 +224,7 @@
   pointer-events: none;
 }
 
-.TimeFieldPopup-backdropBlur {
+.TimeField-popup-backdropBlur {
   position: absolute;
   inset: -20px;
   background: var(--tf-popup-bg);
@@ -232,7 +232,7 @@
 }
 
 /* ── Popup columns ─────────────────────────────────────────────────────────── */
-.TimeFieldPopup-columns {
+.TimeField-popup-columns {
   position: relative;
   z-index: 2;
   display: flex;
@@ -240,7 +240,7 @@
   justify-content: center;
 }
 
-.TimeFieldPopup-column {
+.TimeField-popup-column {
   position: relative;
   width: 64px;
   height: calc(var(--tf-wheel-row-height) * var(--tf-wheel-rows));
@@ -254,7 +254,7 @@
 
   &:active { cursor: grabbing; }
 
-  &:focus-visible .TimeFieldPopup-band {
+  &:focus-visible .TimeField-popup-band {
     box-shadow: 0 0 0 2px Highlight;
   }
 
@@ -277,14 +277,14 @@
   }
 }
 
-.TimeFieldPopup-ring {
+.TimeField-popup-ring {
   position: absolute;
   inset: 0;
   transform-style: preserve-3d;
   will-change: transform;
 }
 
-.TimeFieldPopup-option {
+.TimeField-popup-option {
   position: absolute;
   left: 0; right: 0;
   top: 50%;
@@ -301,13 +301,13 @@
   cursor: pointer;
 }
 
-.TimeFieldPopup-option[aria-selected="true"] {
+.TimeField-popup-option[aria-selected="true"] {
   color: var(--tf-wheel-color-selected);
   font-weight: 600;
 }
 
 /* Center-band (fokus-highlight) */
-.TimeFieldPopup-band {
+.TimeField-popup-band {
   position: absolute;
   left: 4px; right: 4px;
   top: 50%;
@@ -320,7 +320,7 @@
 }
 
 /* ── Popup footer ──────────────────────────────────────────────────────────── */
-.TimeFieldPopup-footer {
+.TimeField-popup-footer {
   position: relative;
   z-index: 2;
   display: flex;
@@ -353,23 +353,23 @@
 }
 
 /* ── Arrow ─────────────────────────────────────────────────────────────────── */
-.TimeFieldPopup-arrow {
-  position: absolute;
-  width: var(--_tf-arrow-size);
-  height: var(--_tf-arrow-size);
-  background-color: var(--tf-popup-bg);
-  left: 50%;
-  z-index: 3;
-}
-
 .TimeField {
-  &[data-direction="top"] .TimeFieldPopup-arrow {
+  & .arrow {
+    position: absolute;
+    width: var(--_tf-arrow-size);
+    height: var(--_tf-arrow-size);
+    background-color: var(--tf-popup-bg);
+    left: 50%;
+    z-index: 3;
+  }
+
+  &[data-direction="top"] .arrow {
     bottom: calc(var(--_tf-arrow-size) * -0.5);
     transform: translateX(calc(-50% + var(--tf-arrow-offset, 0px))) rotate(45deg);
     border-end-end-radius: var(--_tf-arrow-corner-radius);
   }
 
-  &[data-direction="bottom"] .TimeFieldPopup-arrow {
+  &[data-direction="bottom"] .arrow {
     top: calc(var(--_tf-arrow-size) * -0.5);
     transform: translateX(calc(-50% + var(--tf-arrow-offset, 0px))) rotate(45deg);
     border-start-start-radius: var(--_tf-arrow-corner-radius);

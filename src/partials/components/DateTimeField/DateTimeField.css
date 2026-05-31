@@ -3,31 +3,31 @@
   display: inline-block;
   overflow: hidden;
   /* Public API */
-  --df-calendar-width: 18rem;
-  --df-calendar-gap: 1.5rem;
-  --df-site-max-width: var(--MAX--WIDTH--SITE, 100rem);
-  --df-site-padding: var(--SITE--PADDING, 1rem);
+  --dtf-calendar-width: 18rem;
+  --dtf-calendar-gap: 1.5rem;
+  --dtf-site-max-width: var(--MAX--WIDTH--SITE, 100rem);
+  --dtf-site-padding: var(--SITE--PADDING, 1rem);
   /* Design tokens — segments */
-  --df-segments-border-color: currentColor;
-  --df-segments-border-color-hover: #333;
-  --df-segments-bg-hover: #f8f8f8;
-  --df-segments-border-color-invalid: #c00;
-  --df-segments-color-muted: #6e6e6e;
-  --df-trigger-bg-hover: #f0f0f0;
-  --df-trigger-bg-active: #e0e0e0;
+  --dtf-segments-border-color: currentColor;
+  --dtf-segments-border-color-hover: #333;
+  --dtf-segments-bg-hover: #f8f8f8;
+  --dtf-segments-border-color-invalid: #c00;
+  --dtf-segments-color-muted: #6e6e6e;
+  --dtf-trigger-bg-hover: #f0f0f0;
+  --dtf-trigger-bg-active: #e0e0e0;
   /* Design tokens — calendar */
-  --df-calendar-bg: Canvas;
-  --df-calendar-color: CanvasText;
-  --df-calendar-color-muted: #6e6e6e;
-  --df-calendar-border-color: currentColor;
-  --df-calendar-radius: 4px;
-  --df-calendar-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  --df-calendar-backdrop: none;
-  --df-calendar-link-color: LinkText;
+  --dtf-calendar-bg: Canvas;
+  --dtf-calendar-color: CanvasText;
+  --dtf-calendar-color-muted: #6e6e6e;
+  --dtf-calendar-border-color: currentColor;
+  --dtf-calendar-radius: 4px;
+  --dtf-calendar-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  --dtf-calendar-backdrop: none;
+  --dtf-calendar-link-color: LinkText;
   /* Internal */
-  --_df-rail-max-width: calc(var(--df-site-max-width) + var(--df-calendar-width));
-  --_df-arrow-size: 0.75rem;
-  --_df-arrow-corner-radius: 0.25rem;
+  --_dtf-rail-max-width: calc(var(--dtf-site-max-width) + var(--dtf-calendar-width));
+  --_dtf-arrow-size: 0.75rem;
+  --_dtf-arrow-corner-radius: 0.25rem;
 
   & .DateTimeField-native {
     display: block;
@@ -63,7 +63,7 @@
   &[data-input-mode="display"] .DateTimeField-overlay {
     display: inline-flex;
     align-items: center;
-    border: 1px solid var(--df-segments-border-color);
+    border: 1px solid var(--dtf-segments-border-color);
     padding-inline-start: 0.5rem;
     padding-block: 0.25rem;
     gap: 0.125rem;
@@ -103,7 +103,7 @@
     }
 
     &[data-placeholder] {
-      color: var(--df-segments-color-muted);
+      color: var(--dtf-segments-color-muted);
     }
   }
 
@@ -114,8 +114,8 @@
 
   & .DateTimeField-overlay:hover,
   &[data-test-state="hover"] .DateTimeField-overlay {
-    border-color: var(--df-segments-border-color-hover);
-    background-color: var(--df-segments-bg-hover);
+    border-color: var(--dtf-segments-border-color-hover);
+    background-color: var(--dtf-segments-bg-hover);
   }
 
   & .DateTimeField-overlay:focus-within,
@@ -125,7 +125,7 @@
   }
 
   &[data-invalid] .DateTimeField-overlay {
-    border-color: var(--df-segments-border-color-invalid);
+    border-color: var(--dtf-segments-border-color-invalid);
   }
 
   & .DateTimeField-trigger {
@@ -139,12 +139,12 @@
 
     &:hover,
     .DateTimeField[data-test-state="hover"] & {
-      background-color: var(--df-trigger-bg-hover);
+      background-color: var(--dtf-trigger-bg-hover);
     }
 
     &:active,
     .DateTimeField[data-test-state="active"] & {
-      background-color: var(--df-trigger-bg-active);
+      background-color: var(--dtf-trigger-bg-active);
     }
 
     &:focus-visible {
@@ -163,15 +163,15 @@
   }
 }
 
-.DateTimeFieldCalendar {
+.DateTimeField-popup {
   position: absolute;
-  background: var(--df-calendar-bg);
-  color: var(--df-calendar-color);
-  border: 1px solid var(--df-calendar-border-color);
+  background: var(--dtf-calendar-bg);
+  color: var(--dtf-calendar-color);
+  border: 1px solid var(--dtf-calendar-border-color);
   padding: 0.75rem;
   z-index: 100;
-  border-radius: var(--df-calendar-radius);
-  box-shadow: var(--df-calendar-shadow);
+  border-radius: var(--dtf-calendar-radius);
+  box-shadow: var(--dtf-calendar-shadow);
 
   & .CalendarHeader {
     display: flex;
@@ -212,7 +212,7 @@
       padding-block-end: 0.25rem;
       text-align: center;
       font-weight: normal;
-      color: var(--df-calendar-color-muted);
+      color: var(--dtf-calendar-color-muted);
       min-inline-size: 2rem;
     }
 
@@ -254,7 +254,7 @@
     }
 
     & td[data-outside-month] button {
-      color: var(--df-calendar-color-muted);
+      color: var(--dtf-calendar-color-muted);
     }
   }
 
@@ -268,7 +268,7 @@
       background: none;
       border: none;
       cursor: pointer;
-      color: var(--df-calendar-link-color);
+      color: var(--dtf-calendar-link-color);
       font: inherit;
       padding: 0.25rem 0.5rem;
       border-radius: 2px;
@@ -287,31 +287,31 @@
 }
 
 /* ── Picker view ───────────────────────────────────────────────────────────── */
-.DateTimeFieldCalendar .YearMonthPicker {
+.DateTimeField-popup .YearMonthPicker {
   display: none;
 }
 
-.DateTimeFieldCalendar[data-view="picker"] .YearMonthPicker {
+.DateTimeField-popup[data-view="picker"] .YearMonthPicker {
   display: flex;
   overflow: hidden;
   height: 16rem;
 }
 
-.DateTimeFieldCalendar[data-view="picker"] .Grid {
+.DateTimeField-popup[data-view="picker"] .Grid {
   display: none;
 }
 
-.DateTimeFieldCalendar[data-view="picker"] .CalendarFooter {
+.DateTimeField-popup[data-view="picker"] .CalendarFooter {
   display: none;
 }
 
-.DateTimeFieldCalendar[data-view="picker"] .PrevMonth,
-.DateTimeFieldCalendar[data-view="picker"] .NextMonth {
+.DateTimeField-popup[data-view="picker"] .PrevMonth,
+.DateTimeField-popup[data-view="picker"] .NextMonth {
   visibility: hidden;
 }
 
-.DateTimeFieldCalendar .MonthList,
-.DateTimeFieldCalendar .YearList {
+.DateTimeField-popup .MonthList,
+.DateTimeField-popup .YearList {
   list-style: none;
   margin: 0;
   padding: 0;
@@ -320,44 +320,44 @@
   outline: none;
 }
 
-.DateTimeFieldCalendar .MonthList [role="option"],
-.DateTimeFieldCalendar .YearList [role="option"] {
+.DateTimeField-popup .MonthList [role="option"],
+.DateTimeField-popup .YearList [role="option"] {
   padding: 0.25rem 0.5rem;
   cursor: pointer;
 }
 
-.DateTimeFieldCalendar .MonthList [role="option"][aria-selected="true"],
-.DateTimeFieldCalendar .YearList [role="option"][aria-selected="true"] {
+.DateTimeField-popup .MonthList [role="option"][aria-selected="true"],
+.DateTimeField-popup .YearList [role="option"][aria-selected="true"] {
   font-weight: bold;
   outline: 2px solid;
   outline-offset: -2px;
 }
 
-.DateTimeFieldCalendar .MonthList[data-focused="true"] [role="option"][aria-selected="true"],
-.DateTimeFieldCalendar .YearList[data-focused="true"] [role="option"][aria-selected="true"] {
+.DateTimeField-popup .MonthList[data-focused="true"] [role="option"][aria-selected="true"],
+.DateTimeField-popup .YearList[data-focused="true"] [role="option"][aria-selected="true"] {
   background: SelectedItem;
   color: SelectedItemText;
   outline: none;
 }
 
-.DateTimeFieldCalendar .MonthList [role="option"][aria-disabled="true"],
-.DateTimeFieldCalendar .YearList [role="option"][aria-disabled="true"] {
+.DateTimeField-popup .MonthList [role="option"][aria-disabled="true"],
+.DateTimeField-popup .YearList [role="option"][aria-disabled="true"] {
   opacity: 0.4;
   cursor: default;
 }
 
-.DateTimeFieldCalendar .MonthYearTrigger::after {
+.DateTimeField-popup .MonthYearTrigger::after {
   content: '›';
   display: inline-block;
   transform: rotate(90deg);
 }
 
-.DateTimeFieldCalendar .MonthYearTrigger[aria-expanded="true"]::after {
+.DateTimeField-popup .MonthYearTrigger[aria-expanded="true"]::after {
   transform: rotate(-90deg);
 }
 
 /* ── Calendar surface (backdrop-filter layer) ──────────────────────────── */
-.DateTimeFieldCalendar .CalendarSurface {
+.DateTimeField-popup .CalendarSurface {
   position: absolute;
   inset: 0;
   overflow: hidden;
@@ -366,11 +366,11 @@
   pointer-events: none;
 }
 
-.DateTimeFieldCalendar .CalendarSurface .BackdropBlur {
+.DateTimeField-popup .CalendarSurface .BackdropBlur {
   position: absolute;
   inset: -20px;
-  background: var(--df-calendar-bg);
-  backdrop-filter: var(--df-calendar-backdrop);
+  background: var(--dtf-calendar-bg);
+  backdrop-filter: var(--dtf-calendar-backdrop);
 }
 
 /* ── Initialisation gate ───────────────────────────────────────────────── */
@@ -384,69 +384,69 @@
   top: 50%;
   left: 50%;
   transform: translateX(-50%);
-  width: min(100vw, var(--_df-rail-max-width));
+  width: min(100vw, var(--_dtf-rail-max-width));
   height: 0;
   pointer-events: none;
   z-index: 9999;
 }
 
 /* ── Calendar bubble ───────────────────────────────────────────────────── */
-.DateTimeField .DateTimeFieldCalendar {
+.DateTimeField .DateTimeField-popup {
   position: absolute;
-  left: var(--df-popup-offset, 50%);
+  left: var(--dtf-popup-offset, 50%);
   transform: translateX(-50%);
-  min-inline-size: var(--df-calendar-width);
+  min-inline-size: var(--dtf-calendar-width);
   pointer-events: auto;
 }
 
 /* ── Direction gates ───────────────────────────────────────────────────── */
-.DateTimeField[data-direction="bottom"] .DateTimeFieldCalendar {
-  top: var(--df-calendar-gap);
+.DateTimeField[data-direction="bottom"] .DateTimeField-popup {
+  top: var(--dtf-calendar-gap);
 }
 
-.DateTimeField[data-direction="top"] .DateTimeFieldCalendar {
-  bottom: var(--df-calendar-gap);
+.DateTimeField[data-direction="top"] .DateTimeField-popup {
+  bottom: var(--dtf-calendar-gap);
 }
 
 /* ── Arrow ─────────────────────────────────────────────────────────────── */
 .DateTimeField .arrow {
   position: absolute;
-  width: var(--_df-arrow-size);
-  height: var(--_df-arrow-size);
-  background-color: var(--df-calendar-bg);
+  width: var(--_dtf-arrow-size);
+  height: var(--_dtf-arrow-size);
+  background-color: var(--dtf-calendar-bg);
   left: 50%;
 }
 
 .DateTimeField[data-direction="top"] .arrow {
-  bottom: calc(var(--_df-arrow-size) * -0.5);
-  transform: translateX(calc(-50% + var(--df-arrow-offset, 0px))) rotate(45deg);
-  border-end-end-radius: var(--_df-arrow-corner-radius);
+  bottom: calc(var(--_dtf-arrow-size) * -0.5);
+  transform: translateX(calc(-50% + var(--dtf-arrow-offset, 0px))) rotate(45deg);
+  border-end-end-radius: var(--_dtf-arrow-corner-radius);
 }
 
 .DateTimeField[data-direction="bottom"] .arrow {
-  top: calc(var(--_df-arrow-size) * -0.5);
-  transform: translateX(calc(-50% + var(--df-arrow-offset, 0px))) rotate(45deg);
-  border-start-start-radius: var(--_df-arrow-corner-radius);
+  top: calc(var(--_dtf-arrow-size) * -0.5);
+  transform: translateX(calc(-50% + var(--dtf-arrow-offset, 0px))) rotate(45deg);
+  border-start-start-radius: var(--_dtf-arrow-corner-radius);
 }
 
 /* ─── Time columns ─────────────────────────────────────────────────────────── */
 
-.DateTimeFieldCalendar .CalendarInner {
+.DateTimeField-popup .CalendarInner {
   display: flex;
   gap: 0;
 }
 
-.DateTimeFieldCalendar .CalendarLeft {
+.DateTimeField-popup .CalendarLeft {
   flex: 1;
 }
 
-.DateTimeFieldCalendar .TimeColumns {
+.DateTimeField-popup .TimeColumns {
   display: flex;
   gap: 0;
   border-left: 1px solid var(--color-border, #e0e0e0);
 }
 
-.DateTimeFieldCalendar .TimeList {
+.DateTimeField-popup .TimeList {
   list-style: none;
   margin: 0;
   padding: 0;
@@ -456,24 +456,24 @@
   scroll-snap-type: y mandatory;
 }
 
-.DateTimeFieldCalendar .TimeList:focus {
+.DateTimeField-popup .TimeList:focus {
   outline: 2px solid var(--color-focus, #005fcc);
   outline-offset: -2px;
 }
 
-.DateTimeFieldCalendar .TimeList [role="option"] {
+.DateTimeField-popup .TimeList [role="option"] {
   padding: 6px 12px;
   cursor: pointer;
   text-align: center;
   scroll-snap-align: center;
 }
 
-.DateTimeFieldCalendar .TimeList [role="option"][aria-selected="true"] {
+.DateTimeField-popup .TimeList [role="option"][aria-selected="true"] {
   background-color: var(--color-selected-bg, #005fcc);
   color: var(--color-selected-text, #fff);
   font-weight: 600;
 }
 
-.DateTimeFieldCalendar .TimeList [role="option"]:hover:not([aria-selected="true"]) {
+.DateTimeField-popup .TimeList [role="option"]:hover:not([aria-selected="true"]) {
   background-color: var(--color-hover-bg, #f0f0f0);
 }

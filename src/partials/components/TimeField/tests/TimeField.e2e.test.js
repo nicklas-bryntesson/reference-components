@@ -56,12 +56,12 @@ test('trigger has aria-expanded=false and aria-haspopup=dialog when closed', asy
 // ── Popup open / close ─────────────────────────────────────────────────────────
 
 test('popup does not exist in DOM when closed', async ({ page }) => {
-  await expect(page.locator('.TimeFieldPopup')).toHaveCount(0)
+  await expect(page.locator('.TimeField-popup')).toHaveCount(0)
 })
 
 test('popup is visible after trigger click', async ({ page }) => {
   await page.locator(`${TF} .TimeField-trigger`).click()
-  await expect(page.locator('.TimeFieldPopup')).toBeVisible()
+  await expect(page.locator('.TimeField-popup')).toBeVisible()
 })
 
 test('trigger aria-expanded=true when popup open', async ({ page }) => {
@@ -72,46 +72,46 @@ test('trigger aria-expanded=true when popup open', async ({ page }) => {
 test('popup closes on Escape', async ({ page }) => {
   await page.locator(`${TF} .TimeField-trigger`).click()
   // Focus inside the popup so the popup's keydown handler receives the event
-  await page.locator('.TimeFieldPopup-column[data-segment="hour"]').focus()
+  await page.locator('.TimeField-popup-column[data-segment="hour"]').focus()
   await page.keyboard.press('Escape')
-  await expect(page.locator('.TimeFieldPopup')).toHaveCount(0)
+  await expect(page.locator('.TimeField-popup')).toHaveCount(0)
 })
 
 test('focus returns to trigger after Escape', async ({ page }) => {
   await page.locator(`${TF} .TimeField-trigger`).click()
   // Focus inside the popup so the popup's keydown handler receives the event
-  await page.locator('.TimeFieldPopup-column[data-segment="hour"]').focus()
+  await page.locator('.TimeField-popup-column[data-segment="hour"]').focus()
   await page.keyboard.press('Escape')
   await expect(page.locator(`${TF} .TimeField-trigger`)).toBeFocused()
 })
 
 test('popup closes on outside click', async ({ page }) => {
   await page.locator(`${TF} .TimeField-trigger`).click()
-  await expect(page.locator('.TimeFieldPopup')).toBeVisible()
+  await expect(page.locator('.TimeField-popup')).toBeVisible()
   // Wait for the setTimeout(0) outside-click handler to register before clicking outside
   await page.waitForTimeout(50)
   await page.evaluate(() => document.body.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true })))
-  await expect(page.locator('.TimeFieldPopup')).toHaveCount(0)
+  await expect(page.locator('.TimeField-popup')).toHaveCount(0)
 })
 
 // ── Popup ARIA structure ───────────────────────────────────────────────────────
 
 test('popup has role=dialog and aria-modal=true', async ({ page }) => {
   await page.locator(`${TF} .TimeField-trigger`).click()
-  const popup = page.locator('.TimeFieldPopup')
+  const popup = page.locator('.TimeField-popup')
   await expect(popup).toHaveAttribute('role', 'dialog')
   await expect(popup).toHaveAttribute('aria-modal', 'true')
 })
 
 test('popup has aria-label', async ({ page }) => {
   await page.locator(`${TF} .TimeField-trigger`).click()
-  const popup = page.locator('.TimeFieldPopup')
+  const popup = page.locator('.TimeField-popup')
   await expect(popup).toHaveAttribute('aria-label', 'Välj tid')
 })
 
 test('popup hour column has role=spinbutton', async ({ page }) => {
   await page.locator(`${TF} .TimeField-trigger`).click()
-  const hourCol = page.locator('.TimeFieldPopup-column[data-segment="hour"]')
+  const hourCol = page.locator('.TimeField-popup-column[data-segment="hour"]')
   await expect(hourCol).toHaveAttribute('role', 'spinbutton')
   await expect(hourCol).toHaveAttribute('aria-valuemin', '0')
   await expect(hourCol).toHaveAttribute('aria-valuemax', '23')
@@ -119,7 +119,7 @@ test('popup hour column has role=spinbutton', async ({ page }) => {
 
 test('popup minute column has role=spinbutton', async ({ page }) => {
   await page.locator(`${TF} .TimeField-trigger`).click()
-  const minuteCol = page.locator('.TimeFieldPopup-column[data-segment="minute"]')
+  const minuteCol = page.locator('.TimeField-popup-column[data-segment="minute"]')
   await expect(minuteCol).toHaveAttribute('role', 'spinbutton')
   await expect(minuteCol).toHaveAttribute('aria-valuemin', '0')
   await expect(minuteCol).toHaveAttribute('aria-valuemax', '59')
@@ -127,7 +127,7 @@ test('popup minute column has role=spinbutton', async ({ page }) => {
 
 test('popup column contains 9 aria-hidden option elements', async ({ page }) => {
   await page.locator(`${TF} .TimeField-trigger`).click()
-  const options = page.locator('.TimeFieldPopup-column[data-segment="hour"] .TimeFieldPopup-option')
+  const options = page.locator('.TimeField-popup-column[data-segment="hour"] .TimeField-popup-option')
   await expect(options).toHaveCount(9)
   for (let i = 0; i < 9; i++) {
     await expect(options.nth(i)).toHaveAttribute('aria-hidden', 'true')
@@ -182,14 +182,14 @@ test('passes axe on the kitchensink page', async ({ page }) => {
 
 test('passes axe with popup open', async ({ page }) => {
   await page.locator(`${TF} .TimeField-trigger`).click()
-  await expect(page.locator('.TimeFieldPopup')).toBeVisible()
+  await expect(page.locator('.TimeField-popup')).toBeVisible()
   await checkA11y(page, undefined, {
     detailedReport: false,
     axeOptions: {
       runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa'] },
     },
   })
-  await page.locator('.TimeFieldPopup-column[data-segment="hour"]').focus()
+  await page.locator('.TimeField-popup-column[data-segment="hour"]').focus()
   await page.keyboard.press('Escape')
 })
 
@@ -205,7 +205,7 @@ test('wheel column ArrowDown increases value in segment', async ({ page }) => {
 
   // Open popup and focus hour column
   await page.locator(`${TF} .TimeField-trigger`).click()
-  const hourCol = page.locator('.TimeFieldPopup-column[data-segment="hour"]')
+  const hourCol = page.locator('.TimeField-popup-column[data-segment="hour"]')
   await hourCol.focus()
 
   // ArrowDown = stepBy(+1) = höjer värdet
@@ -225,7 +225,7 @@ test('wheel column ArrowUp decreases value in segment', async ({ page }) => {
   await page.waitForTimeout(350)
 
   await page.locator(`${TF} .TimeField-trigger`).click()
-  const hourCol = page.locator('.TimeFieldPopup-column[data-segment="hour"]')
+  const hourCol = page.locator('.TimeField-popup-column[data-segment="hour"]')
   await hourCol.focus()
 
   // ArrowUp = stepBy(-1) = minskar värdet
@@ -237,11 +237,11 @@ test('wheel column ArrowUp decreases value in segment', async ({ page }) => {
 
 test('Nu-knappen synkar hjulet med aktuell tid', async ({ page }) => {
   await page.locator(`${TF} .TimeField-trigger`).click()
-  const nowBtn = page.locator('.TimeFieldPopup-now')
+  const nowBtn = page.locator('.TimeField-popup-now')
   await nowBtn.click()
   // Wheel columns should now have aria-valuenow set
-  const hourCol = page.locator('.TimeFieldPopup-column[data-segment="hour"]')
-  const minuteCol = page.locator('.TimeFieldPopup-column[data-segment="minute"]')
+  const hourCol = page.locator('.TimeField-popup-column[data-segment="hour"]')
+  const minuteCol = page.locator('.TimeField-popup-column[data-segment="minute"]')
   const hourVal = await hourCol.getAttribute('aria-valuenow')
   const minVal = await minuteCol.getAttribute('aria-valuenow')
   expect(Number(hourVal)).toBeGreaterThanOrEqual(0)
@@ -253,9 +253,9 @@ test('Nu-knappen synkar hjulet med aktuell tid', async ({ page }) => {
 test('Nollställ-knappen sätter hjulet till tomt läge', async ({ page }) => {
   // First set a value via Nu
   await page.locator(`${TF} .TimeField-trigger`).click()
-  await page.locator('.TimeFieldPopup-now').click()
+  await page.locator('.TimeField-popup-now').click()
   // Then clear
-  await page.locator('.TimeFieldPopup-clear').click()
+  await page.locator('.TimeField-popup-clear').click()
   // Native value should be empty
   const nativeVal = await page.locator(`${TF} .TimeField-native`).inputValue()
   expect(nativeVal).toBe('')
@@ -263,10 +263,10 @@ test('Nollställ-knappen sätter hjulet till tomt läge', async ({ page }) => {
 
 test('popup wheel kolumn har aria-valuemin och aria-valuemax', async ({ page }) => {
   await page.locator(`${TF} .TimeField-trigger`).click()
-  const hourCol = page.locator('.TimeFieldPopup-column[data-segment="hour"]')
+  const hourCol = page.locator('.TimeField-popup-column[data-segment="hour"]')
   await expect(hourCol).toHaveAttribute('aria-valuemin', '0')
   await expect(hourCol).toHaveAttribute('aria-valuemax', '23')
-  const minuteCol = page.locator('.TimeFieldPopup-column[data-segment="minute"]')
+  const minuteCol = page.locator('.TimeField-popup-column[data-segment="minute"]')
   await expect(minuteCol).toHaveAttribute('aria-valuemin', '0')
   await expect(minuteCol).toHaveAttribute('aria-valuemax', '59')
 })

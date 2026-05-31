@@ -274,7 +274,7 @@ function makeField({ disabled = false, value = '', min = '', max = '', locale = 
       </div>
       <div class="slideContainer">
       <template data-template="datefield-calendar">
-        <div class="DateFieldCalendar" role="dialog" aria-modal="true">
+        <div class="DateField-popup" role="dialog" aria-modal="true">
           <div class="CalendarHeader">
             <button type="button" class="PrevMonth">&#8249;</button>
             <button type="button" class="MonthYearTrigger" aria-live="polite" aria-atomic="true"></button>
@@ -687,7 +687,7 @@ describe('DateField — prop application from wrapper data attributes', () => {
           <button class="Trigger" type="button" aria-expanded="false" aria-haspopup="dialog"></button>
         </div>
         <template data-template="datefield-calendar">
-          <div class="DateFieldCalendar" role="dialog" aria-modal="true">
+          <div class="DateField-popup" role="dialog" aria-modal="true">
             <div class="CalendarHeader">
               <button type="button" class="PrevMonth">&#8249;</button>
               <button type="button" class="MonthYearTrigger" aria-live="polite" aria-atomic="true"></button>
@@ -725,7 +725,7 @@ describe('DateField — prop application from wrapper data attributes', () => {
           <button class="Trigger" type="button" aria-expanded="false" aria-haspopup="dialog"></button>
         </div>
         <template data-template="datefield-calendar">
-          <div class="DateFieldCalendar" role="dialog" aria-modal="true">
+          <div class="DateField-popup" role="dialog" aria-modal="true">
             <div class="CalendarHeader">
               <button type="button" class="PrevMonth">&#8249;</button>
               <button type="button" class="MonthYearTrigger" aria-live="polite" aria-atomic="true"></button>
@@ -765,7 +765,7 @@ describe('DateField — prop application from wrapper data attributes', () => {
           <button class="Trigger" type="button" aria-expanded="false" aria-haspopup="dialog"></button>
         </div>
         <template data-template="datefield-calendar">
-          <div class="DateFieldCalendar" role="dialog" aria-modal="true">
+          <div class="DateField-popup" role="dialog" aria-modal="true">
             <div class="CalendarHeader">
               <button type="button" class="PrevMonth">&#8249;</button>
               <button type="button" class="MonthYearTrigger" aria-live="polite" aria-atomic="true"></button>
@@ -803,7 +803,7 @@ describe('DateField — prop application from wrapper data attributes', () => {
           <button class="Trigger" type="button" aria-expanded="false" aria-haspopup="dialog"></button>
         </div>
         <template data-template="datefield-calendar">
-          <div class="DateFieldCalendar" role="dialog" aria-modal="true">
+          <div class="DateField-popup" role="dialog" aria-modal="true">
             <div class="CalendarHeader">
               <button type="button" class="PrevMonth">&#8249;</button>
               <button type="button" class="MonthYearTrigger" aria-live="polite" aria-atomic="true"></button>
@@ -841,7 +841,7 @@ describe('DateField — prop application from wrapper data attributes', () => {
           <button class="Trigger" type="button" aria-expanded="false" aria-haspopup="dialog"></button>
         </div>
         <template data-template="datefield-calendar">
-          <div class="DateFieldCalendar" role="dialog" aria-modal="true">
+          <div class="DateField-popup" role="dialog" aria-modal="true">
             <div class="CalendarHeader">
               <button type="button" class="PrevMonth">&#8249;</button>
               <button type="button" class="MonthYearTrigger" aria-live="polite" aria-atomic="true"></button>

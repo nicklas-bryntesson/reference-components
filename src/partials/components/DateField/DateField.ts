@@ -585,7 +585,7 @@ class DateField {
     if (!this.calendarTemplate) return
 
     const clone = this.calendarTemplate.content.cloneNode(true) as DocumentFragment
-    this.calendarEl = clone.querySelector<HTMLElement>('.DateFieldCalendar')!
+    this.calendarEl = clone.querySelector<HTMLElement>('.DateField-popup')!
 
     const monthYearTrigger = this.calendarEl.querySelector<HTMLButtonElement>('.MonthYearTrigger')!
     const prevBtn = this.calendarEl.querySelector<HTMLButtonElement>('.PrevMonth')!

@@ -109,20 +109,20 @@ class WheelColumn {
     }
 
     this.ring = document.createElement('div')
-    this.ring.className = 'TimeFieldPopup-ring'
+    this.ring.className = 'TimeField-popup-ring'
     this.ring.style.transformStyle = 'preserve-3d'
     this.ring.style.transform = `translateZ(${-this.radius}px)`
 
     for (let o = -HALF; o <= HALF; o++) {
       const slotEl = document.createElement('div')
-      slotEl.className = 'TimeFieldPopup-option'
+      slotEl.className = 'TimeField-popup-option'
       slotEl.setAttribute('aria-hidden', 'true')
       this.ring.appendChild(slotEl)
       this.slots.push({ el: slotEl, o })
     }
 
     const band = document.createElement('div')
-    band.className = 'TimeFieldPopup-band'
+    band.className = 'TimeField-popup-band'
 
     this.el.appendChild(this.ring)
     this.el.appendChild(band)
@@ -234,7 +234,7 @@ class WheelColumn {
 
   private _onClick = (e: MouseEvent): void => {
     if (this._destroyed) return
-    const option = (e.target as HTMLElement).closest<HTMLElement>('.TimeFieldPopup-option')
+    const option = (e.target as HTMLElement).closest<HTMLElement>('.TimeField-popup-option')
     if (!option) return
 
     const text = option.textContent?.trim()

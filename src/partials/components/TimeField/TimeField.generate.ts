@@ -41,20 +41,20 @@ function canonical(id: string, label: string, rootAttrs: string, inputAttrs: str
     <button type="button" class="TimeField-trigger" aria-label="Öppna tidsväljare" aria-expanded="false" aria-haspopup="dialog"${triggerAttrs}>
       <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
     </button>
-    <div class="TimeField-slideContainer">
+    <div class="slideContainer">
       <template data-template="timefield-popup">
-        <div class="TimeFieldPopup" role="dialog" aria-modal="true" aria-label="Välj tid">
-          <span class="TimeFieldPopup-surface" aria-hidden="true"><span class="TimeFieldPopup-backdropBlur"></span></span>
-          <div class="TimeFieldPopup-columns">
-            <div class="TimeFieldPopup-column" data-segment="hour" role="spinbutton" aria-label="Timmar" tabindex="0"></div>
-            <div class="TimeFieldPopup-column" data-segment="minute" role="spinbutton" aria-label="Minuter" tabindex="-1"></div>
-            <div class="TimeFieldPopup-column" data-segment="second" role="spinbutton" aria-label="Sekunder" tabindex="-1"></div>
+        <div class="TimeField-popup" role="dialog" aria-modal="true" aria-label="Välj tid">
+          <span class="TimeField-popup-surface" aria-hidden="true"><span class="TimeField-popup-backdropBlur"></span></span>
+          <div class="TimeField-popup-columns">
+            <div class="TimeField-popup-column" data-segment="hour" role="spinbutton" aria-label="Timmar" tabindex="0"></div>
+            <div class="TimeField-popup-column" data-segment="minute" role="spinbutton" aria-label="Minuter" tabindex="-1"></div>
+            <div class="TimeField-popup-column" data-segment="second" role="spinbutton" aria-label="Sekunder" tabindex="-1"></div>
           </div>
-          <div class="TimeFieldPopup-footer">
-            <button type="button" class="TimeFieldPopup-clear">Rensa</button>
-            <button type="button" class="TimeFieldPopup-now">Nu</button>
+          <div class="TimeField-popup-footer">
+            <button type="button" class="TimeField-popup-clear">Rensa</button>
+            <button type="button" class="TimeField-popup-now">Nu</button>
           </div>
-          <div class="TimeFieldPopup-arrow"></div>
+          <div class="arrow"></div>
         </div>
       </template>
     </div>

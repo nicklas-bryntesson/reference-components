@@ -116,7 +116,7 @@ toggle-tip .slideContainer {
 }
 
 /* ── Bubble ────────────────────────────────────────────────────── */
-toggle-tip .toggleTipContent {
+toggle-tip .ToggleTip-popup {
   position: absolute;
   left: var(--tt-popup-offset);
   transform: translateX(-50%);
@@ -173,7 +173,7 @@ toggle-tip .arrow {
 }
 
 /* ── Direction: top (bubble above trigger) ─────────────────────── */
-toggle-tip[direction="top"] .toggleTipContent {
+toggle-tip[direction="top"] .ToggleTip-popup {
   bottom: var(--_tt-gap);
 }
 
@@ -184,7 +184,7 @@ toggle-tip[direction="top"] .arrow {
 }
 
 /* ── Direction: bottom (bubble below trigger) ──────────────────── */
-toggle-tip[direction="bottom"] .toggleTipContent {
+toggle-tip[direction="bottom"] .ToggleTip-popup {
   top: var(--_tt-gap);
 }
 

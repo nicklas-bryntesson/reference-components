@@ -11,7 +11,7 @@ test('opens on button click', async ({ page }) => {
   const tip = page.locator('toggle-tip[data-id="inline"]')
   await tip.scrollIntoViewIfNeeded()
   const button = tip.locator('button')
-  const popup = tip.locator('.toggleTipContent')
+  const popup = tip.locator('.ToggleTip-popup')
 
   await expect(popup).not.toBeVisible()
   await button.click()
@@ -27,7 +27,7 @@ test('closes on second click', async ({ page }) => {
 
   await button.click()
   await button.click()
-  await expect(tip.locator('.toggleTipContent')).not.toBeVisible()
+  await expect(tip.locator('.ToggleTip-popup')).not.toBeVisible()
   await expect(button).toHaveAttribute('aria-expanded', 'false')
 })
 
@@ -35,10 +35,10 @@ test('closes on click outside', async ({ page }) => {
   const tip = page.locator('toggle-tip[data-id="inline"]')
   await tip.scrollIntoViewIfNeeded()
   await tip.locator('button').click()
-  await expect(tip.locator('.toggleTipContent')).toBeVisible()
+  await expect(tip.locator('.ToggleTip-popup')).toBeVisible()
 
   await page.mouse.click(5, 5)
-  await expect(tip.locator('.toggleTipContent')).not.toBeVisible()
+  await expect(tip.locator('.ToggleTip-popup')).not.toBeVisible()
 })
 
 // ── Keyboard ────────────────────────────────────────────────────────────────
@@ -48,18 +48,18 @@ test('button is keyboard-activatable with Enter', async ({ page }) => {
   await tip.scrollIntoViewIfNeeded()
   await tip.locator('button').focus()
   await page.keyboard.press('Enter')
-  await expect(tip.locator('.toggleTipContent')).toBeVisible()
+  await expect(tip.locator('.ToggleTip-popup')).toBeVisible()
 })
 
 test('focusout closes the tip', async ({ page }) => {
   const tip = page.locator('toggle-tip[data-id="inline"]')
   await tip.scrollIntoViewIfNeeded()
   await tip.locator('button').click()
-  await expect(tip.locator('.toggleTipContent')).toBeVisible()
+  await expect(tip.locator('.ToggleTip-popup')).toBeVisible()
 
   // Move focus to body programmatically — no mousedown, no tab-order dependency
   await page.evaluate(() => { document.body.setAttribute('tabindex', '-1'); document.body.focus() })
-  await expect(tip.locator('.toggleTipContent')).not.toBeVisible()
+  await expect(tip.locator('.ToggleTip-popup')).not.toBeVisible()
 })
 
 // ── Positioning ─────────────────────────────────────────────────────────────
@@ -70,7 +70,7 @@ test('bubble is positioned above trigger by default', async ({ page }) => {
   await tip.locator('button').click()
 
   const tipBox = await tip.boundingBox()
-  const bubbleBox = await tip.locator('.toggleTipContent').boundingBox()
+  const bubbleBox = await tip.locator('.ToggleTip-popup').boundingBox()
   // bubble bottom edge must be above trigger bottom edge
   expect(bubbleBox.y + bubbleBox.height).toBeLessThan(tipBox.y + tipBox.height)
 })
@@ -92,7 +92,7 @@ test('bubble flips below trigger when near top of viewport', async ({ page }) =>
   await expect(tip).toHaveAttribute('direction', 'bottom')
 
   const tipBox = await tip.boundingBox()
-  const bubbleBox = await tip.locator('.toggleTipContent').boundingBox()
+  const bubbleBox = await tip.locator('.ToggleTip-popup').boundingBox()
 
   // Restore viewport before assertions so subsequent tests start clean
   await page.setViewportSize({ width: 1280, height: 720 })
@@ -106,7 +106,7 @@ test('bubble does not overflow viewport left edge', async ({ page }) => {
   await tip.scrollIntoViewIfNeeded()
   await tip.locator('button').click()
 
-  const bubbleBox = await tip.locator('.toggleTipContent').boundingBox()
+  const bubbleBox = await tip.locator('.ToggleTip-popup').boundingBox()
   expect(bubbleBox.x).toBeGreaterThanOrEqual(0)
 })
 
@@ -116,7 +116,7 @@ test('bubble does not overflow viewport right edge', async ({ page }) => {
   await tip.scrollIntoViewIfNeeded()
   await tip.locator('button').click()
 
-  const bubbleBox = await tip.locator('.toggleTipContent').boundingBox()
+  const bubbleBox = await tip.locator('.ToggleTip-popup').boundingBox()
   const viewport = page.viewportSize()
   expect(Math.round(bubbleBox.x + bubbleBox.width)).toBeLessThanOrEqual(viewport.width)
 })

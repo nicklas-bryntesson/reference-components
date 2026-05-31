@@ -133,7 +133,7 @@ class TimeField {
     this._digitBuffer = ''
     this._digitTimer = null
 
-    this._slideContainer = el.querySelector<HTMLElement>('.TimeField-slideContainer')!
+    this._slideContainer = el.querySelector<HTMLElement>('.slideContainer')!
     this._popupTemplate = el.querySelector<HTMLTemplateElement>('[data-template="timefield-popup"]')
 
     this._init()
@@ -709,14 +709,14 @@ class TimeField {
   private _openPopup(): void {
     if (!this._popupTemplate) return
     const clone = this._popupTemplate.content.cloneNode(true) as DocumentFragment
-    this.popupEl = clone.querySelector<HTMLElement>('.TimeFieldPopup')!
+    this.popupEl = clone.querySelector<HTMLElement>('.TimeField-popup')!
 
     // Footer button states
     this._updateClearButton()
 
     // Wire footer
-    const clearBtn = this.popupEl.querySelector<HTMLButtonElement>('.TimeFieldPopup-clear')!
-    const nowBtn = this.popupEl.querySelector<HTMLButtonElement>('.TimeFieldPopup-now')!
+    const clearBtn = this.popupEl.querySelector<HTMLButtonElement>('.TimeField-popup-clear')!
+    const nowBtn = this.popupEl.querySelector<HTMLButtonElement>('.TimeField-popup-now')!
     clearBtn.addEventListener('click', () => this._handleClear())
     nowBtn.addEventListener('click', () => this._handleNow())
 
@@ -796,7 +796,7 @@ class TimeField {
 
   private _updateClearButton(): void {
     if (!this.popupEl) return
-    const clearBtn = this.popupEl.querySelector<HTMLButtonElement>('.TimeFieldPopup-clear')
+    const clearBtn = this.popupEl.querySelector<HTMLButtonElement>('.TimeField-popup-clear')
     if (clearBtn) {
       const hasValue = this.native.value !== ''
       clearBtn.disabled = !hasValue
@@ -861,7 +861,7 @@ class TimeField {
       const isFirstCol = allCols[0] === col
       if (!e.shiftKey && isLastCol) {
         e.preventDefault()
-        this.popupEl.querySelector<HTMLButtonElement>('.TimeFieldPopup-clear')?.focus()
+        this.popupEl.querySelector<HTMLButtonElement>('.TimeField-popup-clear')?.focus()
       } else if (e.shiftKey && isFirstCol) {
         e.preventDefault()
         this.trigger.focus()

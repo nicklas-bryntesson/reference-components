@@ -48,7 +48,7 @@ class ToggleTip {
   private _init(): void {
     this._buildDOM()
     this.button = this.element.querySelector('button') as HTMLButtonElement
-    this.popup = this.element.querySelector('.toggleTipContent') as HTMLElement
+    this.popup = this.element.querySelector('.ToggleTip-popup') as HTMLElement
     this._updateDirection()
     this.element.setAttribute('initialized', '')
     this.button.addEventListener('click', this._toggle)
@@ -71,7 +71,7 @@ class ToggleTip {
         ${generateIconSVG(this.icon)}
       </button>
       <div class="slideContainer">
-        <div class="toggleTipContent" id="${id}" role="tooltip" aria-hidden="true">
+        <div class="ToggleTip-popup" id="${id}" role="tooltip" aria-hidden="true">
           ${titleHTML}
           ${content}
           <div class="arrow"></div>

@@ -25,7 +25,7 @@ function canonical(id: string, attrs: Record<string, string> = {}): string {
     </button>
   </div>
   <template class="DateTimeField-calendarTemplate">
-    <div class="DateTimeFieldCalendar" role="dialog" aria-modal="true">
+    <div class="DateTimeField-popup" role="dialog" aria-modal="true">
       <div class="CalendarInner">
         <div class="CalendarLeft">
           <div class="CalendarHeader">

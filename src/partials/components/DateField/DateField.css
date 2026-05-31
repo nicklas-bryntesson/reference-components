@@ -162,7 +162,7 @@
   }
 }
 
-.DateFieldCalendar {
+.DateField-popup {
   position: absolute;
   background: transparent;
   color: var(--df-calendar-color);
@@ -286,31 +286,31 @@
 }
 
 /* ── Picker view ───────────────────────────────────────────────────────────── */
-.DateFieldCalendar .YearMonthPicker {
+.DateField-popup .YearMonthPicker {
   display: none;
 }
 
-.DateFieldCalendar[data-view="picker"] .YearMonthPicker {
+.DateField-popup[data-view="picker"] .YearMonthPicker {
   display: flex;
   overflow: hidden;
   height: 16rem;
 }
 
-.DateFieldCalendar[data-view="picker"] .Grid {
+.DateField-popup[data-view="picker"] .Grid {
   display: none;
 }
 
-.DateFieldCalendar[data-view="picker"] .CalendarFooter {
+.DateField-popup[data-view="picker"] .CalendarFooter {
   display: none;
 }
 
-.DateFieldCalendar[data-view="picker"] .PrevMonth,
-.DateFieldCalendar[data-view="picker"] .NextMonth {
+.DateField-popup[data-view="picker"] .PrevMonth,
+.DateField-popup[data-view="picker"] .NextMonth {
   visibility: hidden;
 }
 
-.DateFieldCalendar .MonthList,
-.DateFieldCalendar .YearList {
+.DateField-popup .MonthList,
+.DateField-popup .YearList {
   list-style: none;
   margin: 0;
   padding: 0;
@@ -319,44 +319,44 @@
   outline: none;
 }
 
-.DateFieldCalendar .MonthList [role="option"],
-.DateFieldCalendar .YearList [role="option"] {
+.DateField-popup .MonthList [role="option"],
+.DateField-popup .YearList [role="option"] {
   padding: 0.25rem 0.5rem;
   cursor: pointer;
 }
 
-.DateFieldCalendar .MonthList [role="option"][aria-selected="true"],
-.DateFieldCalendar .YearList [role="option"][aria-selected="true"] {
+.DateField-popup .MonthList [role="option"][aria-selected="true"],
+.DateField-popup .YearList [role="option"][aria-selected="true"] {
   font-weight: bold;
   outline: 2px solid;
   outline-offset: -2px;
 }
 
-.DateFieldCalendar .MonthList[data-focused="true"] [role="option"][aria-selected="true"],
-.DateFieldCalendar .YearList[data-focused="true"] [role="option"][aria-selected="true"] {
+.DateField-popup .MonthList[data-focused="true"] [role="option"][aria-selected="true"],
+.DateField-popup .YearList[data-focused="true"] [role="option"][aria-selected="true"] {
   background: SelectedItem;
   color: SelectedItemText;
   outline: none;
 }
 
-.DateFieldCalendar .MonthList [role="option"][aria-disabled="true"],
-.DateFieldCalendar .YearList [role="option"][aria-disabled="true"] {
+.DateField-popup .MonthList [role="option"][aria-disabled="true"],
+.DateField-popup .YearList [role="option"][aria-disabled="true"] {
   opacity: 0.4;
   cursor: default;
 }
 
-.DateFieldCalendar .MonthYearTrigger::after {
+.DateField-popup .MonthYearTrigger::after {
   content: '›';
   display: inline-block;
   transform: rotate(90deg);
 }
 
-.DateFieldCalendar .MonthYearTrigger[aria-expanded="true"]::after {
+.DateField-popup .MonthYearTrigger[aria-expanded="true"]::after {
   transform: rotate(-90deg);
 }
 
 /* ── Calendar surface (backdrop-filter layer) ──────────────────────────── */
-.DateFieldCalendar .CalendarSurface {
+.DateField-popup .CalendarSurface {
   position: absolute;
   inset: 0;
   overflow: hidden;
@@ -365,7 +365,7 @@
   pointer-events: none;
 }
 
-.DateFieldCalendar .CalendarSurface .BackdropBlur {
+.DateField-popup .CalendarSurface .BackdropBlur {
   position: absolute;
   inset: -20px;
   background: var(--df-calendar-bg);
@@ -390,7 +390,7 @@
 }
 
 /* ── Calendar bubble ───────────────────────────────────────────────────── */
-.DateField .DateFieldCalendar {
+.DateField .DateField-popup {
   position: absolute;
   left: var(--df-popup-offset, 50%);
   transform: translateX(-50%);
@@ -399,11 +399,11 @@
 }
 
 /* ── Direction gates ───────────────────────────────────────────────────── */
-.DateField[data-direction="bottom"] .DateFieldCalendar {
+.DateField[data-direction="bottom"] .DateField-popup {
   top: var(--df-calendar-gap);
 }
 
-.DateField[data-direction="top"] .DateFieldCalendar {
+.DateField[data-direction="top"] .DateField-popup {
   bottom: var(--df-calendar-gap);
 }
 
