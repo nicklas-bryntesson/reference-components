@@ -908,7 +908,7 @@ class TimeField {
       containerRect.width,
       popupWidth,
       window.innerWidth,
-      0
+      this._getCSSPx('--tf-site-padding') / 2
     )
     this.root.style.setProperty('--tf-popup-offset', `${offset}%`)
 
@@ -917,10 +917,21 @@ class TimeField {
       triggerCenterX,
       popupLeft,
       popupWidth,
-      4,  // border-radius approximation
-      8   // arrow-size approximation
+      this._getCSSPx('--_tf-arrow-corner-radius'),
+      this._getCSSPx('--_tf-arrow-size'),
     )
     this.root.style.setProperty('--tf-arrow-offset', `${arrowOffset}px`)
+  }
+
+  // Resolve a CSS custom property to px by measuring a probe inside the root,
+  // so component-scoped tokens (--tf-*) resolve rather than the var() fallback.
+  private _getCSSPx(property: string): number {
+    const probe = document.createElement('div')
+    probe.style.cssText = `position:absolute;visibility:hidden;pointer-events:none;width:var(${property},0px)`
+    this.root.appendChild(probe)
+    const value = probe.getBoundingClientRect().width || 0
+    probe.remove()
+    return value
   }
 
   private _handleResize = (): void => {

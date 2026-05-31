@@ -5,6 +5,7 @@
   /* Public API */
   --tf-popup-width: 14rem;
   --tf-popup-gap: 1.5rem;
+  --tf-site-padding: var(--SITE--PADDING, 1rem);
   /* Design tokens — segments */
   --tf-border-color: currentColor;
   --tf-border-color-hover: #333;
