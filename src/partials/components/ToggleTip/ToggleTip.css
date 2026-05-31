@@ -173,22 +173,22 @@ toggle-tip .arrow {
 }
 
 /* ── Direction: top (bubble above trigger) ─────────────────────── */
-toggle-tip[direction="top"] .ToggleTip-popup {
+toggle-tip[data-direction="top"] .ToggleTip-popup {
   bottom: var(--_tt-gap);
 }
 
-toggle-tip[direction="top"] .arrow {
+toggle-tip[data-direction="top"] .arrow {
   bottom: calc(var(--_tt-arrow-size) * -0.5);
   transform: translateX(calc(-50% + var(--tt-arrow-offset))) rotate(45deg);
   border-end-end-radius: var(--_tt-arrow-corner-radius);
 }
 
 /* ── Direction: bottom (bubble below trigger) ──────────────────── */
-toggle-tip[direction="bottom"] .ToggleTip-popup {
+toggle-tip[data-direction="bottom"] .ToggleTip-popup {
   top: var(--_tt-gap);
 }
 
-toggle-tip[direction="bottom"] .arrow {
+toggle-tip[data-direction="bottom"] .arrow {
   top: calc(var(--_tt-arrow-size) * -0.5);
   transform: translateX(calc(-50% + var(--tt-arrow-offset))) rotate(45deg);
   border-start-start-radius: var(--_tt-arrow-corner-radius);

@@ -83,8 +83,8 @@ class ToggleTip {
   private _updateDirection(): void {
     const triggerRect = this.element.getBoundingClientRect()
     const direction = detectDirection(triggerRect)
-    if (this.element.getAttribute('direction') !== direction) {
-      this.element.setAttribute('direction', direction)
+    if (this.element.getAttribute('data-direction') !== direction) {
+      this.element.setAttribute('data-direction', direction)
     }
   }
 

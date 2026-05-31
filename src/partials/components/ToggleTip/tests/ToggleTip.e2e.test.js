@@ -89,7 +89,7 @@ test('bubble flips below trigger when near top of viewport', async ({ page }) =>
   await page.evaluate(top => window.scrollTo(0, top - 4), absTop)
 
   await tip.locator('button').click()
-  await expect(tip).toHaveAttribute('direction', 'bottom')
+  await expect(tip).toHaveAttribute('data-direction', 'bottom')
 
   const tipBox = await tip.boundingBox()
   const bubbleBox = await tip.locator('.ToggleTip-popup').boundingBox()
