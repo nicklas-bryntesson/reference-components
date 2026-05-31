@@ -341,7 +341,9 @@ export class DateTimeField {
   _getCSSPx(property: string): number {
     const probe = document.createElement('div')
     probe.style.cssText = `position:absolute;visibility:hidden;pointer-events:none;width:var(${property},0px)`
-    document.body.appendChild(probe)
+    // Append inside the component root so component-scoped tokens (--dtf-*) resolve;
+    // appending to document.body would resolve them to the var() fallback (0).
+    this.root.appendChild(probe)
     const value = parseFloat(getComputedStyle(probe).width) || 0
     probe.remove()
     return value
@@ -758,6 +760,7 @@ export class DateTimeField {
 
   _bindTrigger(): void {
     this.trigger.setAttribute('aria-label', this.t.openCalendar)
+    this.trigger.setAttribute('aria-expanded', 'false')
     if (this.native.disabled) {
       this.trigger.disabled = true
       return
@@ -784,6 +787,7 @@ export class DateTimeField {
     this.calendarEl.setAttribute('aria-label', this.t.openCalendar)
     this.root.dataset.open = ''
     this.trigger.setAttribute('aria-label', this.t.closeCalendar)
+    this.trigger.setAttribute('aria-expanded', 'true')
 
     if (this.selectedDatetime) {
       this.currentYear = this.selectedDatetime.getFullYear()
@@ -807,6 +811,7 @@ export class DateTimeField {
     this.calendarEl = null
     this.root.removeAttribute('data-open')
     this.trigger.setAttribute('aria-label', this.t.openCalendar)
+    this.trigger.setAttribute('aria-expanded', 'false')
     if (refocusTrigger) this.trigger.focus()
   }
 
