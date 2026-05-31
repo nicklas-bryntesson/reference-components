@@ -153,7 +153,7 @@ class TimeField {
       : false
 
     if (isTouch) {
-      this._initTouchMode()
+      this._initDisplayMode()
     } else {
       this._initInteractiveMode()
     }
@@ -161,15 +161,31 @@ class TimeField {
     this.root.setAttribute('data-initialized', '')
   }
 
-  // ─── Touch mode ───────────────────────────────────────────────────────────
+  // ─── Display mode (touch / coarse pointer) ────────────────────────────────
+  // Keep the custom appearance, but defer interaction to the native input,
+  // which sits transparently on top and fires the platform time picker on tap.
 
-  _initTouchMode(): void {
-    // Show native input, hide overlay
+  _initDisplayMode(): void {
+    this.root.dataset.inputMode = 'display'
+
+    // The native input is the real, accessible control on touch; the overlay
+    // segments are decorative only.
     this.native.removeAttribute('aria-hidden')
     this.native.removeAttribute('tabindex')
     this.overlay.setAttribute('aria-hidden', 'true')
-    this.overlay.style.display = 'none'
-    this.root.dataset.inputMode = 'native'
+
+    if (this.native.disabled || this.root.hasAttribute('data-disabled')) {
+      this.root.dataset.disabled = ''
+    }
+
+    this._buildSegments()
+    this._segmentEls.forEach(seg => seg.setAttribute('tabindex', '-1'))
+
+    if (!this.native.disabled) {
+      this._bindValueSync()
+      this._bindFormReset()
+    }
+    this._syncInitialValue()
   }
 
   // ─── Interactive mode ─────────────────────────────────────────────────────

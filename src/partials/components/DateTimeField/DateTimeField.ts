@@ -216,6 +216,21 @@ export class DateTimeField {
     this.native.id = this.fieldId
     this.native.name = this.root.dataset.name ?? ''
 
+    const coarse = (typeof window.matchMedia === 'function')
+      ? window.matchMedia('(pointer: coarse)').matches
+      : false
+    if (coarse) {
+      this._initDisplay()
+    } else {
+      this._initInteractive()
+    }
+
+    this.root.dataset.initialized = ''
+  }
+
+  _initInteractive(): void {
+    this.root.dataset.inputMode = 'custom'
+
     this._buildSegments()
     this._bindSegmentEvents()
     this._bindTrigger()
@@ -237,8 +252,38 @@ export class DateTimeField {
     this.native.addEventListener('change', this._handleNativeChange)
     this.native.form?.addEventListener('reset', this._handleFormReset)
     window.addEventListener('resize', this._handleResize)
+  }
 
-    this.root.dataset.initialized = ''
+  // ─── Display mode (touch / coarse pointer) ────────────────────────────────
+  // Keep the custom appearance, but defer interaction to the native input,
+  // which sits transparently on top and fires the platform picker on tap.
+  _initDisplay(): void {
+    this.root.dataset.inputMode = 'display'
+
+    // The native input is the real, accessible control on touch; the overlay
+    // segments are decorative only.
+    this.native.removeAttribute('aria-hidden')
+    this.native.removeAttribute('tabindex')
+    this.root.querySelector('.DateTimeField-overlay')?.setAttribute('aria-hidden', 'true')
+
+    if (this.native.disabled || this.root.hasAttribute('data-disabled')) {
+      this._applyDisabled()
+    }
+    if (this.root.hasAttribute('data-invalid')) {
+      this.native.setAttribute('aria-invalid', 'true')
+    }
+
+    this._buildSegments()
+    this._segmentEls.forEach(seg => seg.setAttribute('tabindex', '-1'))
+
+    const initialValue = this.root.dataset.value ?? this.native.value
+    if (initialValue) {
+      this.selectedDatetime = this._parseDatetime(initialValue)
+      this._syncSegmentsFromDatetime(this.selectedDatetime)
+    }
+
+    this.native.addEventListener('change', this._handleNativeChange)
+    this.native.form?.addEventListener('reset', this._handleFormReset)
   }
 
   _applyDisabled(): void {
