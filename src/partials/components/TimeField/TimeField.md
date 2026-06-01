@@ -64,6 +64,16 @@ All tokens are custom properties on `.TimeField`:
 | `--tf-option-bg-selected` | Selected option background |
 | `--tf-option-color-selected` | Selected option text color |
 
+## Platform gotchas
+
+### iOS: no seconds in the native picker
+
+iOS Safari's native `<input type="time">` picker only renders **hour and minute** wheels — it never shows a seconds wheel, regardless of the `step` attribute. This is a long-standing WebKit limitation, not a bug in this component. (Desktop Chrome, by contrast, does render a seconds field when `step < 60`.)
+
+Because the touch interaction model defers to the native input as the real control, a `TimeField` with `data-step` < 60 effectively **degrades to minute precision on iOS touch**: the user can set hour/minute via the native wheel but cannot edit the seconds there. An existing seconds value (e.g. from `data-value="13:45:30"`) is preserved and still displayed in the custom segments, but is not reachable through the native picker.
+
+If seconds precision must be editable on iOS, do not rely on the native picker — collect seconds through a separate, explicit control.
+
 ## Non-goals
 
 - No time range (two fields)
@@ -90,4 +100,5 @@ All tokens are custom properties on `.TimeField`:
 
 - [ ] Native time input is shown (not the custom overlay)
 - [ ] I can set a time using the native drum-roller (iOS) or time picker (Android)
+- [ ] (seconds fields) On iOS, the native picker shows only hour/minute — seconds cannot be set there (see Platform gotchas)
 - [ ] The field label is read when I enter the input

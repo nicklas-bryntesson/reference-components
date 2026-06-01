@@ -106,6 +106,15 @@ Test with a real screenreader before shipping.
 - [ ] Swipe to trigger — announced as button
 - [ ] Double-tap opens popup
 - [ ] Swipe through time columns — values announced
+- [ ] (seconds fields) On iOS, the native picker shows only hour/minute — seconds cannot be set there (see Platform gotchas)
+
+## Platform gotchas
+
+### iOS: no seconds in the native picker
+
+iOS Safari's native `<input type="datetime-local">` picker only renders date + **hour/minute** wheels — it never shows a seconds wheel, regardless of the `step` attribute. This is a long-standing WebKit limitation, not a bug in this component. (Desktop Chrome does render a seconds field when `step < 60`.)
+
+Because the touch interaction model defers to the native input as the real control, a `DateTimeField` with `data-step` < 60 effectively **degrades to minute precision on iOS touch**: an existing seconds value is preserved and shown in the custom segments but cannot be edited through the native picker. If seconds precision must be editable on iOS, collect it through a separate, explicit control. See `TimeField.md` for the same constraint.
 
 ## Non-goals
 
