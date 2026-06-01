@@ -39,7 +39,7 @@ function canonical(id: string, label: string, rootAttrs: string, inputAttrs: str
     <div class="TimeField-segments" role="group">
     </div>
     <button type="button" class="TimeField-trigger" aria-label="Öppna tidsväljare" aria-expanded="false" aria-haspopup="dialog"${triggerAttrs}>
-      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clock-icon lucide-clock"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
     </button>
     <div class="slideContainer">
       <template data-template="timefield-popup">
