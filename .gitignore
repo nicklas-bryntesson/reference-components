@@ -19,3 +19,5 @@ src/**/states/*.hbs
 
 # AI working docs (specs, plans, wip — ephemeral process artefacts)
 docs/superpowers/
+
+screenshots/
