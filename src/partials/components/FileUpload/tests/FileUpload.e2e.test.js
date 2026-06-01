@@ -314,11 +314,34 @@ test('data-has-errors on root when invalid file type is added', async ({ page })
   await expect(liveRoot).toHaveAttribute('data-has-errors')
 })
 
+// ─── Drop-zone: remove button must win over the full-coverage input ───────────
+
+test('drop-zone remove button removes the file instead of reopening the picker', async ({ page }) => {
+  const dropZone = page.locator('[data-component="FileUpload"][data-drop-zone][data-initialized]').first()
+  await dropZone.scrollIntoViewIfNeeded()
+
+  await dropZone.locator('.FileUpload-input').setInputFiles({
+    name: 'dropped.pdf',
+    mimeType: 'application/pdf',
+    buffer: Buffer.from('x'),
+  })
+  await expect(dropZone.locator('.FileUpload-item-name')).toHaveText('dropped.pdf')
+
+  // The drop-zone stretches the native input over the whole area. The remove
+  // button must sit above it (z-index) so this click hits the button — if the
+  // input intercepted it the file picker would open and the file would remain.
+  await dropZone.locator('.FileUpload-item-remove').click()
+
+  await expect(dropZone.locator('.FileUpload-item-name')).toHaveCount(0)
+  await expect(dropZone).not.toHaveAttribute('data-has-files')
+})
+
 // ─── Server files (data-initial-files) ───────────────────────────────────────
 
 test('server files state has data-source=server and hidden input', async ({ page }) => {
   // The _server-files partial is initialized by JS from data-initial-files JSON.
-  const serverRoot = page.locator('[data-initial-files]').first()
+  // Several states now seed data-initial-files, so target the server fixture by its ref.
+  const serverRoot = page.locator('[data-initial-files*="abc123"]').first()
   await expect(serverRoot).toHaveAttribute('data-initialized')
   const serverItem = serverRoot.locator('.FileUpload-item[data-source="server"]')
   await expect(serverItem).toHaveCount(1)

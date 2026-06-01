@@ -38,6 +38,14 @@ const invalidTypeItem = (name: string, size: string) =>
       <button type="button" class="FileUpload-item-remove" aria-label="Remove ${name}">&#215;</button>
     </li>`
 
+const serverItem = (name: string, size: string, ref: string) =>
+  `\n    <li class="FileUpload-item" data-status="valid" data-source="server" data-entry-id="static-server">
+      <span class="FileUpload-item-name">${name}</span>
+      <span class="FileUpload-item-size">${size}</span>
+      <button type="button" class="FileUpload-item-remove" aria-label="Remove ${name}">&#215;</button>
+      <input type="hidden" name="uploaded-ref" value="${ref}">
+    </li>`
+
 // ─── Item HTML helpers — single mode (inline spans in FileUpload-selected) ───
 
 const validSingleFile = (name: string, size: string) =>
@@ -56,12 +64,6 @@ const invalidSizeSingleFile = (name: string, size: string) =>
     <span class="FileUpload-item-size">${size}</span>
     <span class="FileUpload-item-error" role="alert">File exceeds maximum size</span>
     <button type="button" class="FileUpload-item-remove" aria-label="Remove ${name}">&#215;</button>`
-
-const serverSingleFile = (name: string, size: string, ref: string) =>
-  `\n    <span class="FileUpload-item-name">${name}</span>
-    <span class="FileUpload-item-size">${size}</span>
-    <button type="button" class="FileUpload-item-remove" aria-label="Remove ${name}">&#215;</button>
-    <input type="hidden" name="uploaded-ref" value="${ref}">`
 
 // ─── Canonical markup ─────────────────────────────────────────────────────────
 
@@ -118,6 +120,16 @@ function attrs(obj: Attrs): string {
     .join('')
 }
 
+// ─── data-initial-files payloads ──────────────────────────────────────────────
+// Sizes are chosen to render the same labels as the static markup via
+// formatFileSize() (SI units: 200000 → "200 KB", 48000000 → "48 MB").
+
+const seedReport = '[{"name":"report.pdf","size":200000,"type":"application/pdf"}]'
+const seedInvalidType = '[{"name":"image.exe","size":14000,"type":"application/x-msdownload"}]'
+const seedInvalidSize = '[{"name":"video.mp4","size":48000000,"type":"video/mp4"}]'
+const seedMixed = '[{"name":"report.pdf","size":200000,"type":"application/pdf"},{"name":"image.exe","size":14000,"type":"application/x-msdownload"}]'
+const seedServer = '[{"name":"contract.pdf","size":200000,"type":"application/pdf","ref":"abc123"}]'
+
 // ─── State definitions ────────────────────────────────────────────────────────
 
 const states: StateDefinition[] = [
@@ -127,20 +139,22 @@ const states: StateDefinition[] = [
   { file: '_empty-focus',  label: 'File', root: { 'data-test-state': 'focus'  }, input: {}, items: '' },
   { file: '_empty-active', label: 'File', root: { 'data-test-state': 'active' }, input: {}, items: '' },
 
-  // Interaction states — with files (single mode → FileUpload-selected)
-  { file: '_with-files',        label: 'File', root: { 'data-has-files': ''                            }, input: {}, items: validSingleFile('report.pdf', '200 KB') },
-  { file: '_with-files-hover',  label: 'File', root: { 'data-has-files': '', 'data-test-state': 'hover'  }, input: {}, items: validSingleFile('report.pdf', '200 KB') },
-  { file: '_with-files-focus',  label: 'File', root: { 'data-has-files': '', 'data-test-state': 'focus'  }, input: {}, items: validSingleFile('report.pdf', '200 KB') },
-  { file: '_with-files-active', label: 'File', root: { 'data-has-files': '', 'data-test-state': 'active' }, input: {}, items: validSingleFile('report.pdf', '200 KB') },
+  // Interaction states — with files (single mode → FileUpload-selected).
+  // Seeded via data-initial-files so the rendered chip is entry-backed and its
+  // remove button works (static markup alone is display-only and not removable).
+  { file: '_with-files',        label: 'File', root: { 'data-has-files': ''                            }, input: {}, items: validSingleFile('report.pdf', '200 KB'), initialFiles: seedReport },
+  { file: '_with-files-hover',  label: 'File', root: { 'data-has-files': '', 'data-test-state': 'hover'  }, input: {}, items: validSingleFile('report.pdf', '200 KB'), initialFiles: seedReport },
+  { file: '_with-files-focus',  label: 'File', root: { 'data-has-files': '', 'data-test-state': 'focus'  }, input: {}, items: validSingleFile('report.pdf', '200 KB'), initialFiles: seedReport },
+  { file: '_with-files-active', label: 'File', root: { 'data-has-files': '', 'data-test-state': 'active' }, input: {}, items: validSingleFile('report.pdf', '200 KB'), initialFiles: seedReport },
 
-  // Disabled
+  // Disabled (chip is entry-backed too, but pointer-events:none correctly blocks removal)
   { file: '_disabled-empty',      label: 'File', root: { 'data-disabled': '', 'aria-disabled': 'true'                     }, input: { disabled: '' }, items: '', triggerDisabled: true },
-  { file: '_disabled-with-files', label: 'File', root: { 'data-disabled': '', 'aria-disabled': 'true', 'data-has-files': '' }, input: { disabled: '' }, items: validSingleFile('report.pdf', '200 KB'), triggerDisabled: true },
+  { file: '_disabled-with-files', label: 'File', root: { 'data-disabled': '', 'aria-disabled': 'true', 'data-has-files': '' }, input: { disabled: '' }, items: validSingleFile('report.pdf', '200 KB'), triggerDisabled: true, initialFiles: seedReport },
 
-  // Validation states
-  { file: '_invalid-type',   label: 'File', root: { 'data-has-files': '', 'data-has-errors': '' }, input: { accept: '.pdf' }, items: invalidTypeSingleFile('image.exe', '14 KB') },
-  { file: '_invalid-size',   label: 'File', root: { 'data-has-files': '', 'data-has-errors': '', 'data-max-size': '5mb' }, input: {}, items: invalidSizeSingleFile('video.mp4', '48 MB') },
-  { file: '_invalid-mixed',  label: 'File', root: { 'data-has-files': '', 'data-has-errors': '' }, input: { accept: '.pdf', multiple: '' }, isMultiple: true, items: validItem('report.pdf', '200 KB', 'static-1') + invalidTypeItem('image.exe', '14 KB') },
+  // Validation states (seeded files re-validate on bootstrap → correct status + removable)
+  { file: '_invalid-type',   label: 'File', root: { 'data-has-files': '', 'data-has-errors': '' }, input: { accept: '.pdf' }, items: invalidTypeSingleFile('image.exe', '14 KB'), initialFiles: seedInvalidType },
+  { file: '_invalid-size',   label: 'File', root: { 'data-has-files': '', 'data-has-errors': '', 'data-max-size': '5mb' }, input: {}, items: invalidSizeSingleFile('video.mp4', '48 MB'), initialFiles: seedInvalidSize },
+  { file: '_invalid-mixed',  label: 'File', root: { 'data-has-files': '', 'data-has-errors': '' }, input: { accept: '.pdf', multiple: '' }, isMultiple: true, items: validItem('report.pdf', '200 KB', 'static-1') + invalidTypeItem('image.exe', '14 KB'), initialFiles: seedMixed },
   { file: '_required-empty', label: 'File', root: { 'data-required': '' }, input: { required: '' }, items: '' },
 
   // Variants
@@ -148,13 +162,16 @@ const states: StateDefinition[] = [
   { file: '_drop-zone',          label: 'File',  root: { 'data-drop-zone': '' }, input: {}, items: '' },
   { file: '_drop-zone-dragging', label: 'File',  root: { 'data-drop-zone': '', 'data-dragging-over': '' }, input: {}, items: '' },
   { file: '_server-files',       label: 'CV',    root: { 'data-has-files': '' },
-    input: {},
-    items: serverSingleFile('contract.pdf', '200 KB', 'abc123'),
-    initialFiles: '[{"name":"contract.pdf","size":204800,"type":"application/pdf","ref":"abc123"}]',
+    input: { multiple: '' },
+    isMultiple: true,
+    items: serverItem('contract.pdf', '200 KB', 'abc123'),
+    initialFiles: seedServer,
+    triggerText: 'Add files',
   },
 
-  // Live demo (e2e test target)
-  { file: '_live', label: 'Upload file', root: {}, input: {}, items: '' },
+  // Live demo (e2e test target). Multiple mode exercises the richer list UI the
+  // e2e suite asserts against (list semantics, sibling-focus, server data-source).
+  { file: '_live', label: 'Upload files', root: {}, input: { multiple: '' }, isMultiple: true, items: '', triggerText: 'Add files' },
 ]
 
 // ─── Generate ─────────────────────────────────────────────────────────────────

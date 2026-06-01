@@ -174,7 +174,10 @@ class FileUpload {
       return
     }
     for (const item of parsed) {
-      this._entries.push({
+      // Re-validate server-provided files against the current accept / max-size
+      // constraints so a file that violates them surfaces as invalid rather than
+      // silently rendering as valid.
+      this._entries.push(this._validateEntry({
         id: generateId(),
         source: 'server',
         file: null,
@@ -183,7 +186,7 @@ class FileUpload {
         size: item.size,
         type: item.type,
         status: 'valid',
-      })
+      }))
     }
   }
 

@@ -45,9 +45,13 @@
       pointer-events: all;
     }
 
-    /* List items and trigger must sit above the full-coverage input so that
-       remove buttons and the trigger remain clickable over the drop zone. */
+    /* The file container and trigger must sit above the full-coverage input so
+       that remove buttons and the trigger remain clickable over the drop zone.
+       Both single- (.FileUpload-selected) and multiple-mode (.FileUpload-list)
+       containers need raising — otherwise a click on a single-mode file's
+       remove button lands on the input behind it and reopens the file picker. */
     & .FileUpload-list,
+    & .FileUpload-selected,
     & .FileUpload-trigger {
       position: relative;
       z-index: 1;
