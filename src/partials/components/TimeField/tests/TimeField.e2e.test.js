@@ -208,7 +208,7 @@ test('wheel column ArrowDown increases value in segment', async ({ page }) => {
   const hourCol = page.locator('.TimeField-popup-column[data-segment="hour"]')
   await hourCol.focus()
 
-  // ArrowDown = stepBy(+1) = höjer värdet
+  // ArrowDown = stepBy(+1) = raises the value
   await page.keyboard.press('ArrowDown')
   // Wait for snap animation
   await page.waitForTimeout(500)
@@ -228,14 +228,14 @@ test('wheel column ArrowUp decreases value in segment', async ({ page }) => {
   const hourCol = page.locator('.TimeField-popup-column[data-segment="hour"]')
   await hourCol.focus()
 
-  // ArrowUp = stepBy(-1) = minskar värdet
+  // ArrowUp = stepBy(-1) = lowers the value
   await page.keyboard.press('ArrowUp')
   await page.waitForTimeout(500)
 
   await expect(hourSeg).toHaveAttribute('aria-valuenow', '9')
 })
 
-test('Nu-knappen synkar hjulet med aktuell tid', async ({ page }) => {
+test('"Now" button syncs the wheel with the current time', async ({ page }) => {
   await page.locator(`${TF} .TimeField-trigger`).click()
   const nowBtn = page.locator('.TimeField-popup-now')
   await nowBtn.click()
@@ -250,7 +250,7 @@ test('Nu-knappen synkar hjulet med aktuell tid', async ({ page }) => {
   expect(Number(minVal)).toBeLessThanOrEqual(59)
 })
 
-test('Nollställ-knappen sätter hjulet till tomt läge', async ({ page }) => {
+test('"Clear" button resets the wheel to an empty state', async ({ page }) => {
   // First set a value via Nu
   await page.locator(`${TF} .TimeField-trigger`).click()
   await page.locator('.TimeField-popup-now').click()
@@ -261,7 +261,7 @@ test('Nollställ-knappen sätter hjulet till tomt läge', async ({ page }) => {
   expect(nativeVal).toBe('')
 })
 
-test('popup wheel kolumn har aria-valuemin och aria-valuemax', async ({ page }) => {
+test('popup wheel column has aria-valuemin and aria-valuemax', async ({ page }) => {
   await page.locator(`${TF} .TimeField-trigger`).click()
   const hourCol = page.locator('.TimeField-popup-column[data-segment="hour"]')
   await expect(hourCol).toHaveAttribute('aria-valuemin', '0')
