@@ -8,29 +8,28 @@
   --tf-site-padding: var(--SITE--PADDING, 1rem);
   /* Design tokens — segments */
   --tf-border-color: currentColor;
-  --tf-border-color-hover: #333;
-  --tf-bg-hover: #f8f8f8;
+  --tf-border-color-hover: CanvasText;
+  --tf-bg-hover: var(--SITE--POPOVER--HOVER-BG);
   --tf-border-color-invalid: #c00;
-  --tf-color-muted: #6e6e6e;
-  --tf-trigger-bg-hover: #f0f0f0;
-  --tf-trigger-bg-active: #e0e0e0;
-  /* Design tokens — popup */
-  --tf-popup-bg: Canvas;
-  --tf-popup-color: CanvasText;
-  --tf-popup-border-color: currentColor;
-  --tf-popup-radius: 4px;
-  --tf-popup-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  --tf-popup-backdrop: none;
-  --tf-option-bg-selected: Highlight;
-  --tf-option-color-selected: HighlightText;
+  --tf-color-muted: var(--SITE--POPOVER--MUTED);
+  --tf-trigger-bg-hover: var(--SITE--POPOVER--HOVER-BG);
+  --tf-trigger-bg-active: var(--SITE--POPOVER--HOVER-BG);
+  /* Design tokens — popup (shared popover surface) */
+  --tf-popup-bg: var(--SITE--POPOVER--BG);
+  --tf-popup-color: var(--SITE--POPOVER--COLOR);
+  --tf-popup-border-color: var(--SITE--POPOVER--BORDER--COLOR);
+  --tf-popup-radius: var(--SITE--POPOVER--RADIUS);
+  --tf-popup-shadow: var(--SITE--POPOVER--SHADOW);
+  --tf-option-bg-selected: var(--SITE--POPOVER--ACCENT);
+  --tf-option-color-selected: var(--SITE--POPOVER--ACCENT-TEXT);
   /* Design tokens — wheel column */
   --tf-wheel-row-height: 38px;
   --tf-wheel-rows: 5;
   --tf-wheel-curve: 20deg;          /* grader per rad — bestämmer radien i JS */
-  --tf-wheel-focus-bg: rgba(0,0,0,0.08);
-  --tf-wheel-color: CanvasText;
-  --tf-wheel-color-muted: GrayText;
-  --tf-wheel-color-selected: Highlight;
+  --tf-wheel-focus-bg: var(--SITE--POPOVER--HOVER-BG);
+  --tf-wheel-color: var(--SITE--POPOVER--COLOR);
+  --tf-wheel-color-muted: var(--SITE--POPOVER--MUTED);
+  --tf-wheel-color-selected: var(--SITE--POPOVER--ACCENT);
   --tf-wheel-fade: 0.6;             /* gradient-opacitet i fade-mask */
   /* Internal */
   --_tf-arrow-size: 0.75rem;
@@ -108,8 +107,8 @@
     cursor: default;
 
     &[data-focused] {
-      background-color: Highlight;
-      color: HighlightText;
+      background-color: var(--SITE--POPOVER--ACCENT);
+      color: var(--SITE--POPOVER--ACCENT-TEXT);
     }
 
     &[data-placeholder] {
@@ -119,7 +118,7 @@
 
   & .TimeField-sep {
     user-select: none;
-    color: GrayText;
+    color: var(--tf-color-muted);
   }
 
   &[data-input-mode="custom"] .TimeField-overlay:hover,
@@ -195,13 +194,14 @@
   transform: translateX(-50%);
   inline-size: var(--tf-popup-width);
   pointer-events: auto;
-  background: transparent;
+  background: var(--tf-popup-bg);
   color: var(--tf-popup-color);
   border: 1px solid var(--tf-popup-border-color);
   border-radius: var(--tf-popup-radius);
   box-shadow: var(--tf-popup-shadow);
   z-index: 100;
-  padding: 0.5rem;
+  padding: var(--SITE--POPOVER--PADDING);
+  font-size: 1rem;
 }
 
 /* ── Direction gates ───────────────────────────────────────────────────────── */
@@ -213,23 +213,6 @@
   &[data-direction="top"] .TimeField-popup {
     bottom: var(--tf-popup-gap);
   }
-}
-
-/* ── Popup surface (backdrop-filter layer) ─────────────────────────────────── */
-.TimeField-popup-surface {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  border-radius: inherit;
-  z-index: -1;
-  pointer-events: none;
-}
-
-.TimeField-popup-backdropBlur {
-  position: absolute;
-  inset: -20px;
-  background: var(--tf-popup-bg);
-  backdrop-filter: var(--tf-popup-backdrop);
 }
 
 /* ── Popup columns ─────────────────────────────────────────────────────────── */
@@ -256,7 +239,7 @@
   &:active { cursor: grabbing; }
 
   &:focus-visible .TimeField-popup-band {
-    box-shadow: 0 0 0 2px Highlight;
+    box-shadow: 0 0 0 2px var(--SITE--POPOVER--ACCENT);
   }
 
   /* Fade-mask topp/botten */
@@ -294,7 +277,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.4rem;
+  font-size: 1rem;
   font-variant-numeric: tabular-nums;
   backface-visibility: hidden;
   will-change: opacity, transform;
@@ -304,7 +287,7 @@
 
 .TimeField-popup-option[aria-selected="true"] {
   color: var(--tf-wheel-color-selected);
-  font-weight: 600;
+  font-weight: bold;
 }
 
 /* Center-band (fokus-highlight) */
@@ -331,11 +314,12 @@
 
   & button {
     background: none;
-    border: 1px solid currentColor;
+    border: none;
+    color: var(--tf-wheel-color-selected);
     padding: 0.25rem 0.5rem;
     cursor: pointer;
     border-radius: 2px;
-    font-size: 0.875rem;
+    font: inherit;
 
     &:hover {
       background-color: var(--tf-bg-hover);
@@ -347,7 +331,7 @@
     }
 
     &:disabled {
-      opacity: 0.4;
+      color: var(--tf-color-muted);
       cursor: not-allowed;
     }
   }

@@ -44,7 +44,6 @@ function canonical(id: string, label: string, rootAttrs: string, inputAttrs: str
     <div class="slideContainer">
       <template data-template="timefield-popup">
         <div class="TimeField-popup" role="dialog" aria-modal="true" aria-label="Välj tid">
-          <span class="TimeField-popup-surface" aria-hidden="true"><span class="TimeField-popup-backdropBlur"></span></span>
           <div class="TimeField-popup-columns">
             <div class="TimeField-popup-column" data-segment="hour" role="spinbutton" aria-label="Timmar" tabindex="0"></div>
             <div class="TimeField-popup-column" data-segment="minute" role="spinbutton" aria-label="Minuter" tabindex="-1"></div>

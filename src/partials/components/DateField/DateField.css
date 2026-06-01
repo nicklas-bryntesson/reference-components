@@ -9,21 +9,20 @@
   --df-site-padding: var(--SITE--PADDING, 1rem);
   /* Design tokens — segments */
   --df-segments-border-color: currentColor;
-  --df-segments-border-color-hover: #333;
-  --df-segments-bg-hover: #f8f8f8;
+  --df-segments-border-color-hover: CanvasText;
+  --df-segments-bg-hover: var(--SITE--POPOVER--HOVER-BG);
   --df-segments-border-color-invalid: #c00;
-  --df-segments-color-muted: #6e6e6e;
-  --df-trigger-bg-hover: #f0f0f0;
-  --df-trigger-bg-active: #e0e0e0;
-  /* Design tokens — calendar */
-  --df-calendar-bg: Canvas;
-  --df-calendar-color: CanvasText;
-  --df-calendar-color-muted: #6e6e6e;
-  --df-calendar-border-color: currentColor;
-  --df-calendar-radius: 4px;
-  --df-calendar-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  --df-calendar-backdrop: none;
-  --df-calendar-link-color: LinkText;
+  --df-segments-color-muted: var(--SITE--POPOVER--MUTED);
+  --df-trigger-bg-hover: var(--SITE--POPOVER--HOVER-BG);
+  --df-trigger-bg-active: var(--SITE--POPOVER--HOVER-BG);
+  /* Design tokens — calendar (shared popover surface) */
+  --df-calendar-bg: var(--SITE--POPOVER--BG);
+  --df-calendar-color: var(--SITE--POPOVER--COLOR);
+  --df-calendar-color-muted: var(--SITE--POPOVER--MUTED);
+  --df-calendar-border-color: var(--SITE--POPOVER--BORDER--COLOR);
+  --df-calendar-radius: var(--SITE--POPOVER--RADIUS);
+  --df-calendar-shadow: var(--SITE--POPOVER--SHADOW);
+  --df-calendar-link-color: var(--SITE--POPOVER--ACCENT);
   /* Internal */
   --_df-rail-max-width: calc(var(--df-site-max-width) + var(--df-calendar-width));
   --_df-arrow-size: 0.75rem;
@@ -97,8 +96,8 @@
     cursor: default;
 
     &[data-focused] {
-      background-color: Highlight;
-      color: HighlightText;
+      background-color: var(--SITE--POPOVER--ACCENT);
+      color: var(--SITE--POPOVER--ACCENT-TEXT);
     }
 
     &[data-placeholder] {
@@ -108,7 +107,7 @@
 
   & .Separator {
     user-select: none;
-    color: GrayText;
+    color: var(--df-segments-color-muted);
   }
 
   & .Segments:hover,
@@ -164,10 +163,11 @@
 
 .DateField-popup {
   position: absolute;
-  background: transparent;
+  background: var(--df-calendar-bg);
   color: var(--df-calendar-color);
   border: 1px solid var(--df-calendar-border-color);
-  padding: 0.75rem;
+  padding: var(--SITE--POPOVER--PADDING);
+  font-size: 1rem;
   z-index: 100;
   border-radius: var(--df-calendar-radius);
   box-shadow: var(--df-calendar-shadow);
@@ -185,7 +185,7 @@
       cursor: pointer;
       padding: 0.25rem 0.5rem;
       border-radius: 2px;
-      font-size: 1.25rem;
+      font-size: 1rem;
       line-height: 1;
 
       &:focus-visible {
@@ -195,7 +195,7 @@
     }
 
     & span {
-      font-weight: 600;
+      font-weight: bold;
       flex: 1;
       text-align: center;
     }
@@ -229,7 +229,6 @@
       cursor: pointer;
       border-radius: 2px;
       font-variant-numeric: tabular-nums;
-      font-size: 0.875rem;
 
       &:focus-visible {
         outline: 2px solid;
@@ -239,16 +238,15 @@
 
     & td[data-today] button {
       font-weight: bold;
-      text-decoration: underline;
     }
 
     & td[data-selected] button {
-      background-color: Highlight;
-      color: HighlightText;
+      background-color: var(--SITE--POPOVER--ACCENT);
+      color: var(--SITE--POPOVER--ACCENT-TEXT);
     }
 
     & td[data-disabled] button {
-      color: #767676;
+      color: var(--df-calendar-color-muted);
       cursor: not-allowed;
     }
 
@@ -261,7 +259,7 @@
     display: flex;
     justify-content: space-between;
     padding: 0.5rem;
-    border-top: 1px solid;
+    border-top: 1px solid var(--df-calendar-border-color);
 
     & button {
       background: none;
@@ -278,7 +276,7 @@
       }
 
       &:disabled {
-        color: GrayText;
+        color: var(--df-calendar-color-muted);
         cursor: not-allowed;
       }
     }
@@ -327,8 +325,8 @@
 
 .DateField-popup .MonthList[data-focused="true"] [role="option"][aria-selected="true"],
 .DateField-popup .YearList[data-focused="true"] [role="option"][aria-selected="true"] {
-  background: SelectedItem;
-  color: SelectedItemText;
+  background: var(--SITE--POPOVER--ACCENT);
+  color: var(--SITE--POPOVER--ACCENT-TEXT);
   outline: none;
 }
 
@@ -346,23 +344,6 @@
 
 .DateField-popup .MonthYearTrigger[aria-expanded="true"]::after {
   transform: rotate(-90deg);
-}
-
-/* ── Calendar surface (backdrop-filter layer) ──────────────────────────── */
-.DateField-popup .CalendarSurface {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  border-radius: inherit;
-  z-index: -1;
-  pointer-events: none;
-}
-
-.DateField-popup .CalendarSurface .BackdropBlur {
-  position: absolute;
-  inset: -20px;
-  background: var(--df-calendar-bg);
-  backdrop-filter: var(--df-calendar-backdrop);
 }
 
 /* ── Initialisation gate ───────────────────────────────────────────────── */

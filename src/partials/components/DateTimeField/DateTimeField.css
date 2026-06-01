@@ -9,21 +9,20 @@
   --dtf-site-padding: var(--SITE--PADDING, 1rem);
   /* Design tokens — segments */
   --dtf-segments-border-color: currentColor;
-  --dtf-segments-border-color-hover: #333;
-  --dtf-segments-bg-hover: #f8f8f8;
+  --dtf-segments-border-color-hover: CanvasText;
+  --dtf-segments-bg-hover: var(--SITE--POPOVER--HOVER-BG);
   --dtf-segments-border-color-invalid: #c00;
-  --dtf-segments-color-muted: #6e6e6e;
-  --dtf-trigger-bg-hover: #f0f0f0;
-  --dtf-trigger-bg-active: #e0e0e0;
-  /* Design tokens — calendar */
-  --dtf-calendar-bg: Canvas;
-  --dtf-calendar-color: CanvasText;
-  --dtf-calendar-color-muted: #6e6e6e;
-  --dtf-calendar-border-color: currentColor;
-  --dtf-calendar-radius: 4px;
-  --dtf-calendar-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  --dtf-calendar-backdrop: none;
-  --dtf-calendar-link-color: LinkText;
+  --dtf-segments-color-muted: var(--SITE--POPOVER--MUTED);
+  --dtf-trigger-bg-hover: var(--SITE--POPOVER--HOVER-BG);
+  --dtf-trigger-bg-active: var(--SITE--POPOVER--HOVER-BG);
+  /* Design tokens — calendar (shared popover surface) */
+  --dtf-calendar-bg: var(--SITE--POPOVER--BG);
+  --dtf-calendar-color: var(--SITE--POPOVER--COLOR);
+  --dtf-calendar-color-muted: var(--SITE--POPOVER--MUTED);
+  --dtf-calendar-border-color: var(--SITE--POPOVER--BORDER--COLOR);
+  --dtf-calendar-radius: var(--SITE--POPOVER--RADIUS);
+  --dtf-calendar-shadow: var(--SITE--POPOVER--SHADOW);
+  --dtf-calendar-link-color: var(--SITE--POPOVER--ACCENT);
   /* Internal */
   --_dtf-rail-max-width: calc(var(--dtf-site-max-width) + var(--dtf-calendar-width));
   --_dtf-arrow-size: 0.75rem;
@@ -98,8 +97,8 @@
     cursor: default;
 
     &[data-focused] {
-      background-color: Highlight;
-      color: HighlightText;
+      background-color: var(--SITE--POPOVER--ACCENT);
+      color: var(--SITE--POPOVER--ACCENT-TEXT);
     }
 
     &[data-placeholder] {
@@ -109,7 +108,7 @@
 
   & .Separator {
     user-select: none;
-    color: GrayText;
+    color: var(--dtf-segments-color-muted);
   }
 
   & .DateTimeField-overlay:hover,
@@ -168,7 +167,8 @@
   background: var(--dtf-calendar-bg);
   color: var(--dtf-calendar-color);
   border: 1px solid var(--dtf-calendar-border-color);
-  padding: 0.75rem;
+  padding: var(--SITE--POPOVER--PADDING);
+  font-size: 1rem;
   z-index: 100;
   border-radius: var(--dtf-calendar-radius);
   box-shadow: var(--dtf-calendar-shadow);
@@ -186,7 +186,7 @@
       cursor: pointer;
       padding: 0.25rem 0.5rem;
       border-radius: 2px;
-      font-size: 1.25rem;
+      font-size: 1rem;
       line-height: 1;
 
       &:focus-visible {
@@ -196,7 +196,7 @@
     }
 
     & span {
-      font-weight: 600;
+      font-weight: bold;
       flex: 1;
       text-align: center;
     }
@@ -230,7 +230,6 @@
       cursor: pointer;
       border-radius: 2px;
       font-variant-numeric: tabular-nums;
-      font-size: 0.875rem;
 
       &:focus-visible {
         outline: 2px solid;
@@ -240,16 +239,15 @@
 
     & td[data-today] button {
       font-weight: bold;
-      text-decoration: underline;
     }
 
     & td[data-selected] button {
-      background-color: Highlight;
-      color: HighlightText;
+      background-color: var(--SITE--POPOVER--ACCENT);
+      color: var(--SITE--POPOVER--ACCENT-TEXT);
     }
 
     & td[data-disabled] button {
-      color: #767676;
+      color: var(--dtf-calendar-color-muted);
       cursor: not-allowed;
     }
 
@@ -262,7 +260,7 @@
     display: flex;
     justify-content: space-between;
     padding: 0.5rem;
-    border-top: 1px solid;
+    border-top: 1px solid var(--dtf-calendar-border-color);
 
     & button {
       background: none;
@@ -279,7 +277,7 @@
       }
 
       &:disabled {
-        color: GrayText;
+        color: var(--dtf-calendar-color-muted);
         cursor: not-allowed;
       }
     }
@@ -328,8 +326,8 @@
 
 .DateTimeField-popup .MonthList[data-focused="true"] [role="option"][aria-selected="true"],
 .DateTimeField-popup .YearList[data-focused="true"] [role="option"][aria-selected="true"] {
-  background: SelectedItem;
-  color: SelectedItemText;
+  background: var(--SITE--POPOVER--ACCENT);
+  color: var(--SITE--POPOVER--ACCENT-TEXT);
   outline: none;
 }
 
@@ -347,23 +345,6 @@
 
 .DateTimeField-popup .MonthYearTrigger[aria-expanded="true"]::after {
   transform: rotate(-90deg);
-}
-
-/* ── Calendar surface (backdrop-filter layer) ──────────────────────────── */
-.DateTimeField-popup .CalendarSurface {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  border-radius: inherit;
-  z-index: -1;
-  pointer-events: none;
-}
-
-.DateTimeField-popup .CalendarSurface .BackdropBlur {
-  position: absolute;
-  inset: -20px;
-  background: var(--dtf-calendar-bg);
-  backdrop-filter: var(--dtf-calendar-backdrop);
 }
 
 /* ── Initialisation gate ───────────────────────────────────────────────── */
@@ -436,7 +417,7 @@
 .DateTimeField-popup .TimeColumns {
   display: flex;
   gap: 0;
-  border-left: 1px solid var(--color-border, #e0e0e0);
+  border-left: 1px solid var(--dtf-calendar-border-color);
 }
 
 .DateTimeField-popup .TimeList {
@@ -450,7 +431,7 @@
 }
 
 .DateTimeField-popup .TimeList:focus {
-  outline: 2px solid var(--color-focus, #005fcc);
+  outline: 2px solid var(--SITE--POPOVER--ACCENT);
   outline-offset: -2px;
 }
 
@@ -462,11 +443,11 @@
 }
 
 .DateTimeField-popup .TimeList [role="option"][aria-selected="true"] {
-  background-color: var(--color-selected-bg, #005fcc);
-  color: var(--color-selected-text, #fff);
-  font-weight: 600;
+  background-color: var(--SITE--POPOVER--ACCENT);
+  color: var(--SITE--POPOVER--ACCENT-TEXT);
+  font-weight: bold;
 }
 
 .DateTimeField-popup .TimeList [role="option"]:hover:not([aria-selected="true"]) {
-  background-color: var(--color-hover-bg, #f0f0f0);
+  background-color: var(--SITE--POPOVER--HOVER-BG);
 }

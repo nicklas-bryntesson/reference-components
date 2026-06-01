@@ -56,7 +56,6 @@ function createTimeFieldEl(options: {
         <div class="slideContainer">
           <template data-template="timefield-popup">
             <div class="TimeField-popup" role="dialog" aria-modal="true" aria-label="Välj tid">
-              <span class="TimeField-popup-surface" aria-hidden="true"><span class="TimeField-popup-backdropBlur"></span></span>
               <div class="TimeField-popup-columns">
                 <ul class="TimeField-popup-column" data-segment="hour" role="listbox" aria-label="Timmar" tabindex="0"></ul>
                 <ul class="TimeField-popup-column" data-segment="minute" role="listbox" aria-label="Minuter" tabindex="-1"></ul>

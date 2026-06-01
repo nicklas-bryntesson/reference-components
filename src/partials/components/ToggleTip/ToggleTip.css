@@ -8,12 +8,12 @@
   --toggletip-gap: 0.75rem;
   --toggletip-content-width: 20rem;
   --toggletip-padding: 1.5rem;
-  --toggletip-border-radius: 1rem;
+  --toggletip-border-radius: var(--SITE--POPOVER--RADIUS);
   --toggletip-button-width: 1.5rem;
-  --toggletip-button-color: black;
-  --toggletip-surface-color: white;
-  --toggletip-text-color: black;
-  --toggletip-border-color: lightgrey;
+  --toggletip-button-color: CanvasText;
+  --toggletip-surface-color: Canvas;
+  --toggletip-text-color: CanvasText;
+  --toggletip-border-color: var(--SITE--POPOVER--BORDER--COLOR);
   --toggletip-site-max-width: 100rem;
   --toggletip-site-padding: var(--SITE--PADDING, 1rem);
 }
@@ -26,10 +26,10 @@ toggle-tip {
   --_tt-padding: var(--toggletip-padding, 1.5rem);
   --_tt-border-radius: var(--toggletip-border-radius, 1rem);
   --_tt-button-width: var(--toggletip-button-width, 1.5rem);
-  --_tt-button-color: var(--toggletip-button-color, black);
-  --_tt-surface-color: var(--toggletip-surface-color, white);
-  --_tt-text-color: var(--toggletip-text-color, black);
-  --_tt-border-color: var(--toggletip-border-color, lightgrey);
+  --_tt-button-color: var(--toggletip-button-color, CanvasText);
+  --_tt-surface-color: var(--toggletip-surface-color, Canvas);
+  --_tt-text-color: var(--toggletip-text-color, CanvasText);
+  --_tt-border-color: var(--toggletip-border-color, var(--SITE--POPOVER--BORDER--COLOR));
   --_tt-site-max-width: var(--toggletip-site-max-width, 100rem);
   --_tt-site-padding: var(--toggletip-site-padding, 1rem);
 
@@ -128,18 +128,17 @@ toggle-tip .ToggleTip-popup {
   padding-inline: var(--_tt-padding);
   padding-block: var(--_tt-padding);
   border-radius: var(--_tt-border-radius);
+  border: 1px solid var(--_tt-border-color);
   background-color: var(--_tt-surface-color);
   color: var(--_tt-text-color);
   font: inherit;
+  font-size: 1rem;
+  box-shadow: var(--SITE--POPOVER--SHADOW);
 
   /* Force all descendant text to use the bubble's colour, not the page default */
   & * {
     color: inherit;
   }
-  will-change: filter;
-  filter:
-    drop-shadow(0 0.1875rem 0.1875rem hsl(0 0% 0% / 20%))
-    drop-shadow(0 0.75rem 0.75rem hsl(0 0% 0% / 20%));
 
   &[aria-hidden="true"] {
     display: none;
@@ -158,9 +157,10 @@ toggle-tip .ToggleTip-popup {
 /* ── Title ─────────────────────────────────────────────────────── */
 toggle-tip .title {
   display: block;
+  font-weight: bold;
   margin-block-end: 1rem;
   padding-block-end: 1rem;
-  border-block-end: 0.125rem solid var(--_tt-border-color);
+  border-block-end: 1px solid var(--_tt-border-color);
 }
 
 /* ── Arrow ─────────────────────────────────────────────────────── */
