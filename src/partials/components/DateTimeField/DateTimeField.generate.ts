@@ -29,9 +29,9 @@ function canonical(id: string, attrs: Record<string, string> = {}): string {
       <div class="CalendarInner">
         <div class="CalendarLeft">
           <div class="CalendarHeader">
-            <button class="CalendarPrev" type="button"></button>
+            <button class="CalendarPrev" type="button">&#8249;</button>
             <button class="MonthYearTrigger" type="button" aria-expanded="false"><span class="CalendarMonthYear"></span></button>
-            <button class="CalendarNext" type="button"></button>
+            <button class="CalendarNext" type="button">&#8250;</button>
           </div>
           <div class="Panel" data-panel="calendar" data-active="true">
             <table class="CalendarGrid" role="grid"></table>

@@ -946,6 +946,14 @@ export class DateTimeField {
     const clearBtn = this.calendarEl.querySelector<HTMLButtonElement>('.CalendarFooterClear')
     const monthYearTrigger = this.calendarEl.querySelector<HTMLButtonElement>('.MonthYearTrigger')
 
+    // Localised labels / button text (parity with DateField's footer + nav)
+    prevBtn?.setAttribute('aria-label', this.t.prevMonth)
+    nextBtn?.setAttribute('aria-label', this.t.nextMonth)
+    monthYearTrigger?.setAttribute('aria-label', this.t.openPicker)
+    if (clearBtn) clearBtn.textContent = this.t.clearButton
+    if (todayBtn) todayBtn.textContent = this.t.todayButton
+    if (nowBtn) nowBtn.textContent = this.t.nowButton
+
     prevBtn?.addEventListener('click', () => {
       this.currentMonth -= 1
       if (this.currentMonth < 0) { this.currentMonth = 11; this.currentYear-- }
