@@ -295,47 +295,19 @@
   display: block;
 }
 
+/* Month/year picker — two wheels (look from shared Wheel.css) */
 .DateTimeField-popup [data-panel="picker"][data-active="true"] {
   display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
   overflow: hidden;
   height: 16rem;
 }
 
-.DateTimeField-popup .MonthList,
-.DateTimeField-popup .YearList {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  overflow-y: auto;
-  flex: 1;
-  outline: none;
-}
-
-.DateTimeField-popup .MonthList [role="option"],
-.DateTimeField-popup .YearList [role="option"] {
-  padding: 0.25rem 0.5rem;
-  cursor: pointer;
-}
-
-.DateTimeField-popup .MonthList [role="option"][aria-selected="true"],
-.DateTimeField-popup .YearList [role="option"][aria-selected="true"] {
-  font-weight: bold;
-  outline: 2px solid;
-  outline-offset: -2px;
-}
-
-.DateTimeField-popup .MonthList[data-focused="true"] [role="option"][aria-selected="true"],
-.DateTimeField-popup .YearList[data-focused="true"] [role="option"][aria-selected="true"] {
-  background: var(--SITE--POPOVER--ACCENT);
-  color: var(--SITE--POPOVER--ACCENT-TEXT);
-  outline: none;
-}
-
-.DateTimeField-popup .MonthList [role="option"][aria-disabled="true"],
-.DateTimeField-popup .YearList [role="option"][aria-disabled="true"] {
-  opacity: 0.4;
-  cursor: default;
-}
+/* Wider hosts than the time digits so locale month names fit */
+.DateTimeField-popup .YearMonthPicker .Wheel[data-picker="month"] { width: 8rem; }
+.DateTimeField-popup .YearMonthPicker .Wheel[data-picker="year"] { width: 5rem; }
 
 .DateTimeField-popup .MonthYearTrigger::after {
   content: '›';

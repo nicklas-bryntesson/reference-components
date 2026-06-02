@@ -114,6 +114,7 @@ export class DateTimeField {
 
   calendarEl: HTMLElement | null
   private _wheels: Map<'hour' | 'minute' | 'second', WheelColumn> = new Map()
+  private _pickerWheels: Map<'month' | 'year', WheelColumn> = new Map()
   selectedDatetime: Date | null
   currentYear: number
   currentMonth: number
@@ -993,6 +994,16 @@ export class DateTimeField {
       }
     })
 
+    // ArrowUp/Down steps the focused month/year wheel (wheels built in _openPicker).
+    this.calendarEl.querySelectorAll<HTMLElement>('.YearMonthPicker .Wheel').forEach(host => {
+      host.addEventListener('keydown', (e) => {
+        if (e.key !== 'ArrowUp' && e.key !== 'ArrowDown') return
+        e.preventDefault()
+        const which = host.dataset.picker as 'month' | 'year'
+        this._pickerWheels.get(which)?.stepBy(e.key === 'ArrowDown' ? 1 : -1)
+      })
+    })
+
     this.calendarEl.addEventListener('keydown', (e: KeyboardEvent) => {
       this._handleCalendarKeydown(e)
     })
@@ -1007,6 +1018,11 @@ export class DateTimeField {
   }
 
   _handleCalendarKeydown(e: KeyboardEvent): void {
+    if (this._isPickerActive()) {
+      this._handlePickerKeydown(e)
+      return
+    }
+
     if (e.key === 'Escape') {
       e.preventDefault()
       this._closeCalendar()
@@ -1073,54 +1089,44 @@ export class DateTimeField {
     if (!this.calendarEl) return
     this._pickerEntryYear = this.currentYear
     this._pickerEntryMonth = this.currentMonth
-    const monthList = this.calendarEl.querySelector<HTMLElement>('.MonthList')!
-    const yearList = this.calendarEl.querySelector<HTMLElement>('.YearList')!
+    const pickerGroup = this.calendarEl.querySelector<HTMLElement>('.YearMonthPicker')!
+    pickerGroup.setAttribute('aria-label', this.t.openPicker)
+    const monthHost = this.calendarEl.querySelector<HTMLElement>('.Wheel[data-picker="month"]')!
+    const yearHost = this.calendarEl.querySelector<HTMLElement>('.Wheel[data-picker="year"]')!
 
-    monthList.setAttribute('aria-label', this.t.month)
-    monthList.innerHTML = ''
-    for (let i = 0; i < 12; i++) {
-      const li = document.createElement('li')
-      li.setAttribute('role', 'option')
-      li.id = `${this.fieldId}-month-${i}`
-      li.setAttribute('aria-selected', String(i === this.currentMonth))
-      li.textContent = getMonthName(this.currentYear, i, this.locale)
-      const monthDate = new Date(this.currentYear, i, 1)
-      const monthEnd = new Date(this.currentYear, i + 1, 0)
-      const isDisabled = (this.min && monthEnd < this.min) || (this.max && monthDate > this.max)
-      if (isDisabled) {
-        li.setAttribute('aria-disabled', 'true')
-      } else {
-        li.addEventListener('click', () => this._confirmPickerMonth(i))
-      }
-      monthList.appendChild(li)
-    }
-    monthList.setAttribute('aria-activedescendant', `${this.fieldId}-month-${this.currentMonth}`)
-
-    yearList.setAttribute('aria-label', this.t.year)
-    yearList.innerHTML = ''
     const minYear = this.min ? this.min.getFullYear() : 1900
     const maxYear = this.max ? this.max.getFullYear() : 2100
-    for (let y = minYear; y <= maxYear; y++) {
-      const li = document.createElement('li')
-      li.setAttribute('role', 'option')
-      li.id = `${this.fieldId}-year-${y}`
-      li.setAttribute('aria-selected', String(y === this.currentYear))
-      li.textContent = String(y)
-      li.addEventListener('click', () => this._confirmPickerYear(y))
-      yearList.appendChild(li)
-    }
-    yearList.setAttribute('aria-activedescendant', `${this.fieldId}-year-${this.currentYear}`)
+
+    // Fresh wheels each open (rebuilt from the current month/year)
+    this._pickerWheels.forEach(w => w.destroy())
+    this._pickerWheels.clear()
+    monthHost.replaceChildren()
+    yearHost.replaceChildren()
+
+    monthHost.id = `${this.fieldId}-picker-month`
+    monthHost.setAttribute('aria-label', this.t.month)
+    this._pickerWheels.set('month', new WheelColumn(monthHost, {
+      min: 0, max: 11, value: this.currentMonth, loop: false,
+      format: (v) => getMonthName(this.currentYear, v, this.locale),
+      onChange: (m) => { this.currentMonth = m; this._renderMonth() },
+    }))
+
+    yearHost.id = `${this.fieldId}-picker-year`
+    yearHost.setAttribute('aria-label', this.t.year)
+    this._pickerWheels.set('year', new WheelColumn(yearHost, {
+      min: minYear, max: maxYear, value: this.currentYear, loop: false,
+      format: (v) => String(v),
+      onChange: (y) => { this.currentYear = y; this._renderMonth() },
+    }))
 
     this._setPanel('picker')
-    const pickerGroup = this.calendarEl.querySelector<HTMLElement>('.YearMonthPicker')
-    pickerGroup?.addEventListener('mousedown', e => e.preventDefault())
-    monthList.querySelector<HTMLElement>('[aria-selected="true"]')?.scrollIntoView({ block: 'center' })
-    yearList.querySelector<HTMLElement>('[aria-selected="true"]')?.scrollIntoView({ block: 'center' })
-    monthList.focus()
+    monthHost.focus()
   }
 
   _closePicker(): void {
     if (!this.calendarEl) return
+    this._pickerWheels.forEach(w => w.destroy())
+    this._pickerWheels.clear()
     this._setPanel('calendar')
     this._renderMonth()
     this.calendarEl.querySelector<HTMLButtonElement>('.MonthYearTrigger')?.focus()
@@ -1138,14 +1144,23 @@ export class DateTimeField {
     return this.calendarEl?.querySelector('[data-panel="picker"]')?.getAttribute('data-active') === 'true'
   }
 
-  _confirmPickerMonth(month: number): void {
-    this.currentMonth = month
-    this._closePicker()
-  }
-
-  _confirmPickerYear(year: number): void {
-    this.currentYear = year
-    this._closePicker()
+  _handlePickerKeydown(e: KeyboardEvent): void {
+    // Escape cancels — restore the month/year the picker opened on.
+    if (e.key === 'Escape') {
+      e.preventDefault()
+      this.currentYear = this._pickerEntryYear
+      this.currentMonth = this._pickerEntryMonth
+      this._closePicker()
+      return
+    }
+    // Tab moves between the month and year wheels.
+    if (e.key === 'Tab') {
+      e.preventDefault()
+      const monthHost = this.calendarEl!.querySelector<HTMLElement>('.Wheel[data-picker="month"]')!
+      const yearHost = this.calendarEl!.querySelector<HTMLElement>('.Wheel[data-picker="year"]')!
+      ;(document.activeElement === monthHost ? yearHost : monthHost).focus()
+    }
+    // ArrowUp/Down handled per-wheel-host (see _bindCalendarEvents → stepBy).
   }
 
   // ─── Time wheels (shared 3D spinner, same as TimeField) ──────────────────────

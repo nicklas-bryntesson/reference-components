@@ -4,6 +4,10 @@ export interface WheelColumnOptions {
   value: number | null
   onChange: (value: number) => void
   disabled?: (value: number) => boolean
+  /** When false, the wheel stops at min/max instead of wrapping. Default: true (loops). */
+  loop?: boolean
+  /** Render a value as display text (e.g. month names). Default: zero-padded number. */
+  format?: (value: number) => string
 }
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -55,6 +59,8 @@ class WheelColumn {
   private radius: number
   private rowsPerPx: number
   readonly count: number
+  private _loop: boolean
+  private _format: (value: number) => string
 
   private _rafId: number | null = null
   private _velocity: number = 0
@@ -76,6 +82,8 @@ class WheelColumn {
     this.opts = opts
     this._currentValue = opts.value
     this.count = opts.max - opts.min + 1
+    this._loop = opts.loop ?? true
+    this._format = opts.format ?? ((v: number) => String(v).padStart(2, '0'))
 
     this.rowH = readRowHeight(el)
     this.radius = (this.rowH / 2) / Math.tan((STEP_DEG / 2) * Math.PI / 180)
@@ -89,7 +97,7 @@ class WheelColumn {
     // Set initial position without triggering onChange
     this._externalSet = true
     if (opts.value !== null) {
-      const i = this._mod(opts.value - opts.min)
+      const i = this._resolveIndex(opts.value - opts.min)
       this.pos = i
     } else {
       this.pos = 0
@@ -166,6 +174,7 @@ class WheelColumn {
     const dPos = -dy * this.rowsPerPx
 
     this.pos += dPos
+    this._clampPos()
     // Rolling average matches prototype exactly: weight recent move 60%, history 40%
     this._velocity = this._velocity * 0.4 + (dPos / dtm * 1000) * 0.6
 
@@ -223,6 +232,7 @@ class WheelColumn {
     this._externalSet = false
 
     this.pos -= e.deltaY / 120
+    this._clampPos()
     this.render()
 
     if (this._wheelTimer !== null) clearTimeout(this._wheelTimer)
@@ -237,13 +247,13 @@ class WheelColumn {
     const option = (e.target as HTMLElement).closest<HTMLElement>('.Wheel-option')
     if (!option) return
 
-    const text = option.textContent?.trim()
-    if (!text) return
-    const displayValue = parseInt(text, 10)
+    const raw = option.dataset.value
+    if (raw == null || raw === '') return
+    const displayValue = Number(raw)
     if (isNaN(displayValue)) return
 
     this._externalSet = false
-    const i = this._mod(displayValue - this.opts.min)
+    const i = this._resolveIndex(displayValue - this.opts.min)
     const target = i + this.count * Math.round((this.pos - i) / this.count)
     this._animateTo(target)
     this._currentValue = displayValue
@@ -280,6 +290,7 @@ class WheelColumn {
         // Apply friction
         this._velocity *= Math.pow(0.0004, dt)
         this.pos += this._velocity * dt
+        this._clampPos()
 
         this.render()
 
@@ -333,7 +344,7 @@ class WheelColumn {
   // ─── Commit ──────────────────────────────────────────────────────────────────
 
   private _commit(): void {
-    const index = this._mod(Math.round(this.pos))
+    const index = this._resolveIndex(Math.round(this.pos))
     const value = this.opts.min + index
     this.pos = index + (this.pos - Math.round(this.pos))
     this._currentValue = value
@@ -360,7 +371,7 @@ class WheelColumn {
 
     if (this._currentValue !== null) {
       ariaNow = this._currentValue
-      ariaText = String(this._currentValue).padStart(2, '0')
+      ariaText = this._format(this._currentValue)
     }
 
     if (ariaNow !== null) {
@@ -388,9 +399,19 @@ class WheelColumn {
         slot.el.style.opacity = String(opacity)
       }
 
-      const displayIndex = this._mod(valRow)
+      // Bounded wheels render nothing past the ends; looping wheels wrap.
+      if (!this._loop && (valRow < 0 || valRow >= this.count)) {
+        slot.el.textContent = ''
+        delete slot.el.dataset.value
+        slot.el.removeAttribute('aria-selected')
+        slot.el.id = ''
+        continue
+      }
+
+      const displayIndex = this._loop ? this._mod(valRow) : valRow
       const displayValue = this.opts.min + displayIndex
-      slot.el.textContent = String(displayValue).padStart(2, '0')
+      slot.el.textContent = this._format(displayValue)
+      slot.el.dataset.value = String(displayValue)
 
       const isFront = slot.o === 0
       slot.el.setAttribute('aria-selected', isFront ? 'true' : 'false')
@@ -404,6 +425,19 @@ class WheelColumn {
 
   private _mod(i: number): number {
     return ((i % this.count) + this.count) % this.count
+  }
+
+  // Looping wheels wrap an index into range; bounded wheels clamp to the ends.
+  private _resolveIndex(i: number): number {
+    return this._loop ? this._mod(i) : Math.max(0, Math.min(this.count - 1, i))
+  }
+
+  // Bounded wheels can't scroll past the ends — clamp position and kill velocity at an edge.
+  private _clampPos(): void {
+    if (this._loop) return
+    const max = this.count - 1
+    if (this.pos < 0) { this.pos = 0; this._velocity = 0 }
+    else if (this.pos > max) { this.pos = max; this._velocity = 0 }
   }
 
   // ─── prefersReducedMotion ────────────────────────────────────────────────────
@@ -426,7 +460,7 @@ class WheelColumn {
       return
     }
 
-    const i = this._mod(value - this.opts.min)
+    const i = this._resolveIndex(value - this.opts.min)
     const target = i + this.count * Math.round((this.pos - i) / this.count)
 
     if (animate && !this._prefersReducedMotion()) {
@@ -444,7 +478,7 @@ class WheelColumn {
 
   stepBy(delta: number): void {
     const base = this._currentValue ?? this.opts.min
-    const nextIndex = this._mod(base - this.opts.min + delta)
+    const nextIndex = this._resolveIndex(base - this.opts.min + delta)
     const nextValue = this.opts.min + nextIndex
 
     this._externalSet = false

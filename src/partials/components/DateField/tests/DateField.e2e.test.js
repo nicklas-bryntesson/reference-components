@@ -158,33 +158,41 @@ test('MonthYearTrigger has aria-expanded true when picker open', async ({ page }
   await expect(trigger).toHaveAttribute('aria-expanded', 'true')
 })
 
-test('MonthList receives focus when picker opens', async ({ page }) => {
+test('month and year wheels are spinbuttons when picker opens', async ({ page }) => {
   await page.locator('[data-id="birthdate"] .DateField-trigger').click()
   await page.locator('[data-id="birthdate"] .MonthYearTrigger').click()
-  await expect(page.locator('.MonthList')).toBeFocused()
+  await expect(page.locator('.DateField-popup .Wheel[data-picker="month"]')).toHaveAttribute('role', 'spinbutton')
+  await expect(page.locator('.DateField-popup .Wheel[data-picker="year"]')).toHaveAttribute('role', 'spinbutton')
 })
 
-test('ArrowDown moves aria-activedescendant in MonthList', async ({ page }) => {
+test('month wheel receives focus when picker opens', async ({ page }) => {
   await page.locator('[data-id="birthdate"] .DateField-trigger').click()
   await page.locator('[data-id="birthdate"] .MonthYearTrigger').click()
-  const monthList = page.locator('.MonthList')
-  const initialId = await monthList.getAttribute('aria-activedescendant')
+  await expect(page.locator('.DateField-popup .Wheel[data-picker="month"]')).toBeFocused()
+})
+
+test('ArrowDown on the year wheel navigates the calendar', async ({ page }) => {
+  await page.locator('[data-id="birthdate"] .DateField-trigger').click()
+  const header = page.locator('[data-id="birthdate"] .MonthYearTrigger')
+  await header.click()
+  const before = await header.textContent()
+  await page.locator('.DateField-popup .Wheel[data-picker="year"]').focus()
   await page.keyboard.press('ArrowDown')
-  const nextId = await monthList.getAttribute('aria-activedescendant')
-  expect(nextId).not.toBe(initialId)
+  await page.waitForTimeout(500) // snap animation
+  expect(await header.textContent()).not.toBe(before)
 })
 
-test('Tab moves focus from MonthList to YearList', async ({ page }) => {
+test('Tab moves focus from month wheel to year wheel', async ({ page }) => {
   await page.locator('[data-id="birthdate"] .DateField-trigger').click()
   await page.locator('[data-id="birthdate"] .MonthYearTrigger').click()
   await page.keyboard.press('Tab')
-  await expect(page.locator('.YearList')).toBeFocused()
+  await expect(page.locator('.DateField-popup .Wheel[data-picker="year"]')).toBeFocused()
 })
 
-test('Enter on month option returns to calendar view', async ({ page }) => {
+test('clicking the header again returns to the calendar view', async ({ page }) => {
   await page.locator('[data-id="birthdate"] .DateField-trigger').click()
   await page.locator('[data-id="birthdate"] .MonthYearTrigger').click()
-  await page.keyboard.press('Enter')
+  await page.locator('[data-id="birthdate"] .MonthYearTrigger').click()
   const picker = page.locator('.DateField-popup [data-panel="picker"]')
   await expect(picker).toHaveAttribute('data-active', 'false')
 })
@@ -287,22 +295,3 @@ test('PageUp moves calendar to previous month', async ({ page }) => {
   await page.keyboard.press('Escape')
 })
 
-// ── Month/Year Picker ─────────────────────────────────────────────────────────
-
-test('Home jumps to first enabled month option', async ({ page }) => {
-  await page.locator('[data-id="birthdate"] .DateField-trigger').click()
-  await page.locator('[data-id="birthdate"] .MonthYearTrigger').click()
-  await page.keyboard.press('Home')
-  const monthList = page.locator('.MonthList')
-  const activeId = await monthList.getAttribute('aria-activedescendant')
-  expect(activeId).toMatch(/-month-0$/)
-})
-
-test('End jumps to last enabled month option', async ({ page }) => {
-  await page.locator('[data-id="birthdate"] .DateField-trigger').click()
-  await page.locator('[data-id="birthdate"] .MonthYearTrigger').click()
-  await page.keyboard.press('End')
-  const monthList = page.locator('.MonthList')
-  const activeId = await monthList.getAttribute('aria-activedescendant')
-  expect(activeId).toMatch(/-month-11$/)
-})

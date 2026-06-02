@@ -36,9 +36,9 @@ function canonical(id: string, attrs: Record<string, string> = {}, locale = 'sv-
           <div class="Panel" data-panel="calendar" data-active="true">
             <table class="CalendarGrid" role="grid"></table>
           </div>
-          <div class="Panel YearMonthPicker" data-panel="picker" data-active="false">
-            <ul class="MonthList" role="listbox" tabindex="0"></ul>
-            <ul class="YearList" role="listbox" tabindex="0"></ul>
+          <div class="Panel YearMonthPicker" role="group" data-panel="picker" data-active="false">
+            <div class="Wheel" data-picker="month" tabindex="0"></div>
+            <div class="Wheel" data-picker="year" tabindex="0"></div>
           </div>
         </div>
         <div class="TimeColumns">

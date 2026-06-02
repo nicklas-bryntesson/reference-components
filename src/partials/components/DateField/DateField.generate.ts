@@ -58,8 +58,8 @@ function canonical(id: string, label: string, rootAttrs: string, inputAttrs: str
             </table>
           </div>
           <div class="Panel YearMonthPicker" role="group" data-panel="picker" data-active="false">
-            <ul role="listbox" class="MonthList" tabindex="0"></ul>
-            <ul role="listbox" class="YearList" tabindex="0"></ul>
+            <div class="Wheel" data-picker="month" tabindex="0"></div>
+            <div class="Wheel" data-picker="year" tabindex="0"></div>
           </div>
           <div class="CalendarFooter">
             <button type="button" class="CalendarFooterClear"></button>

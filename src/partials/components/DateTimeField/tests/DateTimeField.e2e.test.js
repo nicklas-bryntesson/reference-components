@@ -210,3 +210,32 @@ test('PageDown navigates to next month', async ({ page }) => {
   const after = await page.locator(`${ROOT} .CalendarMonthYear`).textContent()
   expect(after).not.toBe(before)
 })
+
+// ─── Month/Year picker wheels ───────────────────────────────────────────────
+
+test('month/year picker opens as wheels', async ({ page }) => {
+  await page.locator(`${ROOT} .DateTimeField-trigger`).click()
+  await page.locator(`${ROOT} .MonthYearTrigger`).click()
+  await expect(page.locator(`${ROOT} .Wheel[data-picker="month"]`)).toHaveAttribute('role', 'spinbutton')
+  await expect(page.locator(`${ROOT} .Wheel[data-picker="year"]`)).toHaveAttribute('role', 'spinbutton')
+})
+
+test('ArrowDown on the year wheel navigates the calendar', async ({ page }) => {
+  await page.locator(`${ROOT} .DateTimeField-trigger`).click()
+  await page.locator(`${ROOT} .MonthYearTrigger`).click()
+  const header = page.locator(`${ROOT} .CalendarMonthYear`)
+  const before = await header.textContent()
+  await page.locator(`${ROOT} .Wheel[data-picker="year"]`).focus()
+  await page.keyboard.press('ArrowDown')
+  await page.waitForTimeout(500) // snap animation
+  expect(await header.textContent()).not.toBe(before)
+})
+
+test('Escape from the picker returns to the calendar (keeps popup open)', async ({ page }) => {
+  await page.locator(`${ROOT} .DateTimeField-trigger`).click()
+  await page.locator(`${ROOT} .MonthYearTrigger`).click()
+  await page.locator(`${ROOT} .Wheel[data-picker="month"]`).focus()
+  await page.keyboard.press('Escape')
+  await expect(page.locator(`${ROOT} [data-panel="picker"]`)).toHaveAttribute('data-active', 'false')
+  await expect(page.locator(`${ROOT} .DateTimeField-popup`)).toBeVisible()
+})
