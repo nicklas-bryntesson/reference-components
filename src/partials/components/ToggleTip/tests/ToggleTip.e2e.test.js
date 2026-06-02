@@ -66,8 +66,17 @@ test('focusout closes the tip', async ({ page }) => {
 
 test('bubble is positioned above trigger by default', async ({ page }) => {
   const tip = page.locator('toggle-tip[data-id="center"]')
-  await tip.scrollIntoViewIfNeeded()
+
+  // Place the tip well into the lower half of the viewport so there is clearly
+  // more room above than below. The bubble's default "above" placement is only
+  // chosen when space allows — detectDirection compares available space and a
+  // near-centred trigger is an ambiguous tie, so the test must set the scene.
+  const absTop = await tip.evaluate(el => window.scrollY + el.getBoundingClientRect().top)
+  await page.setViewportSize({ width: 1280, height: 720 })
+  await page.evaluate(top => window.scrollTo(0, top - 600), absTop)
+
   await tip.locator('button').click()
+  await expect(tip).toHaveAttribute('data-direction', 'top')
 
   const tipBox = await tip.boundingBox()
   const bubbleBox = await tip.locator('.ToggleTip-popup').boundingBox()
