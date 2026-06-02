@@ -72,7 +72,7 @@ test('trigger aria-expanded=true when popup open', async ({ page }) => {
 test('popup closes on Escape', async ({ page }) => {
   await page.locator(`${TF} .TimeField-trigger`).click()
   // Focus inside the popup so the popup's keydown handler receives the event
-  await page.locator('.TimeField-popup-column[data-segment="hour"]').focus()
+  await page.locator('.Wheel[data-segment="hour"]').focus()
   await page.keyboard.press('Escape')
   await expect(page.locator('.TimeField-popup')).toHaveCount(0)
 })
@@ -80,7 +80,7 @@ test('popup closes on Escape', async ({ page }) => {
 test('focus returns to trigger after Escape', async ({ page }) => {
   await page.locator(`${TF} .TimeField-trigger`).click()
   // Focus inside the popup so the popup's keydown handler receives the event
-  await page.locator('.TimeField-popup-column[data-segment="hour"]').focus()
+  await page.locator('.Wheel[data-segment="hour"]').focus()
   await page.keyboard.press('Escape')
   await expect(page.locator(`${TF} .TimeField-trigger`)).toBeFocused()
 })
@@ -111,7 +111,7 @@ test('popup has aria-label', async ({ page }) => {
 
 test('popup hour column has role=spinbutton', async ({ page }) => {
   await page.locator(`${TF} .TimeField-trigger`).click()
-  const hourCol = page.locator('.TimeField-popup-column[data-segment="hour"]')
+  const hourCol = page.locator('.Wheel[data-segment="hour"]')
   await expect(hourCol).toHaveAttribute('role', 'spinbutton')
   await expect(hourCol).toHaveAttribute('aria-valuemin', '0')
   await expect(hourCol).toHaveAttribute('aria-valuemax', '23')
@@ -119,7 +119,7 @@ test('popup hour column has role=spinbutton', async ({ page }) => {
 
 test('popup minute column has role=spinbutton', async ({ page }) => {
   await page.locator(`${TF} .TimeField-trigger`).click()
-  const minuteCol = page.locator('.TimeField-popup-column[data-segment="minute"]')
+  const minuteCol = page.locator('.Wheel[data-segment="minute"]')
   await expect(minuteCol).toHaveAttribute('role', 'spinbutton')
   await expect(minuteCol).toHaveAttribute('aria-valuemin', '0')
   await expect(minuteCol).toHaveAttribute('aria-valuemax', '59')
@@ -127,7 +127,7 @@ test('popup minute column has role=spinbutton', async ({ page }) => {
 
 test('popup column contains 9 aria-hidden option elements', async ({ page }) => {
   await page.locator(`${TF} .TimeField-trigger`).click()
-  const options = page.locator('.TimeField-popup-column[data-segment="hour"] .TimeField-popup-option')
+  const options = page.locator('.Wheel[data-segment="hour"] .Wheel-option')
   await expect(options).toHaveCount(9)
   for (let i = 0; i < 9; i++) {
     await expect(options.nth(i)).toHaveAttribute('aria-hidden', 'true')
@@ -189,7 +189,7 @@ test('passes axe with popup open', async ({ page }) => {
       runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa'] },
     },
   })
-  await page.locator('.TimeField-popup-column[data-segment="hour"]').focus()
+  await page.locator('.Wheel[data-segment="hour"]').focus()
   await page.keyboard.press('Escape')
 })
 
@@ -205,7 +205,7 @@ test('wheel column ArrowDown increases value in segment', async ({ page }) => {
 
   // Open popup and focus hour column
   await page.locator(`${TF} .TimeField-trigger`).click()
-  const hourCol = page.locator('.TimeField-popup-column[data-segment="hour"]')
+  const hourCol = page.locator('.Wheel[data-segment="hour"]')
   await hourCol.focus()
 
   // ArrowDown = stepBy(+1) = raises the value
@@ -225,7 +225,7 @@ test('wheel column ArrowUp decreases value in segment', async ({ page }) => {
   await page.waitForTimeout(350)
 
   await page.locator(`${TF} .TimeField-trigger`).click()
-  const hourCol = page.locator('.TimeField-popup-column[data-segment="hour"]')
+  const hourCol = page.locator('.Wheel[data-segment="hour"]')
   await hourCol.focus()
 
   // ArrowUp = stepBy(-1) = lowers the value
@@ -240,8 +240,8 @@ test('"Now" button syncs the wheel with the current time', async ({ page }) => {
   const nowBtn = page.locator('.TimeField-popup-now')
   await nowBtn.click()
   // Wheel columns should now have aria-valuenow set
-  const hourCol = page.locator('.TimeField-popup-column[data-segment="hour"]')
-  const minuteCol = page.locator('.TimeField-popup-column[data-segment="minute"]')
+  const hourCol = page.locator('.Wheel[data-segment="hour"]')
+  const minuteCol = page.locator('.Wheel[data-segment="minute"]')
   const hourVal = await hourCol.getAttribute('aria-valuenow')
   const minVal = await minuteCol.getAttribute('aria-valuenow')
   expect(Number(hourVal)).toBeGreaterThanOrEqual(0)
@@ -263,10 +263,10 @@ test('"Clear" button resets the wheel to an empty state', async ({ page }) => {
 
 test('popup wheel column has aria-valuemin and aria-valuemax', async ({ page }) => {
   await page.locator(`${TF} .TimeField-trigger`).click()
-  const hourCol = page.locator('.TimeField-popup-column[data-segment="hour"]')
+  const hourCol = page.locator('.Wheel[data-segment="hour"]')
   await expect(hourCol).toHaveAttribute('aria-valuemin', '0')
   await expect(hourCol).toHaveAttribute('aria-valuemax', '23')
-  const minuteCol = page.locator('.TimeField-popup-column[data-segment="minute"]')
+  const minuteCol = page.locator('.Wheel[data-segment="minute"]')
   await expect(minuteCol).toHaveAttribute('aria-valuemin', '0')
   await expect(minuteCol).toHaveAttribute('aria-valuemax', '59')
 })

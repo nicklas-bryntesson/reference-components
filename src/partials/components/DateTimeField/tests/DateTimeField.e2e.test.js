@@ -117,46 +117,54 @@ test('clicking a date closes the popup and updates segments', async ({ page }) =
   expect(val).not.toBeNull()
 })
 
-// ─── Time columns ─────────────────────────────────────────────────────────────
+// ─── Time wheels (shared spinner with TimeField) ───────────────────────────────
 
-test('time columns are visible in the popup', async ({ page }) => {
+test('hour and minute wheels are visible in the popup', async ({ page }) => {
   await page.locator(`${ROOT} .DateTimeField-trigger`).click()
-  await expect(page.locator(`${ROOT} .HourList`)).toBeVisible()
-  await expect(page.locator(`${ROOT} .MinuteList`)).toBeVisible()
+  await expect(page.locator(`${ROOT} .Wheel[data-segment="hour"]`)).toBeVisible()
+  await expect(page.locator(`${ROOT} .Wheel[data-segment="minute"]`)).toBeVisible()
 })
 
-test('hour list has role=listbox with aria-label', async ({ page }) => {
+test('hour wheel is a spinbutton with aria-label', async ({ page }) => {
   await page.locator(`${ROOT} .DateTimeField-trigger`).click()
-  const hourList = page.locator(`${ROOT} .HourList`)
-  await expect(hourList).toHaveAttribute('role', 'listbox')
-  const label = await hourList.getAttribute('aria-label')
+  const hourWheel = page.locator(`${ROOT} .Wheel[data-segment="hour"]`)
+  await expect(hourWheel).toHaveAttribute('role', 'spinbutton')
+  const label = await hourWheel.getAttribute('aria-label')
   expect(label?.length).toBeGreaterThan(0)
 })
 
-test('clicking an hour option updates the hour segment', async ({ page }) => {
+test('ArrowDown on the hour wheel sets the hour segment', async ({ page }) => {
   await page.locator(`${ROOT} .DateTimeField-trigger`).click()
-  // Wait for HourList to be populated
-  await page.locator(`${ROOT} .HourList [role="option"]`).first().waitFor()
-
-  const hourOptions = page.locator(`${ROOT} .HourList [role="option"]`)
-  const targetOption = hourOptions.nth(5) // pick 5th hour
-  const expectedValue = await targetOption.evaluate(el => el.id.split('-').at(-1))
-  await targetOption.click()
-
+  const hourWheel = page.locator(`${ROOT} .Wheel[data-segment="hour"]`)
+  await hourWheel.focus()
+  await page.keyboard.press('ArrowDown')
+  await page.waitForTimeout(500) // snap animation
   const hourSeg = page.locator(`${ROOT} .Segment[data-segment="hour"]`)
-  const hourVal = await hourSeg.getAttribute('aria-valuenow')
-  expect(String(hourVal)).toBe(String(expectedValue))
+  await expect(hourSeg).not.toHaveAttribute('data-placeholder')
+  expect(await hourSeg.getAttribute('aria-valuenow')).not.toBeNull()
 })
 
-test('ArrowDown in hour listbox moves selection', async ({ page }) => {
+// ─── AM/PM toggle ───────────────────────────────────────────────────────────────
+
+test('AM/PM toggle is hidden in the 24h (sv-SE) locale', async ({ page }) => {
   await page.locator(`${ROOT} .DateTimeField-trigger`).click()
-  const hourList = page.locator(`${ROOT} .HourList`)
-  await hourList.focus()
-  const beforeActive = await hourList.getAttribute('aria-activedescendant')
-  await page.keyboard.press('ArrowDown')
-  const afterActive = await hourList.getAttribute('aria-activedescendant')
-  // active-descendant should have changed (or be set if it was unset)
-  expect(afterActive).toBeTruthy()
+  await expect(page.locator(`${ROOT} .DateTimeField-ampm`)).toBeHidden()
+})
+
+test('AM/PM toggle is shown and drives the hour in a 12h locale', async ({ page }) => {
+  const TWELVE = '[data-component="DateTimeField"][data-id="dtf-12h"]'
+  await page.locator(`${TWELVE}`).scrollIntoViewIfNeeded()
+  await page.locator(`${TWELVE} .DateTimeField-trigger`).click()
+
+  const toggle = page.locator(`${TWELVE} .DateTimeField-ampm`)
+  await expect(toggle).toBeVisible()
+  const native = page.locator(`${TWELVE} .DateTimeField-native`)
+
+  // Seeded value 14:35 → PM active. Switch to AM → hour drops by 12 (02:35).
+  await expect(native).toHaveValue('2026-05-27T14:35')
+  await page.locator(`${TWELVE} .DateTimeField-ampm-option[data-ampm="0"]`).click()
+  await expect(native).toHaveValue('2026-05-27T02:35')
+  await expect(page.locator(`${TWELVE} .DateTimeField-ampm-option[data-ampm="0"]`)).toHaveAttribute('aria-pressed', 'true')
 })
 
 // ─── "Nu" button ──────────────────────────────────────────────────────────────

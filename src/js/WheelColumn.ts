@@ -25,9 +25,9 @@ const WHEEL_MIN_DELTA = 15  // rows/event — below this we treat it as inertia 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function readRowHeight(el: HTMLElement): number {
-  let raw = getComputedStyle(el).getPropertyValue('--tf-wheel-row-height').trim()
+  let raw = getComputedStyle(el).getPropertyValue('--wheel-row-height').trim()
   if (!raw) {
-    raw = getComputedStyle(document.documentElement).getPropertyValue('--tf-wheel-row-height').trim()
+    raw = getComputedStyle(document.documentElement).getPropertyValue('--wheel-row-height').trim()
   }
   const parsed = parseFloat(raw)
   return isNaN(parsed) ? 38 : parsed
@@ -109,20 +109,20 @@ class WheelColumn {
     }
 
     this.ring = document.createElement('div')
-    this.ring.className = 'TimeField-popup-ring'
+    this.ring.className = 'Wheel-ring'
     this.ring.style.transformStyle = 'preserve-3d'
     this.ring.style.transform = `translateZ(${-this.radius}px)`
 
     for (let o = -HALF; o <= HALF; o++) {
       const slotEl = document.createElement('div')
-      slotEl.className = 'TimeField-popup-option'
+      slotEl.className = 'Wheel-option'
       slotEl.setAttribute('aria-hidden', 'true')
       this.ring.appendChild(slotEl)
       this.slots.push({ el: slotEl, o })
     }
 
     const band = document.createElement('div')
-    band.className = 'TimeField-popup-band'
+    band.className = 'Wheel-band'
 
     this.el.appendChild(this.ring)
     this.el.appendChild(band)
@@ -234,7 +234,7 @@ class WheelColumn {
 
   private _onClick = (e: MouseEvent): void => {
     if (this._destroyed) return
-    const option = (e.target as HTMLElement).closest<HTMLElement>('.TimeField-popup-option')
+    const option = (e.target as HTMLElement).closest<HTMLElement>('.Wheel-option')
     if (!option) return
 
     const text = option.textContent?.trim()

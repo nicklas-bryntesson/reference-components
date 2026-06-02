@@ -15,6 +15,7 @@ import {
 } from '../../../utils/dates'
 import { readLocale, resolveLocale } from '../../../utils/locale'
 import { calculatePopupOffset, calculateArrowOffset, detectDirection } from '../../../js/popup-position'
+import WheelColumn from '../../../js/WheelColumn'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -112,6 +113,7 @@ export class DateTimeField {
   calendarTemplate: HTMLTemplateElement | null
 
   calendarEl: HTMLElement | null
+  private _wheels: Map<'hour' | 'minute' | 'second', WheelColumn> = new Map()
   selectedDatetime: Date | null
   currentYear: number
   currentMonth: number
@@ -365,10 +367,6 @@ export class DateTimeField {
     window.removeEventListener('resize', this._handleResize)
     if (this._rafHandle) cancelAnimationFrame(this._rafHandle)
     this._closeCalendar(false)
-    if ((this as any)._timeColumnsAbort) {
-      (this as any)._timeColumnsAbort.abort()
-      delete (this as any)._timeColumnsAbort
-    }
     delete this.root.__dateTimeFieldInstance
   }
 
@@ -795,7 +793,7 @@ export class DateTimeField {
     }
 
     this._renderMonth()
-    this._renderTimeColumns()
+    this._setupTimeWheels()
     this._bindCalendarEvents()
 
     this.calendarEl.querySelector<HTMLElement>('.CalendarGrid td:not([data-outside-month]):not([aria-disabled]) button, .CalendarFooterToday')?.focus()
@@ -807,6 +805,8 @@ export class DateTimeField {
       document.removeEventListener('click', this._outsideClickHandler)
       this._outsideClickHandler = null
     }
+    this._wheels.forEach(w => w.destroy())
+    this._wheels.clear()
     this.calendarEl.remove()
     this.calendarEl = null
     this.root.removeAttribute('data-open')
@@ -975,7 +975,6 @@ export class DateTimeField {
       const now = new Date()
       this.selectedDatetime = now
       this._syncSegmentsFromDatetime(now)
-      this._renderTimeColumns()
       this._closeCalendar()
     })
 
@@ -1149,106 +1148,53 @@ export class DateTimeField {
     this._closePicker()
   }
 
-  _renderTimeColumns(): void {
+  // ─── Time wheels (shared 3D spinner, same as TimeField) ──────────────────────
+
+  _setupTimeWheels(): void {
     if (!this.calendarEl) return
+    this._wheels.forEach(w => w.destroy())
+    this._wheels.clear()
 
-    // Clean up listeners from previous render
-    if ((this as any)._timeColumnsAbort) {
-      (this as any)._timeColumnsAbort.abort()
+    const is12 = this._is12h()
+    const h = this.selectedDatetime ? this.selectedDatetime.getHours() : null
+    const hourVal = h === null ? null : (is12 ? (h === 0 ? 12 : h > 12 ? h - 12 : h) : h)
+    const initial: Record<'hour' | 'minute' | 'second', number | null> = {
+      hour: hourVal,
+      minute: this.selectedDatetime ? this.selectedDatetime.getMinutes() : null,
+      second: this.selectedDatetime ? this.selectedDatetime.getSeconds() : null,
     }
-    const timeAbort = new AbortController()
-    ;(this as any)._timeColumnsAbort = timeAbort
 
-    const hourList = this.calendarEl.querySelector<HTMLElement>('.HourList')!
-    const minuteList = this.calendarEl.querySelector<HTMLElement>('.MinuteList')!
-    const secondList = this.calendarEl.querySelector<HTMLElement>('.SecondList')
-    const ampmList = this.calendarEl.querySelector<HTMLElement>('.AmPmList')
+    const types: Array<'hour' | 'minute' | 'second'> = ['hour', 'minute']
+    if (this._showSeconds()) types.push('second')
 
-    const currentH = this.selectedDatetime ? this.selectedDatetime.getHours() : -1
-    const currentM = this.selectedDatetime ? this.selectedDatetime.getMinutes() : -1
-    const currentS = this.selectedDatetime ? this.selectedDatetime.getSeconds() : -1
+    // Hide the seconds wheel host when seconds are off
+    const secondHost = this.calendarEl.querySelector<HTMLElement>('.Wheel[data-segment="second"]')
+    if (secondHost) secondHost.style.display = this._showSeconds() ? '' : 'none'
 
-    const renderList = (
-      list: HTMLElement,
-      values: { value: number; label: string }[],
-      selectedValue: number,
-      idPrefix: string,
-      ariaLabel: string
-    ) => {
-      list.setAttribute('role', 'listbox')
-      list.setAttribute('aria-label', ariaLabel)
-      list.setAttribute('tabindex', '0')
-      list.innerHTML = ''
-      let activeId = ''
-      values.forEach(({ value, label }) => {
-        const li = document.createElement('li')
-        li.setAttribute('role', 'option')
-        li.id = `${this.fieldId}-${idPrefix}-${value}`
-        const isSelected = value === selectedValue
-        li.setAttribute('aria-selected', String(isSelected))
-        li.textContent = label
-        if (isSelected) activeId = li.id
-        li.addEventListener('click', () => this._selectTimeValue(idPrefix as 'hour' | 'minute' | 'second' | 'ampm', value))
-        list.appendChild(li)
+    types.forEach(type => {
+      const host = this.calendarEl!.querySelector<HTMLElement>(`.Wheel[data-segment="${type}"]`)
+      if (!host) return
+      host.id = `${this.fieldId}-wheel-${type}`
+      host.setAttribute('aria-label', type === 'hour' ? this.t.hours : type === 'minute' ? this.t.minutes : this.t.seconds)
+      const { min, max } = this._getSegmentLimits(type)
+      const wheel = new WheelColumn(host, {
+        min, max,
+        value: initial[type],
+        onChange: (value: number) => this._onWheelChange(type, value),
       })
-      if (activeId) {
-        list.setAttribute('aria-activedescendant', activeId)
-        list.querySelector<HTMLElement>('[aria-selected="true"]')?.scrollIntoView({ block: 'center' })
-      }
-      list.addEventListener('keydown', (e) => this._handleTimeListKey(e, list, idPrefix as 'hour' | 'minute' | 'second' | 'ampm'), { signal: timeAbort.signal })
-    }
+      this._wheels.set(type, wheel)
+      host.addEventListener('keydown', (e: KeyboardEvent) => {
+        if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+          e.preventDefault()
+          wheel.stepBy(e.key === 'ArrowDown' ? 1 : -1)
+        }
+      })
+    })
 
-    const maxH = this._is12h() ? 12 : 23
-    const minH = this._is12h() ? 1 : 0
-
-    renderList(
-      hourList,
-      Array.from({ length: maxH - minH + 1 }, (_, i) => ({
-        value: minH + i,
-        label: String(minH + i).padStart(2, '0'),
-      })),
-      this._is12h() ? (currentH === 0 ? 12 : currentH > 12 ? currentH - 12 : currentH) : currentH,
-      'hour',
-      this.t.hours
-    )
-
-    renderList(
-      minuteList,
-      Array.from({ length: 60 }, (_, i) => ({ value: i, label: String(i).padStart(2, '0') })),
-      currentM,
-      'minute',
-      this.t.minutes
-    )
-
-    if (secondList && this._showSeconds()) {
-      secondList.style.display = ''
-      renderList(
-        secondList,
-        Array.from({ length: 60 }, (_, i) => ({ value: i, label: String(i).padStart(2, '0') })),
-        currentS,
-        'second',
-        this.t.seconds
-      )
-    } else if (secondList) {
-      secondList.style.display = 'none'
-    }
-
-    if (ampmList && this._is12h()) {
-      ampmList.style.display = ''
-      const ampmValue = currentH >= 12 ? 1 : 0
-      renderList(
-        ampmList,
-        [{ value: 0, label: this.t.am }, { value: 1, label: this.t.pm }],
-        ampmValue,
-        'ampm',
-        `${this.t.am}/${this.t.pm}`
-      )
-    } else if (ampmList) {
-      ampmList.style.display = 'none'
-    }
+    this._setupAmpmToggle()
   }
 
-  _selectTimeValue(type: 'hour' | 'minute' | 'second' | 'ampm', value: number): void {
+  _onWheelChange(type: 'hour' | 'minute' | 'second', value: number): void {
     const base = this.selectedDatetime ? new Date(this.selectedDatetime) : new Date()
     if (type === 'hour') {
       if (this._is12h()) {
@@ -1261,41 +1207,51 @@ export class DateTimeField {
       base.setMinutes(value)
     } else if (type === 'second') {
       base.setSeconds(value)
-    } else if (type === 'ampm') {
-      const h = base.getHours()
-      if (value === 0 && h >= 12) base.setHours(h - 12)
-      if (value === 1 && h < 12) base.setHours(h + 12)
     }
     this.selectedDatetime = base
     this._syncSegmentsFromDatetime(base)
-    this._renderTimeColumns()
+    this._updateAmpmToggle()
   }
 
-  _handleTimeListKey(e: KeyboardEvent, list: HTMLElement, type: 'hour' | 'minute' | 'second' | 'ampm'): void {
-    const items = Array.from(list.querySelectorAll<HTMLElement>('[role="option"]'))
-    const activeId = list.getAttribute('aria-activedescendant') ?? ''
-    const currentIdx = items.findIndex(li => li.id === activeId)
+  // ─── AM/PM toggle (12h only — a 2-state control, not a looping wheel) ────────
 
-    if (e.key === 'ArrowDown') {
-      e.preventDefault()
-      const next = items[(currentIdx + 1) % items.length]
-      if (next) {
-        list.setAttribute('aria-activedescendant', next.id)
-        next.scrollIntoView({ block: 'nearest' })
-        const value = Number(next.id.split('-').at(-1))
-        this._selectTimeValue(type, value)
-      }
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault()
-      const prev = items[(currentIdx - 1 + items.length) % items.length]
-      if (prev) {
-        list.setAttribute('aria-activedescendant', prev.id)
-        prev.scrollIntoView({ block: 'nearest' })
-        const value = Number(prev.id.split('-').at(-1))
-        this._selectTimeValue(type, value)
-      }
-    } else if (e.key === 'Escape') {
-      this._closeCalendar()
-    }
+  _setupAmpmToggle(): void {
+    if (!this.calendarEl) return
+    const toggle = this.calendarEl.querySelector<HTMLElement>('.DateTimeField-ampm')
+    if (!toggle) return
+    if (!this._is12h()) { toggle.hidden = true; return }
+
+    toggle.hidden = false
+    toggle.setAttribute('aria-label', `${this.t.am}/${this.t.pm}`)
+    toggle.innerHTML = ''
+    ;[{ v: 0, label: this.t.am }, { v: 1, label: this.t.pm }].forEach(({ v, label }) => {
+      const btn = document.createElement('button')
+      btn.type = 'button'
+      btn.className = 'DateTimeField-ampm-option'
+      btn.dataset.ampm = String(v)
+      btn.textContent = label
+      btn.addEventListener('click', () => this._selectAmpm(v))
+      toggle.appendChild(btn)
+    })
+    this._updateAmpmToggle()
+  }
+
+  _updateAmpmToggle(): void {
+    if (!this.calendarEl || !this._is12h()) return
+    const h = this.selectedDatetime ? this.selectedDatetime.getHours() : 0
+    const active = h >= 12 ? 1 : 0
+    this.calendarEl.querySelectorAll<HTMLButtonElement>('.DateTimeField-ampm-option').forEach(b => {
+      b.setAttribute('aria-pressed', String(Number(b.dataset.ampm) === active))
+    })
+  }
+
+  _selectAmpm(value: number): void {
+    const base = this.selectedDatetime ? new Date(this.selectedDatetime) : new Date()
+    const h = base.getHours()
+    if (value === 0 && h >= 12) base.setHours(h - 12)
+    if (value === 1 && h < 12) base.setHours(h + 12)
+    this.selectedDatetime = base
+    this._syncSegmentsFromDatetime(base)
+    this._updateAmpmToggle()
   }
 }

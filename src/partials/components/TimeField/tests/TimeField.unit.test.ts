@@ -57,9 +57,9 @@ function createTimeFieldEl(options: {
           <template data-template="timefield-popup">
             <div class="TimeField-popup" role="dialog" aria-modal="true" aria-label="Välj tid">
               <div class="TimeField-popup-columns">
-                <ul class="TimeField-popup-column" data-segment="hour" role="listbox" aria-label="Timmar" tabindex="0"></ul>
-                <ul class="TimeField-popup-column" data-segment="minute" role="listbox" aria-label="Minuter" tabindex="-1"></ul>
-                <ul class="TimeField-popup-column" data-segment="second" role="listbox" aria-label="Sekunder" tabindex="-1"></ul>
+                <ul class="Wheel" data-segment="hour" role="listbox" aria-label="Timmar" tabindex="0"></ul>
+                <ul class="Wheel" data-segment="minute" role="listbox" aria-label="Minuter" tabindex="-1"></ul>
+                <ul class="Wheel" data-segment="second" role="listbox" aria-label="Sekunder" tabindex="-1"></ul>
               </div>
               <div class="TimeField-popup-footer">
                 <button type="button" class="TimeField-popup-clear">Rensa</button>

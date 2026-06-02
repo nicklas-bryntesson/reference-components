@@ -9,6 +9,9 @@
 @import "./01-Setup/grid-breakout.css";
 @import "./kitchensink.css";
 
+/* Shared components */
+@import "./Wheel.css";
+
 /* Components */
 @import "./../../partials/components/DateField/DateField.css";
 @import "./../../partials/components/ToggleTip/ToggleTip.css";

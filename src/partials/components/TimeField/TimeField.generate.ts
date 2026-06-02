@@ -45,9 +45,9 @@ function canonical(id: string, label: string, rootAttrs: string, inputAttrs: str
       <template data-template="timefield-popup">
         <div class="TimeField-popup" role="dialog" aria-modal="true">
           <div class="TimeField-popup-columns">
-            <div class="TimeField-popup-column" data-segment="hour" role="spinbutton" tabindex="0"></div>
-            <div class="TimeField-popup-column" data-segment="minute" role="spinbutton" tabindex="-1"></div>
-            <div class="TimeField-popup-column" data-segment="second" role="spinbutton" tabindex="-1"></div>
+            <div class="Wheel" data-segment="hour" role="spinbutton" tabindex="0"></div>
+            <div class="Wheel" data-segment="minute" role="spinbutton" tabindex="-1"></div>
+            <div class="Wheel" data-segment="second" role="spinbutton" tabindex="-1"></div>
           </div>
           <div class="TimeField-popup-footer">
             <button type="button" class="TimeField-popup-clear"></button>

@@ -2,7 +2,7 @@
 
 import { calculatePopupOffset, calculateArrowOffset, detectDirection } from '../../../js/popup-position'
 import { readLocale, resolveLocale } from '../../../utils/locale'
-import WheelColumn, { type WheelColumnOptions } from './WheelColumn'
+import WheelColumn, { type WheelColumnOptions } from '../../../js/WheelColumn'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -724,7 +724,7 @@ class TimeField {
 
     // Localised labels (popup, wheel columns)
     this.popupEl.setAttribute('aria-label', this.t.popupLabel)
-    this.popupEl.querySelectorAll<HTMLElement>('.TimeField-popup-column').forEach(col => {
+    this.popupEl.querySelectorAll<HTMLElement>('.Wheel').forEach(col => {
       const type = col.dataset.segment as 'hour' | 'minute' | 'second' | undefined
       if (type) col.setAttribute('aria-label', this.t[type])
     })

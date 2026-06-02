@@ -416,38 +416,47 @@
 
 .DateTimeField-popup .TimeColumns {
   display: flex;
-  gap: 0;
+  align-items: center;
+  gap: 0.25rem;
+  padding-inline-start: 0.5rem;
+  margin-inline-start: 0.5rem;
   border-left: 1px solid var(--dtf-calendar-border-color);
 }
 
-.DateTimeField-popup .TimeList {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  overflow-y: auto;
-  max-height: 220px;
-  min-width: 48px;
-  scroll-snap-type: y mandatory;
+/* Wheels (hour/minute/second) get their look from the shared Wheel.css */
+
+/* AM/PM 2-state toggle (shown only in 12h locales) */
+.DateTimeField-popup .DateTimeField-ampm {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
 }
 
-.DateTimeField-popup .TimeList:focus {
-  outline: 2px solid var(--SITE--POPOVER--ACCENT);
-  outline-offset: -2px;
+.DateTimeField-popup .DateTimeField-ampm[hidden] {
+  display: none;
 }
 
-.DateTimeField-popup .TimeList [role="option"] {
-  padding: 6px 12px;
+.DateTimeField-popup .DateTimeField-ampm-option {
+  background: none;
+  border: 1px solid var(--dtf-calendar-border-color);
+  border-radius: 4px;
+  padding: 0.25rem 0.5rem;
   cursor: pointer;
-  text-align: center;
-  scroll-snap-align: center;
+  font: inherit;
 }
 
-.DateTimeField-popup .TimeList [role="option"][aria-selected="true"] {
+.DateTimeField-popup .DateTimeField-ampm-option:hover {
+  background-color: var(--SITE--POPOVER--HOVER-BG);
+}
+
+.DateTimeField-popup .DateTimeField-ampm-option:focus-visible {
+  outline: 2px solid var(--SITE--POPOVER--ACCENT);
+  outline-offset: 1px;
+}
+
+.DateTimeField-popup .DateTimeField-ampm-option[aria-pressed="true"] {
   background-color: var(--SITE--POPOVER--ACCENT);
   color: var(--SITE--POPOVER--ACCENT-TEXT);
+  border-color: var(--SITE--POPOVER--ACCENT);
   font-weight: bold;
-}
-
-.DateTimeField-popup .TimeList [role="option"]:hover:not([aria-selected="true"]) {
-  background-color: var(--SITE--POPOVER--HOVER-BG);
 }
