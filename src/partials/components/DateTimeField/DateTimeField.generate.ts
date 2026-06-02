@@ -53,6 +53,7 @@ function canonical(id: string, attrs: Record<string, string> = {}, locale = 'sv-
         <button type="button" class="CalendarFooterToday"></button>
         <button type="button" class="CalendarFooterNow"></button>
       </div>
+      <div class="arrow"></div>
     </div>
   </template>
   <div class="slideContainer"></div>
