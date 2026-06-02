@@ -1,11 +1,25 @@
 // src/partials/components/TimeField/TimeField.ts
 
 import { calculatePopupOffset, calculateArrowOffset, detectDirection } from '../../../js/popup-position'
+import { readLocale, resolveLocale } from '../../../utils/locale'
 import WheelColumn, { type WheelColumnOptions } from './WheelColumn'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type TimeSegmentType = 'hour' | 'minute' | 'second' | 'ampm'
+
+interface TranslationStrings {
+  hour: string
+  minute: string
+  second: string
+  ampm: string
+  ampmAm: string
+  ampmPm: string
+  openTimePicker: string
+  popupLabel: string
+  clearButton: string
+  nowButton: string
+}
 
 interface SegmentHandlers {
   keydown: (e: KeyboardEvent) => void
@@ -45,30 +59,6 @@ export function wrapValue(n: number, min: number, max: number): number {
 
 // ─── Locale helpers ───────────────────────────────────────────────────────────
 
-interface LocaleLabels {
-  hour: string
-  minute: string
-  second: string
-  ampm: string
-  ampmAm: string
-  ampmPm: string
-}
-
-const LABELS: Record<string, LocaleLabels> = {
-  'sv-SE': { hour: 'Timmar', minute: 'Minuter', second: 'Sekunder', ampm: 'FM eller EM', ampmAm: 'FM', ampmPm: 'EM' },
-  en: { hour: 'Hour', minute: 'Minute', second: 'Second', ampm: 'AM or PM', ampmAm: 'AM', ampmPm: 'PM' },
-}
-
-function getLabels(locale: string): LocaleLabels {
-  if (LABELS[locale]) return LABELS[locale]
-  // Match by language tag prefix
-  const lang = locale.split('-')[0]
-  for (const key of Object.keys(LABELS)) {
-    if (key.startsWith(lang)) return LABELS[key]!
-  }
-  return LABELS['en']!
-}
-
 function is12hLocale(locale: string): boolean {
   return new Intl.DateTimeFormat(locale, { hour: 'numeric' }).resolvedOptions().hour12 === true
 }
@@ -77,6 +67,24 @@ function is12hLocale(locale: string): boolean {
 
 class TimeField {
   static instanceCount = 0
+  static translations: Record<string, TranslationStrings> = {
+    en: {
+      hour: 'Hour', minute: 'Minute', second: 'Second',
+      ampm: 'AM or PM', ampmAm: 'AM', ampmPm: 'PM',
+      openTimePicker: 'Open time picker', popupLabel: 'Choose time',
+      clearButton: 'Clear', nowButton: 'Now',
+    },
+    sv: {
+      hour: 'Timmar', minute: 'Minuter', second: 'Sekunder',
+      ampm: 'FM eller EM', ampmAm: 'FM', ampmPm: 'EM',
+      openTimePicker: 'Öppna tidsväljare', popupLabel: 'Välj tid',
+      clearButton: 'Rensa', nowButton: 'Nu',
+    },
+  }
+
+  static registerLocale(locale: string, strings: Partial<TranslationStrings>): void {
+    TimeField.translations[locale] = { ...TimeField.translations.en, ...strings }
+  }
 
   // DOM refs
   root: HTMLElement
@@ -95,7 +103,7 @@ class TimeField {
   _segmentEls: HTMLSpanElement[]
   _digitBuffer: string
   _digitTimer: ReturnType<typeof setTimeout> | null
-  private _labels: LocaleLabels
+  t: TranslationStrings
   private _suppressEvents = false
   private popupEl: HTMLElement | null = null
   private _wheels: Map<string, WheelColumn> = new Map()
@@ -123,12 +131,12 @@ class TimeField {
     this.announce = el.querySelector<HTMLElement>('.TimeField-announce')!
 
     this.fieldId = el.dataset.id ?? `timefield-${this.instanceId}`
-    this.locale = el.dataset.locale || document.documentElement.lang || 'sv-SE'
+    this.locale = resolveLocale(readLocale(el), TimeField.translations)
     this.is12h = is12hLocale(this.locale)
     const step = parseInt(el.dataset.step ?? '60', 10)
     this.showSeconds = step < 60
 
-    this._labels = getLabels(this.locale)
+    this.t = TimeField.translations[this.locale]
     this._segmentEls = []
     this._digitBuffer = ''
     this._digitTimer = null
@@ -146,6 +154,9 @@ class TimeField {
 
     // Announce element
     this.announce.id = `${this.fieldId}-announce`
+
+    // Localised trigger label (template carries a fallback for the no-JS state)
+    this.trigger.setAttribute('aria-label', this.t.openTimePicker)
 
     // Touch detection
     const isTouch = (typeof window.matchMedia === 'function')
@@ -273,12 +284,12 @@ class TimeField {
     span.setAttribute('role', 'spinbutton')
     span.setAttribute('data-segment', type)
     span.setAttribute('tabindex', '-1')
-    span.setAttribute('aria-label', this._labels[type])
+    span.setAttribute('aria-label', this.t[type])
 
     if (type === 'ampm') {
       span.setAttribute('aria-valuenow', '0')
-      span.setAttribute('aria-valuetext', this._labels.ampmAm)
-      span.textContent = this._labels.ampmAm
+      span.setAttribute('aria-valuetext', this.t.ampmAm)
+      span.textContent = this.t.ampmAm
     } else {
       const { min, max } = this._getSegmentLimits(type)
       span.setAttribute('aria-valuemin', String(min))
@@ -438,7 +449,7 @@ class TimeField {
 
   _setAmpm(seg: HTMLSpanElement, value: number): void {
     // value: 0 = AM/FM, 1 = PM/EM
-    const label = value === 0 ? this._labels.ampmAm : this._labels.ampmPm
+    const label = value === 0 ? this.t.ampmAm : this.t.ampmPm
     seg.setAttribute('aria-valuenow', String(value))
     seg.setAttribute('aria-valuetext', label)
     seg.textContent = label
@@ -711,12 +722,21 @@ class TimeField {
     const clone = this._popupTemplate.content.cloneNode(true) as DocumentFragment
     this.popupEl = clone.querySelector<HTMLElement>('.TimeField-popup')!
 
+    // Localised labels (popup, wheel columns)
+    this.popupEl.setAttribute('aria-label', this.t.popupLabel)
+    this.popupEl.querySelectorAll<HTMLElement>('.TimeField-popup-column').forEach(col => {
+      const type = col.dataset.segment as 'hour' | 'minute' | 'second' | undefined
+      if (type) col.setAttribute('aria-label', this.t[type])
+    })
+
     // Footer button states
     this._updateClearButton()
 
     // Wire footer
     const clearBtn = this.popupEl.querySelector<HTMLButtonElement>('.TimeField-popup-clear')!
     const nowBtn = this.popupEl.querySelector<HTMLButtonElement>('.TimeField-popup-now')!
+    clearBtn.textContent = this.t.clearButton
+    nowBtn.textContent = this.t.nowButton
     clearBtn.addEventListener('click', () => this._handleClear())
     nowBtn.addEventListener('click', () => this._handleNow())
 

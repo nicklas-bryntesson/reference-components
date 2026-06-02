@@ -13,6 +13,7 @@ import {
   getSegmentOrder,
   type DateSegmentType,
 } from '../../../utils/dates'
+import { readLocale, resolveLocale } from '../../../utils/locale'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -63,7 +64,16 @@ class DateField {
       announceSelected: 'Selected date:', dateField: 'date field',
       clearButton: 'Clear', todayButton: 'Today',
       openPicker: 'Choose month and year', closePicker: 'Close month and year picker',
-    }
+    },
+    sv: {
+      day: 'Dag', month: 'Månad', year: 'År',
+      openCalendar: 'Öppna kalender', closeCalendar: 'Stäng kalender',
+      prevMonth: 'Föregående månad', nextMonth: 'Nästa månad',
+      today: 'idag', selected: 'valt', notAvailable: 'ej tillgängligt',
+      announceSelected: 'Valt datum:', dateField: 'datumfält',
+      clearButton: 'Rensa', todayButton: 'I dag',
+      openPicker: 'Välj månad och år', closePicker: 'Stäng månads- och årsväljaren',
+    },
   }
 
   // DOM refs
@@ -160,8 +170,7 @@ class DateField {
   }
 
   _resolveLocale(): string {
-    const loc = this.root.dataset.locale || document.documentElement.lang || 'en'
-    return DateField.translations[loc] ? loc : 'en'
+    return resolveLocale(readLocale(this.root), DateField.translations)
   }
 
   _parseDate(isoString: string): Date {

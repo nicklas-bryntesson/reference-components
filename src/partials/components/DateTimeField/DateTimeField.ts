@@ -13,6 +13,7 @@ import {
   getSegmentOrder,
   type DateSegmentType,
 } from '../../../utils/dates'
+import { readLocale, resolveLocale } from '../../../utils/locale'
 import { calculatePopupOffset, calculateArrowOffset, detectDirection } from '../../../js/popup-position'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -190,8 +191,7 @@ export class DateTimeField {
   }
 
   _resolveLocale(): string {
-    const loc = this.root.dataset.locale || document.documentElement.lang || 'en'
-    return DateTimeField.translations[loc] ? loc : 'en'
+    return resolveLocale(readLocale(this.root), DateTimeField.translations)
   }
 
   _parseDatetime(value: string): Date {
