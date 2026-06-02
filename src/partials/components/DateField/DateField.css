@@ -308,9 +308,22 @@
 .DateField-popup .YearMonthPicker .Wheel[data-picker="month"] { width: 8rem; }
 .DateField-popup .YearMonthPicker .Wheel[data-picker="year"] { width: 5rem; }
 
+/* Month/year picker trigger — padded + hover to read as interactive.
+   The label stays default text colour; only the chevron is accent-coloured. */
+.DateField-popup .MonthYearTrigger {
+  padding-inline: 0.5rem;
+  border-radius: 4px;
+}
+
+.DateField-popup .MonthYearTrigger:hover {
+  background-color: var(--SITE--POPOVER--HOVER-BG);
+}
+
 .DateField-popup .MonthYearTrigger::after {
   content: '›';
   display: inline-block;
+  margin-inline-start: 0.3rem;
+  color: var(--SITE--POPOVER--ACCENT);
   transform: rotate(90deg);
 }
 
