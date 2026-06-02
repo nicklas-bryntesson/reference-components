@@ -212,6 +212,29 @@ test('Escape from picker does not close calendar', async ({ page }) => {
   await expect(page.locator('.DateField-popup')).toBeVisible()
 })
 
+test('spinning the year wheel updates the underlying field', async ({ page }) => {
+  await page.locator('[data-id="birthdate"] .DateField-trigger').click()
+  await page.locator('[data-id="birthdate"] .MonthYearTrigger').click()
+  const native = page.locator('[data-id="birthdate"] .Native')
+  await expect(native).toHaveValue('') // birthdate starts empty
+  await page.locator('.DateField-popup .Wheel[data-picker="year"]').focus()
+  await page.keyboard.press('ArrowDown')
+  await page.waitForTimeout(500) // snap
+  await expect(native).not.toHaveValue('') // the wheel applied a date to the field
+})
+
+test('month wheel loops past the year boundary (Jan ↔ Dec)', async ({ page }) => {
+  await page.locator('[data-id="birthdate"] .DateField-trigger').click()
+  await page.locator('[data-id="birthdate"] .MonthYearTrigger').click()
+  const month = page.locator('.DateField-popup .Wheel[data-picker="month"]')
+  await month.focus()
+  const v0 = Number(await month.getAttribute('aria-valuenow'))
+  // Step up to 0, then once more — a looping wheel wraps to 11, a capped one stays at 0
+  for (let i = 0; i <= v0; i++) { await page.keyboard.press('ArrowUp'); await page.waitForTimeout(150) }
+  await page.waitForTimeout(400)
+  await expect(month).toHaveAttribute('aria-valuenow', '11')
+})
+
 test('axe: no violations in picker view', async ({ page }) => {
   await page.locator('[data-id="birthdate"] .DateField-trigger').click()
   await page.locator('[data-id="birthdate"] .MonthYearTrigger').click()

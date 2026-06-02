@@ -239,3 +239,25 @@ test('Escape from the picker returns to the calendar (keeps popup open)', async 
   await expect(page.locator(`${ROOT} [data-panel="picker"]`)).toHaveAttribute('data-active', 'false')
   await expect(page.locator(`${ROOT} .DateTimeField-popup`)).toBeVisible()
 })
+
+test('spinning the year wheel updates the underlying field', async ({ page }) => {
+  await page.locator(`${ROOT} .DateTimeField-trigger`).click()
+  await page.locator(`${ROOT} .MonthYearTrigger`).click()
+  const native = page.locator(`${ROOT} .DateTimeField-native`)
+  await expect(native).toHaveValue('') // meeting-time starts empty
+  await page.locator(`${ROOT} .Wheel[data-picker="year"]`).focus()
+  await page.keyboard.press('ArrowDown')
+  await page.waitForTimeout(500) // snap
+  await expect(native).not.toHaveValue('') // the wheel wrote the datetime to the field
+})
+
+test('month wheel loops past the year boundary (Jan ↔ Dec)', async ({ page }) => {
+  await page.locator(`${ROOT} .DateTimeField-trigger`).click()
+  await page.locator(`${ROOT} .MonthYearTrigger`).click()
+  const month = page.locator(`${ROOT} .Wheel[data-picker="month"]`)
+  await month.focus()
+  const v0 = Number(await month.getAttribute('aria-valuenow'))
+  for (let i = 0; i <= v0; i++) { await page.keyboard.press('ArrowUp'); await page.waitForTimeout(150) }
+  await page.waitForTimeout(400)
+  await expect(month).toHaveAttribute('aria-valuenow', '11')
+})

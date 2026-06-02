@@ -1103,12 +1103,29 @@ export class DateTimeField {
     monthHost.replaceChildren()
     yearHost.replaceChildren()
 
+    // Spinning a wheel updates the field live (same as the time wheels): rebuild
+    // the date part on selectedDatetime, preserving the time and clamping the day,
+    // defaulting to now when nothing is selected yet. Month loops (Dec↔Jan); year
+    // stays capped at min/max.
+    const applyPickerDate = (year: number, month: number): void => {
+      const base = this.selectedDatetime ? new Date(this.selectedDatetime) : new Date()
+      const next = new Date(
+        year, month, clampDayToMonth(year, month, base.getDate()),
+        base.getHours(), base.getMinutes(), base.getSeconds(),
+      )
+      this.selectedDatetime = next
+      this.currentYear = next.getFullYear()
+      this.currentMonth = next.getMonth()
+      this._syncSegmentsFromDatetime(next)
+      this._renderMonth()
+    }
+
     monthHost.id = `${this.fieldId}-picker-month`
     monthHost.setAttribute('aria-label', this.t.month)
     this._pickerWheels.set('month', new WheelColumn(monthHost, {
-      min: 0, max: 11, value: this.currentMonth, loop: false,
+      min: 0, max: 11, value: this.currentMonth, loop: true,
       format: (v) => getMonthName(this.currentYear, v, this.locale),
-      onChange: (m) => { this.currentMonth = m; this._renderMonth() },
+      onChange: (m) => applyPickerDate(this.currentYear, m),
     }))
 
     yearHost.id = `${this.fieldId}-picker-year`
@@ -1116,7 +1133,7 @@ export class DateTimeField {
     this._pickerWheels.set('year', new WheelColumn(yearHost, {
       min: minYear, max: maxYear, value: this.currentYear, loop: false,
       format: (v) => String(v),
-      onChange: (y) => { this.currentYear = y; this._renderMonth() },
+      onChange: (y) => applyPickerDate(y, this.currentMonth),
     }))
 
     this._setPanel('picker')

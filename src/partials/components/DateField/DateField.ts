@@ -773,10 +773,21 @@ class DateField {
 
     monthHost.id = `${this.fieldId}-picker-month`
     monthHost.setAttribute('aria-label', this.t.month)
+    // Spinning a wheel applies the date live (like the time wheels update the
+    // field), defaulting the day to today when nothing is selected yet. Month
+    // loops (Dec↔Jan); year stays capped at min/max.
+    const applyPickerDate = (year: number, month: number): void => {
+      const refDay = this.selectedDate ? this.selectedDate.getDate() : new Date().getDate()
+      this.currentYear = year
+      this.currentMonth = month
+      this._applyDate(new Date(year, month, clampDayToMonth(year, month, refDay)))
+      this._renderMonth()
+    }
+
     this._pickerWheels.set('month', new WheelColumn(monthHost, {
-      min: 0, max: 11, value: this.currentMonth, loop: false,
+      min: 0, max: 11, value: this.currentMonth, loop: true,
       format: (v) => getMonthName(this.currentYear, v, this.locale),
-      onChange: (m) => { this.currentMonth = m; this._renderMonth() },
+      onChange: (m) => applyPickerDate(this.currentYear, m),
     }))
 
     yearHost.id = `${this.fieldId}-picker-year`
@@ -784,7 +795,7 @@ class DateField {
     this._pickerWheels.set('year', new WheelColumn(yearHost, {
       min: minYear, max: maxYear, value: this.currentYear, loop: false,
       format: (v) => String(v),
-      onChange: (y) => { this.currentYear = y; this._renderMonth() },
+      onChange: (y) => applyPickerDate(y, this.currentMonth),
     }))
 
     this._setPanel('picker')
