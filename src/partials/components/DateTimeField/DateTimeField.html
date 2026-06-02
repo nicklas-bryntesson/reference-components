@@ -18,16 +18,16 @@
       <tr>
         <th scope="row">empty</th>
         <td>{{> components/DateTimeField/states/_default}}</td>
-        <td>{{> components/DateTimeField/states/_default}}</td>
-        <td>{{> components/DateTimeField/states/_default}}</td>
-        <td>{{> components/DateTimeField/states/_default}}</td>
+        <td>{{> components/DateTimeField/states/_default-hover}}</td>
+        <td>{{> components/DateTimeField/states/_default-focus}}</td>
+        <td>{{> components/DateTimeField/states/_default-active}}</td>
       </tr>
       <tr>
         <th scope="row">filled</th>
         <td>{{> components/DateTimeField/states/_filled}}</td>
-        <td>{{> components/DateTimeField/states/_filled}}</td>
-        <td>{{> components/DateTimeField/states/_filled}}</td>
-        <td>{{> components/DateTimeField/states/_filled}}</td>
+        <td>{{> components/DateTimeField/states/_filled-hover}}</td>
+        <td>{{> components/DateTimeField/states/_filled-focus}}</td>
+        <td>{{> components/DateTimeField/states/_filled-active}}</td>
       </tr>
     </tbody>
   </table>
@@ -89,5 +89,33 @@
   <div>
     {{> components/DateTimeField/states/_live-demo}}
   </div>
+
+  <!-- ─── Native reference ───────────────────────────────────────────────── -->
+  <h3>Native reference</h3>
+  <p>Browser-native <code>&lt;input type="datetime-local"&gt;</code> for comparing against the custom component on real devices. 12-/24-hour display follows the device locale, not an attribute — the <code>lang="en-US"</code> row only switches to AM/PM in browsers that honour <code>lang</code> (many use the OS locale instead).</p>
+  <table class="state-table">
+    <tbody>
+      <tr>
+        <th scope="row">default</th>
+        <td>{{> components/DateTimeField/states/_native-default}}</td>
+      </tr>
+      <tr>
+        <th scope="row">with seconds</th>
+        <td>{{> components/DateTimeField/states/_native-seconds}}</td>
+      </tr>
+      <tr>
+        <th scope="row">15-min step</th>
+        <td>{{> components/DateTimeField/states/_native-step}}</td>
+      </tr>
+      <tr>
+        <th scope="row">lang="en-US"</th>
+        <td>{{> components/DateTimeField/states/_native-lang-en}}</td>
+      </tr>
+      <tr>
+        <th scope="row">disabled</th>
+        <td>{{> components/DateTimeField/states/_native-disabled}}</td>
+      </tr>
+    </tbody>
+  </table>
 
 </section>

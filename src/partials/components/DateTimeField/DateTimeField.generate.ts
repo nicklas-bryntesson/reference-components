@@ -61,7 +61,13 @@ function canonical(id: string, attrs: Record<string, string> = {}, locale = 'sv-
 
 const states: { name: string; id: string; attrs: Record<string, string>; locale?: string }[] = [
   { name: '_default', id: 'dtf-default', attrs: {} },
+  { name: '_default-hover',  id: 'dtf-default-hover',  attrs: { 'data-test-state': 'hover' } },
+  { name: '_default-focus',  id: 'dtf-default-focus',  attrs: { 'data-test-state': 'focus' } },
+  { name: '_default-active', id: 'dtf-default-active', attrs: { 'data-test-state': 'active' } },
   { name: '_filled', id: 'dtf-filled', attrs: { 'data-value': '2026-05-27T14:35' } },
+  { name: '_filled-hover',  id: 'dtf-filled-hover',  attrs: { 'data-value': '2026-05-27T14:35', 'data-test-state': 'hover' } },
+  { name: '_filled-focus',  id: 'dtf-filled-focus',  attrs: { 'data-value': '2026-05-27T14:35', 'data-test-state': 'focus' } },
+  { name: '_filled-active', id: 'dtf-filled-active', attrs: { 'data-value': '2026-05-27T14:35', 'data-test-state': 'active' } },
   { name: '_disabled-empty', id: 'dtf-disabled-empty', attrs: { 'data-disabled': '' } },
   { name: '_disabled-filled', id: 'dtf-disabled-filled', attrs: { 'data-disabled': '', 'data-value': '2026-05-27T14:35' } },
   { name: '_invalid-empty', id: 'dtf-invalid-empty', attrs: { 'data-invalid': '' } },
@@ -78,4 +84,22 @@ states.forEach(({ name, id, attrs, locale }) => {
   writeFileSync(resolve(statesDir, `${name}.hbs`), content)
 })
 
+// Native reference partials (no DateTimeField wrapper) — the browser's built-in
+// <input type="datetime-local"> for each variant, to compare native vs custom
+// on real devices.
+const nativeInput = (file: string, label: string, attrs: string): void => {
+  const id = `dtf-native-${file}`
+  writeFileSync(
+    resolve(statesDir, `_native-${file}.hbs`),
+    `<label for="${id}">${label}</label>\n<input type="datetime-local" id="${id}" name="${id}"${attrs} />\n`,
+  )
+  console.log(`  _native-${file}.hbs`)
+}
+
 console.log(`Generated ${states.length} state partials in ${statesDir}`)
+nativeInput('default', 'Datum och tid', ' min="1900-01-01T00:00" max="2100-12-31T23:59" value="2026-05-27T14:35"')
+nativeInput('seconds', 'Datum och tid (sekunder)', ' step="1" value="2026-05-27T14:35:30"')
+nativeInput('step', 'Datum och tid (15-min steg)', ' step="900" value="2026-05-27T14:30"')
+// 12h is decided by the device locale, not an attribute — lang is only honoured by some browsers.
+nativeInput('lang-en', 'Datum och tid (lang="en-US")', ' lang="en-US" value="2026-05-27T14:35"')
+nativeInput('disabled', 'Datum och tid', ' value="2026-05-27T14:35" disabled')
