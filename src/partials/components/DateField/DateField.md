@@ -20,7 +20,7 @@ An accessible date input that renders editable day, month, and year segments wit
     <div class="Segments" role="group">
       <button
         type="button"
-        class="Trigger"
+        class="DateField-trigger"
         aria-label="Open calendar"
         aria-expanded="false"
         aria-haspopup="dialog"
@@ -36,22 +36,23 @@ An accessible date input that renders editable day, month, and year segments wit
     <div class="slideContainer">
       <template data-template="datefield-calendar">
         <div class="DateField-popup" role="dialog" aria-modal="true">
-          <span class="CalendarSurface" aria-hidden="true"><span class="BackdropBlur"></span></span>
           <div class="CalendarHeader">
             <button type="button" class="PrevMonth">&#8249;</button>
             <button type="button" class="MonthYearTrigger" aria-haspopup="listbox" aria-expanded="false"></button>
             <button type="button" class="NextMonth">&#8250;</button>
           </div>
-          <table class="Grid" role="grid">
-            <thead><tr role="row">
-              <th scope="col"></th><th scope="col"></th><th scope="col"></th>
-              <th scope="col"></th><th scope="col"></th><th scope="col"></th><th scope="col"></th>
-            </tr></thead>
-            <tbody></tbody>
-          </table>
-          <div class="YearMonthPicker" role="group">
-            <ul role="listbox" class="MonthList" tabindex="0"></ul>
-            <ul role="listbox" class="YearList" tabindex="0"></ul>
+          <div class="Panel" data-panel="calendar" data-active="true">
+            <table class="Grid" role="grid">
+              <thead><tr role="row">
+                <th scope="col"></th><th scope="col"></th><th scope="col"></th>
+                <th scope="col"></th><th scope="col"></th><th scope="col"></th><th scope="col"></th>
+              </tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <div class="Panel YearMonthPicker" role="group" data-panel="picker" data-active="false">
+            <div class="Wheel" data-picker="month" tabindex="0"></div>
+            <div class="Wheel" data-picker="year" tabindex="0"></div>
           </div>
           <div class="CalendarFooter">
             <button type="button" class="CalendarFooterClear"></button>
@@ -66,7 +67,7 @@ An accessible date input that renders editable day, month, and year segments wit
 </div>
 ```
 
-`FIELD_ID` must be unique on the page and must match both `data-id` and the `<label for>`. `data-locale` controls segment labels and calendar month/weekday names. `data-min` and `data-max` define the selectable date range (ISO 8601). JS injects the segment spans into `.Segments` and clones the calendar dialog from the `<template>` into `.slideContainer` — do not author the segment spans or the cloned calendar outside the template. The SVG icon, the `<template>` structure, and its contents are all authored markup. The `aria-label` on `.Trigger` is a placeholder; JS overwrites it with a localised string derived from `data-locale` — port it to your translation system rather than hardcoding a value.
+`FIELD_ID` must be unique on the page and must match both `data-id` and the `<label for>`. `data-locale` controls segment labels and calendar month/weekday names. `data-min` and `data-max` define the selectable date range (ISO 8601). JS injects the segment spans into `.Segments` and clones the calendar dialog from the `<template>` into `.slideContainer` — do not author the segment spans or the cloned calendar outside the template. The SVG icon, the `<template>` structure, and its contents are all authored markup. The `aria-label` on `.DateField-trigger` is a placeholder; JS overwrites it with a localised string derived from `data-locale` — port it to your translation system rather than hardcoding a value.
 
 ## Behaviour
 
@@ -75,8 +76,8 @@ All observable outcomes are state changes on `data-*` attributes or DOM changes:
 - **Init:** JS reads `data-id`, `data-name`, `data-locale`, `data-min`, `data-max` from the root. It injects three editable segment spans (day, month, year) into `.Segments` and clones the calendar dialog from the `<template>` into `.slideContainer`.
 - **Segment editing (keyboard):** Arrow Up/Down increments/decrements the focused segment value. Left/Right moves focus between segments. Digit keys fill the segment; when the segment is complete it advances focus to the next. Delete/Backspace clears the segment.
 - **Segment editing (commit):** When all three segments are valid, JS writes the ISO date to the native input (`input.value = "YYYY-MM-DD"`) and fires a native `change` event.
-- **Calendar open:** Clicking `.Trigger` sets `aria-expanded="true"` on the trigger and makes the calendar dialog visible. The calendar renders the month grid for the current or selected date.
-- **Calendar navigation:** `.PrevMonth` / `.NextMonth` step the displayed month. `.MonthYearTrigger` toggles the year/month picker panel (`aria-expanded` on `.MonthYearTrigger`).
+- **Calendar open:** Clicking `.DateField-trigger` sets `aria-expanded="true"` on the trigger and makes the calendar dialog visible. The calendar renders the month grid for the current or selected date.
+- **Calendar navigation:** `.PrevMonth` / `.NextMonth` step the displayed month. `.MonthYearTrigger` toggles between the two panels: `.Panel[data-panel="calendar"]` (the grid) and `.Panel[data-panel="picker"]` (the month/year wheels). Only one panel has `data-active="true"` at a time. The two `.Wheel` elements (`data-picker="month"` / `"year"`) are upgraded by the `WheelColumn` kernel primitive to `role="spinbutton"` — see [`src/kernel/js/WheelColumn.md`](../../../kernel/js/WheelColumn.md).
 - **Calendar date selection:** Clicking a day cell commits the date, closes the calendar (`aria-expanded="false"`), and focuses the trigger.
 - **Calendar close (Escape):** Pressing Escape reverts any pending picker state and closes the calendar.
 - **Disabled:** When `data-disabled` is present on the root, all interaction is blocked (`pointer-events: none` via CSS). JS does not set this attribute — the server renders it.
@@ -87,7 +88,7 @@ All observable outcomes are state changes on `data-*` attributes or DOM changes:
 
 - `.Segments` has `role="group"` — groups the three segment spans as a logical unit.
 - Each segment span has `role="spinbutton"`, `aria-valuemin`, `aria-valuemax`, `aria-valuenow`, and `aria-label` (e.g. "dag", "månad", "år"). These are injected by JS.
-- `.Trigger` has `aria-expanded` (toggled by JS) and `aria-haspopup="dialog"`.
+- `.DateField-trigger` has `aria-expanded` (toggled by JS) and `aria-haspopup="dialog"`.
 - The calendar dialog has `role="dialog"` and `aria-modal="true"`.
 - `.Custom` has `aria-hidden="true"` — screen readers use the native input, not the custom segments.
 - `.Announce` has `aria-live="polite"` and `aria-atomic="true"` — date confirmations are announced after a short debounce.
@@ -122,6 +123,25 @@ All observable outcomes are state changes on `data-*` attributes or DOM changes:
 | Attribute | Set when |
 |-----------|----------|
 | `data-initialized` | Component has been mounted |
+
+## Kernel dependencies
+
+This component composes shared primitives from [`src/kernel/`](../../../kernel/README.md). Port and verify these once — they are not re-implemented per component.
+
+| Kernel module | Kind | Used for |
+|---|---|---|
+| [`js/WheelColumn`](../../../kernel/js/WheelColumn.md) | JS | month/year picker wheels |
+| [`js/popup-position`](../../../kernel/js/popup-position.md) | JS | calendar popover placement + arrow offset |
+| [`utils/dates`](../../../kernel/utils/dates.md) | JS | calendar maths, leap years, ISO formatting, segment order |
+| [`utils/locale`](../../../kernel/utils/locale.md) | JS | locale resolution |
+| [`css/Wheel.css`](../../../kernel/css/Wheel.md) | CSS | wheel visuals — required wherever `WheelColumn` runs |
+
+## Required site tokens
+
+The `--df-*` design tokens default to host-provided site tokens. A consumer must declare these (reference values live in [`src/css/site/01-Setup/tokens.css`](../../../css/site/01-Setup/tokens.css)); porting the component without them leaves colours and spacing unset.
+
+- `--MAX--WIDTH--SITE`, `--SITE--PADDING`
+- `--SITE--POPOVER--BG`, `--SITE--POPOVER--COLOR`, `--SITE--POPOVER--MUTED`, `--SITE--POPOVER--BORDER--COLOR`, `--SITE--POPOVER--RADIUS`, `--SITE--POPOVER--SHADOW`, `--SITE--POPOVER--PADDING`, `--SITE--POPOVER--HOVER-BG`, `--SITE--POPOVER--ACCENT`, `--SITE--POPOVER--ACCENT-TEXT`
 
 ## Manual accessibility testing
 

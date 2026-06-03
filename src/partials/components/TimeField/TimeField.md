@@ -64,6 +64,26 @@ All tokens are custom properties on `.TimeField`:
 | `--tf-option-bg-selected` | Selected option background |
 | `--tf-option-color-selected` | Selected option text color |
 
+## Kernel dependencies
+
+This component composes shared primitives from [`src/kernel/`](../../../kernel/README.md). Port and verify these once — they are not re-implemented per component.
+
+| Kernel module | Kind | Used for |
+|---|---|---|
+| [`js/WheelColumn`](../../../kernel/js/WheelColumn.md) | JS | hour/minute/second time wheels |
+| [`js/popup-position`](../../../kernel/js/popup-position.md) | JS | popover placement + arrow offset |
+| [`utils/locale`](../../../kernel/utils/locale.md) | JS | locale resolution + 12h/24h |
+| [`css/Wheel.css`](../../../kernel/css/Wheel.md) | CSS | wheel visuals — required wherever `WheelColumn` runs |
+
+`utils/dates` is **not** used — TimeField does its own time parsing (`parseTimeValue`, `formatSegment`, `wrapValue`).
+
+## Required site tokens
+
+The `--tf-*` tokens (see `## CSS tokens`) default to host-provided site tokens. A consumer must declare these (reference values live in [`src/css/site/01-Setup/tokens.css`](../../../css/site/01-Setup/tokens.css)):
+
+- `--SITE--PADDING`
+- `--SITE--POPOVER--BG`, `--SITE--POPOVER--COLOR`, `--SITE--POPOVER--MUTED`, `--SITE--POPOVER--BORDER--COLOR`, `--SITE--POPOVER--RADIUS`, `--SITE--POPOVER--SHADOW`, `--SITE--POPOVER--PADDING`, `--SITE--POPOVER--HOVER-BG`, `--SITE--POPOVER--ACCENT`, `--SITE--POPOVER--ACCENT-TEXT`
+
 ## Platform gotchas
 
 ### iOS: no seconds in the native picker
