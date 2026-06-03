@@ -1,6 +1,6 @@
 // src/partials/components/DateField/DateField.ts
 
-import { calculatePopupOffset, calculateArrowOffset, detectDirection } from '../../../js/popup-position'
+import { calculatePopupOffset, calculateArrowOffset, detectDirection } from '../../../kernel/js/popup-position'
 import {
   getDaysInMonth,
   clampDayToMonth,
@@ -12,9 +12,9 @@ import {
   getMonthName,
   getSegmentOrder,
   type DateSegmentType,
-} from '../../../utils/dates'
-import { readLocale, resolveLocale } from '../../../utils/locale'
-import WheelColumn from '../../../js/WheelColumn'
+} from '../../../kernel/utils/dates'
+import { readLocale, resolveLocale } from '../../../kernel/utils/locale'
+import WheelColumn from '../../../kernel/js/WheelColumn'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

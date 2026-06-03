@@ -1,8 +1,8 @@
 // src/partials/components/TimeField/TimeField.ts
 
-import { calculatePopupOffset, calculateArrowOffset, detectDirection } from '../../../js/popup-position'
-import { readLocale, resolveLocale } from '../../../utils/locale'
-import WheelColumn, { type WheelColumnOptions } from '../../../js/WheelColumn'
+import { calculatePopupOffset, calculateArrowOffset, detectDirection } from '../../../kernel/js/popup-position'
+import { readLocale, resolveLocale } from '../../../kernel/utils/locale'
+import WheelColumn, { type WheelColumnOptions } from '../../../kernel/js/WheelColumn'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

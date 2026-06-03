@@ -9,6 +9,7 @@ export default defineConfig({
   testMatch: [
     'tests/*.e2e.test.js',
     'src/partials/components/**/tests/*.e2e.test.js',
+    'src/kernel/**/tests/*.e2e.test.js',
   ],
   use: {
     baseURL: externalBase ?? 'http://localhost:5173',

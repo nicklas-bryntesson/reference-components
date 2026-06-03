@@ -1,6 +1,6 @@
 // src/partials/components/ToggleTip/ToggleTip.ts
 
-import { calculatePopupOffset, calculateArrowOffset, detectDirection } from '../../../js/popup-position'
+import { calculatePopupOffset, calculateArrowOffset, detectDirection } from '../../../kernel/js/popup-position'
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
