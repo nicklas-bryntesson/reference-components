@@ -36,9 +36,22 @@ Or run a specific component only:
 BASE_URL=http://localhost:5000 npx playwright test --grep "DateField"
 ```
 
+### Point the suite at your own page
+
+`BASE_URL` chooses *which server*. Two more env vars choose *where on that server* the suite looks (see `src/e2e-helpers/target.js`):
+
+- `TARGET_PATH` — the page the tests navigate to (default `/`). Set it when your demo lives elsewhere, e.g. `TARGET_PATH=/kitchen-sink`.
+- `TARGET_ID` — overrides the component root selector for the suites that target a single instance (DateTimeField, TimeField). DateField and FileUpload assume their canonical demo ids (see below) — render those on your page.
+
+```bash
+BASE_URL=http://localhost:5000 TARGET_PATH=/kitchen-sink npx playwright test
+```
+
+Axe checks are scoped to the component under test, so unrelated markup elsewhere on a shared demo page never fails a component's accessibility audit.
+
 ## What the tests expect
 
-Tests navigate to `/` and locate components by their `data-component` attribute and `data-id` / `data-initialized` state attributes. Your page needs to render the component with the correct HTML contract — see each component's `<Name>.md` for the required markup.
+Tests navigate to `TARGET_PATH` (default `/`) and locate components by their `data-component` attribute and `data-id` / `data-initialized` state attributes. Your page needs to render the component with the correct HTML contract — see each component's `<Name>.md` for the required markup.
 
 For **DateField**, the test target is `[data-id="birthdate"]`. Your page must include a DateField instance with that id.
 

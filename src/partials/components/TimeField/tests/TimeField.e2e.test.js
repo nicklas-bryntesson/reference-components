@@ -1,12 +1,14 @@
 // src/partials/components/TimeField/tests/TimeField.e2e.test.js
 import { test, expect } from '@playwright/test'
 import { checkA11y, injectAxe } from 'axe-playwright'
+import { targetPath, targetId, scopedCheckA11y } from '../../../../e2e-helpers/target.js'
 
-// DateTimeField also uses data-id="meeting-time" — scope to this component only
-const TF = '[data-component="TimeField"][data-id="meeting-time"]'
+// DateTimeField also uses data-id="meeting-time" — scope to this component only.
+// Override via TARGET_ID when porting the suite to your own page.
+const TF = targetId('TimeField')
 
 test.beforeEach(async ({ page }) => {
-  await page.goto('/')
+  await page.goto(targetPath())
   await page.locator(TF).scrollIntoViewIfNeeded()
   await page.locator(`${TF}[data-initialized]`).waitFor()
   await injectAxe(page)
@@ -183,7 +185,7 @@ test('passes axe on the kitchensink page', async ({ page }) => {
 test('passes axe with popup open', async ({ page }) => {
   await page.locator(`${TF} .TimeField-trigger`).click()
   await expect(page.locator('.TimeField-popup')).toBeVisible()
-  await checkA11y(page, undefined, {
+  await scopedCheckA11y(page, TF, {
     detailedReport: false,
     axeOptions: {
       runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa'] },

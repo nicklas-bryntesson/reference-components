@@ -1,10 +1,13 @@
 // tests/DateField.e2e.test.js
 import { test, expect } from '@playwright/test'
-import { checkA11y, injectAxe } from 'axe-playwright'
+import { injectAxe } from 'axe-playwright'
+import { targetPath, targetId, scopedCheckA11y } from '../../../../e2e-helpers/target.js'
+
+const TARGET = targetId('DateField')
 
 test.beforeEach(async ({ page }) => {
-  await page.goto('/')
-  await page.locator('[data-id="birthdate"]').scrollIntoViewIfNeeded()
+  await page.goto(targetPath())
+  await page.locator(TARGET).scrollIntoViewIfNeeded()
   await injectAxe(page)
 })
 
@@ -120,7 +123,7 @@ test('data-state="open" on root when calendar open', async ({ page }) => {
 })
 
 test('axe: zero violations on initial render', async ({ page }) => {
-  await checkA11y(page, '[data-id="birthdate"]', {
+  await scopedCheckA11y(page, TARGET, {
     axeOptions: { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa'] } }
   })
 })
@@ -128,7 +131,7 @@ test('axe: zero violations on initial render', async ({ page }) => {
 test('axe: zero violations with calendar open', async ({ page }) => {
   await page.locator('[data-id="birthdate"] .DateField-trigger').click()
   await expect(page.locator('.DateField-popup')).toBeVisible()
-  await checkA11y(page, undefined, {
+  await scopedCheckA11y(page, TARGET, {
     axeOptions: { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa'] } }
   })
   await page.keyboard.press('Escape')
@@ -247,7 +250,7 @@ test('month wheel loops past the year boundary (Jan ↔ Dec)', async ({ page }) 
 test('axe: no violations in picker view', async ({ page }) => {
   await page.locator('[data-id="birthdate"] .DateField-trigger').click()
   await page.locator('[data-id="birthdate"] .MonthYearTrigger').click()
-  await checkA11y(page)
+  await scopedCheckA11y(page, TARGET)
 })
 
 // ── Keyboard access (atomica11y: date-picker-dialog §1) ──────────────────────

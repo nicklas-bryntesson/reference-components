@@ -1,14 +1,15 @@
 // src/partials/components/DateTimeField/tests/DateTimeField.e2e.test.js
 import { test, expect } from '@playwright/test'
 import { checkA11y, injectAxe } from 'axe-playwright'
+import { targetPath, targetId } from '../../../../e2e-helpers/target.js'
 
 // Scope to the live-demo instance; the kitchensink renders many DateTimeFields,
-// only this one carries data-id="meeting-time". The standalone partial page has
-// no bootstrap script, so the component is exercised via the full app at '/'.
-const ROOT = '[data-component="DateTimeField"][data-id="meeting-time"]'
+// only this one carries data-id="meeting-time". Override via TARGET_ID when
+// porting the suite to your own page.
+const ROOT = targetId('DateTimeField')
 
 test.beforeEach(async ({ page }) => {
-  await page.goto('/')
+  await page.goto(targetPath())
   await page.locator(ROOT).scrollIntoViewIfNeeded()
   await page.locator(`${ROOT}[data-initialized]`).waitFor()
   await injectAxe(page)

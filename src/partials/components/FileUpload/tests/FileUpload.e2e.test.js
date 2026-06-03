@@ -3,11 +3,12 @@ import { test, expect } from '@playwright/test'
 import { checkA11y, injectAxe } from 'axe-playwright'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import { targetPath } from '../../../../e2e-helpers/target.js'
 
 const __dir = path.dirname(fileURLToPath(import.meta.url))
 
 test.beforeEach(async ({ page }) => {
-  await page.goto('/')
+  await page.goto(targetPath())
   await page.locator('[data-component="FileUpload"][data-initialized]').first().scrollIntoViewIfNeeded()
   await injectAxe(page)
 })
