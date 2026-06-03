@@ -463,6 +463,10 @@ class WheelColumn {
     const i = this._resolveIndex(value - this.opts.min)
     const target = i + this.count * Math.round((this.pos - i) / this.count)
 
+    // Set the value BEFORE rendering so aria-valuenow / aria-valuetext reflect it
+    // (render reads _currentValue). _externalSet prevents onChange from firing.
+    this._currentValue = value
+
     if (animate && !this._prefersReducedMotion()) {
       this._animateTo(target)
     } else {
@@ -471,8 +475,6 @@ class WheelColumn {
       this.render()
     }
 
-    // _commit is not called here — _externalSet prevents onChange if it were
-    this._currentValue = value
     this._externalSet = false
   }
 
@@ -485,8 +487,9 @@ class WheelColumn {
 
     const i = nextIndex
     const target = i + this.count * Math.round((this.pos - i) / this.count)
-    this._animateTo(target)
+    // Set before animating so the render inside _animateTo reflects the new value.
     this._currentValue = nextValue
+    this._animateTo(target)
   }
 
   get value(): number | null {

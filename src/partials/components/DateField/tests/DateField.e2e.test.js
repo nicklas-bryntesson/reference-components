@@ -1,10 +1,13 @@
 // tests/DateField.e2e.test.js
 import { test, expect } from '@playwright/test'
-import { checkA11y, injectAxe } from 'axe-playwright'
+import { injectAxe } from 'axe-playwright'
+import { targetPath, targetId, scopedCheckA11y } from '../../../../e2e-helpers/target.js'
+
+const TARGET = targetId('DateField')
 
 test.beforeEach(async ({ page }) => {
-  await page.goto('/')
-  await page.locator('[data-id="birthdate"]').scrollIntoViewIfNeeded()
+  await page.goto(targetPath())
+  await page.locator(TARGET).scrollIntoViewIfNeeded()
   await injectAxe(page)
 })
 
@@ -120,7 +123,7 @@ test('data-state="open" on root when calendar open', async ({ page }) => {
 })
 
 test('axe: zero violations on initial render', async ({ page }) => {
-  await checkA11y(page, '[data-id="birthdate"]', {
+  await scopedCheckA11y(page, TARGET, {
     axeOptions: { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa'] } }
   })
 })
@@ -128,7 +131,7 @@ test('axe: zero violations on initial render', async ({ page }) => {
 test('axe: zero violations with calendar open', async ({ page }) => {
   await page.locator('[data-id="birthdate"] .DateField-trigger').click()
   await expect(page.locator('.DateField-popup')).toBeVisible()
-  await checkA11y(page, undefined, {
+  await scopedCheckA11y(page, TARGET, {
     axeOptions: { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa'] } }
   })
   await page.keyboard.press('Escape')
@@ -156,6 +159,15 @@ test('MonthYearTrigger has aria-expanded true when picker open', async ({ page }
   await page.locator('[data-id="birthdate"] .MonthYearTrigger').click()
   const trigger = page.locator('.MonthYearTrigger')
   await expect(trigger).toHaveAttribute('aria-expanded', 'true')
+})
+
+test('MonthYearTrigger uses aria-controls (not aria-haspopup) for the picker', async ({ page }) => {
+  await page.locator('[data-id="birthdate"] .DateField-trigger').click()
+  const trigger = page.locator('[data-id="birthdate"] .MonthYearTrigger')
+  expect(await trigger.getAttribute('aria-haspopup')).toBeNull()
+  const controls = await trigger.getAttribute('aria-controls')
+  expect(controls).toBeTruthy()
+  await expect(page.locator(`#${controls}`)).toHaveAttribute('data-panel', 'picker')
 })
 
 test('month and year wheels are spinbuttons when picker opens', async ({ page }) => {
@@ -238,7 +250,7 @@ test('month wheel loops past the year boundary (Jan ↔ Dec)', async ({ page }) 
 test('axe: no violations in picker view', async ({ page }) => {
   await page.locator('[data-id="birthdate"] .DateField-trigger').click()
   await page.locator('[data-id="birthdate"] .MonthYearTrigger').click()
-  await checkA11y(page)
+  await scopedCheckA11y(page, TARGET)
 })
 
 // ── Keyboard access (atomica11y: date-picker-dialog §1) ──────────────────────

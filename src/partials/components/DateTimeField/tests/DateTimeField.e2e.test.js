@@ -1,14 +1,15 @@
 // src/partials/components/DateTimeField/tests/DateTimeField.e2e.test.js
 import { test, expect } from '@playwright/test'
 import { checkA11y, injectAxe } from 'axe-playwright'
+import { targetPath, targetId } from '../../../../e2e-helpers/target.js'
 
 // Scope to the live-demo instance; the kitchensink renders many DateTimeFields,
-// only this one carries data-id="meeting-time". The standalone partial page has
-// no bootstrap script, so the component is exercised via the full app at '/'.
-const ROOT = '[data-component="DateTimeField"][data-id="meeting-time"]'
+// only this one carries data-id="meeting-time". Override via TARGET_ID when
+// porting the suite to your own page.
+const ROOT = targetId('DateTimeField')
 
 test.beforeEach(async ({ page }) => {
-  await page.goto('/')
+  await page.goto(targetPath())
   await page.locator(ROOT).scrollIntoViewIfNeeded()
   await page.locator(`${ROOT}[data-initialized]`).waitFor()
   await injectAxe(page)
@@ -218,6 +219,15 @@ test('month/year picker opens as wheels', async ({ page }) => {
   await page.locator(`${ROOT} .MonthYearTrigger`).click()
   await expect(page.locator(`${ROOT} .Wheel[data-picker="month"]`)).toHaveAttribute('role', 'spinbutton')
   await expect(page.locator(`${ROOT} .Wheel[data-picker="year"]`)).toHaveAttribute('role', 'spinbutton')
+})
+
+test('MonthYearTrigger uses aria-controls (not aria-haspopup) for the picker', async ({ page }) => {
+  await page.locator(`${ROOT} .DateTimeField-trigger`).click()
+  const trigger = page.locator(`${ROOT} .MonthYearTrigger`)
+  expect(await trigger.getAttribute('aria-haspopup')).toBeNull()
+  const controls = await trigger.getAttribute('aria-controls')
+  expect(controls).toBeTruthy()
+  await expect(page.locator(`#${controls}`)).toHaveAttribute('data-panel', 'picker')
 })
 
 test('ArrowDown on the year wheel navigates the calendar', async ({ page }) => {

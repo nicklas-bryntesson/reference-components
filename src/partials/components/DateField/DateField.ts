@@ -607,6 +607,14 @@ class DateField {
     this.calendarEl.id = calId
     this.calendarEl.setAttribute('aria-labelledby', monthId)
     monthYearTrigger.id = monthId
+    // The trigger swaps an in-dialog panel of spinbutton wheels (not a listbox popup),
+    // so it carries aria-controls + aria-expanded — not aria-haspopup.
+    const pickerPanel = this.calendarEl.querySelector<HTMLElement>('[data-panel="picker"]')
+    if (pickerPanel) {
+      const pickerId = `${this.fieldId}-picker`
+      pickerPanel.id = pickerId
+      monthYearTrigger.setAttribute('aria-controls', pickerId)
+    }
     monthYearTrigger.setAttribute('aria-label', this.t.openPicker)
     monthYearTrigger.addEventListener('click', () => {
       if (this._isPickerActive()) {
