@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { calculatePopupOffset, calculateArrowOffset, detectDirection } from '../src/js/popup-position'
+import { calculatePopupOffset, calculateArrowOffset, detectDirection } from '../popup-position'
 
 describe('calculatePopupOffset', () => {
   it('centers bubble when trigger is in the middle of the container', () => {

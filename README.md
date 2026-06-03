@@ -22,6 +22,12 @@ Every component lives in `src/partials/components/<Name>/` and ships four things
 3. **`<Name>.ts`** — the implementation. Vanilla TypeScript, no framework. The logic you are porting.
 4. **`tests/`** — automated proof. Unit tests for pure logic, Playwright e2e tests for keyboard behaviour and ARIA structure, axe-playwright for WCAG 2 AA.
 
+## The kernel — shared primitives
+
+Some components share non-trivial behaviour: a 3D wheel that loops past the year boundary, popover positioning, locale-aware date maths. These live in `src/kernel/` (`js/`, `utils/`, `css/`) with their own contracts and conformance tests. Sharing them is a **correctness mechanism** — re-specifying a looping wheel per component is exactly how subtle bugs (Dec↔Jan wrap, leap years, min/max clamp) creep in.
+
+So the portable unit is **the kernel plus the components that compose it**, not a lone component. Each component's `.md` lists what it needs under `## Kernel dependencies`. Port and verify the kernel once; the components then stay thin and cannot drift in the shared behaviour. See [`src/kernel/README.md`](src/kernel/README.md).
+
 ## How to use this repo
 
 ```bash
@@ -44,6 +50,7 @@ Components are built against [atomica11y](https://www.atomica11y.com) acceptance
 |-----------|--------|
 | DateField | Reference implementation + full test suite |
 | DateTimeField | Reference implementation + full test suite |
+| TimeField | Reference implementation + full test suite |
 | FileUpload | Reference implementation + full test suite |
 | ToggleTip | Reference implementation |
 | Combobox | In progress |

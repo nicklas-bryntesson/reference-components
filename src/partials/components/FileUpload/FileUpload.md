@@ -30,6 +30,23 @@ Custom accessible file upload component wrapping a hidden native `input[type=fil
 
 `LABEL_ID` must be unique on the page. The `aria-labelledby` value must match the `id` of the label element.
 
+The file container has two forms, chosen by whether the native input has `multiple`:
+
+- **multiple:** `<ul class="FileUpload-list" aria-live="polite" aria-relevant="additions removals" aria-label="Selected files">` — each file is an `<li class="FileUpload-item">` (shown empty above).
+- **single:** `<div class="FileUpload-selected" aria-live="polite" aria-atomic="true">` — the file's spans and button render inline, with no `<li>` wrapper.
+
+JS renders the entries — do not author them. Each entry carries `data-status` (`valid` / `invalid-type` / `invalid-size`), a `data-entry-id`, and `data-source="server"` for server-seeded files:
+
+```html
+<li class="FileUpload-item" data-status="valid" data-entry-id="...">
+  <span class="FileUpload-item-name">report.pdf</span>
+  <span class="FileUpload-item-size">200 KB</span>
+  <span class="FileUpload-item-error" role="alert">File type not allowed</span> <!-- only when data-status is an error -->
+  <button type="button" class="FileUpload-item-remove" aria-label="Remove report.pdf">&#215;</button>
+  <input type="hidden" name="uploaded-ref" value="..."> <!-- only when data-source="server" -->
+</li>
+```
+
 ## Usage
 
 ```html
@@ -99,6 +116,10 @@ The server reads these hidden fields to know which previously-uploaded files to 
 - Per-file error spans use `role="alert"` for immediate error announcement
 - Focus management: removing a file focuses the next remove button, or the trigger if the list is empty
 - The component is keyboard-accessible: Tab → trigger → remove buttons, Enter/Space to activate
+
+## Kernel dependencies
+
+None. FileUpload composes no shared primitives from [`src/kernel/`](../../../kernel/README.md) and reads no `--SITE--*` tokens — its `--fu-*` tokens are self-contained. Port the component folder on its own.
 
 ## Manual accessibility testing
 

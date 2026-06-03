@@ -10,7 +10,7 @@
 @import "./kitchensink.css";
 
 /* Shared components */
-@import "./Wheel.css";
+@import "../../kernel/css/Wheel.css";
 
 /* Components */
 @import "./../../partials/components/DateField/DateField.css";

@@ -14,15 +14,52 @@ Custom accessible datetime input wrapping a hidden `input[type="datetime-local"]
 >
   <input type="datetime-local" class="DateTimeField-native" tabindex="-1" aria-hidden="true">
   <div class="DateTimeField-overlay">
-    <div class="Segments" role="group" aria-label="…"></div>
-    <button class="DateTimeField-trigger" type="button"><!-- icon --></button>
+    <div class="Segments" role="group"></div>
+    <button class="DateTimeField-trigger" type="button"><!-- calendar icon SVG --></button>
   </div>
   <template class="DateTimeField-calendarTemplate">
-    <!-- see DateTimeField.html for full template markup -->
+    <div class="DateTimeField-popup" role="dialog" aria-modal="true">
+      <div class="CalendarInner">
+        <div class="CalendarLeft">
+          <div class="CalendarHeader">
+            <button class="CalendarPrev" type="button">&#8249;</button>
+            <button class="MonthYearTrigger" type="button" aria-expanded="false"><span class="CalendarMonthYear"></span></button>
+            <button class="CalendarNext" type="button">&#8250;</button>
+          </div>
+          <div class="Panel" data-panel="calendar" data-active="true">
+            <table class="CalendarGrid" role="grid"></table>
+          </div>
+          <div class="Panel YearMonthPicker" role="group" data-panel="picker" data-active="false">
+            <div class="Wheel" data-picker="month" tabindex="0"></div>
+            <div class="Wheel" data-picker="year" tabindex="0"></div>
+          </div>
+        </div>
+        <div class="TimeColumns">
+          <div class="Wheel" data-segment="hour" tabindex="0"></div>
+          <div class="Wheel" data-segment="minute" tabindex="0"></div>
+          <div class="Wheel" data-segment="second" tabindex="0" style="display:none"></div>
+          <div class="DateTimeField-ampm" role="group" hidden></div>
+        </div>
+      </div>
+      <div class="CalendarFooter">
+        <button type="button" class="CalendarFooterClear"></button>
+        <button type="button" class="CalendarFooterToday"></button>
+        <button type="button" class="CalendarFooterNow"></button>
+      </div>
+      <div class="arrow"></div>
+    </div>
   </template>
   <div class="slideContainer"></div>
 </div>
 ```
+
+JS injects the segment spinbuttons into `.Segments` and the day cells into `.CalendarGrid`, and clones
+the `<template>` into `.slideContainer` on open — do not author those. The five `.Wheel` elements
+(two `data-picker` for month/year, three `data-segment` for hour/minute/second) are upgraded by the
+`WheelColumn` kernel primitive to `role="spinbutton"`; see
+[`src/kernel/js/WheelColumn.md`](../../../kernel/js/WheelColumn.md). The `data-panel="calendar"` and
+`data-panel="picker"` panels swap via `data-active`; the second segment and `.DateTimeField-ampm` stay
+hidden unless `data-step < 60` / a 12-hour locale applies.
 
 ## Attributes
 
@@ -61,8 +98,27 @@ Custom accessible datetime input wrapping a hidden `input[type="datetime-local"]
 - `.Segments` has `role="group"` with `aria-roledescription`
 - Each spinbutton has `aria-valuemin`, `aria-valuemax`, `aria-valuenow`, `aria-valuetext`
 - Popup is `role="dialog"` with `aria-modal="true"`
-- Time columns are `role="listbox"` with `aria-label`
+- Time columns are `.Wheel` spinbuttons — the `WheelColumn` primitive sets `role="spinbutton"` with `aria-valuemin`/`aria-valuemax`/`aria-valuenow`/`aria-valuetext` (not `listbox`)
 - `aria-disabled="true"` on all segments when disabled
+
+## Kernel dependencies
+
+This component composes shared primitives from [`src/kernel/`](../../../kernel/README.md). Port and verify these once — they are not re-implemented per component.
+
+| Kernel module | Kind | Used for |
+|---|---|---|
+| [`js/WheelColumn`](../../../kernel/js/WheelColumn.md) | JS | month/year picker wheels **and** hour/minute/second time wheels |
+| [`js/popup-position`](../../../kernel/js/popup-position.md) | JS | popover placement + arrow offset |
+| [`utils/dates`](../../../kernel/utils/dates.md) | JS | calendar maths, leap years, ISO datetime formatting, segment order |
+| [`utils/locale`](../../../kernel/utils/locale.md) | JS | locale resolution + 12h/24h |
+| [`css/Wheel.css`](../../../kernel/css/Wheel.md) | CSS | wheel visuals — required wherever `WheelColumn` runs |
+
+## Required site tokens
+
+The `--dtf-*` design tokens default to host-provided site tokens. A consumer must declare these (reference values live in [`src/css/site/01-Setup/tokens.css`](../../../css/site/01-Setup/tokens.css)); porting the component without them leaves colours and spacing unset.
+
+- `--MAX--WIDTH--SITE`, `--SITE--PADDING`
+- `--SITE--POPOVER--BG`, `--SITE--POPOVER--COLOR`, `--SITE--POPOVER--MUTED`, `--SITE--POPOVER--BORDER--COLOR`, `--SITE--POPOVER--RADIUS`, `--SITE--POPOVER--SHADOW`, `--SITE--POPOVER--PADDING`, `--SITE--POPOVER--HOVER-BG`, `--SITE--POPOVER--ACCENT`, `--SITE--POPOVER--ACCENT-TEXT`
 
 ## Manual accessibility testing
 
@@ -86,10 +142,10 @@ Test with a real screenreader before shipping.
 - [ ] ArrowKeys navigate between days with date announcement
 - [ ] PageUp/PageDown announces new month/year
 
-**Time columns**
-- [ ] Each listbox announces its label (Hours, Minutes, Seconds)
-- [ ] ArrowUp/Down announces the selected hour/minute value
-- [ ] Selected option is indicated as "selected"
+**Time columns (wheels)**
+- [ ] Each wheel announces its label (Hours, Minutes, Seconds)
+- [ ] ArrowUp/Down announces the new hour/minute value
+- [ ] The centred value is announced as the current value
 
 **AM/PM (12h locales only)**
 - [ ] AM/PM segment announces current state

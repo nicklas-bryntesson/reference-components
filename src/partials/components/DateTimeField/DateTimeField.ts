@@ -12,10 +12,10 @@ import {
   getMonthName,
   getSegmentOrder,
   type DateSegmentType,
-} from '../../../utils/dates'
-import { readLocale, resolveLocale } from '../../../utils/locale'
-import { calculatePopupOffset, calculateArrowOffset, detectDirection } from '../../../js/popup-position'
-import WheelColumn from '../../../js/WheelColumn'
+} from '../../../kernel/utils/dates'
+import { readLocale, resolveLocale } from '../../../kernel/utils/locale'
+import { calculatePopupOffset, calculateArrowOffset, detectDirection } from '../../../kernel/js/popup-position'
+import WheelColumn from '../../../kernel/js/WheelColumn'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

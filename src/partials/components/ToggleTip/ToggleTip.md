@@ -4,17 +4,36 @@ An accessible tooltip triggered by a button. The bubble positions itself above t
 
 ## Contract
 
+**Authored markup** — the `<toggle-tip>` custom element is the only thing you write:
+
 ```html
 <toggle-tip icon="info">
   Content shown inside the bubble.
 </toggle-tip>
 ```
 
-The `<toggle-tip>` custom element is the only required authored markup. The JS constructs the trigger button and bubble DOM automatically on initialisation. The `icon` attribute is required; all other attributes are optional. See `## Attributes` for the full list.
+The `icon` attribute is required; all others are optional (see `## Attributes`).
+
+**Rendered DOM** — on initialisation the JS replaces the element's contents with the trigger button and the bubble. Port this structure if you rebuild without the reference JS:
+
+```html
+<toggle-tip icon="info" initialized data-direction="top">
+  <button aria-label="More information" aria-expanded="false" aria-controls="tt-ID">
+    <!-- icon SVG -->
+  </button>
+  <div class="slideContainer">
+    <div class="ToggleTip-popup" id="tt-ID" role="tooltip" aria-hidden="true">
+      <span class="title" role="heading" aria-level="3">Optional heading</span> <!-- only when title is set -->
+      Content shown inside the bubble.
+      <div class="arrow"></div>
+    </div>
+  </div>
+</toggle-tip>
+```
 
 ## Dependencies
 
-None. Fully self-contained — no shared utilities, no framework dependencies. Drop the three files (`ToggleTip.js`, `ToggleTip.css`, `ToggleTip.html`) into any project.
+One kernel primitive: [`popup-position`](../../../kernel/js/popup-position.md) — `detectDirection` plus the bubble/arrow offset maths. No framework dependencies. See `## Kernel dependencies` below.
 
 ## HTML Authoring API
 
@@ -105,6 +124,14 @@ document.addEventListener('htmx:afterSwap', e => initToggleTips(e.detail.target)
 ```
 
 The `root` parameter scopes the query to the swapped fragment so already-running instances are not re-initialised.
+
+## Kernel dependencies
+
+| Kernel module | Kind | Used for |
+|---|---|---|
+| [`js/popup-position`](../../../kernel/js/popup-position.md) | JS | `detectDirection` + bubble/arrow offset maths |
+
+No CSS kernel dependency. The site tokens this component reads (`--SITE--PADDING`, `--SITE--POPOVER--BORDER--COLOR`, `--SITE--POPOVER--RADIUS`, `--SITE--POPOVER--SHADOW`) are surfaced through the `--toggletip-*` CSS Variable API above and each has a fallback, so the component also runs standalone.
 
 ## Non-goals
 
