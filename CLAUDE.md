@@ -36,12 +36,19 @@ src/partials/components/<Name>/
   tests/
     <Name>.unit.test.*            # unit tests
     <Name>.e2e.test.*             # e2e tests
+src/kernel/                       # shared primitives — ported once, composed by components
+  js/    WheelColumn.ts, popup-position.ts   # 3D wheel DOM primitive + popover maths
+  utils/ dates.ts, locale.ts                 # pure date / locale helpers
+  css/   Wheel.css                           # wheel visuals (pairs with WheelColumn)
+  <module>.md  + README.md                   # one contract per primitive
+  js/tests/, utils/tests/                    # kernel conformance tests
 src/js/script.js                  # entry point, imports all components
+src/css/site/01-Setup/tokens.css  # host --SITE--* token contract (components read these)
 docs/superpowers/specs/           # design specs
 docs/superpowers/plans/           # implementation plans
 ```
 
-> **Note:** DateField tests still live in `tests/` at the root — migrate in a separate session.
+> **Note:** Shared primitives live in `src/kernel/` with their own contracts and conformance tests. Each component's `.md` lists the primitives it composes under `## Kernel dependencies` — port the kernel once, then the component stays thin.
 
 ## Kitchensink Pattern
 

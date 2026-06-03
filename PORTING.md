@@ -9,6 +9,18 @@ git submodule add <repo-url> reference-components
 git submodule update --init
 ```
 
+## What you port (and what you don't)
+
+Port in this order:
+
+1. **The kernel** (`src/kernel/`) — the shared primitives (the 3D wheel, popover maths, date/locale helpers, `Wheel.css`). Each component's `.md` lists what it needs under `## Kernel dependencies`. Port these **once** and run their conformance tests; every component that declares them then composes the same verified behaviour, so a looping wheel or a leap-year edge case is never re-interpreted per component.
+2. **The component** — its `.md` contract markup, `.ts` behaviour, and `.css` (map the `## Required site tokens` onto your design system).
+
+Do **not** port:
+
+- **`*.generate.ts` and `states/`** — repo-internal tooling that regenerates the kitchensink's `.hbs` state partials. You author your demo states directly in your own stack.
+- **`*.unit.test.*`** — these are white-box tests of the *reference implementation* (they call private methods and import the TS class directly). They are **not** the portable contract and carry a TS-adaptation tax for no benefit. The portable contract is the **conformance suite** — the e2e + axe tests, which assert observable behaviour and ARIA structure against your own DOM.
+
 ## Run the test suite against your dev server
 
 The test suite is driven by `BASE_URL`. When set, Playwright skips the built-in dev server and points all tests at your server instead.
