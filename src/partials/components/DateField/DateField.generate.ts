@@ -48,7 +48,7 @@ function canonical(id: string, label: string, rootAttrs: string, inputAttrs: str
         <div class="DateField-popup" role="dialog" aria-modal="true">
           <div class="CalendarHeader">
             <button type="button" class="PrevMonth">&#8249;</button>
-            <button type="button" class="MonthYearTrigger" aria-haspopup="listbox" aria-expanded="false"></button>
+            <button type="button" class="MonthYearTrigger" aria-expanded="false"></button>
             <button type="button" class="NextMonth">&#8250;</button>
           </div>
           <div class="Panel" data-panel="calendar" data-active="true">

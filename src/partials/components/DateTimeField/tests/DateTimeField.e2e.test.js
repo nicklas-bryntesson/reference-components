@@ -220,6 +220,15 @@ test('month/year picker opens as wheels', async ({ page }) => {
   await expect(page.locator(`${ROOT} .Wheel[data-picker="year"]`)).toHaveAttribute('role', 'spinbutton')
 })
 
+test('MonthYearTrigger uses aria-controls (not aria-haspopup) for the picker', async ({ page }) => {
+  await page.locator(`${ROOT} .DateTimeField-trigger`).click()
+  const trigger = page.locator(`${ROOT} .MonthYearTrigger`)
+  expect(await trigger.getAttribute('aria-haspopup')).toBeNull()
+  const controls = await trigger.getAttribute('aria-controls')
+  expect(controls).toBeTruthy()
+  await expect(page.locator(`#${controls}`)).toHaveAttribute('data-panel', 'picker')
+})
+
 test('ArrowDown on the year wheel navigates the calendar', async ({ page }) => {
   await page.locator(`${ROOT} .DateTimeField-trigger`).click()
   await page.locator(`${ROOT} .MonthYearTrigger`).click()

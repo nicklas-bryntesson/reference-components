@@ -158,6 +158,15 @@ test('MonthYearTrigger has aria-expanded true when picker open', async ({ page }
   await expect(trigger).toHaveAttribute('aria-expanded', 'true')
 })
 
+test('MonthYearTrigger uses aria-controls (not aria-haspopup) for the picker', async ({ page }) => {
+  await page.locator('[data-id="birthdate"] .DateField-trigger').click()
+  const trigger = page.locator('[data-id="birthdate"] .MonthYearTrigger')
+  expect(await trigger.getAttribute('aria-haspopup')).toBeNull()
+  const controls = await trigger.getAttribute('aria-controls')
+  expect(controls).toBeTruthy()
+  await expect(page.locator(`#${controls}`)).toHaveAttribute('data-panel', 'picker')
+})
+
 test('month and year wheels are spinbuttons when picker opens', async ({ page }) => {
   await page.locator('[data-id="birthdate"] .DateField-trigger').click()
   await page.locator('[data-id="birthdate"] .MonthYearTrigger').click()
