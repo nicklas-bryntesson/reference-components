@@ -6,6 +6,7 @@
 //
 //   TARGET_PATH  — page the suite navigates to            (default: '/')
 //   TARGET_ID    — component root selector override        (per-component default below)
+//   AXE_SETTLE   — wait for opacity to settle before axe   (default: off — see waitForStable)
 //
 // `scopedCheckA11y` always scopes the axe audit to a selector, so a shared host
 // page's unrelated markup can never fail a component's accessibility check.
@@ -26,6 +27,34 @@ export function targetId(component) {
   return process.env.TARGET_ID ?? DEFAULT_TARGET[component]
 }
 
-export function scopedCheckA11y(page, scope, options = {}) {
+// Settle seam for consumers who add an entrance animation.
+//
+// The reference popups appear at full opacity (no fade), so axe always samples a
+// fully-rendered frame and this is a deliberate **no-op by default** — the
+// reference suite's behaviour is unchanged. But if your port wraps a popup in an
+// opacity fade-in (Vue `<Transition>`, React `<AnimatePresence>`, CSS
+// `@starting-style`, …) there is a ~150–180 ms window where all popup text is
+// below WCAG AA contrast. Playwright's auto-wait checks bounding-box stability,
+// NOT opacity, so a `.click()` can return mid-fade and a scoped axe run samples
+// that low-opacity frame → false "color-contrast" violations.
+//
+// Set `AXE_SETTLE=1` to make every scoped axe check first wait until the scope
+// (and everything inside it) has settled to `opacity: 1`. This is honest, not a
+// cheat: a settled popup is compliant; only the transient frame is not. Override
+// or replace this function in your own copy if your animation needs different
+// settle logic.
+export async function waitForStable(page, scope) {
+  if (!process.env.AXE_SETTLE) return
+  await page.waitForFunction((sel) => {
+    const root = document.querySelector(sel)
+    if (!root) return true
+    return [root, ...root.querySelectorAll('*')].every(
+      (el) => parseFloat(getComputedStyle(el).opacity) === 1
+    )
+  }, scope)
+}
+
+export async function scopedCheckA11y(page, scope, options = {}) {
+  await waitForStable(page, scope)
   return checkA11y(page, scope, options)
 }
