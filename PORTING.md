@@ -14,7 +14,9 @@ git submodule update --init
 Port in this order:
 
 1. **The kernel** (`src/kernel/`) — the shared primitives (the 3D wheel, popover maths, date/locale helpers, `Wheel.css`). Each component's `.md` lists what it needs under `## Kernel dependencies`. Port these **once** and run their conformance tests; every component that declares them then composes the same verified behaviour, so a looping wheel or a leap-year edge case is never re-interpreted per component.
-2. **The component** — its `.md` contract markup, `.ts` behaviour, and `.css` (map the `## Required site tokens` onto your design system).
+2. **The component** — its `.md` contract markup, `.ts` behaviour, and `.css`. Copy the `.css` **verbatim** — it is a portable deliverable, keyed off the same `data-*`/ARIA attributes your markup already emits, so it drops in with zero markup changes. Don't re-derive your own thin stylesheet to "satisfy the tests": the suite checks behaviour, not appearance (see below), so a hand-written stylesheet can pass while looking wrong. Only two things change: map the `## Required site tokens` onto your design system, and **drop the runtime-only rules**.
+
+   > **Runtime-only CSS — skip when your framework renders formed markup.** The reference uses a vanilla-JS "hide unstyled content until init" gate: `.DateField { overflow: hidden }` flipped to `overflow: visible` by `.DateField[data-initialized]`. A framework that renders fully-formed markup never needs the gate, and leaving it in **clips your popup**. Drop these init-gated rules; they are reference *runtime*, not the contract.
 
 Do **not** port:
 
@@ -49,6 +51,18 @@ BASE_URL=http://localhost:5000 TARGET_PATH=/kitchen-sink npx playwright test
 
 Axe checks are scoped to the component under test, so unrelated markup elsewhere on a shared demo page never fails a component's accessibility audit.
 
+### Browser matrix — decide it up front
+
+This repo's Playwright config runs **headed locally** (`headless: !!process.env.CI`) and headless on CI, and defines `chromium` + `firefox` + `webkit`. CSS system colors and animation timing can differ headed vs headless and across engines, so an `axe` result is not guaranteed identical between them. Decide which browsers you support and run that full matrix before declaring a port done — don't validate `chromium` alone and assume the rest.
+
+### Entrance animations and `axe` (the subtle one)
+
+The reference appends its popups at **full opacity** — no fade — so `axe` always samples fully-contrasted text. If your port adds an opacity **entrance** animation (the idiomatic `<Transition>` / `<AnimatePresence>` / `@starting-style` move), there is a ~150–180 ms window where popup text is below WCAG AA contrast. Playwright's auto-wait checks bounding-box stability, **not opacity**, so a click can return mid-fade and a scoped axe check samples that frame → **false "color-contrast" violations**. This is transient, not a real defect — a settled popup is compliant. Three honest options:
+
+- Set `AXE_SETTLE=1` — `scopedCheckA11y` then waits for the scope to reach `opacity: 1` before auditing (see `src/e2e-helpers/target.js → waitForStable`).
+- Animate a property that doesn't affect contrast (`transform`/slide), or pop in instantly and only fade *out* (the suite never samples during close).
+- Keep the reference's no-animation behaviour.
+
 ## What the tests expect
 
 Tests navigate to `TARGET_PATH` (default `/`) and locate components by their `data-component` attribute and `data-id` / `data-initialized` state attributes. Your page needs to render the component with the correct HTML contract — see each component's `<Name>.md` for the required markup.
@@ -70,11 +84,15 @@ Then update the fixture path in the relevant test file.
 
 ## Exit criteria
 
+**The suite proves behaviour and a11y, not appearance.** It asserts structure, ARIA, and interaction — it can be fully green while day cells render as raw `<button>` chrome or a chevron is missing. Visual fidelity is a separate axis whose source of truth is the component `.css`; verify it with a deliberate side-by-side against the reference's live demo. "Tests green" is necessary, not sufficient.
+
 A port is complete when:
 
-- [ ] All component e2e tests pass against your dev server
-- [ ] `axe` tests pass (zero WCAG 2 AA violations)
+- [ ] All component e2e tests pass against your dev server, **on your chosen browser matrix** (not chromium alone)
+- [ ] `axe` tests pass (zero WCAG 2 AA violations) — with open/animated states settled (see *Entrance animations and `axe`* above)
+- [ ] **Visual parity** checked side-by-side against the reference demo (the suite will not catch appearance regressions)
 - [ ] The manual accessibility checklist in each component's `<Name>.md` has been worked through with a real screen reader
+- [ ] The submodule is still clean (`git -C reference-components status`) — operate from your project root, never with your shell `cwd` inside the submodule
 
 Once all boxes are checked, remove the submodule:
 
