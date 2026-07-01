@@ -3,7 +3,7 @@
   display: inline-block;
   overflow: hidden;
   /* Public API */
-  --mf-popup-width: 15rem;
+  /* Popup sizes to its content (fit-content); month + year columns define the width. */
   --mf-popup-gap: 1.5rem;
   --mf-site-padding: var(--SITE--PADDING, 1rem);
   /* Design tokens — segments */
@@ -188,7 +188,7 @@
   position: absolute;
   left: var(--mf-popup-offset, 50%);
   transform: translateX(-50%);
-  inline-size: var(--mf-popup-width);
+  inline-size: fit-content;
   pointer-events: auto;
   background: var(--mf-popup-bg);
   color: var(--mf-popup-color);
@@ -218,6 +218,13 @@
   display: flex;
   gap: 0.25rem;
   justify-content: center;
+}
+
+/* The shared .Wheel is 64px — sized for numeric time/year columns. The month
+   wheel shows full localized names ("september", "februari"), so it needs to be
+   wider or the names clip under the wheel's overflow:hidden. */
+.MonthField-popup-columns .Wheel[data-picker="month"] {
+  width: 7rem;
 }
 
 /* ── Popup footer ──────────────────────────────────────────────────────────── */
