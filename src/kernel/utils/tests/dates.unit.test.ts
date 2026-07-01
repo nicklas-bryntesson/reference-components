@@ -6,6 +6,8 @@ import {
   isDayDisabled,
   formatISO,
   formatDatetimeISO,
+  formatMonthISO,
+  parseMonthISO,
   getWeekdayNames,
   getMonthName,
   getSegmentOrder,
@@ -111,6 +113,51 @@ describe('formatDatetimeISO', () => {
   it('includes seconds when includeSeconds=true', () => {
     const d = new Date(2026, 4, 27, 14, 35, 8)
     expect(formatDatetimeISO(d, true)).toBe('2026-05-27T14:35:08')
+  })
+})
+
+describe('formatMonthISO', () => {
+  it('formats year + 0-based month to yyyy-mm', () => {
+    expect(formatMonthISO(2026, 5)).toBe('2026-06')
+  })
+  it('pads single-digit month', () => {
+    expect(formatMonthISO(2026, 0)).toBe('2026-01')
+  })
+  it('handles december (month index 11)', () => {
+    expect(formatMonthISO(2026, 11)).toBe('2026-12')
+  })
+})
+
+describe('parseMonthISO', () => {
+  it('parses yyyy-mm into year and 0-indexed month', () => {
+    expect(parseMonthISO('2026-06')).toEqual({ year: 2026, month: 5 })
+  })
+  it('parses january as month 0', () => {
+    expect(parseMonthISO('2026-01')).toEqual({ year: 2026, month: 0 })
+  })
+  it('parses december as month 11', () => {
+    expect(parseMonthISO('2026-12')).toEqual({ year: 2026, month: 11 })
+  })
+  it('round-trips with formatMonthISO', () => {
+    const p = parseMonthISO('2026-06')!
+    expect(formatMonthISO(p.year, p.month)).toBe('2026-06')
+  })
+  it('trims surrounding whitespace', () => {
+    expect(parseMonthISO('  2026-06  ')).toEqual({ year: 2026, month: 5 })
+  })
+  it('returns null for month 00', () => {
+    expect(parseMonthISO('2026-00')).toBeNull()
+  })
+  it('returns null for month 13', () => {
+    expect(parseMonthISO('2026-13')).toBeNull()
+  })
+  it('returns null for a full date string', () => {
+    expect(parseMonthISO('2026-06-15')).toBeNull()
+  })
+  it('returns null for non-numeric or malformed input', () => {
+    expect(parseMonthISO('')).toBeNull()
+    expect(parseMonthISO('2026-6')).toBeNull()
+    expect(parseMonthISO('abc-de')).toBeNull()
   })
 })
 
