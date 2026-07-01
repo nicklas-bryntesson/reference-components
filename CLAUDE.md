@@ -11,7 +11,7 @@ Static component boilerplate — Vite + Handlebars + Tailwind. Components are re
 - **Styling:** Tailwind v4 + PostCSS nesting
 - **Unit tests:** Vitest + jsdom
 - **E2E tests:** Playwright + axe-playwright
-- **TypeScript:** DateField and ToggleTip (`strict: true`, `noEmit: true`). Other components are `.js` — convert in separate sessions.
+- **TypeScript:** TS is the norm (`strict: true`, `noEmit: true`). The mature component set — DateField, DateTimeField, TimeField, MonthField, FileUpload, ToggleTip — and the whole `src/kernel/` are all TS. Only TabAccordion and Combobox remain `.js`, and they are **parked legacy references**, not migration targets.
 
 ## Commands
 

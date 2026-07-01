@@ -1,0 +1,147 @@
+# MonthField
+
+An accessible month input wrapping `<input type="month">`. The value is a `YYYY-MM` string (year + month, no day). Custom spinbutton segments for keyboard interaction on desktop; the native month input on touch devices. The popup picker is two spinning wheels — a month wheel and a year wheel — with **no calendar day grid**.
+
+Completes the date family alongside DateField, DateTimeField, and TimeField.
+
+## Attributes
+
+| Attribute | Type | Description |
+|---|---|---|
+| `data-id` | string | Applied as `id` and `name` on the native input |
+| `data-name` | string | Overrides the field `name` (defaults to `data-id`) |
+| `data-locale` | BCP 47 | Controls segment/wheel labels and month names. Default: `sv-SE` |
+| `data-value` | `YYYY-MM` | Initial value (server-side render) |
+| `data-min` | `YYYY-MM` | Minimum allowed month; bounds both wheels and the segments |
+| `data-max` | `YYYY-MM` | Maximum allowed month; bounds both wheels and the segments |
+| `data-step` | number | Accepted for `<input type="month">` parity. The picker steps one month at a time. Default: `1` |
+| `data-disabled` | boolean | Disables the entire field |
+| `data-invalid` | boolean | Marks the field invalid; adds `aria-invalid="true"` to the native input |
+| `data-input-mode` | `custom` \| `display` | Set by JS: `custom` on fine pointers (spinbutton overlay), `display` on touch (native picker) |
+
+State attributes set by JS: `data-initialized`, `data-open`, `data-has-value`, `data-direction`, and `aria-expanded` on the trigger.
+
+## Segments
+
+Two inline spinbutton segments, in order **month → year** separated by `/`:
+
+- **month** — `role="spinbutton"`, `aria-valuemin="0"` / `aria-valuemax="11"`. Displays a **zero-padded 1-based number** ("06" for June); `aria-valuenow` is the **0-based index** (5) so it stays consistent with the wheel. `aria-valuetext` carries a human label so AT announces e.g. "juni 2026" (O2).
+- **year** — `role="spinbutton"`, bounds derived from `data-min`/`data-max`, or the current year ±100 when unbounded (O5). Displays the plain 4-digit year.
+
+The popup **month wheel** shows the localized month **name** ("Juni"); the inline month **segment** shows the number ("06"). Both surfaces carry the human label in `aria-valuetext` (O2).
+
+## Keyboard
+
+| Key | Action |
+|-----|--------|
+| `0`–`9` | Digit entry. Month accepts a 1-based value (1–12) with fast-advance; year accepts up to 4 digits |
+| `ArrowUp` / `ArrowDown` | Month steps ±1 and **wraps** Dec↔Jan; year steps ±1 and **clamps** to bounds |
+| `ArrowLeft` / `ArrowRight` | Move between segments |
+| `Tab` / `Shift+Tab` | Move between segments; Tab on last (year) → trigger |
+| `Backspace` | Clear segment, move left |
+| `Space` / `Enter` (trigger) | Open the popup; focus moves to the month wheel |
+| `ArrowUp` / `ArrowDown` (wheel) | `WheelColumn.stepBy` — spin the focused wheel |
+| `Tab` (popup) | Cycle month wheel → year wheel → footer buttons |
+| `Escape` | Close the popup; focus returns to the trigger |
+
+Light-dismiss (outside click) closes the popup but **never** calls `trigger.focus()` — this avoids scroll-jump and focus-steal (TimeField is the reference for this rule).
+
+## Value sync
+
+The native `<input type="month">` value is written as `YYYY-MM` only when **both** segments are filled. Partial state leaves the native input empty (same contract as DateField/TimeField). When `data-min`/`data-max` are set, the combined value is clamped before it reaches the native input, and the correction is reflected back into the segments.
+
+## Events
+
+The component dispatches `input` and `change` events on the native `<input>` when the value changes.
+
+## CSS tokens
+
+All tokens are custom properties on `.MonthField`:
+
+| Token | Description |
+|---|---|
+| `--mf-border-color` | Segment border |
+| `--mf-border-color-hover` | Segment border on hover |
+| `--mf-border-color-invalid` | Border color when invalid |
+| `--mf-bg-hover` | Background on hover |
+| `--mf-color-muted` | Placeholder / separator text color |
+| `--mf-trigger-bg-hover` | Trigger button hover background |
+| `--mf-trigger-bg-active` | Trigger button active background |
+| `--mf-popup-bg` | Popup background |
+| `--mf-popup-color` | Popup text color |
+| `--mf-popup-border-color` | Popup border |
+| `--mf-popup-radius` | Popup border radius |
+| `--mf-popup-shadow` | Popup box shadow |
+| `--mf-popup-width` | Popup width |
+| `--mf-option-bg-selected` | Selected option background |
+| `--mf-option-color-selected` | Selected option text color |
+
+## Kernel dependencies
+
+This component composes shared primitives from [`src/kernel/`](../../../kernel/README.md). Port and verify these once — they are not re-implemented per component.
+
+| Kernel module | Kind | Used for |
+|---|---|---|
+| [`js/WheelColumn`](../../../kernel/js/WheelColumn.md) | JS | month + year picker wheels |
+| [`js/popup-position`](../../../kernel/js/popup-position.md) | JS | popover placement + arrow offset |
+| [`utils/dates`](../../../kernel/utils/dates.md) | JS | `getMonthName`, `formatMonthISO`, `parseMonthISO` |
+| [`utils/locale`](../../../kernel/utils/locale.md) | JS | locale resolution |
+| [`css/Wheel.css`](../../../kernel/css/Wheel.md) | CSS | wheel visuals — required wherever `WheelColumn` runs |
+
+## Required site tokens
+
+The `--mf-*` tokens (see `## CSS tokens`) default to host-provided site tokens. A consumer must declare these (reference values live in [`src/css/site/01-Setup/tokens.css`](../../../css/site/01-Setup/tokens.css)); porting the component without them leaves colours and spacing unset.
+
+- `--SITE--PADDING`
+- `--SITE--POPOVER--BG`, `--SITE--POPOVER--COLOR`, `--SITE--POPOVER--MUTED`, `--SITE--POPOVER--BORDER--COLOR`, `--SITE--POPOVER--RADIUS`, `--SITE--POPOVER--SHADOW`, `--SITE--POPOVER--PADDING`, `--SITE--POPOVER--HOVER-BG`, `--SITE--POPOVER--ACCENT`, `--SITE--POPOVER--ACCENT-TEXT`
+
+Map onto your design system from the **values** in `tokens.css`, not from the names alone. The reference popover colours are CSS **system colors** (`Canvas`, `CanvasText`, `color-mix(in srgb, CanvasText 12%, transparent)`): this gives free dark-mode support and makes `axe` treat the colour as un-evaluable, so faded/transient text never trips a contrast check. Substituting fixed hex values is valid but a deliberate divergence — you then own contrast yourself.
+
+## Non-goals
+
+- No calendar day grid (this is a month picker — DateField owns day selection)
+- No month-range selection (two fields)
+- No inline mode — popup only
+- No top-layer / popover-clip fix (deferred to consuming projects)
+- No RTL layout
+
+## Manual accessibility testing
+
+Test with a real screenreader before shipping. Sources: `docs/atomica11y/form/date-picker-dialog.md`, `docs/atomica11y/form/text-input.md`, `docs/atomica11y/form/hint-help-or-error.md`.
+
+### Desktop screenreader (NVDA, JAWS, VoiceOver)
+
+**Segments**
+- [ ] When tabbing into the field, I hear the label ("Mötesmånad") and the first segment label ("Månad")
+- [ ] Each segment identifies itself as an editable input (spinbutton)
+- [ ] Pressing ArrowUp/Down announces the new value; the month announces its name + year (e.g. "juni 2026"), not just "06"
+- [ ] The month segment wraps Dec↔Jan; the year segment stops at its bounds
+- [ ] Tab to the next segment reads the segment label ("År")
+- [ ] Disabled/required state is expressed if applicable
+
+**Month trigger**
+- [ ] Purpose is clear ("Öppna månadsväljare" or localised equivalent)
+- [ ] Identifies as a button with popup/dialog indicator
+- [ ] Expresses expanded/collapsed state
+
+**Picker dialog**
+- [ ] Dialog title or purpose is announced on open ("Välj månad")
+- [ ] Identifies itself as a dialog/modal
+- [ ] Moving into a wheel reads the wheel label ("Månad", "År")
+- [ ] The month wheel announces the month **name**; the year wheel announces the number
+- [ ] Selecting/spinning a wheel reflects the value in the inline segment
+- [ ] "Denna månad" and "Rensa" buttons have clear purpose
+- [ ] Pressing Escape closes the popup and focus returns to the trigger
+- [ ] Content behind the dialog is not the focus target while open
+
+**Invalid state**
+- [ ] When `data-invalid` is set, the error is announced automatically
+- [ ] Error is read after the input name, role, and state
+
+### Mobile screenreader (VoiceOver iOS, TalkBack Android)
+
+- [ ] Native month input is shown (not the custom overlay)
+- [ ] Swipe to the control — purpose is clear
+- [ ] Double-tap opens the native month picker
+- [ ] I can set a month + year using the native picker
+- [ ] The field label is read when I enter the input
