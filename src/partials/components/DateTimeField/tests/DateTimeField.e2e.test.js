@@ -271,3 +271,44 @@ test('month wheel loops past the year boundary (Jan ↔ Dec)', async ({ page }) 
   await page.waitForTimeout(400)
   await expect(month).toHaveAttribute('aria-valuenow', '11')
 })
+
+// ── Kernel: popup-interaction (focus trap + scroll containment) ─────────────────
+
+test('Tab past the last footer button keeps focus inside the calendar', async ({ page }) => {
+  await page.locator(`${ROOT} .DateTimeField-trigger`).click()
+  await expect(page.locator(`${ROOT} .DateTimeField-popup`)).toBeVisible()
+  // "Now" is the last tab stop. Tab must wrap back into the calendar, not
+  // escape the aria-modal dialog (this calendar previously had no Tab trap).
+  await page.locator(`${ROOT} .DateTimeField-popup .CalendarFooterNow`).focus()
+  await page.keyboard.press('Tab')
+  const inside = await page.evaluate((rootSel) => {
+    const popup = document.querySelector(`${rootSel} .DateTimeField-popup`)
+    return popup?.contains(document.activeElement) ?? false
+  }, ROOT)
+  expect(inside).toBe(true)
+})
+
+test('Shift+Tab from the first tab stop keeps focus inside the calendar', async ({ page }) => {
+  await page.locator(`${ROOT} .DateTimeField-trigger`).click()
+  await expect(page.locator(`${ROOT} .DateTimeField-popup`)).toBeVisible()
+  await page.locator(`${ROOT} .DateTimeField-popup .CalendarPrev`).focus()
+  await page.keyboard.press('Shift+Tab')
+  await expect(page.locator(`${ROOT} .DateTimeField-popup`)).toBeVisible()
+  const inside = await page.evaluate((rootSel) => {
+    const popup = document.querySelector(`${rootSel} .DateTimeField-popup`)
+    return popup?.contains(document.activeElement) ?? false
+  }, ROOT)
+  expect(inside).toBe(true)
+})
+
+test('wheel event on the calendar surface (off a wheel) is defaultPrevented', async ({ page }) => {
+  await page.locator(`${ROOT} .DateTimeField-trigger`).click()
+  await expect(page.locator(`${ROOT} .DateTimeField-popup`)).toBeVisible()
+  const prevented = await page.evaluate((rootSel) => {
+    const popup = document.querySelector(`${rootSel} .DateTimeField-popup`)
+    const ev = new WheelEvent('wheel', { deltaY: 120, bubbles: true, cancelable: true })
+    popup.dispatchEvent(ev)
+    return ev.defaultPrevented
+  }, ROOT)
+  expect(prevented).toBe(true)
+})

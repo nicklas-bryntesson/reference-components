@@ -272,3 +272,43 @@ test('popup wheel column has aria-valuemin and aria-valuemax', async ({ page }) 
   await expect(minuteCol).toHaveAttribute('aria-valuemin', '0')
   await expect(minuteCol).toHaveAttribute('aria-valuemax', '59')
 })
+
+// ── Kernel: popup-interaction (focus trap + scroll containment) ─────────────────
+
+test('Tab past the last footer button keeps focus inside the popup', async ({ page }) => {
+  await page.locator(`${TF} .TimeField-trigger`).click()
+  await expect(page.locator('.TimeField-popup')).toBeVisible()
+  // "Now" is the last tab stop (Clear is disabled while empty). Tab must wrap
+  // back into the popup, not escape to the page behind the aria-modal dialog.
+  await page.locator('.TimeField-popup-now').focus()
+  await page.keyboard.press('Tab')
+  const inside = await page.evaluate(() =>
+    document.querySelector('.TimeField-popup')?.contains(document.activeElement) ?? false,
+  )
+  expect(inside).toBe(true)
+})
+
+test('Shift+Tab from the first wheel keeps focus inside the popup (wraps, does not close)', async ({ page }) => {
+  await page.locator(`${TF} .TimeField-trigger`).click()
+  await expect(page.locator('.TimeField-popup')).toBeVisible()
+  await page.locator('.Wheel[data-segment="hour"]').focus()
+  await page.keyboard.press('Shift+Tab')
+  // Popup stays open and focus is still within it (wraps to the last footer button).
+  await expect(page.locator('.TimeField-popup')).toBeVisible()
+  const inside = await page.evaluate(() =>
+    document.querySelector('.TimeField-popup')?.contains(document.activeElement) ?? false,
+  )
+  expect(inside).toBe(true)
+})
+
+test('wheel event on the popup surface (off a column) is defaultPrevented', async ({ page }) => {
+  await page.locator(`${TF} .TimeField-trigger`).click()
+  await expect(page.locator('.TimeField-popup')).toBeVisible()
+  const prevented = await page.evaluate(() => {
+    const popup = document.querySelector('.TimeField-popup')
+    const ev = new WheelEvent('wheel', { deltaY: 120, bubbles: true, cancelable: true })
+    popup.dispatchEvent(ev)
+    return ev.defaultPrevented
+  })
+  expect(prevented).toBe(true)
+})
