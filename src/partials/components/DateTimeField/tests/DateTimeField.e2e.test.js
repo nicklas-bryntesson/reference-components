@@ -301,6 +301,22 @@ test('Shift+Tab from the first tab stop keeps focus inside the calendar', async 
   expect(inside).toBe(true)
 })
 
+test('Tab from a focused grid day exits the grid as one composite stop (→ time wheel)', async ({ page }) => {
+  await page.locator(`${ROOT} .DateTimeField-trigger`).click()
+  await expect(page.locator(`${ROOT} .DateTimeField-popup`)).toBeVisible()
+  // Focus the grid's roving day cell. Tab must leave the grid (WAI-ARIA grid is
+  // ONE tab stop) and land on the first time wheel, not the adjacent day.
+  const day = page.locator(`${ROOT} .DateTimeField-popup .CalendarGrid td:not([data-outside-month]):not([aria-disabled]) button[tabindex="0"]`)
+  await day.focus()
+  await page.keyboard.press('Tab')
+  const landedOnDay = await page.evaluate((rootSel) => {
+    const active = document.activeElement
+    return Boolean(active?.closest(`${rootSel} .CalendarGrid td button`))
+  }, ROOT)
+  expect(landedOnDay).toBe(false)
+  await expect(page.locator(`${ROOT} .Wheel[data-segment="hour"]`)).toBeFocused()
+})
+
 test('wheel event on the calendar surface (off a wheel) is defaultPrevented', async ({ page }) => {
   await page.locator(`${ROOT} .DateTimeField-trigger`).click()
   await expect(page.locator(`${ROOT} .DateTimeField-popup`)).toBeVisible()

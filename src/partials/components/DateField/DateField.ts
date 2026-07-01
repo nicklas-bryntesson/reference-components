@@ -1106,6 +1106,11 @@ class DateField {
   // Ordered tab stops for the shared focus trap. Depends on which panel is
   // active: the month/year picker is a modal-within-modal whose only stops are
   // its two wheels; the calendar panel cycles nav → grid → footer.
+  //
+  // The date grid is a SINGLE composite tab stop (WAI-ARIA grid pattern): it
+  // uses roving tabindex internally (one cell tabindex="0", the rest "-1"), so
+  // Tab must enter/leave the grid as a unit and arrow keys move within it — it
+  // must contribute exactly one stop, not one per day.
   _calendarTabStops(): HTMLElement[] {
     if (!this.calendarEl) return []
 
@@ -1123,10 +1128,21 @@ class DateField {
     const clearBtn = this.calendarEl.querySelector<HTMLButtonElement>('.CalendarFooterClear')
     const todayBtn = this.calendarEl.querySelector<HTMLButtonElement>('.CalendarFooterToday')
 
+    // The grid's single stop is its current roving cell (falling back to the
+    // first in-month, enabled cell — mirrors _updateRovingTabindex, which never
+    // rovers onto an outside-month or disabled cell).
+    const gridStop =
+      grid.querySelector<HTMLButtonElement>(
+        'td:not([data-outside-month]):not([aria-disabled="true"]) button[tabindex="0"]',
+      ) ??
+      grid.querySelector<HTMLButtonElement>(
+        'td:not([data-outside-month]):not([aria-disabled="true"]) button',
+      )
+
     const stops: Array<HTMLElement | null> = [
       prevBtn,
       monthYearTrigger,
-      ...Array.from(grid.querySelectorAll<HTMLButtonElement>('td:not([aria-disabled="true"]) button')),
+      gridStop,
       nextBtn,
       ...(clearBtn && !clearBtn.disabled ? [clearBtn] : []),
       ...(todayBtn && !todayBtn.disabled ? [todayBtn] : []),

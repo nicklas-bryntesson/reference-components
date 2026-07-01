@@ -357,6 +357,21 @@ test('Shift+Tab from the first tab stop keeps focus inside the calendar', async 
   expect(inside).toBe(true)
 })
 
+test('Tab from a focused grid day exits the grid as one composite stop (→ NextMonth)', async ({ page }) => {
+  await page.locator('[data-id="birthdate"] .DateField-trigger').click()
+  await expect(page.locator('.DateField-popup')).toBeVisible()
+  // Focus the grid's roving day cell. Tab must leave the grid (WAI-ARIA grid is
+  // ONE tab stop), not step to the adjacent day.
+  const day = page.locator('.DateField-popup td:not([data-outside-month]):not([aria-disabled="true"]) button[tabindex="0"]')
+  await day.focus()
+  await page.keyboard.press('Tab')
+  const landedOnDay = await page.evaluate(() =>
+    Boolean(document.activeElement?.closest('.Grid td button')),
+  )
+  expect(landedOnDay).toBe(false)
+  await expect(page.locator('.DateField-popup .NextMonth')).toBeFocused()
+})
+
 test('Escape closes the calendar and returns focus to the trigger', async ({ page }) => {
   await page.locator('[data-id="birthdate"] .DateField-trigger').click()
   await expect(page.locator('.DateField-popup')).toBeVisible()

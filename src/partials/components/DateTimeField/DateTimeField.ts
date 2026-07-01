@@ -1047,8 +1047,13 @@ export class DateTimeField {
   // Ordered tab stops for the shared focus trap. Depends on which panel is
   // active: the month/year picker is a modal-within-modal whose only stops are
   // its two wheels; the calendar panel cycles nav → grid → time wheels → am/pm
-  // → footer. Hidden wheels (seconds off), disabled grid cells and absent
-  // buttons are excluded so Tab never lands on an unreachable control.
+  // → footer. Hidden wheels (seconds off) and absent buttons are excluded so
+  // Tab never lands on an unreachable control.
+  //
+  // The date grid is a SINGLE composite tab stop (WAI-ARIA grid pattern): it
+  // uses roving tabindex internally (one cell tabindex="0", the rest "-1"), so
+  // Tab must enter/leave the grid as a unit and arrow keys move within it — it
+  // must contribute exactly one stop, not one per day.
   _calendarTabStops(): HTMLElement[] {
     if (!this.calendarEl) return []
 
@@ -1063,9 +1068,18 @@ export class DateTimeField {
     const monthYearTrigger = this.calendarEl.querySelector<HTMLButtonElement>('.MonthYearTrigger')
     const nextBtn = this.calendarEl.querySelector<HTMLButtonElement>('.CalendarNext')
     const grid = this.calendarEl.querySelector<HTMLElement>('.CalendarGrid')
-    const gridButtons = grid
-      ? Array.from(grid.querySelectorAll<HTMLButtonElement>('td:not([aria-disabled]) button'))
-      : []
+    // The grid's single stop is its current roving cell (falling back to the
+    // first in-month, enabled cell — matches the component's own focus
+    // selectors at ~812/~938). Outside-month cells are decorative here and are
+    // never rovered onto, so they are excluded from the trap too.
+    const gridStop = grid
+      ? grid.querySelector<HTMLButtonElement>(
+          'td:not([data-outside-month]):not([aria-disabled]) button[tabindex="0"]',
+        ) ??
+        grid.querySelector<HTMLButtonElement>(
+          'td:not([data-outside-month]):not([aria-disabled]) button',
+        )
+      : null
     const timeWheels = Array.from(
       this.calendarEl.querySelectorAll<HTMLElement>('.Wheel[data-segment][role="spinbutton"]'),
     ).filter(w => w.style.display !== 'none')
@@ -1080,7 +1094,7 @@ export class DateTimeField {
       prevBtn,
       monthYearTrigger,
       nextBtn,
-      ...gridButtons,
+      gridStop,
       ...timeWheels,
       ...ampmButtons,
       ...(clearBtn && !clearBtn.disabled ? [clearBtn] : []),
