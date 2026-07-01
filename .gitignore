@@ -17,7 +17,8 @@ playwright-report/
 # Generated state partials (source of truth is *.generate.ts)
 src/**/states/*.hbs
 
-# AI working docs (specs, plans, wip — ephemeral process artefacts)
+# AI working docs (specs, plans, todo, findings, wip — ephemeral process artefacts)
 docs/superpowers/
+tasks/
 
 screenshots/

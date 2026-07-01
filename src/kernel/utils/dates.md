@@ -15,6 +15,8 @@ formatISO(date): string                             // 'YYYY-MM-DD'
 formatDatetimeISO(date, includeSeconds = false): string        // 'YYYY-MM-DDTHH:mm[:ss]'
 getWeekdayNames(locale): string[]                   // 7 short names, Monday-first
 getMonthName(year, month, locale): string           // long month name via Intl
+formatMonthISO(year, month): string                 // 'YYYY-MM' (month is 0-based)
+parseMonthISO(value): { year, month } | null        // 'YYYY-MM' → 0-based month, null if malformed
 getSegmentOrder(locale): { order: ('day'|'month'|'year')[]; separator: string }
 
 type DateSegmentType = 'day' | 'month' | 'year'
@@ -32,4 +34,4 @@ type DateSegmentType = 'day' | 'month' | 'year'
 
 ## Conformance
 
-Black-box: [`tests/dates.unit.test.ts`](tests/dates.unit.test.ts). Consumed by: DateField, DateTimeField.
+Black-box: [`tests/dates.unit.test.ts`](tests/dates.unit.test.ts). Consumed by: DateField, DateTimeField, MonthField.
