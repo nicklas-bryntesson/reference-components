@@ -67,6 +67,29 @@ export function getMonthName(year: number, month: number, locale: string): strin
   return new Intl.DateTimeFormat(locale, { month: 'long' }).format(new Date(year, month, 1))
 }
 
+/**
+ * Format a year + zero-based month as the native `<input type="month">` value.
+ * @example formatMonthISO(2026, 5) // "2026-06"
+ */
+export function formatMonthISO(year: number, month: number): string {
+  const m = String(month + 1).padStart(2, '0')
+  return `${year}-${m}`
+}
+
+/**
+ * Parse a `YYYY-MM` value into a year + zero-based month.
+ * Returns `null` for empty or malformed input.
+ * @example parseMonthISO("2026-06") // { year: 2026, month: 5 }
+ */
+export function parseMonthISO(value: string): { year: number; month: number } | null {
+  const match = /^(\d{4})-(\d{2})$/.exec(value.trim())
+  if (!match) return null
+  const year = Number(match[1])
+  const month = Number(match[2]) - 1
+  if (month < 0 || month > 11) return null
+  return { year, month }
+}
+
 export type DateSegmentType = 'day' | 'month' | 'year'
 
 export function getSegmentOrder(locale: string): { order: DateSegmentType[]; separator: string } {
