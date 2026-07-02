@@ -36,12 +36,12 @@ function canonical(id: string, attrs: Record<string, string> = {}, locale = 'sv-
           <div class="Panel" data-panel="calendar" data-active="true">
             <table class="CalendarGrid" role="grid"></table>
           </div>
-          <div class="Panel YearMonthPicker" role="group" data-panel="picker" data-active="false">
+          <div class="Panel YearMonthPicker WheelColumns" role="group" data-panel="picker" data-active="false">
             <div class="Wheel" data-picker="month" tabindex="0"></div>
             <div class="Wheel" data-picker="year" tabindex="0"></div>
           </div>
         </div>
-        <div class="TimeColumns">
+        <div class="TimeColumns WheelColumns">
           <div class="Wheel" data-segment="hour" tabindex="0"></div>
           <div class="Wheel" data-segment="minute" tabindex="0"></div>
           <div class="Wheel" data-segment="second" tabindex="0" style="display:none"></div>

@@ -57,7 +57,7 @@ function canonical(id: string, label: string, rootAttrs: string, inputAttrs: str
               <tbody></tbody>
             </table>
           </div>
-          <div class="Panel YearMonthPicker" role="group" data-panel="picker" data-active="false">
+          <div class="Panel YearMonthPicker WheelColumns" role="group" data-panel="picker" data-active="false">
             <div class="Wheel" data-picker="month" tabindex="0"></div>
             <div class="Wheel" data-picker="year" tabindex="0"></div>
           </div>
