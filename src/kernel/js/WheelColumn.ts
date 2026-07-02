@@ -385,7 +385,7 @@ class WheelColumn {
 
     for (const slot of this.slots) {
       const valRow = base + slot.o
-      const angle = (valRow - this.pos) * STEP_DEG
+      const angle = (this.pos - valRow) * STEP_DEG
       const abs = Math.abs(angle)
 
       slot.el.style.transform = `rotateX(${angle}deg) translateZ(${this.radius}px)`
