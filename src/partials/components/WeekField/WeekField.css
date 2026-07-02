@@ -1,0 +1,377 @@
+.WeekField {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  /* Public API */
+  --wf-popup-gap: 1.5rem;
+  --wf-popup-width: 20rem;
+  --wf-site-padding: var(--SITE--PADDING, 1rem);
+  /* Design tokens — segments */
+  --wf-border-color: currentColor;
+  --wf-border-color-hover: CanvasText;
+  --wf-bg-hover: var(--SITE--POPOVER--HOVER-BG);
+  --wf-border-color-invalid: #c00;
+  --wf-color-muted: var(--SITE--POPOVER--MUTED);
+  --wf-trigger-bg-hover: var(--SITE--POPOVER--HOVER-BG);
+  --wf-trigger-bg-active: var(--SITE--POPOVER--HOVER-BG);
+  /* Design tokens — popup (shared popover surface) */
+  --wf-popup-bg: var(--SITE--POPOVER--BG);
+  --wf-popup-color: var(--SITE--POPOVER--COLOR);
+  --wf-popup-color-muted: var(--SITE--POPOVER--MUTED);
+  --wf-popup-border-color: var(--SITE--POPOVER--BORDER--COLOR);
+  --wf-popup-radius: var(--SITE--POPOVER--RADIUS);
+  --wf-popup-shadow: var(--SITE--POPOVER--SHADOW);
+  --wf-popup-link-color: var(--SITE--POPOVER--ACCENT);
+  --wf-option-bg-selected: var(--SITE--POPOVER--ACCENT);
+  --wf-option-color-selected: var(--SITE--POPOVER--ACCENT-TEXT);
+  /* Internal */
+  --_wf-arrow-size: 0.75rem;
+  --_wf-arrow-corner-radius: 0.25rem;
+
+  & .WeekField-native {
+    display: block;
+  }
+
+  & .WeekField-overlay {
+    display: none;
+  }
+
+  &[data-disabled] {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  &[data-input-mode="custom"] {
+    & .WeekField-native {
+      position: absolute;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      inline-size: 1px;
+      block-size: 1px;
+      overflow: hidden;
+    }
+
+    & .WeekField-overlay {
+      display: inline-flex;
+      align-items: center;
+      gap: 0;
+      border: 1px solid var(--wf-border-color);
+      padding-inline: 0.5rem;
+      padding-block: 0.25rem;
+      border-radius: 4px;
+    }
+  }
+
+  &[data-input-mode="display"] {
+    & .WeekField-native {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    & .WeekField-overlay {
+      display: inline-flex;
+      align-items: center;
+      gap: 0;
+      border: 1px solid var(--wf-border-color);
+      padding-inline: 0.5rem;
+      padding-block: 0.25rem;
+      border-radius: 4px;
+      pointer-events: none;
+    }
+  }
+
+  & .WeekField-segments {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.125rem;
+  }
+
+  & .WeekField-prefix {
+    user-select: none;
+    color: var(--wf-color-muted);
+    margin-inline-end: 0.125rem;
+  }
+
+  & .WeekField-segment {
+    font-variant-numeric: tabular-nums;
+    min-inline-size: 2ch;
+    text-align: center;
+    outline: none;
+    border-radius: 2px;
+    cursor: default;
+
+    &[data-segment="year"] {
+      min-inline-size: 4ch;
+    }
+
+    &[data-focused] {
+      background-color: var(--SITE--POPOVER--ACCENT);
+      color: var(--SITE--POPOVER--ACCENT-TEXT);
+    }
+
+    &[data-placeholder] {
+      color: var(--wf-color-muted);
+    }
+  }
+
+  & .WeekField-sep {
+    user-select: none;
+    color: var(--wf-color-muted);
+  }
+
+  &[data-input-mode="custom"] .WeekField-overlay:hover,
+  &[data-test-state="hover"] .WeekField-overlay {
+    border-color: var(--wf-border-color-hover);
+    background-color: var(--wf-bg-hover);
+  }
+
+  &[data-input-mode="custom"] .WeekField-overlay:focus-within,
+  &[data-test-state="focus"] .WeekField-overlay {
+    outline: 2px solid;
+    outline-offset: 1px;
+  }
+
+  &[data-invalid] .WeekField-overlay {
+    border-color: var(--wf-border-color-invalid);
+  }
+
+  & .WeekField-trigger {
+    margin-inline-start: 0;
+    background: none;
+    border: none;
+    padding: 0.25rem;
+    cursor: pointer;
+    border-radius: 2px;
+    vertical-align: middle;
+
+    &:focus-visible {
+      outline: 2px solid;
+      outline-offset: 2px;
+    }
+  }
+
+  & .WeekField-trigger:hover {
+    background-color: var(--wf-trigger-bg-hover);
+  }
+
+  & .WeekField-trigger:active {
+    background-color: var(--wf-trigger-bg-active);
+  }
+
+  & .WeekField-announce {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  /* ── Initialisation gate ─────────────────────────────────────────────────── */
+  &[data-initialized] {
+    overflow: visible;
+  }
+
+  /* ── Slide rail ──────────────────────────────────────────────────────────── */
+  & .slideContainer {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(100vw, calc(100vw - 2rem));
+    height: 0;
+    pointer-events: none;
+    z-index: 9999;
+  }
+}
+
+/* ── Popup bubble ──────────────────────────────────────────────────────────── */
+.WeekField-popup {
+  position: absolute;
+  left: var(--wf-popup-offset, 50%);
+  transform: translateX(-50%);
+  inline-size: var(--wf-popup-width);
+  pointer-events: auto;
+  background: var(--wf-popup-bg);
+  color: var(--wf-popup-color);
+  border: 1px solid var(--wf-popup-border-color);
+  border-radius: var(--wf-popup-radius);
+  box-shadow: var(--wf-popup-shadow);
+  z-index: 100;
+  padding: var(--SITE--POPOVER--PADDING);
+  font-size: 1rem;
+
+  & .CalendarHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-block-end: 0.5rem;
+    gap: 0.5rem;
+
+    & button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0.25rem 0.5rem;
+      border-radius: 2px;
+      font-size: 1rem;
+      line-height: 1;
+
+      &:focus-visible {
+        outline: 2px solid;
+        outline-offset: 2px;
+      }
+    }
+
+    & .MonthYearLabel {
+      font-weight: bold;
+      flex: 1;
+      text-align: center;
+    }
+  }
+
+  & .WeekGrid {
+    width: 100%;
+    border-collapse: collapse;
+
+    & th {
+      border: 0;
+      padding: 0;
+      padding-block-end: 0.25rem;
+      text-align: center;
+      font-weight: normal;
+      color: var(--wf-popup-color-muted);
+      min-inline-size: 2rem;
+    }
+
+    & th.WeekNumHead {
+      font-weight: bold;
+    }
+
+    & td {
+      border: 0;
+      padding: 0;
+      text-align: center;
+      block-size: 2rem;
+      font-variant-numeric: tabular-nums;
+    }
+
+    & td.WeekNumCell {
+      font-weight: bold;
+      color: var(--wf-popup-color-muted);
+      border-inline-end: 1px solid var(--wf-popup-border-color);
+    }
+
+    & td[data-today] {
+      font-weight: bold;
+      text-decoration: underline;
+    }
+
+    & td[data-outside-month] {
+      color: var(--wf-popup-color-muted);
+    }
+
+    /* Whole-row selection — the native full-week look. */
+    & tbody tr {
+      cursor: pointer;
+      outline: none;
+      border-radius: 4px;
+
+      &:focus-visible,
+      &:focus {
+        outline: 2px solid;
+        outline-offset: -2px;
+      }
+    }
+
+    & tbody tr[data-preview] td:not(.WeekNumCell) {
+      background-color: var(--wf-bg-hover);
+    }
+
+    & tbody tr[data-selected] td {
+      background-color: var(--wf-option-bg-selected);
+      color: var(--wf-option-color-selected);
+    }
+
+    & tbody tr[data-disabled] {
+      cursor: not-allowed;
+
+      & td {
+        color: var(--wf-popup-color-muted);
+      }
+    }
+  }
+
+  & .WeekField-popup-footer {
+    display: flex;
+    justify-content: space-between;
+    margin-block-start: 0.5rem;
+    padding-block-start: 0.5rem;
+    border-top: 1px solid var(--wf-popup-border-color);
+    gap: 0.5rem;
+
+    & button {
+      background: none;
+      border: none;
+      color: var(--wf-popup-link-color);
+      padding: 0.25rem 0.5rem;
+      cursor: pointer;
+      border-radius: 2px;
+      font: inherit;
+
+      &:hover {
+        background-color: var(--wf-bg-hover);
+      }
+
+      &:focus-visible {
+        outline: 2px solid;
+        outline-offset: 2px;
+      }
+
+      &:disabled {
+        color: var(--wf-popup-color-muted);
+        cursor: not-allowed;
+      }
+    }
+  }
+}
+
+/* ── Direction gates ───────────────────────────────────────────────────────── */
+.WeekField {
+  &[data-direction="bottom"] .WeekField-popup {
+    top: var(--wf-popup-gap);
+  }
+
+  &[data-direction="top"] .WeekField-popup {
+    bottom: var(--wf-popup-gap);
+  }
+}
+
+/* ── Arrow ─────────────────────────────────────────────────────────────────── */
+.WeekField {
+  & .arrow {
+    position: absolute;
+    width: var(--_wf-arrow-size);
+    height: var(--_wf-arrow-size);
+    background-color: var(--wf-popup-bg);
+    left: 50%;
+    z-index: 3;
+  }
+
+  &[data-direction="top"] .arrow {
+    bottom: calc(var(--_wf-arrow-size) * -0.5);
+    transform: translateX(calc(-50% + var(--wf-arrow-offset, 0px))) rotate(45deg);
+    border-end-end-radius: var(--_wf-arrow-corner-radius);
+  }
+
+  &[data-direction="bottom"] .arrow {
+    top: calc(var(--_wf-arrow-size) * -0.5);
+    transform: translateX(calc(-50% + var(--wf-arrow-offset, 0px))) rotate(45deg);
+    border-start-start-radius: var(--_wf-arrow-corner-radius);
+  }
+}
