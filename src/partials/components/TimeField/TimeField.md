@@ -72,6 +72,7 @@ This component composes shared primitives from [`src/kernel/`](../../../kernel/R
 |---|---|---|
 | [`js/WheelColumn`](../../../kernel/js/WheelColumn.md) | JS | hour/minute/second time wheels |
 | [`js/popup-position`](../../../kernel/js/popup-position.md) | JS | popover placement + arrow offset |
+| [`js/popup-interaction`](../../../kernel/js/popup-interaction.md) | JS | popup focus trap (wheels → footer) + wheel-scroll containment |
 | [`utils/locale`](../../../kernel/utils/locale.md) | JS | locale resolution + 12h/24h |
 | [`css/Wheel.css`](../../../kernel/css/Wheel.md) | CSS | wheel visuals — required wherever `WheelColumn` runs |
 

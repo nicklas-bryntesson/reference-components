@@ -1,6 +1,7 @@
 // src/partials/components/DateField/DateField.ts
 
 import { calculatePopupOffset, calculateArrowOffset, detectDirection } from '../../../kernel/js/popup-position'
+import { trapPopupInteraction } from '../../../kernel/js/popup-interaction'
 import {
   getDaysInMonth,
   clampDayToMonth,
@@ -109,6 +110,8 @@ class DateField {
   _digitTimer: ReturnType<typeof setTimeout> | null
   _outsideClickHandler: ((e: MouseEvent) => void) | null
   private _rafHandle: number | null = null
+  // Aborted on close — tears down the shared focus-trap + scroll-containment listeners.
+  private _popupAbort: AbortController | null = null
   _handleTriggerClick: () => void
   _handleNativeChange: () => void
   _handleFormReset: () => void
@@ -670,6 +673,17 @@ class DateField {
 
     this.calendarEl.addEventListener('keydown', e => this._handleCalendarKeydown(e))
 
+    // Shared popup hygiene: cyclic focus trap over the calendar panel's tab
+    // stops, plus wheel-scroll containment (the month/year picker wheels sit
+    // inside this surface). Escape + grid arrow-nav + the picker's own 2-wheel
+    // Tab cycle stay local (see _handleCalendarKeydown / _handlePickerKeydown).
+    this._popupAbort = new AbortController()
+    trapPopupInteraction({
+      container: this.calendarEl,
+      tabStops: () => this._calendarTabStops(),
+      signal: this._popupAbort.signal,
+    })
+
     this._outsideClickHandler = (e: MouseEvent) => {
       if (!this.root.contains(e.target as Node)) {
         // Light dismiss: don't refocus the trigger — that would scroll the
@@ -736,6 +750,10 @@ class DateField {
 
   _closeCalendar(refocusTrigger = true): void {
     if (!this.calendarEl) return
+    if (this._popupAbort) {
+      this._popupAbort.abort()
+      this._popupAbort = null
+    }
     this.calendarEl.remove()
     this.calendarEl = null
     document.removeEventListener('click', this._outsideClickHandler!)
@@ -1018,30 +1036,8 @@ class DateField {
       return
     }
 
-    if (e.key === 'Tab') {
-      const prevBtn = this.calendarEl!.querySelector<HTMLButtonElement>('.PrevMonth')!
-      const monthYearTrigger = this.calendarEl!.querySelector<HTMLButtonElement>('.MonthYearTrigger')!
-      const nextBtn = this.calendarEl!.querySelector<HTMLButtonElement>('.NextMonth')!
-      const clearBtn = this.calendarEl!.querySelector<HTMLButtonElement>('.CalendarFooterClear')
-      const todayBtn = this.calendarEl!.querySelector<HTMLButtonElement>('.CalendarFooterToday')
-      const tabbable = [
-        prevBtn,
-        monthYearTrigger,
-        ...Array.from(grid.querySelectorAll<HTMLButtonElement>('td:not([aria-disabled="true"]) button')),
-        nextBtn,
-        ...(clearBtn && !clearBtn.disabled ? [clearBtn] : []),
-        ...(todayBtn && !todayBtn.disabled ? [todayBtn] : []),
-      ].filter((b): b is HTMLButtonElement => Boolean(b))
-
-      const first = tabbable[0]
-      const last = tabbable[tabbable.length - 1]
-      if (!e.shiftKey && document.activeElement === last) {
-        e.preventDefault(); first.focus()
-      } else if (e.shiftKey && document.activeElement === first) {
-        e.preventDefault(); last.focus()
-      }
-      return
-    }
+    // Tab / Shift+Tab are owned by the shared cyclic focus trap
+    // (trapPopupInteraction, tab stops from _calendarTabStops).
 
     if (!focusedBtn) return
     const currentISO = focusedBtn.dataset.date
@@ -1102,14 +1098,56 @@ class DateField {
       return
     }
 
-    // Tab moves between the month and year wheels.
-    if (e.key === 'Tab') {
-      e.preventDefault()
-      const monthHost = this.calendarEl!.querySelector<HTMLElement>('.Wheel[data-picker="month"]')!
-      const yearHost = this.calendarEl!.querySelector<HTMLElement>('.Wheel[data-picker="year"]')!
-      ;(document.activeElement === monthHost ? yearHost : monthHost).focus()
-    }
+    // Tab (month↔year wheel cycle) is owned by the shared focus trap — when the
+    // picker panel is active, _calendarTabStops returns just the two wheels.
     // ArrowUp/Down are handled per-wheel-host (see _openCalendar setup → stepBy).
+  }
+
+  // Ordered tab stops for the shared focus trap. Depends on which panel is
+  // active: the month/year picker is a modal-within-modal whose only stops are
+  // its two wheels; the calendar panel cycles nav → grid → footer.
+  //
+  // The date grid is a SINGLE composite tab stop (WAI-ARIA grid pattern): it
+  // uses roving tabindex internally (one cell tabindex="0", the rest "-1"), so
+  // Tab must enter/leave the grid as a unit and arrow keys move within it — it
+  // must contribute exactly one stop, not one per day.
+  _calendarTabStops(): HTMLElement[] {
+    if (!this.calendarEl) return []
+
+    if (this._isPickerActive()) {
+      return [
+        this.calendarEl.querySelector<HTMLElement>('.Wheel[data-picker="month"]'),
+        this.calendarEl.querySelector<HTMLElement>('.Wheel[data-picker="year"]'),
+      ].filter((el): el is HTMLElement => Boolean(el))
+    }
+
+    const grid = this.calendarEl.querySelector<HTMLElement>('.Grid')!
+    const prevBtn = this.calendarEl.querySelector<HTMLButtonElement>('.PrevMonth')
+    const monthYearTrigger = this.calendarEl.querySelector<HTMLButtonElement>('.MonthYearTrigger')
+    const nextBtn = this.calendarEl.querySelector<HTMLButtonElement>('.NextMonth')
+    const clearBtn = this.calendarEl.querySelector<HTMLButtonElement>('.CalendarFooterClear')
+    const todayBtn = this.calendarEl.querySelector<HTMLButtonElement>('.CalendarFooterToday')
+
+    // The grid's single stop is its current roving cell (falling back to the
+    // first in-month, enabled cell — mirrors _updateRovingTabindex, which never
+    // rovers onto an outside-month or disabled cell).
+    const gridStop =
+      grid.querySelector<HTMLButtonElement>(
+        'td:not([data-outside-month]):not([aria-disabled="true"]) button[tabindex="0"]',
+      ) ??
+      grid.querySelector<HTMLButtonElement>(
+        'td:not([data-outside-month]):not([aria-disabled="true"]) button',
+      )
+
+    const stops: Array<HTMLElement | null> = [
+      prevBtn,
+      monthYearTrigger,
+      gridStop,
+      nextBtn,
+      ...(clearBtn && !clearBtn.disabled ? [clearBtn] : []),
+      ...(todayBtn && !todayBtn.disabled ? [todayBtn] : []),
+    ]
+    return stops.filter((b): b is HTMLElement => b !== null)
   }
 
   _focusCalendarDate(date: Date): void {

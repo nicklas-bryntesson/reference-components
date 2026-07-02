@@ -330,3 +330,66 @@ test('PageUp moves calendar to previous month', async ({ page }) => {
   await page.keyboard.press('Escape')
 })
 
+// ── Kernel: popup-interaction (focus trap + scroll containment) ─────────────────
+
+test('Tab past the last footer button keeps focus inside the calendar', async ({ page }) => {
+  await page.locator('[data-id="birthdate"] .DateField-trigger').click()
+  await expect(page.locator('.DateField-popup')).toBeVisible()
+  // "Today" is the last tab stop (Clear is disabled while empty). Tab must wrap
+  // back into the calendar, not escape the aria-modal dialog.
+  await page.locator('.DateField-popup .CalendarFooterToday').focus()
+  await page.keyboard.press('Tab')
+  const inside = await page.evaluate(() =>
+    document.querySelector('.DateField-popup')?.contains(document.activeElement) ?? false,
+  )
+  expect(inside).toBe(true)
+})
+
+test('Shift+Tab from the first tab stop keeps focus inside the calendar', async ({ page }) => {
+  await page.locator('[data-id="birthdate"] .DateField-trigger').click()
+  await expect(page.locator('.DateField-popup')).toBeVisible()
+  await page.locator('.DateField-popup .PrevMonth').focus()
+  await page.keyboard.press('Shift+Tab')
+  await expect(page.locator('.DateField-popup')).toBeVisible()
+  const inside = await page.evaluate(() =>
+    document.querySelector('.DateField-popup')?.contains(document.activeElement) ?? false,
+  )
+  expect(inside).toBe(true)
+})
+
+test('Tab from a focused grid day exits the grid as one composite stop (→ NextMonth)', async ({ page }) => {
+  await page.locator('[data-id="birthdate"] .DateField-trigger').click()
+  await expect(page.locator('.DateField-popup')).toBeVisible()
+  // Focus the grid's roving day cell. Tab must leave the grid (WAI-ARIA grid is
+  // ONE tab stop), not step to the adjacent day.
+  const day = page.locator('.DateField-popup td:not([data-outside-month]):not([aria-disabled="true"]) button[tabindex="0"]')
+  await day.focus()
+  await page.keyboard.press('Tab')
+  const landedOnDay = await page.evaluate(() =>
+    Boolean(document.activeElement?.closest('.Grid td button')),
+  )
+  expect(landedOnDay).toBe(false)
+  await expect(page.locator('.DateField-popup .NextMonth')).toBeFocused()
+})
+
+test('Escape closes the calendar and returns focus to the trigger', async ({ page }) => {
+  await page.locator('[data-id="birthdate"] .DateField-trigger').click()
+  await expect(page.locator('.DateField-popup')).toBeVisible()
+  await page.locator('.Grid').focus()
+  await page.keyboard.press('Escape')
+  await expect(page.locator('.DateField-popup')).toHaveCount(0)
+  await expect(page.locator('[data-id="birthdate"] .DateField-trigger')).toBeFocused()
+})
+
+test('wheel event on the calendar surface (off a wheel) is defaultPrevented', async ({ page }) => {
+  await page.locator('[data-id="birthdate"] .DateField-trigger').click()
+  await expect(page.locator('.DateField-popup')).toBeVisible()
+  const prevented = await page.evaluate(() => {
+    const popup = document.querySelector('.DateField-popup')
+    const ev = new WheelEvent('wheel', { deltaY: 120, bubbles: true, cancelable: true })
+    popup.dispatchEvent(ev)
+    return ev.defaultPrevented
+  })
+  expect(prevented).toBe(true)
+})
+

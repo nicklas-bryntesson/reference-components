@@ -1,6 +1,7 @@
 // src/partials/components/TimeField/TimeField.ts
 
 import { calculatePopupOffset, calculateArrowOffset, detectDirection } from '../../../kernel/js/popup-position'
+import { trapPopupInteraction } from '../../../kernel/js/popup-interaction'
 import { readLocale, resolveLocale } from '../../../kernel/utils/locale'
 import WheelColumn, { type WheelColumnOptions } from '../../../kernel/js/WheelColumn'
 
@@ -111,6 +112,8 @@ class TimeField {
   private _outsideClickHandler: ((e: MouseEvent) => void) | null = null
   private _rafHandle: number | null = null
   private _popupTemplate: HTMLTemplateElement | null = null
+  // Aborted on close — tears down the shared focus-trap + scroll-containment listeners.
+  private _popupAbort: AbortController | null = null
 
   static attach(parent: Document | HTMLElement = document): void {
     parent.querySelectorAll('[data-component="TimeField"]').forEach(el => {
@@ -776,6 +779,16 @@ class TimeField {
       this._wheels.set(segType, wheel)
     })
 
+    // Shared popup hygiene: cyclic focus trap over wheels → footer buttons, plus
+    // wheel-scroll containment so a trackpad scroll off a column can't jitter the
+    // page. Escape + ArrowUp/Down stay local (see _handlePopupKeydown).
+    this._popupAbort = new AbortController()
+    trapPopupInteraction({
+      container: this.popupEl,
+      tabStops: () => this._popupTabStops(),
+      signal: this._popupAbort.signal,
+    })
+
     // Outside click to close
     this._outsideClickHandler = (e: MouseEvent) => {
       if (!this.root.contains(e.target as Node)) {
@@ -787,7 +800,25 @@ class TimeField {
     }, 0)
   }
 
+  // Ordered tab stops for the focus trap: wheel columns in DOM order, then the
+  // enabled footer buttons (Clear is skipped while disabled so Tab never lands
+  // on an unactionable control).
+  private _popupTabStops(): HTMLElement[] {
+    if (!this.popupEl) return []
+    const wheels = [...this.popupEl.querySelectorAll<HTMLElement>('[role="spinbutton"]')]
+    const clearBtn = this.popupEl.querySelector<HTMLButtonElement>('.TimeField-popup-clear')
+    const nowBtn = this.popupEl.querySelector<HTMLButtonElement>('.TimeField-popup-now')
+    const buttons = [clearBtn, nowBtn].filter(
+      (b): b is HTMLButtonElement => Boolean(b) && !b!.disabled,
+    )
+    return [...wheels, ...buttons]
+  }
+
   private _closePopup(): void {
+    if (this._popupAbort) {
+      this._popupAbort.abort()
+      this._popupAbort = null
+    }
     if (this.popupEl) {
       this._wheels.forEach(wheel => wheel.destroy())
       this._wheels.clear()
@@ -873,27 +904,8 @@ class TimeField {
   }
 
   private _handlePopupKeydown(e: KeyboardEvent): void {
-    if (e.key === 'Tab') {
-      const col = (e.target as HTMLElement).closest<HTMLElement>('[role="spinbutton"]')
-      if (!col || !this.popupEl) return
-      const allCols = [...this.popupEl.querySelectorAll<HTMLElement>('[role="spinbutton"]')]
-      const isLastCol = allCols[allCols.length - 1] === col
-      const isFirstCol = allCols[0] === col
-      if (!e.shiftKey && isLastCol) {
-        e.preventDefault()
-        this.popupEl.querySelector<HTMLButtonElement>('.TimeField-popup-clear')?.focus()
-      } else if (e.shiftKey && isFirstCol) {
-        e.preventDefault()
-        this.trigger.focus()
-        this._closePopup()
-      } else if (!e.shiftKey && !isLastCol) {
-        e.preventDefault()
-        allCols[allCols.indexOf(col) + 1]?.focus()
-      } else if (e.shiftKey && !isFirstCol) {
-        e.preventDefault()
-        allCols[allCols.indexOf(col) - 1]?.focus()
-      }
-    }
+    // Tab / Shift+Tab are owned by the shared cyclic focus trap
+    // (trapPopupInteraction). Only Escape + ArrowUp/Down are handled locally.
     if (e.key === 'Escape') {
       e.preventDefault()
       this._closePopup()

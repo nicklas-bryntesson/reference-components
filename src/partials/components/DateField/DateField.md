@@ -132,6 +132,7 @@ This component composes shared primitives from [`src/kernel/`](../../../kernel/R
 |---|---|---|
 | [`js/WheelColumn`](../../../kernel/js/WheelColumn.md) | JS | month/year picker wheels |
 | [`js/popup-position`](../../../kernel/js/popup-position.md) | JS | calendar popover placement + arrow offset |
+| [`js/popup-interaction`](../../../kernel/js/popup-interaction.md) | JS | calendar focus trap (nav → grid → footer; picker wheels when active) + wheel-scroll containment |
 | [`utils/dates`](../../../kernel/utils/dates.md) | JS | calendar maths, leap years, ISO formatting, segment order |
 | [`utils/locale`](../../../kernel/utils/locale.md) | JS | locale resolution |
 | [`css/Wheel.css`](../../../kernel/css/Wheel.md) | CSS | wheel visuals — required wherever `WheelColumn` runs |
