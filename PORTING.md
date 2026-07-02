@@ -43,7 +43,7 @@ BASE_URL=http://localhost:5000 npx playwright test --grep "DateField"
 `BASE_URL` chooses *which server*. Two more env vars choose *where on that server* the suite looks (see `src/e2e-helpers/target.js`):
 
 - `TARGET_PATH` — the page the tests navigate to (default `/`). Set it when your demo lives elsewhere, e.g. `TARGET_PATH=/kitchen-sink`.
-- `TARGET_ID` — overrides the component root selector for the suites that target a single instance (DateTimeField, TimeField, MonthField). DateField and FileUpload assume their canonical demo ids (see below) — render those on your page.
+- `TARGET_ID` — overrides the component root selector for the suites that target a single instance (DateTimeField, TimeField, MonthField, WeekField). DateField and FileUpload assume their canonical demo ids (see below) — render those on your page.
 
 ```bash
 BASE_URL=http://localhost:5000 TARGET_PATH=/kitchen-sink npx playwright test
@@ -72,6 +72,8 @@ For **DateField**, the test target is `[data-id="birthdate"]`. Your page must in
 For **FileUpload**, the test target is `[data-component="FileUpload"][data-initialized]`. Multiple instances are fine — tests use `.last()` to target the live demo instance.
 
 For **MonthField**, the test target is `[data-component="MonthField"][data-id="meeting-month"]`. Your page must include a MonthField instance with that id (or override `TARGET_ID`).
+
+For **WeekField**, the test target is `[data-component="WeekField"][data-id="meeting-week"]`. Your page must include a WeekField instance with that id (or override `TARGET_ID`).
 
 ## Fixtures
 
