@@ -17,6 +17,10 @@ getWeekdayNames(locale): string[]                   // 7 short names, Monday-fir
 getMonthName(year, month, locale): string           // long month name via Intl
 formatMonthISO(year, month): string                 // 'YYYY-MM' (month is 0-based)
 parseMonthISO(value): { year, month } | null        // 'YYYY-MM' → 0-based month, null if malformed
+getISOWeekYear(date): number                         // ISO week-numbering year (≠ calendar year near Jan/Dec)
+getDateOfISOWeek(weekYear, week): Date               // Monday of the ISO week
+formatWeekISO(weekYear, week): string                // 'YYYY-Www' (week zero-padded)
+parseWeekISO(value): { weekYear, week } | null       // 'YYYY-Www'; null if malformed / week ∉ 1–53
 getSegmentOrder(locale): { order: ('day'|'month'|'year')[]; separator: string }
 
 type DateSegmentType = 'day' | 'month' | 'year'
@@ -31,7 +35,11 @@ type DateSegmentType = 'day' | 'month' | 'year'
 - **Inclusive bounds.** `isDayDisabled` compares at day granularity; `min` and `max` are selectable.
 - **Locale segment order.** `getSegmentOrder` derives day/month/year order and the separator from
   `Intl.formatToParts`, stripping bidi control chars, with a `['day','month','year'] / '/'` fallback.
+- **ISO week-numbering year.** `getISOWeekYear` can differ from the calendar year at the Jan/Dec
+  boundary (Mon 2025-12-29 is `2026-W01`; 2027-01-01 is `2026-W53`). `getDateOfISOWeek` inverts it
+  (Jan 4 is always in ISO week 1). Week↔date mapping must go through these — never infer the year from
+  a visible month. `parseWeekISO` returns `null` (never throws) for malformed input or week ∉ 1–53.
 
 ## Conformance
 
-Black-box: [`tests/dates.unit.test.ts`](tests/dates.unit.test.ts). Consumed by: DateField, DateTimeField, MonthField.
+Black-box: [`tests/dates.unit.test.ts`](tests/dates.unit.test.ts). Consumed by: DateField, DateTimeField, MonthField, WeekField.

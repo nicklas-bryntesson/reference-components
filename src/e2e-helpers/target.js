@@ -21,6 +21,7 @@ const DEFAULT_TARGET = {
   DateTimeField: '[data-component="DateTimeField"][data-id="meeting-time"]',
   TimeField: '[data-component="TimeField"][data-id="meeting-time"]',
   MonthField: '[data-component="MonthField"][data-id="meeting-month"]',
+  WeekField: '[data-component="WeekField"][data-id="meeting-week"]',
   FileUpload: '[data-component="FileUpload"][data-initialized]',
 }
 

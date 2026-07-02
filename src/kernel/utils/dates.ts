@@ -90,6 +90,43 @@ export function parseMonthISO(value: string): { year: number; month: number } | 
   return { year, month }
 }
 
+// ── ISO week helpers (native <input type="week"> value: 'YYYY-Www') ──────────
+// The ISO week-*numbering* year can differ from the calendar year near Jan 1 /
+// Dec 31 (e.g. Mon 2025-12-29 is 2026-W01; 2027-01-01 is 2026-W53). Week↔date
+// mapping must go through these — never infer the year from a visible month.
+
+/** ISO week-numbering year for a date (the calendar year of that week's Thursday). */
+export function getISOWeekYear(date: Date): number {
+  const d = new Date(date.getFullYear(), date.getMonth(), date.getDate())
+  d.setDate(d.getDate() + 3 - ((d.getDay() + 6) % 7)) // → Thursday of this ISO week
+  return d.getFullYear()
+}
+
+/** Monday of the given ISO week. Jan 4 is always in ISO week 1. */
+export function getDateOfISOWeek(weekYear: number, week: number): Date {
+  const jan4 = new Date(weekYear, 0, 4)
+  const week1Monday = new Date(jan4)
+  week1Monday.setDate(jan4.getDate() - ((jan4.getDay() + 6) % 7))
+  const monday = new Date(week1Monday)
+  monday.setDate(week1Monday.getDate() + (week - 1) * 7)
+  return monday
+}
+
+/** Format an ISO week-year + week as the native value. @example formatWeekISO(2026, 27) // "2026-W27" */
+export function formatWeekISO(weekYear: number, week: number): string {
+  return `${weekYear}-W${String(week).padStart(2, '0')}`
+}
+
+/** Parse a 'YYYY-Www' value. Returns null for malformed input or week outside 1–53. */
+export function parseWeekISO(value: string): { weekYear: number; week: number } | null {
+  const match = /^(\d{4})-W(\d{2})$/.exec(value.trim())
+  if (!match) return null
+  const weekYear = Number(match[1])
+  const week = Number(match[2])
+  if (week < 1 || week > 53) return null
+  return { weekYear, week }
+}
+
 export type DateSegmentType = 'day' | 'month' | 'year'
 
 export function getSegmentOrder(locale: string): { order: DateSegmentType[]; separator: string } {
