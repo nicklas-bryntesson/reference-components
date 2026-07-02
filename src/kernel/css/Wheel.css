@@ -23,26 +23,9 @@
 
   &:active { cursor: grabbing; }
 
-  &:focus-visible .Wheel-band {
-    box-shadow: 0 0 0 2px var(--SITE--POPOVER--ACCENT);
-  }
-
-  /* Fade mask, top and bottom, toward the popover surface colour */
-  &::before, &::after {
-    content: "";
-    position: absolute;
-    left: 0; right: 0;
-    height: calc((100% - var(--wheel-row-height)) / 2);
-    pointer-events: none;
-    z-index: 2;
-  }
-  &::before {
-    top: 0;
-    background: linear-gradient(Canvas, rgba(255, 255, 255, 0));
-  }
-  &::after {
-    bottom: 0;
-    background: linear-gradient(rgba(255, 255, 255, 0), Canvas);
+  &:focus-visible {
+    outline: 2px solid var(--SITE--POPOVER--ACCENT);
+    outline-offset: -2px;
   }
 }
 
@@ -75,15 +58,40 @@
   font-weight: bold;
 }
 
-/* Center band (focus highlight) */
+/* Center band — moved to the full-width .WheelColumns container below.
+   WheelColumn still injects this element; hide the per-column version. */
 .Wheel-band {
+  display: none;
+}
+
+/* A row of wheel columns. Draws the single full-width selection band + fade
+   that spans all columns, matching the native picker (see .Wheel). */
+.WheelColumns {
+  position: relative;
+  --wheel-row-height: 38px; /* keep in sync with .Wheel */
+}
+.WheelColumns::before { /* full-width selection band, behind the numbers */
+  content: "";
   position: absolute;
-  left: 4px; right: 4px;
+  left: 0; right: 0;
   top: 50%;
   height: var(--wheel-row-height);
-  margin-top: calc(var(--wheel-row-height) / -2);
+  transform: translateY(-50%);
+  background: var(--SITE--POPOVER--HOVER-BG);
   border-radius: 9px;
-  background: var(--wheel-focus-bg);
+  z-index: 0;
   pointer-events: none;
-  z-index: 1;
+}
+.WheelColumns::after { /* full-width top+bottom fade toward the popover surface, above the numbers */
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: linear-gradient(
+    Canvas,
+    transparent var(--wheel-row-height),
+    transparent calc(100% - var(--wheel-row-height)),
+    Canvas
+  );
 }

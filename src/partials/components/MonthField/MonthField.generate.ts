@@ -44,7 +44,7 @@ function canonical(id: string, label: string, rootAttrs: string, inputAttrs: str
     <div class="slideContainer">
       <template data-template="monthfield-popup">
         <div class="MonthField-popup" role="dialog" aria-modal="true">
-          <div class="MonthField-popup-columns">
+          <div class="MonthField-popup-columns WheelColumns">
             <div class="Wheel" data-picker="month" role="spinbutton" tabindex="0"></div>
             <div class="Wheel" data-picker="year" role="spinbutton" tabindex="-1"></div>
           </div>
