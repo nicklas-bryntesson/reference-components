@@ -638,6 +638,8 @@ class WeekField {
       weekSeg.setAttribute('aria-valuenow', String(parsed.week))
       weekSeg.textContent = formatSegment(parsed.week)
     }
+    // A cross-year correction may land in a year with a different 52/53 max week.
+    this._refreshWeekMax()
     this._refreshValueTexts()
   }
 
@@ -1131,6 +1133,8 @@ class WeekField {
     this.selectedWeekYear = null
     this.root.removeAttribute('data-has-value')
     this._suppressEvents = false
+    // Clearing is a value change — fire both, matching the set path (_syncToNative).
+    this.native.dispatchEvent(new Event('input', { bubbles: true }))
     this.native.dispatchEvent(new Event('change', { bubbles: true }))
     this._updateClearButton()
     this._renderMonth()

@@ -23,7 +23,6 @@ Completes the date family alongside DateField, DateTimeField, TimeField, and Mon
 | `data-value` | `YYYY-Www` | Initial value (server-side render) |
 | `data-min` | `YYYY-Www` | Minimum allowed week; bounds the segments and disables earlier week rows |
 | `data-max` | `YYYY-Www` | Maximum allowed week; bounds the segments and disables later week rows |
-| `data-step` | number | Accepted for `<input type="week">` parity. The picker steps one week at a time. Default: `1` |
 | `data-disabled` | boolean | Disables the entire field |
 | `data-invalid` | boolean | Marks the field invalid; adds `aria-invalid="true"` to the native input |
 | `data-input-mode` | `custom` \| `display` | Set by JS: `custom` on desktop / where native week is unsupported, `display` on touch with native week support |
