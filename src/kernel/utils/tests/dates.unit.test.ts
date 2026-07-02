@@ -8,6 +8,10 @@ import {
   formatDatetimeISO,
   formatMonthISO,
   parseMonthISO,
+  getISOWeekYear,
+  getDateOfISOWeek,
+  formatWeekISO,
+  parseWeekISO,
   getWeekdayNames,
   getMonthName,
   getSegmentOrder,
@@ -158,6 +162,70 @@ describe('parseMonthISO', () => {
     expect(parseMonthISO('')).toBeNull()
     expect(parseMonthISO('2026-6')).toBeNull()
     expect(parseMonthISO('abc-de')).toBeNull()
+  })
+})
+
+describe('getISOWeekYear', () => {
+  it('returns the calendar year for a mid-year date', () => {
+    expect(getISOWeekYear(new Date(2026, 5, 15))).toBe(2026)
+  })
+  it('returns 2026 for Mon 2025-12-29 (belongs to 2026-W01)', () => {
+    expect(getISOWeekYear(new Date(2025, 11, 29))).toBe(2026)
+  })
+  it('returns 2026 for Fri 2027-01-01 (belongs to 2026-W53)', () => {
+    expect(getISOWeekYear(new Date(2027, 0, 1))).toBe(2026)
+  })
+})
+
+describe('getDateOfISOWeek', () => {
+  it('returns Monday 2025-12-29 for 2026-W01', () => {
+    const d = getDateOfISOWeek(2026, 1)
+    expect([d.getFullYear(), d.getMonth(), d.getDate()]).toEqual([2025, 11, 29])
+  })
+  it('round-trips with getISOWeek and getISOWeekYear', () => {
+    const d = getDateOfISOWeek(2026, 27)
+    expect(getISOWeek(d)).toBe(27)
+    expect(getISOWeekYear(d)).toBe(2026)
+  })
+  it('handles a 53-week year (2020-W53 → Mon 2020-12-28)', () => {
+    const d = getDateOfISOWeek(2020, 53)
+    expect(getISOWeek(d)).toBe(53)
+    expect([d.getFullYear(), d.getMonth(), d.getDate()]).toEqual([2020, 11, 28])
+  })
+})
+
+describe('formatWeekISO', () => {
+  it('formats to yyyy-Www', () => {
+    expect(formatWeekISO(2026, 27)).toBe('2026-W27')
+  })
+  it('zero-pads a single-digit week', () => {
+    expect(formatWeekISO(2026, 1)).toBe('2026-W01')
+  })
+})
+
+describe('parseWeekISO', () => {
+  it('parses yyyy-Www', () => {
+    expect(parseWeekISO('2026-W27')).toEqual({ weekYear: 2026, week: 27 })
+  })
+  it('parses zero-padded week 01', () => {
+    expect(parseWeekISO('2026-W01')).toEqual({ weekYear: 2026, week: 1 })
+  })
+  it('round-trips with formatWeekISO', () => {
+    const p = parseWeekISO('2026-W27')!
+    expect(formatWeekISO(p.weekYear, p.week)).toBe('2026-W27')
+  })
+  it('trims surrounding whitespace', () => {
+    expect(parseWeekISO('  2026-W27  ')).toEqual({ weekYear: 2026, week: 27 })
+  })
+  it('returns null for week 00 and 54', () => {
+    expect(parseWeekISO('2026-W00')).toBeNull()
+    expect(parseWeekISO('2026-W54')).toBeNull()
+  })
+  it('returns null for malformed input', () => {
+    expect(parseWeekISO('2026-27')).toBeNull()
+    expect(parseWeekISO('2026-W1')).toBeNull()
+    expect(parseWeekISO('')).toBeNull()
+    expect(parseWeekISO('abc')).toBeNull()
   })
 })
 
