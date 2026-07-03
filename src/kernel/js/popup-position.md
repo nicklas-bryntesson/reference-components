@@ -37,4 +37,4 @@ detectDirection(
 Black-box: [`tests/popup-position.unit.test.ts`](tests/popup-position.unit.test.ts). Port the three
 functions, run this suite against your implementation.
 
-Consumed by: DateField, DateTimeField, TimeField, ToggleTip.
+Consumed by: DateField, DateTimeField, TimeField, MonthField, WeekField, ToggleTip.

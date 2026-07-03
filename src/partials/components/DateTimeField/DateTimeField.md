@@ -29,12 +29,12 @@ Custom accessible datetime input wrapping a hidden `input[type="datetime-local"]
           <div class="Panel" data-panel="calendar" data-active="true">
             <table class="CalendarGrid" role="grid"></table>
           </div>
-          <div class="Panel YearMonthPicker" role="group" data-panel="picker" data-active="false">
+          <div class="Panel YearMonthPicker WheelColumns" role="group" data-panel="picker" data-active="false">
             <div class="Wheel" data-picker="month" tabindex="0"></div>
             <div class="Wheel" data-picker="year" tabindex="0"></div>
           </div>
         </div>
-        <div class="TimeColumns">
+        <div class="TimeColumns WheelColumns">
           <div class="Wheel" data-segment="hour" tabindex="0"></div>
           <div class="Wheel" data-segment="minute" tabindex="0"></div>
           <div class="Wheel" data-segment="second" tabindex="0" style="display:none"></div>
@@ -50,6 +50,7 @@ Custom accessible datetime input wrapping a hidden `input[type="datetime-local"]
     </div>
   </template>
   <div class="slideContainer"></div>
+  <div class="Announce" aria-live="polite" aria-atomic="true"></div>
 </div>
 ```
 
@@ -57,9 +58,14 @@ JS injects the segment spinbuttons into `.Segments` and the day cells into `.Cal
 the `<template>` into `.slideContainer` on open — do not author those. The five `.Wheel` elements
 (two `data-picker` for month/year, three `data-segment` for hour/minute/second) are upgraded by the
 `WheelColumn` kernel primitive to `role="spinbutton"`; see
-[`src/kernel/js/WheelColumn.md`](../../../kernel/js/WheelColumn.md). The `data-panel="calendar"` and
+[`src/kernel/js/WheelColumn.md`](../../../kernel/js/WheelColumn.md). The `WheelColumns` class on the
+picker panel and `.TimeColumns` is required — the kernel `Wheel.css` styles the wheel band and fade
+on it. The `data-panel="calendar"` and
 `data-panel="picker"` panels swap via `data-active`; the second segment and `.DateTimeField-ampm` stay
-hidden unless `data-step < 60` / a 12-hour locale applies.
+hidden unless `data-step < 60` / a 12-hour locale applies. JS gives `.MonthYearTrigger` an
+`aria-controls` pointing at the picker panel and toggles its `aria-expanded` on picker open/close; it
+deliberately carries no `aria-haspopup` (the trigger swaps an in-dialog panel of spinbutton wheels,
+not a listbox popup).
 
 ## Attributes
 
@@ -70,8 +76,8 @@ hidden unless `data-step < 60` / a 12-hour locale applies.
 | `data-id` | string | Unique field ID (required) |
 | `data-name` | string | Native input name (required) |
 | `data-locale` | BCP 47 | Controls segment order and 12h/24h |
-| `data-min` | `YYYY-MM-DDTHH:mm` | Minimum allowed datetime |
-| `data-max` | `YYYY-MM-DDTHH:mm` | Maximum allowed datetime |
+| `data-min` | `YYYY-MM-DDTHH:mm` | Constrains the calendar grid (day granularity) and the year segment/wheel range. Typed segment values are not clamped to it on write |
+| `data-max` | `YYYY-MM-DDTHH:mm` | Constrains the calendar grid (day granularity) and the year segment/wheel range. Typed segment values are not clamped to it on write |
 | `data-disabled` | boolean | Disables the component |
 | `data-invalid` | boolean | Marks field invalid, adds `aria-invalid` |
 | `data-value` | `YYYY-MM-DDTHH:mm` | Initial value (server-render) |
@@ -83,6 +89,10 @@ hidden unless `data-step < 60` / a 12-hour locale applies.
 |---|---|
 | `data-initialized` | Component mounted |
 | `data-open` | Popup is open |
+| `data-input-mode` | `"custom"` or `"display"` — chosen at init via `matchMedia('(pointer: coarse)')` |
+| `data-direction` | `"top"` or `"bottom"` — which side of the trigger the popup opens on |
+
+JS also sets two inline custom properties on the root while the popup is open: `--dtf-popup-offset` (horizontal popup position, %) and `--dtf-arrow-offset` (arrow position, px).
 
 ## Behaviour
 
@@ -92,14 +102,20 @@ hidden unless `data-step < 60` / a 12-hour locale applies.
 - All segments must be filled before native input is written
 - Form reset clears all segments
 
+## Events
+
+- `change` — dispatched on the native input as `new Event('change', { bubbles: true })`, exactly once per actual value change. An equality gate against the native input's current value collapses cascading segment writes (e.g. a calendar selection touches up to seven segments) into a single event. Popup **Clear** also dispatches `change` (value set to `""`).
+- Each value change also writes "Selected date and time: <localized label>" (localised) to the `.Announce` live region.
+
 ## Accessibility notes
 
 - Native input is `aria-hidden="true"` and `tabindex="-1"`
 - `.Segments` has `role="group"` with `aria-roledescription`
-- Each spinbutton has `aria-valuemin`, `aria-valuemax`, `aria-valuenow`, `aria-valuetext`
+- Each spinbutton has `aria-valuemin`, `aria-valuemax`, `aria-valuenow`, `aria-valuetext` — except the AM/PM segment, which gets only `aria-valuenow`/`aria-valuetext` (a 2-state toggle, not a range)
 - Popup is `role="dialog"` with `aria-modal="true"`
 - Time columns are `.Wheel` spinbuttons — the `WheelColumn` primitive sets `role="spinbutton"` with `aria-valuemin`/`aria-valuemax`/`aria-valuenow`/`aria-valuetext` (not `listbox`)
 - `aria-disabled="true"` on all segments when disabled
+- `.Announce` (`aria-live="polite"`, `aria-atomic="true"`, last child of the root) announces the selected date and time on each value change
 
 ## Kernel dependencies
 

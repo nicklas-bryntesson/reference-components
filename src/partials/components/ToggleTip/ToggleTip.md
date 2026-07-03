@@ -12,7 +12,7 @@ An accessible tooltip triggered by a button. The bubble positions itself above t
 </toggle-tip>
 ```
 
-The `icon` attribute is required; all others are optional (see `## Attributes`).
+All attributes are optional — `icon` defaults to `"info"` (see `## Attributes`).
 
 **Rendered DOM** — on initialisation the JS replaces the element's contents with the trigger button and the bubble. Port this structure if you rebuild without the reference JS:
 
@@ -53,7 +53,7 @@ One kernel primitive: [`popup-position`](../../../kernel/js/popup-position.md) �
 | `title` | string | — | Heading inside bubble. Optional. |
 | `heading-level` | `"1"`–`"6"` | `"3"` | `aria-level` for the title heading |
 
-`direction` and `initialized` are set by JS — do not author them.
+`data-direction` and `initialized` are set by JS — do not author them.
 
 ### Known attribute conflict
 
@@ -67,11 +67,13 @@ Override at `:root` or on the `toggle-tip` element directly.
 |---|---|---|
 | `--toggletip-gap` | `0.75rem` | Space between trigger and bubble |
 | `--toggletip-content-width` | `20rem` | Bubble max width |
+| `--toggletip-padding` | `1.5rem` | Bubble inner padding |
+| `--toggletip-border-radius` | `var(--SITE--POPOVER--RADIUS)` | Bubble corner radius |
 | `--toggletip-button-width` | `1.5rem` | Trigger button size |
-| `--toggletip-button-color` | `black` | Icon colour |
-| `--toggletip-surface-color` | `white` | Bubble background |
-| `--toggletip-text-color` | `black` | Bubble text colour |
-| `--toggletip-border-color` | `lightgrey` | Title divider colour |
+| `--toggletip-button-color` | `CanvasText` | Icon colour |
+| `--toggletip-surface-color` | `Canvas` | Bubble background |
+| `--toggletip-text-color` | `CanvasText` | Bubble text colour |
+| `--toggletip-border-color` | `var(--SITE--POPOVER--BORDER--COLOR)` | Bubble border and title divider colour |
 | `--toggletip-site-max-width` | `100rem` | Site max width (caps the slide rail) |
 | `--toggletip-site-padding` | `var(--SITE--PADDING, 1rem)` | Outer site padding — bubble stays at least half this value from each viewport edge |
 
@@ -97,6 +99,10 @@ DOM removal causes layout recalculation on every open, and loses the bubble's sc
 - `focusout` on the component closes the bubble — covers both Tab-away and programmatic focus moves.
 - No arrow-key navigation inside the bubble (content is passive).
 
+### Pointer light dismiss
+
+A `mousedown` outside the component closes the bubble. Closing this way deliberately does **not** refocus the trigger — refocusing on outside click steals the user's click target and can cause scroll jumps (project-wide light-dismiss convention).
+
 ## Positioning
 
 The slide-rail model is left-to-right only. RTL is not supported — the rail is intentionally physical (uses `left`, not `inset-inline-start`). If RTL is needed, the JS offset calculations and CSS rail positioning both need mirroring.
@@ -105,12 +111,12 @@ CSS Anchor Positioning is not used — browser support was below the customer th
 
 ## Framework integration / dynamic injection
 
-All layout calculations run on button press, not at page load or component init. `_buildDOM()` only constructs markup; position, direction, and CSS variable resolution all happen lazily when the bubble opens. This means the component works correctly when injected into the DOM after page load — e.g. via HTMX, a SPA router, or any other dynamic mechanism — as long as it is initialised after injection.
+Bubble/arrow offset maths and CSS variable resolution run lazily when the bubble opens, not at page load or component init — `_buildDOM()` only constructs markup. Direction (`data-direction`) is the exception: it is computed at init and re-computed on window resize, even while the bubble is closed. This means the component works correctly when injected into the DOM after page load — e.g. via HTMX, a SPA router, or any other dynamic mechanism — as long as it is initialised after injection.
 
-`DOMContentLoaded` has already fired by the time a dynamic partial lands, so the built-in bootstrap won't pick up new elements automatically. Expose `initToggleTips` and call it after the swap:
+`DOMContentLoaded` has already fired by the time a dynamic partial lands, so the built-in bootstrap won't pick up new elements automatically. The reference file exports nothing — the `ToggleTip` class is module-private and only the bootstrap runs. When porting or supporting dynamic injection, add an export such as `initToggleTips` and call it after the swap:
 
 ```js
-// ToggleTip.js — expose alongside the default bootstrap
+// ToggleTip.ts — what to add alongside the default bootstrap
 export function initToggleTips(root = document) {
   root.querySelectorAll('toggle-tip').forEach(el => new ToggleTip(el))
 }
@@ -125,13 +131,15 @@ document.addEventListener('htmx:afterSwap', e => initToggleTips(e.detail.target)
 
 The `root` parameter scopes the query to the swapped fragment so already-running instances are not re-initialised.
 
+Each instance exposes `destroy()`, which removes all listeners (window resize, document mousedown, component focusout, button click) — call it before removing the element from the DOM.
+
 ## Kernel dependencies
 
 | Kernel module | Kind | Used for |
 |---|---|---|
 | [`js/popup-position`](../../../kernel/js/popup-position.md) | JS | `detectDirection` + bubble/arrow offset maths |
 
-No CSS kernel dependency. The site tokens this component reads (`--SITE--PADDING`, `--SITE--POPOVER--BORDER--COLOR`, `--SITE--POPOVER--RADIUS`, `--SITE--POPOVER--SHADOW`) are surfaced through the `--toggletip-*` CSS Variable API above and each has a fallback, so the component also runs standalone.
+No CSS kernel dependency. The site tokens this component reads (`--SITE--PADDING`, `--SITE--POPOVER--BORDER--COLOR`, `--SITE--POPOVER--RADIUS`, `--SITE--POPOVER--SHADOW`) are surfaced through the `--toggletip-*` CSS Variable API above. Most have fallbacks, so the component largely runs standalone — with two exceptions: `box-shadow: var(--SITE--POPOVER--SHADOW)` has no fallback (no shadow without the token), and `--toggletip-border-color`'s fallback chain bottoms out in `--SITE--POPOVER--BORDER--COLOR` (the border degrades to `currentColor` without it).
 
 ## Non-goals
 

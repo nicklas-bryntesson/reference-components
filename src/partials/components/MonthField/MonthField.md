@@ -10,13 +10,12 @@ Completes the date family alongside DateField, DateTimeField, and TimeField.
 |---|---|---|
 | `data-id` | string | Applied as `id` and `name` on the native input |
 | `data-name` | string | Overrides the field `name` (defaults to `data-id`) |
-| `data-locale` | BCP 47 | Controls segment/wheel labels and month names. Default: `sv-SE` |
+| `data-locale` | BCP 47 | Controls segment/wheel labels and month names. Resolved as `data-locale` → `<html lang>` → `en`; `sv-SE` is the kitchensink's authored value |
 | `data-value` | `YYYY-MM` | Initial value (server-side render) |
-| `data-min` | `YYYY-MM` | Minimum allowed month; bounds both wheels and the segments |
-| `data-max` | `YYYY-MM` | Maximum allowed month; bounds both wheels and the segments |
-| `data-step` | number | Accepted for `<input type="month">` parity. The picker steps one month at a time. Default: `1` |
+| `data-min` | `YYYY-MM` | Minimum allowed month; bounds the year wheel and the segments — the month wheel always spans all 12 months, and out-of-range combinations are corrected (`_enforceBounds`) |
+| `data-max` | `YYYY-MM` | Maximum allowed month; bounds the year wheel and the segments — the month wheel always spans all 12 months, and out-of-range combinations are corrected (`_enforceBounds`) |
 | `data-disabled` | boolean | Disables the entire field |
-| `data-invalid` | boolean | Marks the field invalid; adds `aria-invalid="true"` to the native input |
+| `data-invalid` | boolean | Marks the field invalid — styling hook only; the author must also set `aria-invalid="true"` on the native input (as the kitchensink states do) |
 | `data-input-mode` | `custom` \| `display` | Set by JS: `custom` on fine pointers (spinbutton overlay), `display` on touch (native picker) |
 
 State attributes set by JS: `data-initialized`, `data-open`, `data-has-value`, `data-direction`, and `aria-expanded` on the trigger.
@@ -37,9 +36,9 @@ The popup **month wheel** shows the localized month **name** ("Juni"); the inlin
 | `0`–`9` | Digit entry. Month accepts a 1-based value (1–12) with fast-advance; year accepts up to 4 digits |
 | `ArrowUp` / `ArrowDown` | Month steps ±1 and **wraps** Dec↔Jan; year steps ±1 and **clamps** to bounds |
 | `ArrowLeft` / `ArrowRight` | Move between segments |
-| `Tab` / `Shift+Tab` | Move between segments; Tab on last (year) → trigger |
+| `Tab` / `Shift+Tab` | Leave the segment group (roving tabindex — the segments are one tab stop): Tab moves to the trigger, Shift+Tab exits the field |
 | `Backspace` | Clear segment, move left |
-| `Space` / `Enter` (trigger) | Open the popup; focus moves to the month wheel |
+| `Space` / `Enter` (trigger) | Open the popup; focus stays on the trigger — Tab moves into the wheels |
 | `ArrowUp` / `ArrowDown` (wheel) | `WheelColumn.stepBy` — spin the focused wheel |
 | `Tab` (popup) | Cycle month wheel → year wheel → footer buttons |
 | `Escape` | Close the popup; focus returns to the trigger |
@@ -52,7 +51,11 @@ The native `<input type="month">` value is written as `YYYY-MM` only when **both
 
 ## Events
 
-The component dispatches `input` and `change` events on the native `<input>` when the value changes.
+The component dispatches `input` and `change` events on the native `<input>` only when a **complete** value is written (both segments filled). Clearing a filled field with `Backspace` empties the native value without dispatching anything, and the popup **Rensa** (Clear) and **Denna månad** (This month) buttons also write silently.
+
+## JS API
+
+`MonthField` is the default export. Statics: `MonthField.attach(parent?)` (instantiate every `.MonthField` root) and `MonthField.registerLocale(locale, strings)`. Instances expose `destroy()`. The pure helpers `formatSegment`, `wrapValue`, `clampValue` and `clampMonthISO` are exported for unit tests.
 
 ## CSS tokens
 
@@ -72,9 +75,12 @@ All tokens are custom properties on `.MonthField`:
 | `--mf-popup-border-color` | Popup border |
 | `--mf-popup-radius` | Popup border radius |
 | `--mf-popup-shadow` | Popup box shadow |
-| `--mf-popup-width` | Popup width |
+| `--mf-popup-gap` | Gap between field and popup |
+| `--mf-site-padding` | Viewport padding read by JS for popup positioning (defaults to `--SITE--PADDING`) |
 | `--mf-option-bg-selected` | Selected option background |
 | `--mf-option-color-selected` | Selected option text color |
+
+There is no popup width token — the popup sizes to `fit-content`; the month + year columns define the width.
 
 ## Kernel dependencies
 

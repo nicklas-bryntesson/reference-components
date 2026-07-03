@@ -38,7 +38,7 @@ An accessible date input that renders editable day, month, and year segments wit
         <div class="DateField-popup" role="dialog" aria-modal="true">
           <div class="CalendarHeader">
             <button type="button" class="PrevMonth">&#8249;</button>
-            <button type="button" class="MonthYearTrigger" aria-haspopup="listbox" aria-expanded="false"></button>
+            <button type="button" class="MonthYearTrigger" aria-expanded="false"></button>
             <button type="button" class="NextMonth">&#8250;</button>
           </div>
           <div class="Panel" data-panel="calendar" data-active="true">
@@ -50,7 +50,7 @@ An accessible date input that renders editable day, month, and year segments wit
               <tbody></tbody>
             </table>
           </div>
-          <div class="Panel YearMonthPicker" role="group" data-panel="picker" data-active="false">
+          <div class="Panel YearMonthPicker WheelColumns" role="group" data-panel="picker" data-active="false">
             <div class="Wheel" data-picker="month" tabindex="0"></div>
             <div class="Wheel" data-picker="year" tabindex="0"></div>
           </div>
@@ -67,20 +67,20 @@ An accessible date input that renders editable day, month, and year segments wit
 </div>
 ```
 
-`FIELD_ID` must be unique on the page and must match both `data-id` and the `<label for>`. `data-locale` controls segment labels and calendar month/weekday names. `data-min` and `data-max` define the selectable date range (ISO 8601). JS injects the segment spans into `.Segments` and clones the calendar dialog from the `<template>` into `.slideContainer` — do not author the segment spans or the cloned calendar outside the template. The SVG icon, the `<template>` structure, and its contents are all authored markup. The `aria-label` on `.DateField-trigger` is a placeholder; JS overwrites it with a localised string derived from `data-locale` — port it to your translation system rather than hardcoding a value.
+`FIELD_ID` must be unique on the page and must match both `data-id` and the `<label for>`. `data-locale` controls segment labels and calendar month/weekday names. `data-min` and `data-max` define the selectable date range (ISO 8601). JS injects the segment spans into `.Segments` and clones the calendar dialog from the `<template>` into `.slideContainer` on open — do not author the segment spans or the cloned calendar outside the template. The `WheelColumns` class on the picker panel is required — the kernel `Wheel.css` styles the wheel band and fade on it. JS gives `.MonthYearTrigger` an `aria-controls` pointing at the picker panel and toggles its `aria-expanded`; it deliberately carries no `aria-haspopup` (the trigger swaps an in-dialog panel of spinbutton wheels, not a listbox popup). The SVG icon, the `<template>` structure, and its contents are all authored markup. The `aria-label` on `.DateField-trigger` is a placeholder; JS overwrites it with a localised string derived from `data-locale` — port it to your translation system rather than hardcoding a value.
 
 ## Behaviour
 
 All observable outcomes are state changes on `data-*` attributes or DOM changes:
 
-- **Init:** JS reads `data-id`, `data-name`, `data-locale`, `data-min`, `data-max` from the root. It injects three editable segment spans (day, month, year) into `.Segments` and clones the calendar dialog from the `<template>` into `.slideContainer`.
-- **Segment editing (keyboard):** Arrow Up/Down increments/decrements the focused segment value. Left/Right moves focus between segments. Digit keys fill the segment; when the segment is complete it advances focus to the next. Delete/Backspace clears the segment.
+- **Init:** JS reads `data-id`, `data-name`, `data-locale`, `data-min`, `data-max` from the root and injects three editable segment spans (day, month, year) into `.Segments`. The calendar dialog is cloned fresh from the `<template>` into `.slideContainer` on every open and removed from the DOM on close.
+- **Segment editing (keyboard):** Arrow Up/Down increments/decrements the focused segment value. Left/Right moves focus between segments. Digit keys fill the segment; when the segment is complete it advances focus to the next. Backspace clears the segment.
 - **Segment editing (commit):** When all three segments are valid, JS writes the ISO date to the native input (`input.value = "YYYY-MM-DD"`) and fires a native `change` event.
 - **Calendar open:** Clicking `.DateField-trigger` sets `aria-expanded="true"` on the trigger and makes the calendar dialog visible. The calendar renders the month grid for the current or selected date.
 - **Calendar navigation:** `.PrevMonth` / `.NextMonth` step the displayed month. `.MonthYearTrigger` toggles between the two panels: `.Panel[data-panel="calendar"]` (the grid) and `.Panel[data-panel="picker"]` (the month/year wheels). Only one panel has `data-active="true"` at a time. The two `.Wheel` elements (`data-picker="month"` / `"year"`) are upgraded by the `WheelColumn` kernel primitive to `role="spinbutton"` — see [`src/kernel/js/WheelColumn.md`](../../../kernel/js/WheelColumn.md).
 - **Calendar date selection:** Clicking a day cell commits the date, closes the calendar (`aria-expanded="false"`), and focuses the trigger.
-- **Calendar close (Escape):** Pressing Escape reverts any pending picker state and closes the calendar.
-- **Disabled:** When `data-disabled` is present on the root, all interaction is blocked (`pointer-events: none` via CSS). JS does not set this attribute — the server renders it.
+- **Calendar close (Escape):** Escape is two-step. When the month/year picker panel is open, Escape reverts to the month/year the picker opened on and closes only the picker (back to the calendar panel); a second Escape closes the calendar.
+- **Disabled:** When `data-disabled` is present on the root, all interaction is blocked (`pointer-events: none` via CSS). The server renders it, and JS also mirrors it onto the root at init when the native input has the `disabled` attribute.
 - **Invalid:** When `data-invalid` is present, CSS applies error styling. JS does not set this attribute — the server renders it.
 - **Announcement:** After a date is committed, JS writes a human-readable string to `.Announce` (e.g. "15 juni 1990") so screen readers announce the selection.
 
@@ -90,9 +90,9 @@ All observable outcomes are state changes on `data-*` attributes or DOM changes:
 - Each segment span has `role="spinbutton"`, `aria-valuemin`, `aria-valuemax`, `aria-valuenow`, and `aria-label` (e.g. "dag", "månad", "år"). These are injected by JS.
 - `.DateField-trigger` has `aria-expanded` (toggled by JS) and `aria-haspopup="dialog"`.
 - The calendar dialog has `role="dialog"` and `aria-modal="true"`.
-- `.Custom` has `aria-hidden="true"` — screen readers use the native input, not the custom segments.
-- `.Announce` has `aria-live="polite"` and `aria-atomic="true"` — date confirmations are announced after a short debounce.
-- The native `input[type=date]` is visually hidden but accessible to screen readers and receives the committed value.
+- `.Custom` is authored with `aria-hidden="true"`. In `data-input-mode="custom"` (fine pointer) JS removes it — the segments are the accessible control, and the native input is hidden from everyone (`visibility: hidden`), serving only as the value carrier for form submission. In `data-input-mode="display"` (coarse pointer) the custom layer stays `aria-hidden` and the native input is the accessible control.
+- `.Announce` has `aria-live="polite"` and `aria-atomic="true"` — date confirmations are announced synchronously on commit.
+- The native `input[type=date]` receives the committed value in both modes and carries it for form submission.
 
 ## Attributes
 
@@ -102,9 +102,10 @@ All observable outcomes are state changes on `data-*` attributes or DOM changes:
 |-----------|------|----------|-------------|
 | `data-id` | string | yes | Unique ID — used as `id` on the native input and as `for` on the label |
 | `data-name` | string | yes | `name` attribute written to the native input for form submission |
-| `data-locale` | BCP 47 tag | yes | Locale for segment labels and calendar formatting (e.g. `"sv-SE"`) |
-| `data-min` | ISO 8601 date | yes | Earliest selectable date (`YYYY-MM-DD`) |
-| `data-max` | ISO 8601 date | yes | Latest selectable date (`YYYY-MM-DD`) |
+| `data-locale` | BCP 47 tag | no | Locale for segment labels and calendar formatting (e.g. `"sv-SE"`). Falls back to `<html lang>`, then `"en"` |
+| `data-min` | ISO 8601 date | no | Earliest selectable date (`YYYY-MM-DD`). Defaults to none — year segment/wheel then spans 1900–2100 |
+| `data-max` | ISO 8601 date | no | Latest selectable date (`YYYY-MM-DD`). Defaults to none — year segment/wheel then spans 1900–2100 |
+| `data-label-field` | string | no | Fallback `aria-label` for `.Segments` when no matching `<label for>` exists |
 | `data-disabled` | boolean | no | Disables all interaction; renders CSS disabled state |
 | `data-invalid` | boolean | no | Renders CSS error state; does not block interaction |
 | `data-test-state` | `"hover"` / `"focus"` / `"active"` | no | Kitchensink / visual-test only — simulates CSS pseudo-state without user interaction |
@@ -123,6 +124,15 @@ All observable outcomes are state changes on `data-*` attributes or DOM changes:
 | Attribute | Set when |
 |-----------|----------|
 | `data-initialized` | Component has been mounted |
+| `data-input-mode` | `"custom"` or `"display"` — chosen at init via `matchMedia('(pointer: coarse)')` |
+| `data-state` | `"open"` while the calendar is open, `"idle"` after close |
+| `data-direction` | `"top"` or `"bottom"` — which side of the trigger the popup opens on |
+
+JS also sets two inline custom properties on the root while the calendar is open: `--df-popup-offset` (horizontal popup position, %) and `--df-arrow-offset` (arrow position, px).
+
+#### Display mode (coarse pointer / touch)
+
+On coarse-pointer devices JS sets `data-input-mode="display"` instead of `"custom"`: the component keeps the custom appearance, but the segments become non-interactive read-only display (`tabindex="-1"`, custom layer stays `aria-hidden`) and the native input is the real, accessible control — it sits transparently on top and opens the platform's own date picker on tap. DateField is the family reference for this native-fallback pattern.
 
 ## Kernel dependencies
 

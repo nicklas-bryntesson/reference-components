@@ -15,12 +15,12 @@ just hygiene. This folder makes that coupling **explicit** instead of hidden beh
 
 | Module | Kind | Conformance test | Consumed by |
 |--------|------|------------------|-------------|
-| [`js/WheelColumn.ts`](js/WheelColumn.md) | DOM primitive | e2e/axe **deferred** (exercised indirectly today) | DateField, DateTimeField, TimeField |
-| [`js/popup-position.ts`](js/popup-position.md) | pure functions | `js/tests/popup-position.unit.test.ts` | DateField, DateTimeField, TimeField, ToggleTip |
-| [`js/popup-interaction.ts`](js/popup-interaction.md) | DOM primitive | `js/tests/popup-interaction.unit.test.ts` (+ field e2e) | DateField, DateTimeField, TimeField, MonthField |
-| [`utils/dates.ts`](utils/dates.md) | pure functions | `utils/tests/dates.unit.test.ts` | DateField, DateTimeField |
-| [`utils/locale.ts`](utils/locale.md) | pure functions | (covered via component tests) | DateField, DateTimeField, TimeField |
-| [`css/Wheel.css`](css/Wheel.md) | CSS primitive | visual/axe **deferred** (paired with WheelColumn) | DateField, DateTimeField, TimeField |
+| [`js/WheelColumn.ts`](js/WheelColumn.md) | DOM primitive | `js/tests/WheelColumn.unit.test.ts` (standalone e2e/axe **deferred**) | DateField, DateTimeField, TimeField, MonthField |
+| [`js/popup-position.ts`](js/popup-position.md) | pure functions | `js/tests/popup-position.unit.test.ts` | DateField, DateTimeField, TimeField, MonthField, WeekField, ToggleTip |
+| [`js/popup-interaction.ts`](js/popup-interaction.md) | DOM primitive | `js/tests/popup-interaction.unit.test.ts` (+ field e2e) | DateField, DateTimeField, TimeField, MonthField, WeekField |
+| [`utils/dates.ts`](utils/dates.md) | pure functions | `utils/tests/dates.unit.test.ts` | DateField, DateTimeField, MonthField, WeekField |
+| [`utils/locale.ts`](utils/locale.md) | pure functions | (covered via component tests) | DateField, DateTimeField, TimeField, MonthField, WeekField |
+| [`css/Wheel.css`](css/Wheel.md) | CSS primitive | visual/axe **deferred** (paired with WheelColumn) | DateField, DateTimeField, TimeField, MonthField |
 
 The kernel modules have **zero dependencies on each other** — each can be ported independently.
 The pure-function modules (`popup-position`, `dates`, `locale`) are black-box-portable: port the

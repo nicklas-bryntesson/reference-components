@@ -35,7 +35,7 @@ The file container has two forms, chosen by whether the native input has `multip
 - **multiple:** `<ul class="FileUpload-list" aria-live="polite" aria-relevant="additions removals" aria-label="Selected files">` — each file is an `<li class="FileUpload-item">` (shown empty above).
 - **single:** `<div class="FileUpload-selected" aria-live="polite" aria-atomic="true">` — the file's spans and button render inline, with no `<li>` wrapper.
 
-JS renders the entries — do not author them. Each entry carries `data-status` (`valid` / `invalid-type` / `invalid-size`), a `data-entry-id`, and `data-source="server"` for server-seeded files:
+JS renders the entries — do not author them. In multiple mode each `<li>` carries `data-status` (`valid` / `invalid-type` / `invalid-size`), a `data-entry-id`, and `data-source="server"` for server-seeded files. In single mode the `.FileUpload-selected` container carries only `data-status` — no `data-entry-id` or `data-source` (the hidden `uploaded-ref` input is still emitted for server files):
 
 ```html
 <li class="FileUpload-item" data-status="valid" data-entry-id="...">
@@ -62,6 +62,11 @@ JS renders the entries — do not author them. Each entry carries `data-status` 
 FileUpload.attach()
 ```
 
+### JS API
+
+- `FileUpload.attach(parent = document)` — mounts every `[data-component="FileUpload"]` under `parent`. Idempotent: a `__fileUploadInstance` guard on the element skips already-mounted instances, so it is safe to call again after dynamic injection.
+- `destroy()` (instance method) — removes all event listeners and clears the instance guard.
+
 ## Attributes
 
 ### On root element
@@ -76,7 +81,6 @@ FileUpload.attach()
 | `data-label-remove` | string | Remove button aria-label, `{name}` interpolated |
 | `data-error-accept` | string | File type error message |
 | `data-error-size` | string | File size error message |
-| `data-label-drop-zone` | string | Visible drop zone text |
 
 ### State attributes (set by JS)
 
@@ -90,6 +94,10 @@ FileUpload.attach()
 ### On native input
 
 All native `input[type=file]` attributes are supported: `accept`, `multiple`, `required`, `disabled`.
+
+### Disabled
+
+JS does not derive a disabled state from the input's `disabled` attribute — author it explicitly, as the kitchensink states do: `data-disabled` and `aria-disabled="true"` on the root (the CSS keys its disabled visuals off `data-disabled`), plus `disabled` on both the native input and the trigger button.
 
 ## Persistent state (server-render multi-step forms)
 
@@ -108,14 +116,18 @@ The component renders these as list items with `data-source="server"` and create
 
 The server reads these hidden fields to know which previously-uploaded files to retain.
 
+## Validation
+
+Invalid entries (`data-status="invalid-type"` / `"invalid-size"`) render in the list so the user can see and remove them, but they are never submitted: only user-selected entries with a `valid` status are written back to `input.files` (via `DataTransfer`), so invalid files are excluded from the form payload.
+
 ## Accessibility notes
 
 - The native input is `aria-hidden="true"` and `tabindex="-1"` — screen readers never reach it
 - `role="group"` + `aria-labelledby` on root groups the component semantically
 - `aria-live="polite"` on the list announces file additions and removals
 - Per-file error spans use `role="alert"` for immediate error announcement
-- Focus management: removing a file focuses the next remove button, or the trigger if the list is empty
-- The component is keyboard-accessible: Tab → trigger → remove buttons, Enter/Space to activate
+- Focus management: removing a file focuses the next file's remove button (or the previous one when the last item was removed), falling back to the trigger when the list is empty; in single mode focus always returns to the trigger
+- The component is keyboard-accessible: Tab → remove buttons → trigger (the file list precedes the trigger in DOM order), Enter/Space to activate
 
 ## Kernel dependencies
 
@@ -144,7 +156,7 @@ Test with a real screenreader before shipping. Sources: `docs/atomica11y/form/bu
 **File list — remove button**
 - [ ] Each remove button announces the filename it will remove (e.g. "Remove cv.pdf, button")
 - [ ] Pressing Space or Enter removes the file and announces the removal
-- [ ] After removal, focus moves to the next file's remove button, or to the trigger if the list is empty
+- [ ] After removal, focus moves to the next file's remove button (the previous one when the last item was removed), or to the trigger if the list is empty
 
 **Validation errors**
 - [ ] When an invalid file is added, the error message is announced immediately (role="alert")

@@ -1,6 +1,6 @@
 /**
  * Calculate the percentage offset of the bubble along the slide rail,
- * clamped so the bubble never overflows the rail edges.
+ * clamped so the bubble never overflows the viewport (viewportWidth/viewportInset).
  */
 export function calculatePopupOffset(
   triggerCenterX: number,

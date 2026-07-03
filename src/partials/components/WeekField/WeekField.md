@@ -19,12 +19,12 @@ Completes the date family alongside DateField, DateTimeField, TimeField, and Mon
 |---|---|---|
 | `data-id` | string | Applied as `id` and `name` on the native input |
 | `data-name` | string | Overrides the field `name` (defaults to `data-id`) |
-| `data-locale` | BCP 47 | Controls segment labels, weekday/month names. Default: `sv-SE` |
+| `data-locale` | BCP 47 | Controls segment labels, weekday/month names. Resolved as `data-locale` → `<html lang>` → `en`; `sv-SE` is the kitchensink's authored value |
 | `data-value` | `YYYY-Www` | Initial value (server-side render) |
 | `data-min` | `YYYY-Www` | Minimum allowed week; bounds the segments and disables earlier week rows |
 | `data-max` | `YYYY-Www` | Maximum allowed week; bounds the segments and disables later week rows |
 | `data-disabled` | boolean | Disables the entire field |
-| `data-invalid` | boolean | Marks the field invalid; adds `aria-invalid="true"` to the native input |
+| `data-invalid` | boolean | Marks the field invalid — styling hook only; the author must also set `aria-invalid="true"` on the native input (as the kitchensink states do) |
 | `data-input-mode` | `custom` \| `display` | Set by JS: `custom` on desktop / where native week is unsupported, `display` on touch with native week support |
 
 State attributes set by JS: `data-initialized`, `data-open`, `data-has-value`, `data-direction`, and `aria-expanded` on the trigger.
@@ -45,7 +45,7 @@ In every mode the value written to the native input is a valid `YYYY-Www` string
 
 ## Segments
 
-Two inline spinbutton segments, in order **week → year** separated by `/`, prefixed with a localized "week" abbreviation (`v.` / `Wk`):
+Two inline spinbutton segments, in order **week → year** separated by `/`, prefixed with a localized "week" abbreviation (`v.` / `Wk`). The segments group carries a localized `aria-roledescription` so AT announces it as a week field:
 
 - **week** — `role="spinbutton"`, `aria-valuemin="1"`, `aria-valuemax` = **52 or 53** depending on the current year (an ISO year has 53 weeks iff Dec 28 falls in week 53). Displays a zero-padded number ("27"). `aria-valuetext` carries a human label so AT announces e.g. "Vecka 27, 2026" (O1).
 - **year** — `role="spinbutton"`, bounds from `data-min`/`data-max`, or the current ISO week-year ±100 when unbounded (O3). Displays the plain 4-digit year. Changing the year re-clamps the week segment to that year's valid max.
@@ -59,7 +59,7 @@ Two inline spinbutton segments, in order **week → year** separated by `/`, pre
 | `0`–`9` | Digit entry. Week accepts 1–max with fast-advance (a first digit ≥6 commits); year accepts up to 4 digits |
 | `ArrowUp` / `ArrowDown` | Week steps ±1 and **wraps** at the year boundary (1 ↔ 52/53); year steps ±1 and **clamps** to bounds |
 | `ArrowLeft` / `ArrowRight` | Move between segments |
-| `Tab` / `Shift+Tab` | Move between segments; Tab on last (year) → trigger |
+| `Tab` / `Shift+Tab` | Leave the segment group (roving tabindex — the segments are one tab stop): Tab moves to the trigger, Shift+Tab exits the field |
 | `Backspace` | Clear segment, move left |
 | `Space` / `Enter` (trigger) | Open the popup; focus moves into the week grid |
 
@@ -84,7 +84,11 @@ The native `<input type="week">` value is written as `YYYY-Www` only when **both
 
 ## Events
 
-The component dispatches `input` and `change` events on the native `<input>` when the value changes.
+The component dispatches `input` and `change` events on the native `<input>` only when a **complete** value is written: both segments filled, a week selected in the calendar, or **Denna vecka** (This week) pressed. The popup **Rensa** (Clear) button also dispatches both events (unlike TimeField/MonthField, where popup Clear is silent). Clearing a filled field with `Backspace` empties the native value without dispatching anything.
+
+## JS API
+
+`WeekField` is the default export. Statics: `WeekField.attach(parent?)` (instantiate every `.WeekField` root), `WeekField.registerLocale(locale, strings)` and `WeekField.supportsNativeWeek()` (feature detection). Instances expose `destroy()`. The pure helpers `formatSegment`, `wrapValue`, `clampValue`, `weeksInISOYear` and `clampWeekISO` are exported for unit tests.
 
 ## CSS tokens
 
@@ -106,6 +110,8 @@ All tokens are custom properties on `.WeekField`:
 | `--wf-popup-radius` | Popup border radius |
 | `--wf-popup-shadow` | Popup box shadow |
 | `--wf-popup-width` | Popup width |
+| `--wf-popup-gap` | Gap between field and popup |
+| `--wf-site-padding` | Viewport padding read by JS for popup positioning (defaults to `--SITE--PADDING`) |
 | `--wf-popup-link-color` | Footer button text color |
 | `--wf-option-bg-selected` | Selected week-row background |
 | `--wf-option-color-selected` | Selected week-row text color |
