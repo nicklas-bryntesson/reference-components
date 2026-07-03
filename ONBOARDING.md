@@ -61,6 +61,7 @@ Arrow size / corner-radius / site-padding are CSS custom properties (e.g. `--_tf
   > **Gotcha (already bit us):** calling `.focus()` on the trigger during outside-click close scrolls the viewport back to an off-screen trigger and steals focus from whatever the user clicked. Only refocus on **keyboard/Escape** close.
 - **Keyboard / Escape close:** refocuses the trigger (`refocusTrigger = true`, the default) — correct WAI-ARIA behavior.
 - **aria-expanded** is managed on the trigger (`false`/`true`) for the field components.
+- **Focus on open (family rule):** calendar-grid popups (DateField, DateTimeField, WeekField) move focus into the grid on open; wheel-only popups (TimeField, MonthField) keep focus on the trigger — the user Tabs into the wheels. Both are deliberate: a grid has an obvious "current day" to land on, a wheel stack doesn't.
 - **Focus trap + wheel-scroll containment** inside the open popup is a shared kernel primitive — see `src/kernel/js/popup-interaction.md`.
 
 ### Native fallback on touch (`data-input-mode`)
