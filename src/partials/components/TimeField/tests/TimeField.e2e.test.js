@@ -263,6 +263,20 @@ test('"Clear" button resets the wheel to an empty state', async ({ page }) => {
   expect(nativeVal).toBe('')
 })
 
+test('"Now" and "Clear" dispatch input + change on the native input', async ({ page }) => {
+  await page.locator(`${TF} .TimeField-trigger`).click()
+  await page.evaluate((sel) => {
+    const native = document.querySelector(`${sel} .TimeField-native`)
+    window.__events = []
+    native.addEventListener('input', () => window.__events.push('input'))
+    native.addEventListener('change', () => window.__events.push('change'))
+  }, TF)
+  await page.locator('.TimeField-popup-now').click()
+  expect(await page.evaluate(() => window.__events)).toEqual(['input', 'change'])
+  await page.locator('.TimeField-popup-clear').click()
+  expect(await page.evaluate(() => window.__events)).toEqual(['input', 'change', 'input', 'change'])
+})
+
 test('popup wheel column has aria-valuemin and aria-valuemax', async ({ page }) => {
   await page.locator(`${TF} .TimeField-trigger`).click()
   const hourCol = page.locator('.Wheel[data-segment="hour"]')

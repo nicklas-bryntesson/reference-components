@@ -84,7 +84,7 @@ The native `<input type="week">` value is written as `YYYY-Www` only when **both
 
 ## Events
 
-The component dispatches `input` and `change` events on the native `<input>` only when a **complete** value is written: both segments filled, a week selected in the calendar, or **Denna vecka** (This week) pressed. The popup **Rensa** (Clear) button also dispatches both events (unlike TimeField/MonthField, where popup Clear is silent). Clearing a filled field with `Backspace` empties the native value without dispatching anything.
+The component dispatches `input` and `change` events on the native `<input>` only when a **complete** value is written: both segments filled, a week selected in the calendar, or **Denna vecka** (This week) pressed. The popup **Rensa** (Clear) button also dispatches both events — the same contract as TimeField/MonthField. Clearing a filled field with `Backspace` empties the native value without dispatching anything.
 
 ## JS API
 
