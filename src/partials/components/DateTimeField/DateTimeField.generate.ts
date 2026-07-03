@@ -57,6 +57,7 @@ function canonical(id: string, attrs: Record<string, string> = {}, locale = 'sv-
     </div>
   </template>
   <div class="slideContainer"></div>
+  <div class="Announce" aria-live="polite" aria-atomic="true"></div>
 </div>`
 }
 

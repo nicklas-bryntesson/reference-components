@@ -11,7 +11,7 @@ Static component boilerplate — Vite + Handlebars + Tailwind. Components are re
 - **Styling:** Tailwind v4 + PostCSS nesting
 - **Unit tests:** Vitest + jsdom
 - **E2E tests:** Playwright + axe-playwright
-- **TypeScript:** TS is the norm (`strict: true`, `noEmit: true`). The mature component set — DateField, DateTimeField, TimeField, MonthField, FileUpload, ToggleTip — and the whole `src/kernel/` are all TS. Only TabAccordion and Combobox remain `.js`, and they are **parked legacy references**, not migration targets.
+- **TypeScript:** TS is the norm (`strict: true`, `noEmit: true`). The mature component set — DateField, DateTimeField, TimeField, MonthField, WeekField, FileUpload, ToggleTip — and the whole `src/kernel/` are all TS. Only TabAccordion and Combobox remain `.js`, and they are **parked legacy references**, not migration targets.
 
 ## Commands
 
@@ -32,32 +32,34 @@ src/partials/components/<Name>/
   <Name>.html                     # kitchensink / dev preview
   <Name>.md                       # API reference, a11y notes, non-goals
   <Name>.generate.ts              # state partial generator (if component has states)
-  states/                         # generated .hbs partials (15 files) — gitignored, never edit by hand
+  states/                         # generated .hbs partials (~16–21 files) — gitignored, never edit by hand
   tests/
     <Name>.unit.test.*            # unit tests
     <Name>.e2e.test.*             # e2e tests
 src/kernel/                       # shared primitives — ported once, composed by components
-  js/    WheelColumn.ts, popup-position.ts   # 3D wheel DOM primitive + popover maths
+  js/    WheelColumn.ts, popup-position.ts, popup-interaction.ts   # 3D wheel + popover maths + focus trap / scroll containment
   utils/ dates.ts, locale.ts                 # pure date / locale helpers
   css/   Wheel.css                           # wheel visuals (pairs with WheelColumn)
   <module>.md  + README.md                   # one contract per primitive
   js/tests/, utils/tests/                    # kernel conformance tests
-src/js/script.js                  # entry point, imports all components
+src/js/script.js                  # entry point, imports all active components
 src/css/site/01-Setup/tokens.css  # host --SITE--* token contract (components read these)
-docs/superpowers/specs/           # design specs
-docs/superpowers/plans/           # implementation plans
+tasks/                            # current specs & implementation plans (gitignored, local)
+docs/superpowers/                 # historical specs/plans archive — no longer the active workflow
 ```
 
 > **Note:** Shared primitives live in `src/kernel/` with their own contracts and conformance tests. Each component's `.md` lists the primitives it composes under `## Kernel dependencies` — port the kernel once, then the component stays thin.
 
 ## Kitchensink Pattern
 
-Each component's `.html` file is a kitchensink with 4 tables:
+Each component's `.html` file is a kitchensink with 5–6 sections:
 
 1. **Interaction states** — columns: default / hover / focus / active; rows: empty / filled
 2. **Disabled** — single-column (no interaction columns — `pointer-events:none` makes hover impossible)
 3. **Invalid** — single-column
-4. **Native reference** — browser's built-in control for comparison
+4. **Variants** — component-specific configurations (most components; DateTimeField uses named variant sections instead)
+5. **Live demo** — a real interactive instance
+6. **Native reference** — browser's built-in control for comparison
 
 Hover/focus/active states are simulated via `data-test-state="hover|focus|active"` on the component root element. CSS uses descendant selectors: `&[data-test-state="hover"] .Segments`. This mirrors the real pseudo-class selectors written in pairs.
 

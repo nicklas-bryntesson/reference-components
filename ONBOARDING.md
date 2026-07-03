@@ -2,7 +2,7 @@
 
 ## Popover architecture
 
-Four components share one popover/positioning model. If you touch one, keep it consistent with the others — they drift easily because they were built by copy-paste.
+Six components share one popover/positioning model. If you touch one, keep it consistent with the others — they drift easily because they were built by copy-paste.
 
 ### The components and who's the reference
 
@@ -12,12 +12,14 @@ Four components share one popover/positioning model. If you touch one, keep it c
 | **DateField** | calendar | **reference for the segment-field family** (native fallback, segments, value sync) |
 | **DateTimeField** | calendar + time columns | follows DateField |
 | **TimeField** | 3D wheel columns (see `WheelColumn.ts`) | follows DateField |
+| **MonthField** | month + year wheel columns | follows TimeField |
+| **WeekField** | calendar with selectable week rows + week-number column | follows DateField |
 
-Files: `src/partials/components/<Name>/<Name>.{ts,css}`. Shared math: `src/js/popup-position.ts`.
+Files: `src/partials/components/<Name>/<Name>.{ts,css}`. Shared math: `src/kernel/js/popup-position.ts`.
 
-### Shared positioning module — `src/js/popup-position.ts`
+### Shared positioning module — `src/kernel/js/popup-position.ts`
 
-Three pure functions, used by all four:
+Three pure functions, used by all six:
 
 - `calculatePopupOffset(triggerCenterX, containerLeft, containerWidth, popupWidth, viewportWidth, viewportInset)` → `%` offset along the rail, clamped so the popup never overflows the viewport.
 - `calculateArrowOffset(triggerCenterX, popupLeft, popupWidth, borderRadius, arrowSize)` → `px` correction so the arrow points at the trigger, clamped inside the rounded corners.
@@ -34,7 +36,7 @@ CSS Anchor Positioning isn't used (browser support). Instead each component posi
 3. `data-direction="top|bottom"` is set on the root; CSS flips the popup above/below accordingly.
 4. Resize is handled by `_handleResize`, **rAF-throttled** (cancel pending frame, schedule one), recomputing only while open.
 
-`<prefix>` is per component: `--tt-*` (ToggleTip), `--df-*` (DateField), `--dtf-*` (DateTimeField), `--tf-*` (TimeField).
+`<prefix>` is per component: `--tt-*` (ToggleTip), `--df-*` (DateField), `--dtf-*` (DateTimeField), `--tf-*` (TimeField), `--mf-*` (MonthField), `--wf-*` (WeekField).
 
 #### `_getCSSPx(property)` — resolving design tokens to px
 
@@ -59,6 +61,7 @@ Arrow size / corner-radius / site-padding are CSS custom properties (e.g. `--_tf
   > **Gotcha (already bit us):** calling `.focus()` on the trigger during outside-click close scrolls the viewport back to an off-screen trigger and steals focus from whatever the user clicked. Only refocus on **keyboard/Escape** close.
 - **Keyboard / Escape close:** refocuses the trigger (`refocusTrigger = true`, the default) — correct WAI-ARIA behavior.
 - **aria-expanded** is managed on the trigger (`false`/`true`) for the field components.
+- **Focus trap + wheel-scroll containment** inside the open popup is a shared kernel primitive — see `src/kernel/js/popup-interaction.md`.
 
 ### Native fallback on touch (`data-input-mode`)
 
@@ -96,7 +99,7 @@ The DOM attribute is the single source of truth — read it (`_isPickerActive()`
 
 ### One deliberate difference (not drift)
 
-ToggleTip **keeps** its popup in the DOM and toggles visibility via `aria-hidden` + `display:none`; the three fields **remove + clone** from a `<template>` on each open (their content is rebuilt anyway). ToggleTip also has no Escape/focus-management (it's a tooltip, not a dialog) — that's correct, not drift.
+ToggleTip **keeps** its popup in the DOM and toggles visibility via `aria-hidden` + `display:none`; the five fields **remove + clone** from a `<template>` on each open (their content is rebuilt anyway). ToggleTip also has no Escape/focus-management (it's a tooltip, not a dialog) — that's correct, not drift.
 
 ### State partials
 

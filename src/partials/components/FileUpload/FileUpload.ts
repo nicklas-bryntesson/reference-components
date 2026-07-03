@@ -22,9 +22,6 @@ export interface TranslationStrings {
   labelRemove: string
   errorAccept: string
   errorSize: string
-  labelDropZone: string
-  announceAdded: string
-  announceRemoved: string
 }
 
 // ─── Pure utilities (exported for testing) ───────────────────────────────────
@@ -74,9 +71,6 @@ const DEFAULT_TRANSLATIONS: TranslationStrings = {
   labelRemove: 'Remove {name}',
   errorAccept: 'File type not allowed',
   errorSize: 'File exceeds maximum size',
-  labelDropZone: 'Drop files here',
-  announceAdded: '{name} added',
-  announceRemoved: '{name} removed',
 }
 
 // ─── Global augmentation ─────────────────────────────────────────────────────
@@ -127,9 +121,6 @@ class FileUpload {
       labelRemove: d.labelRemove ?? DEFAULT_TRANSLATIONS.labelRemove,
       errorAccept: d.errorAccept ?? DEFAULT_TRANSLATIONS.errorAccept,
       errorSize: d.errorSize ?? DEFAULT_TRANSLATIONS.errorSize,
-      labelDropZone: d.labelDropZone ?? DEFAULT_TRANSLATIONS.labelDropZone,
-      announceAdded: d.announceAdded ?? DEFAULT_TRANSLATIONS.announceAdded,
-      announceRemoved: d.announceRemoved ?? DEFAULT_TRANSLATIONS.announceRemoved,
     }
   }
 

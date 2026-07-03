@@ -10,6 +10,7 @@ function makeRoot(attrs = '') {
         <button class="DateTimeField-trigger" type="button"></button>
       </div>
       <template class="DateTimeField-calendarTemplate"></template>
+      <div class="Announce" aria-live="polite" aria-atomic="true"></div>
     </div>
   `)
   return dom.window.document.querySelector('[data-component="DateTimeField"]')
@@ -116,6 +117,31 @@ describe('_trySyncToNative()', () => {
     const instance = root.__dateTimeFieldInstance
     instance._syncSegmentsFromDatetime(new Date(2026, 4, 27, 9, 5))
     expect(instance.native.value).toBe('2026-05-27T09:05')
+    root.remove()
+  })
+
+  it('dispatches exactly one change event per value change and announces it', async () => {
+    const { DateTimeField } = await import('../DateTimeField.ts')
+    const root = makeRoot()
+    document.body.appendChild(root)
+    DateTimeField.attach(document.body)
+    const instance = root.__dateTimeFieldInstance
+    let changeCount = 0
+    instance.native.addEventListener('change', () => changeCount++)
+
+    // Seven segment writes cascade into _trySyncToNative — the equality gate
+    // must collapse them to a single change event.
+    instance._syncSegmentsFromDatetime(new Date(2026, 4, 27, 14, 35))
+    expect(changeCount).toBe(1)
+    expect(root.querySelector('.Announce').textContent).toContain('Selected date and time:')
+
+    // Re-syncing the same value is silent.
+    instance._syncSegmentsFromDatetime(new Date(2026, 4, 27, 14, 35))
+    expect(changeCount).toBe(1)
+
+    // A real change dispatches again.
+    instance._setSegmentValue(instance._getSegmentEl('minute'), 36)
+    expect(changeCount).toBe(2)
     root.remove()
   })
 

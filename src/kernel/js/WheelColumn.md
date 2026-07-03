@@ -1,7 +1,7 @@
 # WheelColumn (kernel / DOM primitive)
 
 An iOS-style 3D wheel/spinner over a numeric range. Drives the month/year pickers (DateField,
-DateTimeField) and the hour/minute/second columns (DateTimeField, TimeField). Pairs with
+DateTimeField, MonthField) and the hour/minute/second columns (DateTimeField, TimeField). Pairs with
 [`Wheel.css`](../css/Wheel.md) — the JS injects the structure, the CSS gives it the 3D look.
 
 ## DOM contract
@@ -18,7 +18,9 @@ On construction, WheelColumn:
 - per render, sets `aria-valuenow`, `aria-valuetext` (the formatted display, or `--` when empty) and
   `aria-activedescendant` pointing at the centred option;
 - injects a `.Wheel-ring` containing nine `.Wheel-option` slots (`aria-hidden`, the centred one gets
-  `aria-selected="true"` + an id) and one `.Wheel-band` (the centre highlight).
+  `aria-selected="true"` + an id), plus one `.Wheel-band` appended to the host as a **sibling** of
+  the ring. Per [`Wheel.css`](../css/Wheel.md) the band is currently hidden — the visible centre
+  band and fade are drawn by the component-authored `.WheelColumns` wrapper.
 
 Do not author `.Wheel-ring` / `.Wheel-option` / `.Wheel-band` — they are generated.
 
@@ -50,8 +52,9 @@ destroy(): void                                        // aborts listeners, canc
 - **Looping vs bounded.** `loop: true` wraps the index (`Dec → Jan`, the year-boundary case); `loop:
   false` clamps at the ends, kills velocity at an edge, and renders nothing past the ends.
 - **Momentum vs snap.** A flick above the velocity threshold runs a friction-based momentum loop, then
-  snaps to the nearest row; a slow release snaps directly. `prefers-reduced-motion` short-circuits to
-  an instant set + commit (no animation).
+  snaps to the nearest row; a slow release snaps directly. `prefers-reduced-motion` short-circuits
+  the `_animateTo` paths (click, `stepBy`, animated `setValue`) to an instant set + commit; a drag
+  release under reduced motion skips only momentum — the snap easing still animates.
 - **External vs user change.** `setValue` sets an internal `_externalSet` flag so syncing the wheel
   from the field does **not** re-fire `onChange` (no feedback loop). User gestures and `stepBy` do fire it.
 - **Cross-column wheel lock.** When several wheels sit side by side, a module-level lock + min-delta
@@ -65,6 +68,8 @@ it the options stack as unstyled overlapping text and fail colour-contrast (the 
 
 ## Conformance
 
-No dedicated e2e/axe yet — currently exercised indirectly by the DateField/DateTimeField/TimeField
-e2e suites (wheel open, spinbutton roles, value sync, Jan↔Dec loop, aria-valuemin/max). A dedicated
-WheelColumn conformance suite (loop/snap/clamp math unit + standalone e2e/axe) is a **deferred TODO**.
+Unit: [`tests/WheelColumn.unit.test.ts`](tests/WheelColumn.unit.test.ts) — construction/ARIA, loop
+wrap, bounded clamp, `onChange` gating (including an animated-`setValue` regression), format,
+`setValue`, `destroy`. No dedicated e2e/axe yet — that layer is exercised indirectly by the
+DateField/DateTimeField/TimeField e2e suites (wheel open, spinbutton roles, value sync, Jan↔Dec
+loop, aria-valuemin/max); a standalone WheelColumn e2e/axe suite is a **deferred TODO**.

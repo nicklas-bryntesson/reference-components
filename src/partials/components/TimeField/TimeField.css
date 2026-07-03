@@ -22,7 +22,7 @@
   --tf-popup-shadow: var(--SITE--POPOVER--SHADOW);
   --tf-option-bg-selected: var(--SITE--POPOVER--ACCENT);
   --tf-option-color-selected: var(--SITE--POPOVER--ACCENT-TEXT);
-  /* Wheel visuals live in the shared src/css/site/Wheel.css (.Wheel-*) */
+  /* Wheel visuals live in the shared src/kernel/css/Wheel.css (.Wheel-*) */
   /* Internal */
   --_tf-arrow-size: 0.75rem;
   --_tf-arrow-corner-radius: 0.25rem;

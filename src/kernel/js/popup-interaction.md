@@ -25,7 +25,9 @@ nextTabStop(
 - **Cyclic Tab trap.** On `Tab`, `tabStops()` is called fresh, the current stop is located via
   `document.activeElement`, and focus moves to the next stop — wrapping last→first (Tab) and
   first→last (Shift+Tab). Tab is **always** `preventDefault`ed while the popup is open, so focus can
-  never escape into the page — the correct behaviour for `aria-modal="true"`. This is the deliberate
+  never escape into the page — the correct behaviour for `aria-modal="true"`. One exception: when
+  `tabStops()` returns an **empty list**, the handler returns before `preventDefault` and Tab leaks
+  to the page — the trap assumes at least one stop. This is the deliberate
   fix for two gaps: (a) once focus reached a **footer button**, Tab used to leak to the page; and
   (b) Shift+Tab from the **first** stop used to close the popup — under the pure trap it wraps to the
   last footer button instead.
@@ -51,7 +53,7 @@ only.
 
 Black-box: [`tests/popup-interaction.unit.test.ts`](tests/popup-interaction.unit.test.ts) covers the
 `nextTabStop` wrapping/wrap-around/snap logic. The trap + scroll containment are exercised end-to-end
-by the four field e2e suites (focus stays inside the popup on Tab/Shift+Tab past the last footer
+by the five field e2e suites (focus stays inside the popup on Tab/Shift+Tab past the last footer
 button; a `wheel` on the popup surface is `defaultPrevented`).
 
-Consumed by: DateField, DateTimeField, TimeField, MonthField.
+Consumed by: DateField, DateTimeField, TimeField, MonthField, WeekField.

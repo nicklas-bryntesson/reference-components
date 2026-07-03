@@ -6,14 +6,18 @@ An accessible time input wrapping `<input type="time">`. Custom spinbutton segme
 
 | Attribute | Type | Description |
 |---|---|---|
-| `data-id` | string | Applied as `id` and `name` on the native input |
-| `data-locale` | BCP 47 | Controls 12h/24h display and segment labels. Default: `sv-SE` |
+| `data-id` | string | Applied as `id` on the native input, and as `name` when `data-name` is absent |
+| `data-name` | string | Overrides the field `name` (defaults to `data-id`) |
+| `data-locale` | BCP 47 | Controls 12h/24h display and segment labels. Resolved as `data-locale` → `<html lang>` → `en`; `sv-SE` is the kitchensink's authored value |
 | `data-value` | `HH:mm` or `HH:mm:ss` | Initial value (server-side render) |
-| `data-min` | `HH:mm` | Minimum allowed time |
-| `data-max` | `HH:mm` | Maximum allowed time |
+| `data-min` | `HH:mm` | Only clamps the popup **Now** button — segments, wheels and the native input are not bounded |
+| `data-max` | `HH:mm` | Only clamps the popup **Now** button — segments, wheels and the native input are not bounded |
 | `data-step` | number (seconds) | Step in seconds. Values < 60 show the seconds segment. Default: 60 |
 | `data-disabled` | boolean | Disables the entire field |
-| `data-invalid` | boolean | Marks the field invalid; adds `aria-invalid="true"` to the native input |
+| `data-invalid` | boolean | Marks the field invalid — styling hook only; the author must also set `aria-invalid="true"` on the native input (as the kitchensink states do) |
+| `data-input-mode` | `custom` \| `display` | Set by JS: `custom` on fine pointers (spinbutton overlay), `display` on touch (native picker) — via `matchMedia('(pointer: coarse)')` |
+
+State attributes set by JS: `data-initialized`, `data-open`, `data-has-value`, `data-direction`, and `aria-expanded` on the trigger. All are styling hooks in `TimeField.css`.
 
 ## Segments
 
@@ -29,10 +33,18 @@ An accessible time input wrapping `<input type="time">`. Custom spinbutton segme
 | `0`–`9` | Digit entry with fast-advance |
 | `ArrowUp` / `ArrowDown` | Increment / decrement with wrap |
 | `ArrowLeft` / `ArrowRight` | Move between segments |
-| `Tab` / `Shift+Tab` | Move between segments; Tab on last → trigger |
+| `Tab` / `Shift+Tab` | Leave the segment group (roving tabindex — the segments are one tab stop): Tab moves to the trigger, Shift+Tab exits the field |
 | `Backspace` | Clear segment, move left |
 | `A` / `P` | Set AM / PM (ampm segment only) |
+| `Tab` (popup) | Cyclic focus trap: wheels → footer buttons (Clear, Now) |
 | `Escape` | Close popup |
+
+## Popup footer
+
+Two footer buttons, both tab stops inside the popup focus trap:
+
+- **Clear** ("Rensa") — disabled (and skipped by Tab) while the field is empty. Clears the segments and the native value **silently** — no `input`/`change` is dispatched.
+- **Now** ("Nu") — writes the current time, clamped to `data-min`/`data-max`. Also written silently.
 
 ## Value sync
 
@@ -40,7 +52,11 @@ The native `<input type="time">` value is written only when all active segments 
 
 ## Events
 
-The component dispatches `input` and `change` events on the native `<input>` when the value changes.
+The component dispatches `input` and `change` events on the native `<input>` only when a **complete** value is written (all active segments filled). Clearing a filled field with `Backspace` empties the native value without dispatching anything, and the popup **Clear** and **Now** buttons also write silently.
+
+## JS API
+
+`TimeField` is the default export. Statics: `TimeField.attach(parent?)` (instantiate every `.TimeField` root) and `TimeField.registerLocale(locale, strings)`. Instances expose `destroy()`. The pure helpers `parseTimeValue`, `formatSegment` and `wrapValue` are exported for unit tests.
 
 ## CSS tokens
 
@@ -56,11 +72,13 @@ All tokens are custom properties on `.TimeField`:
 | `--tf-trigger-bg-hover` | Trigger button hover background |
 | `--tf-trigger-bg-active` | Trigger button active background |
 | `--tf-popup-bg` | Popup background |
+| `--tf-popup-color` | Popup text color |
 | `--tf-popup-border-color` | Popup border |
 | `--tf-popup-radius` | Popup border radius |
 | `--tf-popup-shadow` | Popup box shadow |
 | `--tf-popup-width` | Popup width |
-| `--tf-popup-backdrop` | Popup backdrop-filter (glass effect) |
+| `--tf-popup-gap` | Gap between field and popup |
+| `--tf-site-padding` | Viewport padding read by JS for popup positioning (defaults to `--SITE--PADDING`) |
 | `--tf-option-bg-selected` | Selected option background |
 | `--tf-option-color-selected` | Selected option text color |
 
@@ -115,6 +133,7 @@ If seconds precision must be editable on iOS, do not rely on the native picker �
 - [ ] When opening the popup with the trigger, I hear "Välj tid" (dialog label)
 - [ ] When moving into a column, I hear the column label ("Timmar", "Minuter")
 - [ ] When selecting an option in the popup column, the value is reflected in the segment
+- [ ] The "Rensa" and "Nu" footer buttons have clear purpose; "Rensa" is not a tab stop while the field is empty
 - [ ] When pressing Escape, the popup closes and focus returns to the trigger
 - [ ] On a disabled field, I cannot interact with any segment or button
 - [ ] The AM/PM segment announces "FM" / "EM" (sv-SE) or "AM" / "PM" (en-US) correctly

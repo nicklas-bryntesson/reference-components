@@ -1,12 +1,11 @@
-/* Shared 3D wheel / spinner — driven by src/js/WheelColumn.ts.
-   Used by TimeField and DateTimeField. The host element carries .Wheel;
-   WheelColumn injects .Wheel-ring / .Wheel-option / .Wheel-band. */
+/* Shared 3D wheel / spinner — driven by src/kernel/js/WheelColumn.ts.
+   Used by DateField, DateTimeField, TimeField and MonthField. The host element
+   carries .Wheel; WheelColumn injects .Wheel-ring / .Wheel-option / .Wheel-band. */
 
 .Wheel {
   /* Geometry token read by WheelColumn (readRowHeight) */
   --wheel-row-height: 38px;
   --wheel-rows: 5;
-  --wheel-focus-bg: var(--SITE--POPOVER--HOVER-BG);
   --wheel-color: var(--SITE--POPOVER--COLOR);
   --wheel-color-selected: var(--SITE--POPOVER--ACCENT);
 

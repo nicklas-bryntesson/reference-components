@@ -4,7 +4,6 @@ import {
   getDaysInMonth,
   clampDayToMonth,
   getFirstWeekdayOfMonth,
-  getISOWeek,
   isDayDisabled,
   formatISO,
   formatDatetimeISO,
@@ -111,6 +110,7 @@ export class DateTimeField {
   native: HTMLInputElement
   segments: HTMLElement
   trigger: HTMLButtonElement
+  announce: HTMLElement
   calendarTemplate: HTMLTemplateElement | null
 
   calendarEl: HTMLElement | null
@@ -168,6 +168,7 @@ export class DateTimeField {
     this.native = el.querySelector<HTMLInputElement>('.DateTimeField-native')!
     this.segments = el.querySelector<HTMLElement>('.Segments')!
     this.trigger = el.querySelector<HTMLButtonElement>('.DateTimeField-trigger')!
+    this.announce = el.querySelector<HTMLElement>('.Announce')!
     this.calendarTemplate = el.querySelector<HTMLTemplateElement>('.DateTimeField-calendarTemplate')
 
     this.calendarEl = null
@@ -429,7 +430,7 @@ export class DateTimeField {
 
   _appendSep(text: string): void {
     const sep = document.createElement('span')
-    sep.className = 'Segment-sep'
+    sep.className = 'Separator'
     sep.setAttribute('aria-hidden', 'true')
     sep.textContent = text
     this.segments.appendChild(sep)
@@ -593,8 +594,20 @@ export class DateTimeField {
       dt.setSeconds(s)
     }
 
+    // Segment writes cascade here once per segment (e.g. _syncSegmentsFromDatetime
+    // touches up to seven) — the equality gate keeps it to one change event and
+    // one announcement per actual value change.
+    const next = formatDatetimeISO(dt, this._showSeconds())
     this._syncingFromCustom = true
-    this.native.value = formatDatetimeISO(dt, this._showSeconds())
+    if (this.native.value !== next) {
+      this.native.value = next
+      this.native.dispatchEvent(new Event('change', { bubbles: true }))
+      const label = dt.toLocaleString(this.locale, {
+        dateStyle: 'long',
+        timeStyle: this._showSeconds() ? 'medium' : 'short',
+      })
+      this.announce.textContent = `${this.t.announceSelected} ${label}`
+    }
     this.selectedDatetime = dt
     this._syncingFromCustom = false
   }
@@ -998,7 +1011,10 @@ export class DateTimeField {
     clearBtn?.addEventListener('click', () => {
       this.selectedDatetime = null
       this._segmentEls.forEach(seg => this._clearSegment(seg))
+      this._syncingFromCustom = true
       this.native.value = ''
+      this.native.dispatchEvent(new Event('change', { bubbles: true }))
+      this._syncingFromCustom = false
       this._closeCalendar()
     })
 
@@ -1223,6 +1239,7 @@ export class DateTimeField {
       onChange: (y) => applyPickerDate(y, this.currentMonth),
     }))
 
+    this.calendarEl.querySelector<HTMLButtonElement>('.MonthYearTrigger')?.setAttribute('aria-expanded', 'true')
     this._setPanel('picker')
     monthHost.focus()
   }
@@ -1233,7 +1250,9 @@ export class DateTimeField {
     this._pickerWheels.clear()
     this._setPanel('calendar')
     this._renderMonth()
-    this.calendarEl.querySelector<HTMLButtonElement>('.MonthYearTrigger')?.focus()
+    const monthYearTrigger = this.calendarEl.querySelector<HTMLButtonElement>('.MonthYearTrigger')
+    monthYearTrigger?.setAttribute('aria-expanded', 'false')
+    monthYearTrigger?.focus()
   }
 
   // Deterministic panel switch: set data-active="true" on the named panel and

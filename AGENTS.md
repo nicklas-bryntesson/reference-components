@@ -25,9 +25,10 @@ Follow these steps to implement a component:
 | DateField | `src/partials/components/DateField/DateField.md` | `src/partials/components/DateField/tests/` | ✅ complete |
 | DateTimeField | `src/partials/components/DateTimeField/DateTimeField.md` | `src/partials/components/DateTimeField/tests/` | ✅ complete |
 | TimeField | `src/partials/components/TimeField/TimeField.md` | `src/partials/components/TimeField/tests/` | ✅ complete |
+| MonthField | `src/partials/components/MonthField/MonthField.md` | `src/partials/components/MonthField/tests/` | ✅ complete |
+| WeekField | `src/partials/components/WeekField/WeekField.md` | `src/partials/components/WeekField/tests/` | ✅ complete |
 | FileUpload | `src/partials/components/FileUpload/FileUpload.md` | `src/partials/components/FileUpload/tests/` | ✅ complete |
 | ToggleTip | `src/partials/components/ToggleTip/ToggleTip.md` | `src/partials/components/ToggleTip/tests/` | ✅ complete |
-| Button | — | — | 🚧 stub |
 | Combobox | — | — | 🚧 stub |
 | TabAccordion | — | — | 🚧 stub |
 

@@ -1,7 +1,8 @@
 # locale (kernel / pure functions)
 
-Shared locale resolution so DateField, DateTimeField, and TimeField all follow one pattern: read the
-requested locale from the element, then resolve it to a key that has a registered translation.
+Shared locale resolution so DateField, DateTimeField, TimeField, MonthField, and WeekField all follow
+one pattern: read the requested locale from the element, then resolve it to a key that has a
+registered translation.
 
 ## Public API
 
@@ -25,4 +26,4 @@ resolveLocale(requested: string, available: Record<string, unknown>, fallback = 
 ## Conformance
 
 Covered indirectly through the component locale-resolution tests (e.g. DateField's locale fallback /
-`<html lang>` cases). Consumed by: DateField, DateTimeField, TimeField.
+`<html lang>` cases). Consumed by: DateField, DateTimeField, TimeField, MonthField, WeekField.
