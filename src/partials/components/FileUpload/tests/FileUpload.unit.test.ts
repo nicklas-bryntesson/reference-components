@@ -501,4 +501,33 @@ describe('FileUpload drop-zone', () => {
     expect(el.hasAttribute('data-dragging-over')).toBe(false)
     el.remove()
   })
+
+  it('injects an aria-hidden drop label with the default text', () => {
+    const el = createFileUploadEl({ rootAttrs: { 'data-drop-zone': '' } })
+    new FileUpload(el)
+
+    const label = el.querySelector('.FileUpload-dropLabel')!
+    expect(label).not.toBeNull()
+    expect(label.getAttribute('aria-hidden')).toBe('true')
+    expect(label.textContent).toBe('Drop files here')
+    el.remove()
+  })
+
+  it('uses data-label-drop-zone for the drop label text', () => {
+    const el = createFileUploadEl({
+      rootAttrs: { 'data-drop-zone': '', 'data-label-drop-zone': 'Släpp filer här' },
+    })
+    new FileUpload(el)
+
+    expect(el.querySelector('.FileUpload-dropLabel')!.textContent).toBe('Släpp filer här')
+    el.remove()
+  })
+
+  it('does not inject a drop label without data-drop-zone', () => {
+    const el = createFileUploadEl()
+    new FileUpload(el)
+
+    expect(el.querySelector('.FileUpload-dropLabel')).toBeNull()
+    el.remove()
+  })
 })

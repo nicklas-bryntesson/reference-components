@@ -75,6 +75,7 @@ FileUpload.attach()
 |---|---|---|
 | `data-max-size` | `"5mb"` / `"500kb"` / bytes | Frontend max file size validation |
 | `data-drop-zone` | boolean | Opt-in native drag-and-drop |
+| `data-label-drop-zone` | string | Visible drop-zone hint text (default: "Drop files here"). JS injects it as an `aria-hidden` `.FileUpload-dropLabel` span — the trigger button remains the accessible action |
 | `data-initial-files` | JSON string | Server-provided files (persistent state) |
 | `data-label-trigger` | string | Trigger button text (default: "Add file") |
 | `data-label-trigger-multiple` | string | Trigger text with `multiple` (default: "Add files") |

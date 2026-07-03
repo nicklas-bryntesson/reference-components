@@ -22,6 +22,7 @@ export interface TranslationStrings {
   labelRemove: string
   errorAccept: string
   errorSize: string
+  labelDropZone: string
 }
 
 // ─── Pure utilities (exported for testing) ───────────────────────────────────
@@ -71,6 +72,7 @@ const DEFAULT_TRANSLATIONS: TranslationStrings = {
   labelRemove: 'Remove {name}',
   errorAccept: 'File type not allowed',
   errorSize: 'File exceeds maximum size',
+  labelDropZone: 'Drop files here',
 }
 
 // ─── Global augmentation ─────────────────────────────────────────────────────
@@ -121,6 +123,7 @@ class FileUpload {
       labelRemove: d.labelRemove ?? DEFAULT_TRANSLATIONS.labelRemove,
       errorAccept: d.errorAccept ?? DEFAULT_TRANSLATIONS.errorAccept,
       errorSize: d.errorSize ?? DEFAULT_TRANSLATIONS.errorSize,
+      labelDropZone: d.labelDropZone ?? DEFAULT_TRANSLATIONS.labelDropZone,
     }
   }
 
@@ -134,8 +137,22 @@ class FileUpload {
       this._renderList()
     }
     this._updateTriggerText()
+    this._renderDropLabel()
     this._bindEvents()
     this.root.setAttribute('data-initialized', '')
+  }
+
+  // Visible drop-zone hint text. Injected by JS (consumers don't author it) and
+  // aria-hidden — drag-and-drop is a pointer affordance; the trigger button is
+  // the accessible action.
+  private _renderDropLabel(): void {
+    if (!this.root.hasAttribute('data-drop-zone')) return
+    if (this.root.querySelector('.FileUpload-dropLabel')) return
+    const label = document.createElement('span')
+    label.className = 'FileUpload-dropLabel'
+    label.setAttribute('aria-hidden', 'true')
+    label.textContent = this._t.labelDropZone
+    this.input.insertAdjacentElement('afterend', label)
   }
 
   private _bootstrapFromInput(): void {
