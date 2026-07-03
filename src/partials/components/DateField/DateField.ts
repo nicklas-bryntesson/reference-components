@@ -6,7 +6,6 @@ import {
   getDaysInMonth,
   clampDayToMonth,
   getFirstWeekdayOfMonth,
-  getISOWeek,
   isDayDisabled,
   formatISO,
   getWeekdayNames,

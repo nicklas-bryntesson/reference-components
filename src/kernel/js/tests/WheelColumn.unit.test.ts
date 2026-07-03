@@ -5,7 +5,8 @@ import WheelColumn, { type WheelColumnOptions } from '../WheelColumn'
 // public API + the drift-prone maths (loop wrap, bounded clamp, onChange gating,
 // format, ARIA). The interactive physics (drag/momentum/snap) is covered by the
 // component e2e suites. We mock prefers-reduced-motion: reduce so animations
-// short-circuit synchronously — no requestAnimationFrame needed.
+// short-circuit synchronously — no requestAnimationFrame needed. The animated
+// setValue regression instead allows motion and drives a stubbed rAF queue.
 
 function makeWheel(opts: Partial<WheelColumnOptions> = {}): {
   el: HTMLElement
@@ -120,6 +121,47 @@ describe('WheelColumn — onChange gating', () => {
     wheel.setValue(8)
     expect(onChange).not.toHaveBeenCalled()
     expect(wheel.value).toBe(8)
+  })
+
+  it('does NOT fire onChange on animated setValue (motion allowed), and later user steps still do', () => {
+    // Motion allowed: the eased snap defers _commit to rAF frames — the
+    // _externalSet flag must survive until that deferred commit.
+    vi.stubGlobal('matchMedia', (query: string) => ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addListener: () => {},
+      removeListener: () => {},
+      addEventListener: () => {},
+      removeEventListener: () => {},
+      dispatchEvent: () => false,
+    }))
+    let frames: FrameRequestCallback[] = []
+    vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => { frames.push(cb); return frames.length })
+    vi.stubGlobal('cancelAnimationFrame', () => {})
+
+    // Drain the rAF queue with large timesteps so the eased snap lands fast.
+    const drive = (): void => {
+      let t = performance.now()
+      for (let i = 0; i < 50 && frames.length > 0; i++) {
+        const batch = frames
+        frames = []
+        t += 100
+        for (const cb of batch) cb(t)
+      }
+      expect(frames.length).toBe(0)
+    }
+
+    const { wheel, onChange } = makeWheel({ value: 5 })
+
+    wheel.setValue(8)
+    drive()
+    expect(onChange).not.toHaveBeenCalled()
+    expect(wheel.value).toBe(8)
+
+    wheel.stepBy(1)
+    drive()
+    expect(onChange).toHaveBeenCalledWith(9)
   })
 })
 

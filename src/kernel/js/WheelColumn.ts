@@ -352,6 +352,9 @@ class WheelColumn {
     if (!this._externalSet) {
       this.opts.onChange(value)
     }
+    // An animated setValue leaves the flag set until its deferred snap lands
+    // here — clear it so later user-driven commits fire onChange again.
+    this._externalSet = false
 
     // Release wheel lock now that this column has snapped to rest.
     // Short grace period so the snap animation fully settles before
@@ -468,14 +471,16 @@ class WheelColumn {
     this._currentValue = value
 
     if (animate && !this._prefersReducedMotion()) {
+      // The flag must survive until the eased snap commits (next RAF frames),
+      // so _commit() clears it — not us. User gestures that interrupt the
+      // animation (drag/wheel/click/stepBy) all reset it to false themselves.
       this._animateTo(target)
     } else {
       this._stop()
       this.pos = target
       this.render()
+      this._externalSet = false
     }
-
-    this._externalSet = false
   }
 
   stepBy(delta: number): void {
