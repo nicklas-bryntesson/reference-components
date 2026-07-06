@@ -265,18 +265,18 @@ describe('data-input-characters', () => {
 // ─── data-has-prefix / data-has-suffix presence (end-state contract) ─────────
 
 describe('affix presence attributes', () => {
-  it('gap-fills data-has-prefix and data-has-suffix from affix presence', () => {
+  it('gap-fills data-has-prefix="true" and data-has-suffix="true" from affix presence', () => {
     const el = createAffixFieldEl({ inputAttrs: { id: 'af-p1' } })
     AffixField.attach()
-    expect(el.hasAttribute('data-has-prefix')).toBe(true)
-    expect(el.hasAttribute('data-has-suffix')).toBe(true)
+    expect(el.getAttribute('data-has-prefix')).toBe('true')
+    expect(el.getAttribute('data-has-suffix')).toBe('true')
   })
 
   it('only sets the attribute for the side that exists', () => {
     const el = createAffixFieldEl({ inputAttrs: { id: 'af-p2' }, prefix: null })
     AffixField.attach()
     expect(el.hasAttribute('data-has-prefix')).toBe(false)
-    expect(el.hasAttribute('data-has-suffix')).toBe(true)
+    expect(el.getAttribute('data-has-suffix')).toBe('true')
   })
 
   it('sets the attribute even for an aria-hidden affix (visual, not ARIA, data)', () => {
@@ -286,7 +286,7 @@ describe('affix presence attributes', () => {
       suffix: { text: 'timmar', attrs: { 'aria-hidden': 'true' } },
     })
     AffixField.attach()
-    expect(el.hasAttribute('data-has-suffix')).toBe(true)
+    expect(el.getAttribute('data-has-suffix')).toBe('true')
   })
 
   it('never touches an authored presence attribute', () => {
@@ -306,8 +306,8 @@ describe('fully-authored fixture', () => {
   function createAuthoredEl(): HTMLElement {
     return createAffixFieldEl({
       rootAttrs: {
-        'data-has-prefix': '',
-        'data-has-suffix': '',
+        'data-has-prefix': 'true',
+        'data-has-suffix': 'true',
         style: '--af-prefix-chars: 1; --af-suffix-chars: 3;',
       },
       inputAttrs: {

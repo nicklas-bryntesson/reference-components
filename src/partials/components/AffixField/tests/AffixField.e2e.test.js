@@ -31,21 +31,21 @@ test.beforeEach(async ({ page }) => {
 
 test('root carries the data-has-prefix / data-has-suffix presence attributes', async ({ page }) => {
   // Part of the end-state contract — the CSS padding gates key on them.
-  await expect(page.locator(AF)).toHaveAttribute('data-has-prefix', '')
-  await expect(page.locator(AF)).toHaveAttribute('data-has-suffix', '')
+  await expect(page.locator(AF)).toHaveAttribute('data-has-prefix', 'true')
+  await expect(page.locator(AF)).toHaveAttribute('data-has-suffix', 'true')
 })
 
 test('JS gap-fills the presence attributes on the bare variant', async ({ page }) => {
   // The bare variant authors neither attribute — after init they must exist.
   await page.locator(`${BARE}[data-initialized]`).waitFor()
-  await expect(page.locator(BARE)).toHaveAttribute('data-has-prefix', '')
-  await expect(page.locator(BARE)).toHaveAttribute('data-has-suffix', '')
+  await expect(page.locator(BARE)).toHaveAttribute('data-has-prefix', 'true')
+  await expect(page.locator(BARE)).toHaveAttribute('data-has-suffix', 'true')
 })
 
 test('a side without an affix gets no presence attribute', async ({ page }) => {
   // unit-in-label has only a suffix.
   await page.locator(`${UNIT_IN_LABEL}[data-initialized]`).waitFor()
-  await expect(page.locator(UNIT_IN_LABEL)).toHaveAttribute('data-has-suffix', '')
+  await expect(page.locator(UNIT_IN_LABEL)).toHaveAttribute('data-has-suffix', 'true')
   expect(await page.locator(UNIT_IN_LABEL).getAttribute('data-has-prefix')).toBeNull()
 })
 
@@ -158,8 +158,8 @@ test('the fully-authored variant is untouched — computed attributes strictly e
   // JS write would re-serialize it (spacing/semicolon normalization).
   await expect(root).toHaveAttribute('style', '--af-prefix-chars: 1; --af-suffix-chars: 3')
   // Presence attributes are authored (server end-state), values untouched.
-  await expect(root).toHaveAttribute('data-has-prefix', '')
-  await expect(root).toHaveAttribute('data-has-suffix', '')
+  await expect(root).toHaveAttribute('data-has-prefix', 'true')
+  await expect(root).toHaveAttribute('data-has-suffix', 'true')
   await expect(root.locator('.AffixField-prefix')).toHaveAttribute('id', 'af-variant-authored-prefix')
   await expect(root.locator('.AffixField-suffix')).toHaveAttribute('id', 'af-variant-authored-suffix')
   await expect(root.locator('.AffixField-input')).toHaveAttribute(
