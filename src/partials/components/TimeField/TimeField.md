@@ -13,11 +13,11 @@ An accessible time input wrapping `<input type="time">`. Custom spinbutton segme
 | `data-min` | `HH:mm` | Only clamps the popup **Now** button — segments, wheels and the native input are not bounded |
 | `data-max` | `HH:mm` | Only clamps the popup **Now** button — segments, wheels and the native input are not bounded |
 | `data-step` | number (seconds) | Step in seconds. Values < 60 show the seconds segment. Default: 60 |
-| `data-disabled` | boolean | Disables the entire field |
-| `data-invalid` | boolean | Marks the field invalid — styling hook only; the author must also set `aria-invalid="true"` on the native input (as the kitchensink states do) |
+| `data-disabled` | `"true"` | Disables the entire field |
+| `data-invalid` | `"true"` | Marks the field invalid — styling hook only; the author must also set `aria-invalid="true"` on the native input (as the kitchensink states do) |
 | `data-input-mode` | `custom` \| `display` | Set by JS: `custom` on fine pointers (spinbutton overlay), `display` on touch (native picker) — via `matchMedia('(pointer: coarse)')` |
 
-State attributes set by JS: `data-initialized`, `data-open`, `data-has-value`, `data-direction`, and `aria-expanded` on the trigger. All are styling hooks in `TimeField.css`.
+State attributes set by JS: `data-initialized="true"`, `data-open="true"`, `data-has-value="true"` (boolean state always carries the literal value `"true"`, absent when off), `data-direction`, and `aria-expanded` on the trigger. All are styling hooks in `TimeField.css`.
 
 ## Segments
 

@@ -27,7 +27,7 @@
   }
 
   /* Drop-zone: input spans full root, captures native drag-and-drop */
-  &[data-drop-zone] {
+  &[data-drop-zone="true"] {
     border: 2px dashed var(--fu-border-color);
     border-radius: var(--fu-border-radius);
     padding: 1rem;
@@ -66,7 +66,7 @@
     }
   }
 
-  &[data-drop-zone][data-dragging-over] {
+  &[data-drop-zone="true"][data-dragging-over="true"] {
     border-color: var(--fu-drop-zone-border-color);
     background: var(--fu-drop-zone-bg);
   }
@@ -95,8 +95,8 @@
     font-size: 0.875rem;
   }
 
-  &[data-has-errors] .FileUpload-item[data-status="invalid-type"],
-  &[data-has-errors] .FileUpload-item[data-status="invalid-size"] {
+  &[data-has-errors="true"] .FileUpload-item[data-status="invalid-type"],
+  &[data-has-errors="true"] .FileUpload-item[data-status="invalid-size"] {
     border-color: var(--fu-error-color);
     color: var(--fu-error-color);
   }
@@ -169,7 +169,7 @@
     background: var(--fu-trigger-bg-active);
   }
 
-  &[data-disabled] {
+  &[data-disabled="true"] {
     opacity: 0.5;
 
     & * {

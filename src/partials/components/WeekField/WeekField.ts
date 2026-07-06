@@ -235,7 +235,7 @@ class WeekField {
       this._initInteractiveMode()
     }
 
-    this.root.setAttribute('data-initialized', '')
+    this.root.setAttribute('data-initialized', 'true')
   }
 
   // ─── Display mode (touch + native week) ────────────────────────────────────
@@ -248,7 +248,7 @@ class WeekField {
     this.overlay.setAttribute('aria-hidden', 'true')
 
     if (this.native.disabled || this.root.hasAttribute('data-disabled')) {
-      this.root.dataset.disabled = ''
+      this.root.dataset.disabled = 'true'
     }
 
     this._buildSegments()
@@ -276,7 +276,7 @@ class WeekField {
     this.segments.setAttribute('aria-roledescription', this.t.weekField)
 
     if (this.native.disabled || this.root.hasAttribute('data-disabled')) {
-      this.root.dataset.disabled = ''
+      this.root.dataset.disabled = 'true'
     }
 
     this._buildSegments()
@@ -347,7 +347,7 @@ class WeekField {
     const { min, max } = this._getSegmentLimits(type)
     span.setAttribute('aria-valuemin', String(min))
     span.setAttribute('aria-valuemax', String(max))
-    span.setAttribute('data-placeholder', '')
+    span.setAttribute('data-placeholder', 'true')
     span.setAttribute('aria-valuetext', '--')
     span.textContent = type === 'year' ? '----' : '--'
 
@@ -377,7 +377,7 @@ class WeekField {
       s.removeAttribute('data-focused')
       s.setAttribute('tabindex', '-1')
     })
-    seg.setAttribute('data-focused', '')
+    seg.setAttribute('data-focused', 'true')
     seg.setAttribute('tabindex', '0')
   }
 
@@ -529,7 +529,7 @@ class WeekField {
 
   _clearSegment(seg: HTMLSpanElement): void {
     const type = seg.dataset.segment as WeekSegmentType
-    seg.setAttribute('data-placeholder', '')
+    seg.setAttribute('data-placeholder', 'true')
     seg.removeAttribute('aria-valuenow')
     seg.setAttribute('aria-valuetext', '--')
     seg.textContent = type === 'year' ? '----' : '--'
@@ -679,7 +679,7 @@ class WeekField {
     this.native.value = weekStr
     this.selectedWeek = week
     this.selectedWeekYear = year
-    this.root.dataset.hasValue = ''
+    this.root.dataset.hasValue = 'true'
 
     if (!this._suppressEvents) {
       this.native.dispatchEvent(new Event('input', { bubbles: true }))
@@ -788,7 +788,7 @@ class WeekField {
     this._renderMonth()
 
     this._slideContainer.appendChild(this.popupEl)
-    this.root.setAttribute('data-open', '')
+    this.root.setAttribute('data-open', 'true')
     this.trigger.setAttribute('aria-expanded', 'true')
 
     this._updateLayout()
@@ -928,9 +928,9 @@ class WeekField {
     const isSelected = this.selectedWeek === week && this.selectedWeekYear === weekYear
     const isDisabled = this._isWeekDisabled(iso)
 
-    if (isSelected) { tr.dataset.selected = ''; tr.setAttribute('aria-selected', 'true') }
+    if (isSelected) { tr.dataset.selected = 'true'; tr.setAttribute('aria-selected', 'true') }
     else tr.setAttribute('aria-selected', 'false')
-    if (isDisabled) { tr.dataset.disabled = ''; tr.setAttribute('aria-disabled', 'true') }
+    if (isDisabled) { tr.dataset.disabled = 'true'; tr.setAttribute('aria-disabled', 'true') }
 
     // Row is the selectable unit (composite grid row). It carries the human
     // label so AT announces the whole week; roving tabindex lives on the row.
@@ -958,15 +958,15 @@ class WeekField {
       date.setDate(monday.getDate() + d)
       const td = document.createElement('td')
       td.setAttribute('role', 'gridcell')
-      if (date.getMonth() !== this.viewMonth) td.dataset.outsideMonth = ''
-      if (date.toDateString() === today.toDateString()) td.dataset.today = ''
+      if (date.getMonth() !== this.viewMonth) td.dataset.outsideMonth = 'true'
+      if (date.toDateString() === today.toDateString()) td.dataset.today = 'true'
       td.textContent = String(date.getDate())
       tr.appendChild(td)
     }
 
     if (!isDisabled) {
       tr.addEventListener('click', () => this._selectWeek(weekYear, week))
-      tr.addEventListener('mouseenter', () => tr.dataset.preview = '')
+      tr.addEventListener('mouseenter', () => tr.dataset.preview = 'true')
       tr.addEventListener('mouseleave', () => tr.removeAttribute('data-preview'))
     }
 
@@ -1102,7 +1102,7 @@ class WeekField {
     this._suppressEvents = false
 
     this.native.value = formatWeekISO(weekYear, week)
-    this.root.dataset.hasValue = ''
+    this.root.dataset.hasValue = 'true'
     this.native.dispatchEvent(new Event('input', { bubbles: true }))
     this.native.dispatchEvent(new Event('change', { bubbles: true }))
     this._announceValue(weekYear, week)

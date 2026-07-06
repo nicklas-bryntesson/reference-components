@@ -232,7 +232,7 @@ export class DateTimeField {
       this._initInteractive()
     }
 
-    this.root.dataset.initialized = ''
+    this.root.dataset.initialized = 'true'
   }
 
   _initInteractive(): void {
@@ -459,7 +459,7 @@ export class DateTimeField {
     seg.setAttribute('aria-label', labels[type])
     seg.setAttribute('aria-valuemin', String(limits.min))
     seg.setAttribute('aria-valuemax', String(limits.max))
-    seg.setAttribute('data-placeholder', '')
+    seg.setAttribute('data-placeholder', 'true')
     seg.setAttribute('aria-valuetext', SEGMENT_PLACEHOLDERS[type])
     seg.textContent = SEGMENT_PLACEHOLDERS[type]
 
@@ -504,7 +504,7 @@ export class DateTimeField {
       seg.textContent = this.t.am
       return
     }
-    seg.setAttribute('data-placeholder', '')
+    seg.setAttribute('data-placeholder', 'true')
     seg.removeAttribute('aria-valuenow')
     seg.setAttribute('aria-valuetext', SEGMENT_PLACEHOLDERS[type] ?? '--')
     seg.textContent = SEGMENT_PLACEHOLDERS[type] ?? '--'
@@ -684,7 +684,7 @@ export class DateTimeField {
       s.removeAttribute('data-focused')
       s.setAttribute('tabindex', '-1')
     })
-    seg.setAttribute('data-focused', '')
+    seg.setAttribute('data-focused', 'true')
     seg.setAttribute('tabindex', '0')
   }
 
@@ -809,7 +809,7 @@ export class DateTimeField {
       pickerPanel.id = pickerId
       monthYearTrigger.setAttribute('aria-controls', pickerId)
     }
-    this.root.dataset.open = ''
+    this.root.dataset.open = 'true'
     this.trigger.setAttribute('aria-label', this.t.closeCalendar)
     this.trigger.setAttribute('aria-expanded', 'true')
 
@@ -883,7 +883,7 @@ export class DateTimeField {
     // Leading outside-month cells
     for (let i = firstDay - 1; i >= 0; i--) {
       const td = document.createElement('td')
-      td.setAttribute('data-outside-month', '')
+      td.setAttribute('data-outside-month', 'true')
       const btn = document.createElement('button')
       btn.type = 'button'
       btn.setAttribute('tabindex', '-1')
@@ -933,7 +933,7 @@ export class DateTimeField {
       let nextDay = 1
       while (cellCount % 7 !== 0) {
         const td = document.createElement('td')
-        td.setAttribute('data-outside-month', '')
+        td.setAttribute('data-outside-month', 'true')
         const btn = document.createElement('button')
         btn.type = 'button'
         btn.setAttribute('tabindex', '-1')

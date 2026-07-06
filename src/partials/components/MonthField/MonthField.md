@@ -14,11 +14,11 @@ Completes the date family alongside DateField, DateTimeField, and TimeField.
 | `data-value` | `YYYY-MM` | Initial value (server-side render) |
 | `data-min` | `YYYY-MM` | Minimum allowed month; bounds the year wheel and the segments — the month wheel always spans all 12 months, and out-of-range combinations are corrected (`_enforceBounds`) |
 | `data-max` | `YYYY-MM` | Maximum allowed month; bounds the year wheel and the segments — the month wheel always spans all 12 months, and out-of-range combinations are corrected (`_enforceBounds`) |
-| `data-disabled` | boolean | Disables the entire field |
-| `data-invalid` | boolean | Marks the field invalid — styling hook only; the author must also set `aria-invalid="true"` on the native input (as the kitchensink states do) |
+| `data-disabled` | `"true"` | Disables the entire field |
+| `data-invalid` | `"true"` | Marks the field invalid — styling hook only; the author must also set `aria-invalid="true"` on the native input (as the kitchensink states do) |
 | `data-input-mode` | `custom` \| `display` | Set by JS: `custom` on fine pointers (spinbutton overlay), `display` on touch (native picker) |
 
-State attributes set by JS: `data-initialized`, `data-open`, `data-has-value`, `data-direction`, and `aria-expanded` on the trigger.
+State attributes set by JS: `data-initialized="true"`, `data-open="true"`, `data-has-value="true"` (boolean state always carries the literal value `"true"`, absent when off), `data-direction`, and `aria-expanded` on the trigger.
 
 ## Segments
 
@@ -142,7 +142,7 @@ Test with a real screenreader before shipping. Sources: `docs/atomica11y/form/da
 - [ ] Content behind the dialog is not the focus target while open
 
 **Invalid state**
-- [ ] When `data-invalid` is set, the error is announced automatically
+- [ ] When `data-invalid="true"` is set, the error is announced automatically
 - [ ] Error is read after the input name, role, and state
 
 ### Mobile screenreader (VoiceOver iOS, TalkBack Android)

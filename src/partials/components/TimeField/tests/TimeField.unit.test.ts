@@ -43,7 +43,7 @@ function createTimeFieldEl(options: {
       data-name="${id}"
       data-locale="${options.locale ?? 'sv-SE'}"
       ${options.value ? `data-value="${options.value}"` : ''}
-      ${options.disabled ? 'data-disabled' : ''}
+      ${options.disabled ? 'data-disabled="true"' : ''}
       ${options.step != null ? `data-step="${options.step}"` : ''}
     >
       <input class="TimeField-native" type="time" aria-hidden="true" tabindex="-1"
@@ -559,6 +559,6 @@ describe('data-initialized', () => {
   it('root has data-initialized after construction', () => {
     const el = createTimeFieldEl()
     new TimeField(el)
-    expect(el.hasAttribute('data-initialized')).toBe(true)
+    expect(el.getAttribute('data-initialized')).toBe('true')
   })
 })

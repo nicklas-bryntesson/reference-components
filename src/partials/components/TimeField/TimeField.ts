@@ -172,7 +172,7 @@ class TimeField {
       this._initInteractiveMode()
     }
 
-    this.root.setAttribute('data-initialized', '')
+    this.root.setAttribute('data-initialized', 'true')
   }
 
   // ─── Display mode (touch / coarse pointer) ────────────────────────────────
@@ -189,7 +189,7 @@ class TimeField {
     this.overlay.setAttribute('aria-hidden', 'true')
 
     if (this.native.disabled || this.root.hasAttribute('data-disabled')) {
-      this.root.dataset.disabled = ''
+      this.root.dataset.disabled = 'true'
     }
 
     this._buildSegments()
@@ -221,7 +221,7 @@ class TimeField {
 
     // Disabled state
     if (this.native.disabled || this.root.hasAttribute('data-disabled')) {
-      this.root.dataset.disabled = ''
+      this.root.dataset.disabled = 'true'
     }
 
     this._buildSegments()
@@ -297,7 +297,7 @@ class TimeField {
       const { min, max } = this._getSegmentLimits(type)
       span.setAttribute('aria-valuemin', String(min))
       span.setAttribute('aria-valuemax', String(max))
-      span.setAttribute('data-placeholder', '')
+      span.setAttribute('data-placeholder', 'true')
       span.setAttribute('aria-valuetext', '--')
       span.textContent = '--'
     }
@@ -326,7 +326,7 @@ class TimeField {
       s.removeAttribute('data-focused')
       s.setAttribute('tabindex', '-1')
     })
-    seg.setAttribute('data-focused', '')
+    seg.setAttribute('data-focused', 'true')
     seg.setAttribute('tabindex', '0')
   }
 
@@ -460,7 +460,7 @@ class TimeField {
   }
 
   _clearSegment(seg: HTMLSpanElement): void {
-    seg.setAttribute('data-placeholder', '')
+    seg.setAttribute('data-placeholder', 'true')
     seg.removeAttribute('aria-valuenow')
     seg.setAttribute('aria-valuetext', '--')
     seg.textContent = '--'
@@ -627,7 +627,7 @@ class TimeField {
       : `${formatSegment(h)}:${formatSegment(minute)}`
 
     this.native.value = timeStr
-    this.root.dataset.hasValue = ''
+    this.root.dataset.hasValue = 'true'
 
     if (!this._suppressEvents) {
       this.native.dispatchEvent(new Event('input', { bubbles: true }))
@@ -747,7 +747,7 @@ class TimeField {
     this.popupEl.addEventListener('keydown', (e) => this._handlePopupKeydown(e))
 
     this._slideContainer.appendChild(this.popupEl)
-    this.root.setAttribute('data-open', '')
+    this.root.setAttribute('data-open', 'true')
     this.trigger.setAttribute('aria-expanded', 'true')
 
     this._updateLayout()
@@ -888,7 +888,7 @@ class TimeField {
     this._suppressEvents = true
     this._syncFromNative(timeStr)
     this.native.value = timeStr
-    this.root.dataset.hasValue = ''
+    this.root.dataset.hasValue = 'true'
     this._suppressEvents = false
     // "Now" is a value change — fire both once (the suppressed segment cascade
     // above would otherwise fire per segment).

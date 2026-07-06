@@ -35,7 +35,7 @@
     display: none;
   }
 
-  &[data-disabled] {
+  &[data-disabled="true"] {
     opacity: 0.5;
     pointer-events: none;
   }
@@ -98,12 +98,12 @@
     border-radius: 2px;
     cursor: default;
 
-    &[data-focused] {
+    &[data-focused="true"] {
       background-color: var(--SITE--POPOVER--ACCENT);
       color: var(--SITE--POPOVER--ACCENT-TEXT);
     }
 
-    &[data-placeholder] {
+    &[data-placeholder="true"] {
       color: var(--tf-color-muted);
     }
   }
@@ -125,7 +125,7 @@
     outline-offset: 1px;
   }
 
-  &[data-invalid] .TimeField-overlay {
+  &[data-invalid="true"] .TimeField-overlay {
     border-color: var(--tf-border-color-invalid);
   }
 
@@ -162,7 +162,7 @@
   }
 
   /* ── Initialisation gate ─────────────────────────────────────────────────── */
-  &[data-initialized] {
+  &[data-initialized="true"] {
     overflow: visible;
   }
 

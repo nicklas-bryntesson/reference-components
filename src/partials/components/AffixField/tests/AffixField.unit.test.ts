@@ -323,7 +323,7 @@ describe('fully-authored fixture', () => {
     const el = createAuthoredEl()
     const before = el.outerHTML
     AffixField.attach()
-    expect(el.hasAttribute('data-initialized')).toBe(true)
+    expect(el.getAttribute('data-initialized')).toBe('true')
     el.removeAttribute('data-initialized')
     expect(el.outerHTML).toBe(before)
   })
@@ -343,7 +343,7 @@ describe('AffixField.attach', () => {
     const el = createAffixFieldEl({ inputAttrs: { id: 'af-13' } })
     AffixField.attach()
     expect((el as any).__affixFieldInstance).toBeInstanceOf(AffixField)
-    expect(el.hasAttribute('data-initialized')).toBe(true)
+    expect(el.getAttribute('data-initialized')).toBe('true')
   })
 
   it('does not re-instantiate already attached elements', () => {

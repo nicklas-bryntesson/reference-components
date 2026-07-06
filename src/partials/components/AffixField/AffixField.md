@@ -40,7 +40,7 @@ End-state (after JS gap-fill *or* fully server-rendered — identical):
 
 ```html
 <label for="af-1">Belopp</label>
-<div class="AffixField" data-component="AffixField" data-initialized
+<div class="AffixField" data-component="AffixField" data-initialized="true"
      data-has-prefix="true" data-has-suffix="true"
      style="--af-prefix-chars: 1; --af-suffix-chars: 3">
   <span class="AffixField-prefix" id="af-1-prefix">$</span>
@@ -78,10 +78,10 @@ One caveat: custom properties inherit, so a `--af-prefix-chars` set on an *ances
 | `data-component` | `"AffixField"` | Attach hook. |
 | `data-align` | `"end"` | Opt-in end-alignment of the input text (amounts). Default: `start`. There is no `center`. |
 | `data-input-characters` | number | Width of the **value area** in character units — JS (or the server) maps it to `--af-input-chars`, and the wrapper width becomes `calc(var(--af-input-chars) * var(--af-ch-unit) + affix slots + gaps + paddings + borders)`. **When absent** (the default) no width is imposed: the field sizes via normal CSS. |
-| `data-has-prefix` / `data-has-suffix` | `"true"` | **End-state contract** — set to the literal string `"true"` for each affix side that exists, absent otherwise. The explicit value (rather than a bare boolean attribute) is deliberate: `data-has-prefix="true"` reads unambiguously in both the HTML and the CSS selectors. The padding gates match `[data-has-prefix="true"]` exactly — any other value is treated as absent (affix presence is load-bearing layout data, so it is expressed as end-state data — never inferred with `:has()`). Server-rendered, or gap-filled by JS from affix presence; authored attributes are never touched, so author `"true"` or nothing. |
-| `data-disabled` | boolean | Styling hook (author also sets `disabled` on the input, as the kitchensink states do). |
-| `data-invalid` | boolean | Styling hook (author also sets `aria-invalid="true"` on the input). |
-| `data-initialized` | — | Set by JS (or authored in a server end-state). |
+| `data-has-prefix` / `data-has-suffix` | `"true"` | **End-state contract** — set to the literal string `"true"` for each affix side that exists, absent otherwise (the family-wide boolean convention — see `.claude/philosophy.md`). The padding gates match `[data-has-prefix="true"]` exactly — any other value is treated as absent (affix presence is load-bearing layout data, so it is expressed as end-state data — never inferred with `:has()`). Server-rendered, or gap-filled by JS from affix presence; authored attributes are never touched, so author `"true"` or nothing. |
+| `data-disabled` | `"true"` | Styling hook (author also sets `disabled` on the input, as the kitchensink states do). |
+| `data-invalid` | `"true"` | Styling hook (author also sets `aria-invalid="true"` on the input). |
+| `data-initialized` | `"true"` | Set by JS (or authored in a server end-state). |
 
 > **Why not the native `size` attribute for width?** `size` *is* the platform's "width in characters" API, but browsers compute it inconsistently — the same `size="4"` renders different widths across engines. `data-input-characters` keeps the deterministic cross-browser behaviour a design system needs, and ports cleanly to a server-rendered stack (it's just an attribute → custom property mapping).
 
@@ -139,7 +139,7 @@ What `attach()` does per instance (all of it optional in a server stack):
 2. Sets `--af-prefix-chars` / `--af-suffix-chars` inline on the root from each affix's `textContent.trim().length` (skipped for any count already authored inline on the root — including fractional tuning values).
 3. `data-input-characters` → sets `--af-input-chars` on the root (skipped if already authored).
 4. Wires affix ids + `aria-describedby` per the accessibility model (skipped where authored/overridden).
-5. Sets `data-initialized`.
+5. Sets `data-initialized="true"`.
 
 ## Events
 

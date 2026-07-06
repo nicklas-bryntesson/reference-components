@@ -22,7 +22,7 @@ describe('DateTimeField.attach()', () => {
     const root = makeRoot()
     document.body.appendChild(root)
     DateTimeField.attach(document.body)
-    expect(root.dataset.initialized).toBeDefined()
+    expect(root.dataset.initialized).toBe('true')
     root.remove()
   })
 })

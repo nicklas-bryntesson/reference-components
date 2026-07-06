@@ -139,7 +139,7 @@ class FileUpload {
     this._updateTriggerText()
     this._renderDropLabel()
     this._bindEvents()
-    this.root.setAttribute('data-initialized', '')
+    this.root.setAttribute('data-initialized', 'true')
   }
 
   // Visible drop-zone hint text. Injected by JS (consumers don't author it) and
@@ -317,11 +317,11 @@ class FileUpload {
   }
 
   private _updateRootState(): void {
-    if (this._entries.length > 0) this.root.setAttribute('data-has-files', '')
+    if (this._entries.length > 0) this.root.setAttribute('data-has-files', 'true')
     else this.root.removeAttribute('data-has-files')
 
     const hasErrors = this._entries.some(e => e.status !== 'valid')
-    if (hasErrors) this.root.setAttribute('data-has-errors', '')
+    if (hasErrors) this.root.setAttribute('data-has-errors', 'true')
     else this.root.removeAttribute('data-has-errors')
   }
 
@@ -379,7 +379,7 @@ class FileUpload {
 
   private _handleDragEnter = (): void => {
     this._dragDepth++
-    this.root.setAttribute('data-dragging-over', '')
+    this.root.setAttribute('data-dragging-over', 'true')
   }
 
   private _handleDragLeave = (): void => {

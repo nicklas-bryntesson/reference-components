@@ -23,7 +23,7 @@ const SIZED = anchor('affixfield-sized')
 test.beforeEach(async ({ page }) => {
   await page.goto(targetPath())
   await page.locator(AF).scrollIntoViewIfNeeded()
-  await page.locator(`${AF}[data-initialized]`).waitFor()
+  await page.locator(`${AF}[data-initialized="true"]`).waitFor()
   await injectAxe(page)
 })
 
@@ -37,14 +37,14 @@ test('root carries the data-has-prefix / data-has-suffix presence attributes', a
 
 test('JS gap-fills the presence attributes on the bare variant', async ({ page }) => {
   // The bare variant authors neither attribute — after init they must exist.
-  await page.locator(`${BARE}[data-initialized]`).waitFor()
+  await page.locator(`${BARE}[data-initialized="true"]`).waitFor()
   await expect(page.locator(BARE)).toHaveAttribute('data-has-prefix', 'true')
   await expect(page.locator(BARE)).toHaveAttribute('data-has-suffix', 'true')
 })
 
 test('a side without an affix gets no presence attribute', async ({ page }) => {
   // unit-in-label has only a suffix.
-  await page.locator(`${UNIT_IN_LABEL}[data-initialized]`).waitFor()
+  await page.locator(`${UNIT_IN_LABEL}[data-initialized="true"]`).waitFor()
   await expect(page.locator(UNIT_IN_LABEL)).toHaveAttribute('data-has-suffix', 'true')
   expect(await page.locator(UNIT_IN_LABEL).getAttribute('data-has-prefix')).toBeNull()
 })
@@ -62,7 +62,7 @@ test('input aria-describedby references prefix then suffix', async ({ page }) =>
 })
 
 test('affix ids append AFTER an existing hint id (describedby merge)', async ({ page }) => {
-  await page.locator(`${DESCRIBEDBY}[data-initialized]`).waitFor()
+  await page.locator(`${DESCRIBEDBY}[data-initialized="true"]`).waitFor()
   await expect(page.locator(`${DESCRIBEDBY} .AffixField-input`)).toHaveAttribute(
     'aria-describedby',
     'af-variant-describedby-hint af-variant-describedby-suffix',
@@ -70,7 +70,7 @@ test('affix ids append AFTER an existing hint id (describedby merge)', async ({ 
 })
 
 test('an aria-hidden affix is skipped entirely — no id, no reference', async ({ page }) => {
-  await page.locator(`${UNIT_IN_LABEL}[data-initialized]`).waitFor()
+  await page.locator(`${UNIT_IN_LABEL}[data-initialized="true"]`).waitFor()
   const suffix = page.locator(`${UNIT_IN_LABEL} .AffixField-suffix`)
   await expect(suffix).toHaveAttribute('aria-hidden', 'true')
   expect(await suffix.getAttribute('id')).toBeNull()
@@ -152,7 +152,7 @@ test('clicking an affix focuses the input (pointer-events pass-through)', async 
 // ── Fully-authored variant: JS verifiably touches nothing ──────────────────────
 
 test('the fully-authored variant is untouched — computed attributes strictly equal authored ones', async ({ page }) => {
-  await page.locator(`${AUTHORED}[data-initialized]`).waitFor()
+  await page.locator(`${AUTHORED}[data-initialized="true"]`).waitFor()
   const root = page.locator(AUTHORED)
   // The style attribute is byte-identical to what the generator authored: any
   // JS write would re-serialize it (spacing/semicolon normalization).
@@ -171,7 +171,7 @@ test('the fully-authored variant is untouched — computed attributes strictly e
 // ── Sized variant ───────────────────────────────────────────────────────────────
 
 test('data-input-characters sets --af-input-chars and imposes a compact width', async ({ page }) => {
-  await page.locator(`${SIZED}[data-initialized]`).waitFor()
+  await page.locator(`${SIZED}[data-initialized="true"]`).waitFor()
   const state = await page.locator(SIZED).evaluate((root) => ({
     chars: root.style.getPropertyValue('--af-input-chars'),
     rootWidth: root.getBoundingClientRect().width,

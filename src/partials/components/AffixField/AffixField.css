@@ -157,13 +157,13 @@
   }
 
   /* ── Disabled (functional state — no interaction states can occur) ───────── */
-  &[data-disabled] {
+  &[data-disabled="true"] {
     opacity: 0.5;
     pointer-events: none;
   }
 
   /* ── Invalid ──────────────────────────────────────────────────────────────── */
-  &[data-invalid] .AffixField-input {
+  &[data-invalid="true"] .AffixField-input {
     border-color: var(--af-border-color-invalid);
   }
 }

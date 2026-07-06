@@ -86,12 +86,12 @@ const states: StateDefinition[] = [
   { file: '_filled-active', id: 'mf-filled-active',  label: 'Månad', root: { 'data-value': '2026-06', 'data-test-state': 'active' }, input: { value: '2026-06' }, trigger: {} },
 
   // ── Disabled ────────────────────────────────────────────────────────────────
-  { file: '_disabled-empty',  id: 'mf-disabled-empty',  label: 'Månad', root: { 'data-disabled': '' }, input: { disabled: '' }, trigger: { disabled: '' } },
-  { file: '_disabled-filled', id: 'mf-disabled-filled', label: 'Månad', root: { 'data-disabled': '', 'data-value': '2026-06' }, input: { value: '2026-06', disabled: '' }, trigger: { disabled: '' } },
+  { file: '_disabled-empty',  id: 'mf-disabled-empty',  label: 'Månad', root: { 'data-disabled': 'true' }, input: { disabled: '' }, trigger: { disabled: '' } },
+  { file: '_disabled-filled', id: 'mf-disabled-filled', label: 'Månad', root: { 'data-disabled': 'true', 'data-value': '2026-06' }, input: { value: '2026-06', disabled: '' }, trigger: { disabled: '' } },
 
   // ── Invalid ─────────────────────────────────────────────────────────────────
-  { file: '_invalid-empty',  id: 'mf-invalid-empty',  label: 'Månad <span aria-hidden="true">*</span>', root: { 'data-invalid': '' }, input: { required: '', 'aria-invalid': 'true' }, trigger: {} },
-  { file: '_invalid-filled', id: 'mf-invalid-filled', label: 'Månad',                                   root: { 'data-invalid': '', 'data-value': '2020-01' }, input: { value: '2020-01', 'aria-invalid': 'true' }, trigger: {} },
+  { file: '_invalid-empty',  id: 'mf-invalid-empty',  label: 'Månad <span aria-hidden="true">*</span>', root: { 'data-invalid': 'true' }, input: { required: '', 'aria-invalid': 'true' }, trigger: {} },
+  { file: '_invalid-filled', id: 'mf-invalid-filled', label: 'Månad',                                   root: { 'data-invalid': 'true', 'data-value': '2020-01' }, input: { value: '2020-01', 'aria-invalid': 'true' }, trigger: {} },
 
   // ── With min/max range ───────────────────────────────────────────────────────
   { file: '_with-range', id: 'mf-with-range', label: 'Månad', root: { 'data-min': '2026-03', 'data-max': '2026-09', 'data-value': '2026-06' }, input: { value: '2026-06', min: '2026-03', max: '2026-09' }, trigger: {} },

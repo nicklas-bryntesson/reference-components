@@ -507,7 +507,7 @@ describe('DateField — display mode (pointer: coarse)', () => {
 
   it('sets data-disabled on root when native input is disabled', () => {
     const { el } = makeDisplayField({ disabled: true })
-    expect(el.hasAttribute('data-disabled')).toBe(true)
+    expect(el.getAttribute('data-disabled')).toBe('true')
     el.remove()
   })
 })

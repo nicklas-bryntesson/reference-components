@@ -74,7 +74,7 @@ FileUpload.attach()
 | Attribute | Type | Description |
 |---|---|---|
 | `data-max-size` | `"5mb"` / `"500kb"` / bytes | Frontend max file size validation |
-| `data-drop-zone` | boolean | Opt-in native drag-and-drop |
+| `data-drop-zone` | `"true"` | Opt-in native drag-and-drop |
 | `data-label-drop-zone` | string | Visible drop-zone hint text (default: "Drop files here"). JS injects it as an `aria-hidden` `.FileUpload-dropLabel` span — the trigger button remains the accessible action |
 | `data-initial-files` | JSON string | Server-provided files (persistent state) |
 | `data-label-trigger` | string | Trigger button text (default: "Add file") |
@@ -85,12 +85,14 @@ FileUpload.attach()
 
 ### State attributes (set by JS)
 
+All boolean state attributes carry the literal value `"true"` when on and are absent when off (see `.claude/philosophy.md`).
+
 | Attribute | Set when |
 |---|---|
-| `data-has-files` | List is non-empty |
-| `data-has-errors` | At least one file has a validation error |
-| `data-dragging-over` | User is dragging over the drop zone |
-| `data-initialized` | Component has been mounted |
+| `data-has-files="true"` | List is non-empty |
+| `data-has-errors="true"` | At least one file has a validation error |
+| `data-dragging-over="true"` | User is dragging over the drop zone |
+| `data-initialized="true"` | Component has been mounted |
 
 ### On native input
 
@@ -98,7 +100,7 @@ All native `input[type=file]` attributes are supported: `accept`, `multiple`, `r
 
 ### Disabled
 
-JS does not derive a disabled state from the input's `disabled` attribute — author it explicitly, as the kitchensink states do: `data-disabled` and `aria-disabled="true"` on the root (the CSS keys its disabled visuals off `data-disabled`), plus `disabled` on both the native input and the trigger button.
+JS does not derive a disabled state from the input's `disabled` attribute — author it explicitly, as the kitchensink states do: `data-disabled="true"` and `aria-disabled="true"` on the root (the CSS keys its disabled visuals off `[data-disabled="true"]`), plus `disabled` on both the native input and the trigger button.
 
 ## Persistent state (server-render multi-step forms)
 

@@ -8,7 +8,7 @@ const MF = targetId('MonthField')
 test.beforeEach(async ({ page }) => {
   await page.goto(targetPath())
   await page.locator(MF).scrollIntoViewIfNeeded()
-  await page.locator(`${MF}[data-initialized]`).waitFor()
+  await page.locator(`${MF}[data-initialized="true"]`).waitFor()
   await injectAxe(page)
 })
 
@@ -174,7 +174,7 @@ test('"This month" button sets the current month and year', async ({ page }) => 
   })
   await expect(page.locator(`${MF} .MonthField-native`)).toHaveValue(expected)
   // And the segments reflect it.
-  await expect(page.locator(`${MF} .MonthField-segment[data-segment="year"]`)).not.toHaveAttribute('data-placeholder', '')
+  await expect(page.locator(`${MF} .MonthField-segment[data-segment="year"]`)).not.toHaveAttribute('data-placeholder')
 })
 
 test('"Clear" button empties the native value', async ({ page }) => {
@@ -201,7 +201,7 @@ test('"This month" and "Clear" dispatch input + change on the native input', asy
 // ── Disabled ────────────────────────────────────────────────────────────────────
 
 test('disabled field trigger is disabled', async ({ page }) => {
-  const disabledTrigger = page.locator('.MonthField[data-disabled] .MonthField-trigger').first()
+  const disabledTrigger = page.locator('.MonthField[data-disabled="true"] .MonthField-trigger').first()
   if (await disabledTrigger.count() > 0) {
     await expect(disabledTrigger).toBeDisabled()
   }

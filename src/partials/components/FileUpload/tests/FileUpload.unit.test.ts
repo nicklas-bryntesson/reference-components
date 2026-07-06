@@ -179,7 +179,7 @@ describe('FileUpload bootstrap from data-initial-files', () => {
     expect(container.querySelector('.FileUpload-item-name')!.textContent).toBe('contract.pdf')
     expect(container.querySelector('.FileUpload-item-size')!.textContent).toBe('200 KB')
     expect(container.querySelector('input[type="hidden"]')!.getAttribute('value')).toBe('abc123')
-    expect(el.hasAttribute('data-has-files')).toBe(true)
+    expect(el.getAttribute('data-has-files')).toBe('true')
     el.remove()
   })
 
@@ -311,7 +311,7 @@ describe('FileUpload add files', () => {
     const container = el.querySelector('.FileUpload-selected')!
     expect(container.querySelector('.FileUpload-item-name')!.textContent).toBe('report.pdf')
     expect(container.getAttribute('data-status')).toBe('valid')
-    expect(el.hasAttribute('data-has-files')).toBe(true)
+    expect(el.getAttribute('data-has-files')).toBe('true')
     el.remove()
   })
 
@@ -329,7 +329,7 @@ describe('FileUpload add files', () => {
     const container = el.querySelector('.FileUpload-selected')!
     expect(container.getAttribute('data-status')).toBe('invalid-type')
     expect(container.querySelector('.FileUpload-item-error')!.textContent).toBe('File type not allowed')
-    expect(el.hasAttribute('data-has-errors')).toBe(true)
+    expect(el.getAttribute('data-has-errors')).toBe('true')
     el.remove()
   })
 
@@ -404,7 +404,7 @@ describe('FileUpload remove files', () => {
     Object.defineProperty(input, 'files', { value: dt.files, configurable: true })
     input.dispatchEvent(new Event('change'))
 
-    expect(el.hasAttribute('data-has-errors')).toBe(true)
+    expect(el.getAttribute('data-has-errors')).toBe('true')
 
     const removeBtn = el.querySelector('.FileUpload-item-remove') as HTMLButtonElement
     removeBtn.click()
@@ -465,16 +465,16 @@ describe('FileUpload remove files', () => {
 
 describe('FileUpload drop-zone', () => {
   it('sets data-dragging-over on dragenter when data-drop-zone is present', () => {
-    const el = createFileUploadEl({ rootAttrs: { 'data-drop-zone': '' } })
+    const el = createFileUploadEl({ rootAttrs: { 'data-drop-zone': 'true' } })
     new FileUpload(el)
 
     el.dispatchEvent(new Event('dragenter', { bubbles: true }))
-    expect(el.hasAttribute('data-dragging-over')).toBe(true)
+    expect(el.getAttribute('data-dragging-over')).toBe('true')
     el.remove()
   })
 
   it('removes data-dragging-over on dragleave when depth returns to zero', () => {
-    const el = createFileUploadEl({ rootAttrs: { 'data-drop-zone': '' } })
+    const el = createFileUploadEl({ rootAttrs: { 'data-drop-zone': 'true' } })
     new FileUpload(el)
 
     el.dispatchEvent(new Event('dragenter', { bubbles: true }))
@@ -484,7 +484,7 @@ describe('FileUpload drop-zone', () => {
   })
 
   it('removes data-dragging-over on drop', () => {
-    const el = createFileUploadEl({ rootAttrs: { 'data-drop-zone': '' } })
+    const el = createFileUploadEl({ rootAttrs: { 'data-drop-zone': 'true' } })
     new FileUpload(el)
 
     el.dispatchEvent(new Event('dragenter', { bubbles: true }))
@@ -503,7 +503,7 @@ describe('FileUpload drop-zone', () => {
   })
 
   it('injects an aria-hidden drop label with the default text', () => {
-    const el = createFileUploadEl({ rootAttrs: { 'data-drop-zone': '' } })
+    const el = createFileUploadEl({ rootAttrs: { 'data-drop-zone': 'true' } })
     new FileUpload(el)
 
     const label = el.querySelector('.FileUpload-dropLabel')!
@@ -515,7 +515,7 @@ describe('FileUpload drop-zone', () => {
 
   it('uses data-label-drop-zone for the drop label text', () => {
     const el = createFileUploadEl({
-      rootAttrs: { 'data-drop-zone': '', 'data-label-drop-zone': 'Släpp filer här' },
+      rootAttrs: { 'data-drop-zone': 'true', 'data-label-drop-zone': 'Släpp filer här' },
     })
     new FileUpload(el)
 

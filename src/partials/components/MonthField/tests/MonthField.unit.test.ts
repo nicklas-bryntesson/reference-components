@@ -45,7 +45,7 @@ function createMonthFieldEl(options: {
       data-name="${id}"
       data-locale="${options.locale ?? 'sv-SE'}"
       ${options.value ? `data-value="${options.value}"` : ''}
-      ${options.disabled ? 'data-disabled' : ''}
+      ${options.disabled ? 'data-disabled="true"' : ''}
       ${options.min ? `data-min="${options.min}"` : ''}
       ${options.max ? `data-max="${options.max}"` : ''}
     >
@@ -171,7 +171,7 @@ describe('segment construction', () => {
   it('data-initialized after construction', () => {
     const el = createMonthFieldEl()
     new MonthField(el)
-    expect(el.hasAttribute('data-initialized')).toBe(true)
+    expect(el.getAttribute('data-initialized')).toBe('true')
   })
 })
 
