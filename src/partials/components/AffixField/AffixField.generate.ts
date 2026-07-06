@@ -1,0 +1,174 @@
+import { writeFileSync, mkdirSync } from 'node:fs'
+import { resolve, dirname } from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+const __dir = dirname(fileURLToPath(import.meta.url))
+const statesDir = resolve(__dir, 'states')
+mkdirSync(statesDir, { recursive: true })
+const out = (file: string) => resolve(statesDir, file)
+
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+type Attrs = Record<string, string>
+
+interface StateDefinition {
+  file: string
+  id: string            // input id (also the label's for=)
+  rootId?: string       // data-id on the root element — stable e2e/demo anchor
+                        // (family convention: [data-component="X"][data-id="…"])
+  label: string
+  root?: Attrs
+  input?: Attrs
+  prefix?: string       // pre-rendered .AffixField-prefix span (see helpers)
+  suffix?: string       // pre-rendered .AffixField-suffix span
+  hint?: { id: string; text: string } // external hint referenced by aria-describedby
+  bare?: boolean        // omit the authored data-has-* presence attributes —
+                        // the bare variant demonstrates the JS gap-fill path
+}
+
+// ─── Affix helpers ────────────────────────────────────────────────────────────
+
+const prefix = (text: string, extra: Attrs = {}) =>
+  `<span class="AffixField-prefix"${attrs(extra)}>${text}</span>`
+
+const suffix = (text: string, extra: Attrs = {}) =>
+  `<span class="AffixField-suffix"${attrs(extra)}>${text}</span>`
+
+// ─── Attribute serializers ────────────────────────────────────────────────────
+
+function attrs(obj: Attrs): string {
+  return Object.entries(obj)
+    .map(([k, v]) => (v === '' ? ` ${k}` : ` ${k}="${v}"`))
+    .join('')
+}
+
+// Root attributes render one per line (matches the sibling generators' style).
+function rootAttrs(obj: Attrs): string {
+  return Object.entries(obj)
+    .map(([k, v]) => (v === '' ? `\n  ${k}` : `\n  ${k}="${v}"`))
+    .join('')
+}
+
+// ─── Canonical markup ─────────────────────────────────────────────────────────
+// Single source of truth for AffixField HTML structure.
+// Update this function when the component markup changes, then re-run this script.
+//
+// A real <label for> is part of the contract — a placeholder is not a name.
+// The optional hint paragraph renders after the field, matching the
+// describedby-merge example (affix ids append AFTER the hint id).
+
+function canonical(state: StateDefinition): string {
+  const rootIdAttr = state.rootId ? `\n  data-id="${state.rootId}"` : ''
+  // data-has-prefix / data-has-suffix are end-state contract attributes: the
+  // CSS padding gates key on them, so the server end-state authors them from
+  // affix presence (the bare variant omits them — JS gap-fills there).
+  const presence: Attrs = {}
+  if (!state.bare) {
+    if (state.prefix) presence['data-has-prefix'] = ''
+    if (state.suffix) presence['data-has-suffix'] = ''
+  }
+  const rootExtra = rootAttrs({ ...presence, ...(state.root ?? {}) })
+  const inputAttrs = attrs({ type: 'text', ...(state.input ?? {}) })
+  const prefixLine = state.prefix ? `\n  ${state.prefix}` : ''
+  const suffixLine = state.suffix ? `\n  ${state.suffix}` : ''
+  const hintLine = state.hint
+    ? `\n<p id="${state.hint.id}">${state.hint.text}</p>`
+    : ''
+  return `<label for="${state.id}">${state.label}</label>
+<div
+  class="AffixField"
+  data-component="AffixField"${rootIdAttr}${rootExtra}
+>${prefixLine}
+  <input class="AffixField-input" id="${state.id}" name="${state.id}"${inputAttrs} />${suffixLine}
+</div>${hintLine}
+`
+}
+
+// ─── State definitions ────────────────────────────────────────────────────────
+
+const money = { prefix: prefix('$'), suffix: suffix('USD') }
+const decimalInput = { inputmode: 'decimal' }
+
+const states: StateDefinition[] = [
+  // ── Interaction states — empty ──────────────────────────────────────────────
+  { file: '_empty',        id: 'af-empty-default', label: 'Belopp', input: decimalInput, ...money },
+  { file: '_empty-hover',  id: 'af-empty-hover',   label: 'Belopp', root: { 'data-test-state': 'hover'  }, input: decimalInput, ...money },
+  { file: '_empty-focus',  id: 'af-empty-focus',   label: 'Belopp', root: { 'data-test-state': 'focus'  }, input: decimalInput, ...money },
+  { file: '_empty-active', id: 'af-empty-active',  label: 'Belopp', root: { 'data-test-state': 'active' }, input: decimalInput, ...money },
+
+  // ── Interaction states — filled ─────────────────────────────────────────────
+  { file: '_filled',        id: 'af-filled-default', label: 'Belopp', input: { ...decimalInput, value: '100' }, ...money },
+  { file: '_filled-hover',  id: 'af-filled-hover',   label: 'Belopp', root: { 'data-test-state': 'hover'  }, input: { ...decimalInput, value: '100' }, ...money },
+  { file: '_filled-focus',  id: 'af-filled-focus',   label: 'Belopp', root: { 'data-test-state': 'focus'  }, input: { ...decimalInput, value: '100' }, ...money },
+  { file: '_filled-active', id: 'af-filled-active',  label: 'Belopp', root: { 'data-test-state': 'active' }, input: { ...decimalInput, value: '100' }, ...money },
+
+  // ── Disabled (author sets data-disabled on root AND disabled on the input) ──
+  { file: '_disabled-empty',  id: 'af-disabled-empty',  label: 'Belopp', root: { 'data-disabled': '' }, input: { ...decimalInput, disabled: '' }, ...money },
+  { file: '_disabled-filled', id: 'af-disabled-filled', label: 'Belopp', root: { 'data-disabled': '' }, input: { ...decimalInput, value: '100', disabled: '' }, ...money },
+
+  // ── Invalid (author sets data-invalid on root AND aria-invalid on the input) ─
+  { file: '_invalid-empty',  id: 'af-invalid-empty',  label: 'Belopp <span aria-hidden="true">*</span>', root: { 'data-invalid': '' }, input: { ...decimalInput, required: '', 'aria-invalid': 'true' }, ...money },
+  { file: '_invalid-filled', id: 'af-invalid-filled', label: 'Belopp', root: { 'data-invalid': '' }, input: { ...decimalInput, value: '-1', 'aria-invalid': 'true' }, ...money },
+
+  // ── Variants — the spec's 6-example matrix ──────────────────────────────────
+
+  // 1. Bare + JS-wired: minimal authored markup; JS fills ids, describedby,
+  //    widths AND the data-has-* presence attributes.
+  { file: '_variant-bare', id: 'af-variant-bare', rootId: 'affixfield-bare', label: 'Belopp',
+    input: decimalInput, ...money, bare: true },
+
+  // 2. Fully authored: the server end-state. JS verifiably touches nothing —
+  //    the widths are authored round values a live measurement would not
+  //    produce, and the e2e suite asserts strict equality with what is below.
+  { file: '_variant-authored', id: 'af-variant-authored', rootId: 'affixfield-authored', label: 'Belopp',
+    root: { style: '--af-prefix-width: 17px; --af-suffix-width: 41px' },
+    input: { ...decimalInput, 'aria-describedby': 'af-variant-authored-prefix af-variant-authored-suffix' },
+    prefix: prefix('$', { id: 'af-variant-authored-prefix' }),
+    suffix: suffix('USD', { id: 'af-variant-authored-suffix' }) },
+
+  // 3. Unit in label: the visible label already carries the unit — the affix is
+  //    authored aria-hidden so it is never announced twice. JS skips it entirely.
+  { file: '_variant-unit-in-label', id: 'af-variant-unit-in-label', rootId: 'affixfield-unit-in-label', label: 'Antal timmar',
+    input: { inputmode: 'numeric' },
+    suffix: suffix('timmar', { 'aria-hidden': 'true' }) },
+
+  // 4. Number with prefix + suffix: hidden spinner (it would collide with the
+  //    suffix); arrow-key stepping still works.
+  { file: '_variant-number', id: 'af-variant-number', rootId: 'affixfield-number', label: 'Belopp (number)',
+    input: { type: 'number', value: '100' }, ...money },
+
+  // 5. describedby merge: the input has an existing hint id — the affix ids
+  //    append AFTER it, so the hint survives and keeps its order.
+  { file: '_variant-describedby', id: 'af-variant-describedby', rootId: 'affixfield-describedby', label: 'Pris',
+    input: { ...decimalInput, 'aria-describedby': 'af-variant-describedby-hint' },
+    suffix: suffix('kr'),
+    hint: { id: 'af-variant-describedby-hint', text: 'Anges exklusive moms.' } },
+
+  // 6. Sized field: the value area is exactly 4ch (the SVL example-site look);
+  //    data-align="end" right-aligns the amount against the suffix.
+  { file: '_variant-sized', id: 'af-variant-sized', rootId: 'affixfield-sized', label: 'Antal timmar',
+    root: { 'data-input-characters': '4', 'data-align': 'end' },
+    input: { type: 'number', value: '40' },
+    suffix: suffix('timmar') },
+
+  // ── Live demo (e2e test target) ──────────────────────────────────────────────
+  { file: '_live', id: 'af-live', rootId: 'affixfield-live', label: 'Belopp',
+    input: decimalInput, ...money },
+]
+
+// ─── Generate ─────────────────────────────────────────────────────────────────
+
+for (const state of states) {
+  writeFileSync(out(`${state.file}.hbs`), canonical(state))
+  console.log(`  ${state.file}.hbs`)
+}
+
+// Native reference (no AffixField wrapper): a bare number input with its
+// spinner visible — the collision the component's hidden spinner avoids.
+writeFileSync(
+  out('_native-number.hbs'),
+  '<label for="af-native-number">Belopp</label>\n<input type="number" id="af-native-number" name="af-native-number" value="100" />\n',
+)
+console.log('  _native-number.hbs')
+
+console.log(`done — ${states.length + 1} state files written`)
