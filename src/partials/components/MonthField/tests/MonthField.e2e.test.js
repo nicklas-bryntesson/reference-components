@@ -184,6 +184,20 @@ test('"Clear" button empties the native value', async ({ page }) => {
   await expect(page.locator(`${MF} .MonthField-native`)).toHaveValue('')
 })
 
+test('"This month" and "Clear" dispatch input + change on the native input', async ({ page }) => {
+  await page.locator(`${MF} .MonthField-trigger`).click()
+  await page.evaluate((sel) => {
+    const native = document.querySelector(`${sel} .MonthField-native`)
+    window.__events = []
+    native.addEventListener('input', () => window.__events.push('input'))
+    native.addEventListener('change', () => window.__events.push('change'))
+  }, MF)
+  await page.locator('.MonthField-popup-now').click()
+  expect(await page.evaluate(() => window.__events)).toEqual(['input', 'change'])
+  await page.locator('.MonthField-popup-clear').click()
+  expect(await page.evaluate(() => window.__events)).toEqual(['input', 'change', 'input', 'change'])
+})
+
 // ── Disabled ────────────────────────────────────────────────────────────────────
 
 test('disabled field trigger is disabled', async ({ page }) => {

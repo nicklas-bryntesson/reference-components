@@ -833,6 +833,9 @@ class MonthField {
     this.native.value = ''
     this.root.removeAttribute('data-has-value')
     this._suppressEvents = false
+    // Clearing is a value change — fire both once, matching the set path (_syncToNative).
+    this.native.dispatchEvent(new Event('input', { bubbles: true }))
+    this.native.dispatchEvent(new Event('change', { bubbles: true }))
     this._updateClearButton()
     this._syncWheelsFromSegments(false)
   }
@@ -847,6 +850,10 @@ class MonthField {
     this.native.value = iso
     this.root.dataset.hasValue = ''
     this._suppressEvents = false
+    // "This month" is a value change — fire both once (the suppressed segment
+    // cascade above would otherwise fire per segment).
+    this.native.dispatchEvent(new Event('input', { bubbles: true }))
+    this.native.dispatchEvent(new Event('change', { bubbles: true }))
 
     this._refreshMonthWheelDisplay()
     this._syncWheelsFromSegments(true)

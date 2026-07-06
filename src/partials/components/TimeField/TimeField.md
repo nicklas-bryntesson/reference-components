@@ -43,8 +43,8 @@ State attributes set by JS: `data-initialized`, `data-open`, `data-has-value`, `
 
 Two footer buttons, both tab stops inside the popup focus trap:
 
-- **Clear** ("Rensa") — disabled (and skipped by Tab) while the field is empty. Clears the segments and the native value **silently** — no `input`/`change` is dispatched.
-- **Now** ("Nu") — writes the current time, clamped to `data-min`/`data-max`. Also written silently.
+- **Clear** ("Rensa") — disabled (and skipped by Tab) while the field is empty. Clears the segments and the native value, then dispatches `input` + `change` once.
+- **Now** ("Nu") — writes the current time, clamped to `data-min`/`data-max`, then dispatches `input` + `change` once.
 
 ## Value sync
 
@@ -52,7 +52,7 @@ The native `<input type="time">` value is written only when all active segments 
 
 ## Events
 
-The component dispatches `input` and `change` events on the native `<input>` only when a **complete** value is written (all active segments filled). Clearing a filled field with `Backspace` empties the native value without dispatching anything, and the popup **Clear** and **Now** buttons also write silently.
+The component dispatches `input` and `change` events on the native `<input>` when a **complete** value is written (all active segments filled) and once per popup **Clear**/**Now** press. Clearing a filled field with `Backspace` empties the native value without dispatching anything.
 
 ## JS API
 
