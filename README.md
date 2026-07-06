@@ -4,7 +4,7 @@ This repo is a **living library of accessible UI components** — not a publishe
 
 ## What this is for
 
-When building a product UI, the hard problems are rarely visual. They are:
+When building a product UI, the hardest problems are often not the visual ones. They are things like:
 
 - What keyboard interactions does this component need?
 - What ARIA roles, states, and live regions make it work for screen reader users?
@@ -28,6 +28,8 @@ Some components share non-trivial behaviour: a 3D wheel that loops past the year
 
 So the portable unit is **the kernel plus the components that compose it**, not a lone component. Each component's `.md` lists what it needs under `## Kernel dependencies`. Port and verify the kernel once; the components then stay thin and cannot drift in the shared behaviour. See [`src/kernel/README.md`](src/kernel/README.md).
 
+The kernel is the **one deliberate exception** to an otherwise anti-DRY stance: everything else favours clarity over reuse. Each component is self-contained and self-documenting so it can be read — and ported — in isolation, even when that means repeating a pattern a shared abstraction could have hidden.
+
 ## How to use this repo
 
 ```bash
@@ -36,6 +38,8 @@ npm run test:e2e   # run all accessibility and behaviour tests
 ```
 
 Browse the kitchensink to see what components look and feel like. Read the `.md` contract to understand the API. Port the `.ts` logic to your framework. The tests tell you when your port has drifted from the reference.
+
+When you are ready to port, start with [`PORTING.md`](PORTING.md) — the step-by-step porting guide, including how to reuse this repo's e2e suites against your own implementation. The model is proven: it has carried real ports to other stacks (including Vue 3), and the findings from those ports have been folded back into the contracts.
 
 ## Accessibility approach
 
@@ -53,7 +57,14 @@ Components are built against [atomica11y](https://www.atomica11y.com) acceptance
 | TimeField | Reference implementation + full test suite |
 | MonthField | Reference implementation + full test suite |
 | WeekField | Reference implementation + full test suite |
+| AffixField | Reference implementation + full test suite |
 | FileUpload | Reference implementation + full test suite |
-| ToggleTip | Reference implementation |
-| Combobox | In progress |
-| TabAccordion | In progress |
+| ToggleTip | Reference implementation + full test suite |
+| Combobox | Parked legacy reference |
+| TabAccordion | Parked legacy reference — rebuild planned |
+
+**Parked legacy reference** = kept for inspection but not maintained to the current contract standard: still `.js`, no test suite, no `.md` contract guarantee. They are not in-progress work and not TypeScript-migration targets — when one is needed, it is rebuilt from scratch on the current model rather than migrated.
+
+### Next in line
+
+The library keeps growing on the same accessibility-first model — contract first, kernel reuse where behaviour is shared, kitchensink + automated and manual a11y verification before a component ships. Planned next: a rebuilt **TabAccordion**, **button groups**, **messages**, and **chips**.

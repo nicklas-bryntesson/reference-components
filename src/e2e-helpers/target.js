@@ -23,6 +23,7 @@ const DEFAULT_TARGET = {
   MonthField: '[data-component="MonthField"][data-id="meeting-month"]',
   WeekField: '[data-component="WeekField"][data-id="meeting-week"]',
   FileUpload: '[data-component="FileUpload"][data-initialized]',
+  AffixField: '[data-component="AffixField"][data-id="affixfield-live"]',
 }
 
 export function targetId(component) {

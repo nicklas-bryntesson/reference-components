@@ -1,0 +1,113 @@
+<section class="kitchensink-section">
+
+  <h2>AffixField</h2>
+
+  <!-- Interaction states -->
+  <h3>Interaction states</h3>
+  <table class="state-table">
+    <thead>
+      <tr>
+        <th scope="col">State</th>
+        <th scope="col">default</th>
+        <th scope="col">hover</th>
+        <th scope="col">focus</th>
+        <th scope="col">active</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th scope="row">empty</th>
+        <td>{{> components/AffixField/states/_empty}}</td>
+        <td>{{> components/AffixField/states/_empty-hover}}</td>
+        <td>{{> components/AffixField/states/_empty-focus}}</td>
+        <td>{{> components/AffixField/states/_empty-active}}</td>
+      </tr>
+      <tr>
+        <th scope="row">filled</th>
+        <td>{{> components/AffixField/states/_filled}}</td>
+        <td>{{> components/AffixField/states/_filled-hover}}</td>
+        <td>{{> components/AffixField/states/_filled-focus}}</td>
+        <td>{{> components/AffixField/states/_filled-active}}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Disabled -->
+  <h3>Disabled</h3>
+  <table class="state-table">
+    <tbody>
+      <tr>
+        <th scope="row">empty</th>
+        <td>{{> components/AffixField/states/_disabled-empty}}</td>
+      </tr>
+      <tr>
+        <th scope="row">filled</th>
+        <td>{{> components/AffixField/states/_disabled-filled}}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Invalid -->
+  <h3>Invalid</h3>
+  <table class="state-table">
+    <tbody>
+      <tr>
+        <th scope="row">required + empty</th>
+        <td>{{> components/AffixField/states/_invalid-empty}}</td>
+      </tr>
+      <tr>
+        <th scope="row">invalid value</th>
+        <td>{{> components/AffixField/states/_invalid-filled}}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Variants — the spec's 6-example matrix -->
+  <h3>Variants</h3>
+  <table class="state-table">
+    <tbody>
+      <tr>
+        <th scope="row">bare + JS-wired</th>
+        <td>{{> components/AffixField/states/_variant-bare}}</td>
+      </tr>
+      <tr>
+        <th scope="row">fully authored (server end-state)</th>
+        <td>{{> components/AffixField/states/_variant-authored}}</td>
+      </tr>
+      <tr>
+        <th scope="row">unit in label (aria-hidden affix)</th>
+        <td>{{> components/AffixField/states/_variant-unit-in-label}}</td>
+      </tr>
+      <tr>
+        <th scope="row">number, prefix + suffix</th>
+        <td>{{> components/AffixField/states/_variant-number}}</td>
+      </tr>
+      <tr>
+        <th scope="row">describedby merge (hint survives)</th>
+        <td>{{> components/AffixField/states/_variant-describedby}}</td>
+      </tr>
+      <tr>
+        <th scope="row">sized (4 characters)</th>
+        <td>{{> components/AffixField/states/_variant-sized}}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Live demo -->
+  <h3>Live demo</h3>
+  <div>
+    {{> components/AffixField/states/_live}}
+  </div>
+
+  <!-- Native reference -->
+  <h3>Native reference</h3>
+  <table class="state-table">
+    <tbody>
+      <tr>
+        <th scope="row">number (spinner visible)</th>
+        <td>{{> components/AffixField/states/_native-number}}</td>
+      </tr>
+    </tbody>
+  </table>
+
+</section>

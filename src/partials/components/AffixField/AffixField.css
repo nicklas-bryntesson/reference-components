@@ -1,0 +1,159 @@
+/* src/partials/components/AffixField/AffixField.css */
+/*
+ * Grid-stack overlay (kept from the SVL origin): every child shares one grid
+ * area, the affixes float above the input with pointer-events: none, so the
+ * ENTIRE component surface stays the native input's hit target — clicking an
+ * affix focuses the field for free.
+ *
+ * The width custom properties (--af-prefix-width / --af-suffix-width) are set
+ * by JS measurement in this reference — or authored server-side (e.g.
+ * ch-math). This CSS only consumes them; it never cares who computed them.
+ */
+
+.AffixField {
+  /* Public API */
+  --af-gap: 0.5ch;              /* space between an affix and the value area */
+  --af-inline-padding: 0.75rem; /* inline padding inside the input */
+  --af-border-width: 1px;       /* input border (also part of the sized-width calc) */
+  /* Design tokens */
+  --af-border-color: currentColor;
+  --af-border-color-hover: CanvasText;
+  --af-border-color-invalid: #c00;
+  --af-bg-hover: var(--SITE--POPOVER--HOVER-BG);
+  --af-bg-active: var(--SITE--POPOVER--HOVER-BG);
+  --af-affix-color: var(--SITE--POPOVER--MUTED);
+  /* Set by JS at init (or authored server-side) — never given base values here:
+     --af-prefix-width, --af-suffix-width  (measured affix width, px)
+     --af-input-chars                      (number, from data-input-characters) */
+
+  /* Grid stack: one named area, all children overlap. minmax(0, 1fr) lets the
+     column track the root's set inline-size (sized variant) while still
+     shrink-to-fitting the input's natural width when no size is imposed. */
+  display: inline-grid;
+  grid-template-columns: [stack] minmax(0, 1fr);
+  grid-template-rows: [stack] auto;
+  align-items: center;
+
+  & > * {
+    grid-area: stack;
+  }
+
+  & .AffixField-prefix,
+  & .AffixField-suffix {
+    white-space: nowrap;
+    line-height: 1;
+    color: var(--af-affix-color);
+    /* Above the input, but transparent to the pointer — the input under the
+       affix remains the click target. */
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  & .AffixField-prefix {
+    justify-self: start;
+    margin-inline-start: var(--af-inline-padding);
+  }
+
+  & .AffixField-suffix {
+    justify-self: end;
+    margin-inline-end: var(--af-inline-padding);
+  }
+
+  & .AffixField-input {
+    box-sizing: border-box;
+    min-inline-size: 0; /* allow the sized variant to shrink below the input's UA minimum */
+    font: inherit;      /* the wrapper's ch unit must equal the input's ch unit */
+    border: var(--af-border-width) solid var(--af-border-color);
+    border-radius: 4px;
+    padding-block: 0.25rem;
+    padding-inline-start: var(--_af-pad-start);
+    padding-inline-end: var(--_af-pad-end);
+  }
+
+  /* ── Inline padding gates ──────────────────────────────────────────────────
+     Each affix side reserves measured width + gap; a side without an affix is
+     plain inline padding. Gated on data-has-prefix / data-has-suffix, which are
+     part of the end-state contract (server-rendered or JS-gap-filled, exactly
+     like the ids and aria-describedby). Attribute selectors, not :has():
+     affix presence is load-bearing layout data, and load-bearing functionality
+     must never depend on :has() support. Exhaustive, self-contained branches
+     (deletability): the base rule only consumes the private props set here. */
+  &:not([data-has-prefix]) {
+    --_af-pad-start: var(--af-inline-padding);
+  }
+
+  &[data-has-prefix] {
+    --_af-pad-start: calc(var(--af-prefix-width, 0px) + var(--af-gap) + var(--af-inline-padding));
+  }
+
+  &:not([data-has-suffix]) {
+    --_af-pad-end: var(--af-inline-padding);
+  }
+
+  &[data-has-suffix] {
+    --_af-pad-end: calc(var(--af-suffix-width, 0px) + var(--af-gap) + var(--af-inline-padding));
+  }
+
+  /* ── Sized variant ─────────────────────────────────────────────────────────
+     Only when data-input-characters is authored: the value area is exactly
+     N × 1ch, plus whatever the affixes/gaps/paddings consume. When
+     --af-input-chars is missing (no JS ran and nothing was authored) the calc
+     is invalid at computed-value time and the width gracefully stays auto. */
+  &[data-input-characters] {
+    inline-size: calc(
+      var(--af-input-chars) * 1ch
+      + var(--_af-pad-start) + var(--_af-pad-end)
+      + 2 * var(--af-border-width)
+    );
+  }
+
+  /* ── Alignment ─────────────────────────────────────────────────────────────
+     Opt-in end-alignment of the value (amounts). Default is the UA's start. */
+  &[data-align="end"] .AffixField-input {
+    text-align: end;
+  }
+
+  /* ── Number spinner ────────────────────────────────────────────────────────
+     type="number" is a primary use case and the WebKit spinner physically
+     collides with a suffix at inline-end — the contract hides it. Arrow-key
+     stepping still works; this is deliberate and a11y-safe (see AffixField.md). */
+  & .AffixField-input[type="number"] {
+    appearance: textfield; /* Firefox */
+
+    &::-webkit-inner-spin-button,
+    &::-webkit-outer-spin-button {
+      appearance: none;
+      display: none;
+    }
+  }
+
+  /* ── Interaction states (real pseudo-class + data-test-state pairs) ──────── */
+  & .AffixField-input:hover,
+  &[data-test-state="hover"] .AffixField-input {
+    border-color: var(--af-border-color-hover);
+    background-color: var(--af-bg-hover);
+  }
+
+  & .AffixField-input:focus-visible,
+  &[data-test-state="focus"] .AffixField-input {
+    outline: 2px solid;
+    outline-offset: 1px;
+  }
+
+  & .AffixField-input:active,
+  &[data-test-state="active"] .AffixField-input {
+    border-color: var(--af-border-color-hover);
+    background-color: var(--af-bg-active);
+  }
+
+  /* ── Disabled (functional state — no interaction states can occur) ───────── */
+  &[data-disabled] {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  /* ── Invalid ──────────────────────────────────────────────────────────────── */
+  &[data-invalid] .AffixField-input {
+    border-color: var(--af-border-color-invalid);
+  }
+}
