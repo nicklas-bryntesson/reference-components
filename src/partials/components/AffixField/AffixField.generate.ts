@@ -64,8 +64,8 @@ function canonical(state: StateDefinition): string {
   // affix presence (the bare variant omits them — JS gap-fills there).
   const presence: Attrs = {}
   if (!state.bare) {
-    if (state.prefix) presence['data-has-prefix'] = ''
-    if (state.suffix) presence['data-has-suffix'] = ''
+    if (state.prefix) presence['data-has-prefix'] = 'true'
+    if (state.suffix) presence['data-has-suffix'] = 'true'
   }
   const rootExtra = rootAttrs({ ...presence, ...(state.root ?? {}) })
   const inputAttrs = attrs({ type: 'text', ...(state.input ?? {}) })

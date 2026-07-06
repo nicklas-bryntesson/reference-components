@@ -100,10 +100,10 @@ class AffixField {
   // not overwriting.
   private _setAffixPresence(): void {
     if (this.prefix && !this.root.hasAttribute('data-has-prefix')) {
-      this.root.setAttribute('data-has-prefix', '')
+      this.root.setAttribute('data-has-prefix', 'true')
     }
     if (this.suffix && !this.root.hasAttribute('data-has-suffix')) {
-      this.root.setAttribute('data-has-suffix', '')
+      this.root.setAttribute('data-has-suffix', 'true')
     }
   }
 

@@ -87,19 +87,19 @@
      functionality must never depend on :has() support. Exhaustive,
      self-contained branches (deletability): the base rule only consumes the
      private props set here. */
-  &:not([data-has-prefix]) {
+  &:not([data-has-prefix="true"]) {
     --_af-pad-start: var(--af-inline-padding);
   }
 
-  &[data-has-prefix] {
+  &[data-has-prefix="true"] {
     --_af-pad-start: calc(var(--af-prefix-chars, 0) * var(--af-ch-unit) + var(--af-gap) + var(--af-inline-padding));
   }
 
-  &:not([data-has-suffix]) {
+  &:not([data-has-suffix="true"]) {
     --_af-pad-end: var(--af-inline-padding);
   }
 
-  &[data-has-suffix] {
+  &[data-has-suffix="true"] {
     --_af-pad-end: calc(var(--af-suffix-chars, 0) * var(--af-ch-unit) + var(--af-gap) + var(--af-inline-padding));
   }
 

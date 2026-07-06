@@ -14,7 +14,7 @@ Therefore this contract specifies **the finished DOM end-state**, not where it i
 |---|---|
 | Affixes carry ids | reference: JS at init · server stack: rendered in markup |
 | Input `aria-describedby` references the affix ids (unless opted out) | same |
-| Root carries `data-has-prefix` / `data-has-suffix` for the sides that exist | same — the CSS padding gates key on them |
+| Root carries `data-has-prefix="true"` / `data-has-suffix="true"` for the sides that exist | same — the CSS padding gates key on them |
 | Root has `--af-prefix-chars` / `--af-suffix-chars` set (the affix string lengths) | same — **fully symmetric:** reference JS and a server compute the *same thing* (the string length), just at different times |
 | Number spinner hidden | CSS (static, no computation) |
 
@@ -41,7 +41,7 @@ End-state (after JS gap-fill *or* fully server-rendered — identical):
 ```html
 <label for="af-1">Belopp</label>
 <div class="AffixField" data-component="AffixField" data-initialized
-     data-has-prefix data-has-suffix
+     data-has-prefix="true" data-has-suffix="true"
      style="--af-prefix-chars: 1; --af-suffix-chars: 3">
   <span class="AffixField-prefix" id="af-1-prefix">$</span>
   <input class="AffixField-input" id="af-1" name="af-1" type="text" inputmode="decimal"
@@ -51,7 +51,7 @@ End-state (after JS gap-fill *or* fully server-rendered — identical):
 ```
 
 - Prefix and/or suffix may each be omitted; the component works with either or both.
-- The input keeps its own border/background — the native element stays the styled element. Its inline padding is gated on `data-has-prefix` / `data-has-suffix` and computed from the counts (`padding-inline-start: calc(var(--af-prefix-chars) * var(--af-ch-unit) + gap + inline padding)`, mirrored for the suffix); a side without an affix degrades to the plain inline padding.
+- The input keeps its own border/background — the native element stays the styled element. Its inline padding is gated on `data-has-prefix="true"` / `data-has-suffix="true"` and computed from the counts (`padding-inline-start: calc(var(--af-prefix-chars) * var(--af-ch-unit) + gap + inline padding)`, mirrored for the suffix); a side without an affix degrades to the plain inline padding.
 - Logical properties throughout — RTL flips for free.
 
 ## Where the logic lives (an honesty section)
@@ -78,7 +78,7 @@ One caveat: custom properties inherit, so a `--af-prefix-chars` set on an *ances
 | `data-component` | `"AffixField"` | Attach hook. |
 | `data-align` | `"end"` | Opt-in end-alignment of the input text (amounts). Default: `start`. There is no `center`. |
 | `data-input-characters` | number | Width of the **value area** in character units — JS (or the server) maps it to `--af-input-chars`, and the wrapper width becomes `calc(var(--af-input-chars) * var(--af-ch-unit) + affix slots + gaps + paddings + borders)`. **When absent** (the default) no width is imposed: the field sizes via normal CSS. |
-| `data-has-prefix` / `data-has-suffix` | boolean | **End-state contract** — present for each affix side that exists. The CSS padding gates key on these attribute selectors (affix presence is load-bearing layout data, so it is expressed as end-state data — never inferred with `:has()`). Server-rendered, or gap-filled by JS from affix presence; authored attributes are never touched. |
+| `data-has-prefix` / `data-has-suffix` | `"true"` | **End-state contract** — set to the literal string `"true"` for each affix side that exists, absent otherwise. The explicit value (rather than a bare boolean attribute) is deliberate: `data-has-prefix="true"` reads unambiguously in both the HTML and the CSS selectors. The padding gates match `[data-has-prefix="true"]` exactly — any other value is treated as absent (affix presence is load-bearing layout data, so it is expressed as end-state data — never inferred with `:has()`). Server-rendered, or gap-filled by JS from affix presence; authored attributes are never touched, so author `"true"` or nothing. |
 | `data-disabled` | boolean | Styling hook (author also sets `disabled` on the input, as the kitchensink states do). |
 | `data-invalid` | boolean | Styling hook (author also sets `aria-invalid="true"` on the input). |
 | `data-initialized` | — | Set by JS (or authored in a server end-state). |
@@ -135,7 +135,7 @@ Robustness guideline (authoring, not component logic): when the unit is critical
 
 What `attach()` does per instance (all of it optional in a server stack):
 
-1. Sets `data-has-prefix` / `data-has-suffix` for the affix sides that exist (skipped for authored attributes).
+1. Sets `data-has-prefix="true"` / `data-has-suffix="true"` for the affix sides that exist (skipped for authored attributes).
 2. Sets `--af-prefix-chars` / `--af-suffix-chars` inline on the root from each affix's `textContent.trim().length` (skipped for any count already authored inline on the root — including fractional tuning values).
 3. `data-input-characters` → sets `--af-input-chars` on the root (skipped if already authored).
 4. Wires affix ids + `aria-describedby` per the accessibility model (skipped where authored/overridden).
