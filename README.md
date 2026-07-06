@@ -4,7 +4,7 @@ This repo is a **living library of accessible UI components** — not a publishe
 
 ## What this is for
 
-When building a product UI, the hard problems are rarely visual. They are:
+When building a product UI, the hardest problems are often not the visual ones. They are things like:
 
 - What keyboard interactions does this component need?
 - What ARIA roles, states, and live regions make it work for screen reader users?
