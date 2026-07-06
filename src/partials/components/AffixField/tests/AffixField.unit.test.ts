@@ -1,8 +1,9 @@
 // src/partials/components/AffixField/tests/AffixField.unit.test.ts
 //
-// jsdom — no layout. Width measurement is e2e territory; these tests cover the
-// attribute-computing logic: id generation, describedby merge order, the
-// aria-hidden override, the gap-fill no-op guarantee, and attach/destroy.
+// jsdom — no layout, and none is needed: the character-count model is pure
+// string arithmetic, so every assertion here is exact. Covered: id generation,
+// describedby merge order, the aria-hidden override, presence attributes,
+// character counts, the gap-fill no-op guarantee, and attach/destroy.
 import { describe, it, expect, afterEach } from 'vitest'
 import AffixField, { mergeTokenList } from '../AffixField'
 
@@ -177,6 +178,59 @@ describe('aria-hidden override', () => {
   })
 })
 
+// ─── Character counts (end-state contract) ───────────────────────────────────
+// Fully deterministic in jsdom: counts are string lengths, not layout.
+
+describe('affix character counts', () => {
+  it('gap-fills --af-prefix-chars / --af-suffix-chars from the affix string lengths', () => {
+    const el = createAffixFieldEl({ inputAttrs: { id: 'af-c1' } }) // "$" / "USD"
+    AffixField.attach()
+    expect(el.style.getPropertyValue('--af-prefix-chars')).toBe('1')
+    expect(el.style.getPropertyValue('--af-suffix-chars')).toBe('3')
+  })
+
+  it('trims surrounding whitespace before counting', () => {
+    const el = createAffixFieldEl({
+      inputAttrs: { id: 'af-c2' },
+      prefix: null,
+      suffix: { text: '  kr  ' },
+    })
+    AffixField.attach()
+    expect(el.style.getPropertyValue('--af-suffix-chars')).toBe('2')
+    expect(el.style.getPropertyValue('--af-prefix-chars')).toBe('')
+  })
+
+  it('an authored count always wins — including a fractional tuning value', () => {
+    const el = createAffixFieldEl({
+      rootAttrs: { style: '--af-prefix-chars: 3.5' }, // "WWW" runs wide
+      inputAttrs: { id: 'af-c3' },
+      prefix: { text: 'WWW' },
+    })
+    AffixField.attach()
+    expect(el.style.getPropertyValue('--af-prefix-chars').trim()).toBe('3.5')
+  })
+
+  it('authoring is per side — an authored prefix count leaves the suffix gap-fill intact', () => {
+    const el = createAffixFieldEl({
+      rootAttrs: { style: '--af-prefix-chars: 1.5' },
+      inputAttrs: { id: 'af-c4' },
+    })
+    AffixField.attach()
+    expect(el.style.getPropertyValue('--af-prefix-chars').trim()).toBe('1.5')
+    expect(el.style.getPropertyValue('--af-suffix-chars')).toBe('3') // "USD"
+  })
+
+  it('counts an aria-hidden affix too (visual, not ARIA, data)', () => {
+    const el = createAffixFieldEl({
+      inputAttrs: { id: 'af-c5' },
+      prefix: null,
+      suffix: { text: 'timmar', attrs: { 'aria-hidden': 'true' } },
+    })
+    AffixField.attach()
+    expect(el.style.getPropertyValue('--af-suffix-chars')).toBe('6')
+  })
+})
+
 // ─── data-input-characters ───────────────────────────────────────────────────
 
 describe('data-input-characters', () => {
@@ -254,7 +308,7 @@ describe('fully-authored fixture', () => {
       rootAttrs: {
         'data-has-prefix': '',
         'data-has-suffix': '',
-        style: '--af-prefix-width: 17px; --af-suffix-width: 41px;',
+        style: '--af-prefix-chars: 1; --af-suffix-chars: 3;',
       },
       inputAttrs: {
         id: 'af-authored',
@@ -274,24 +328,11 @@ describe('fully-authored fixture', () => {
     expect(el.outerHTML).toBe(before)
   })
 
-  it('keeps the authored widths verbatim (no re-measure)', () => {
+  it('keeps the authored counts verbatim', () => {
     const el = createAuthoredEl()
     AffixField.attach()
-    expect(el.style.getPropertyValue('--af-prefix-width').trim()).toBe('17px')
-    expect(el.style.getPropertyValue('--af-suffix-width').trim()).toBe('41px')
-  })
-
-  it('width ownership is per property — an authored prefix width survives while the suffix is measured', () => {
-    const el = createAffixFieldEl({
-      rootAttrs: { style: '--af-prefix-width: 3ch;' },
-      inputAttrs: { id: 'af-mixed' },
-    })
-    AffixField.attach()
-    // The authored property is untouched…
-    expect(el.style.getPropertyValue('--af-prefix-width').trim()).toBe('3ch')
-    // …while the unauthored one is measured and written (jsdom has no layout,
-    // so the value is 0px — the write happening at all is the proof).
-    expect(el.style.getPropertyValue('--af-suffix-width').trim()).toBe('0px')
+    expect(el.style.getPropertyValue('--af-prefix-chars').trim()).toBe('1')
+    expect(el.style.getPropertyValue('--af-suffix-chars').trim()).toBe('3')
   })
 })
 

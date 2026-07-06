@@ -6,7 +6,7 @@ The layout is a grid-stack overlay: all children share one grid area, the affixe
 
 ## The end-state contract (read this first)
 
-AffixField has **no interactivity**: no popup, no keyboard model, no value logic. Everything its JS does is *compute attributes* — ids, ARIA wiring, width custom properties. All of that is equally computable server-side (a Razor Tag Helper or a Vue render function knows the affix strings at render time).
+AffixField has **no interactivity**: no popup, no keyboard model, no value logic. Everything its JS does is *compute attributes* — ids, ARIA wiring, presence attributes, character counts. All of that is equally computable server-side (a Razor Tag Helper or a Vue render function knows the affix strings at render time).
 
 Therefore this contract specifies **the finished DOM end-state**, not where it is computed:
 
@@ -15,7 +15,7 @@ Therefore this contract specifies **the finished DOM end-state**, not where it i
 | Affixes carry ids | reference: JS at init · server stack: rendered in markup |
 | Input `aria-describedby` references the affix ids (unless opted out) | same |
 | Root carries `data-has-prefix` / `data-has-suffix` for the sides that exist | same — the CSS padding gates key on them |
-| Wrapper has `--af-prefix-width` / `--af-suffix-width` set | reference: JS measures · server stack: authored (e.g. ch-math) |
+| Root has `--af-prefix-chars` / `--af-suffix-chars` set (the affix string lengths) | same — **fully symmetric:** reference JS and a server compute the *same thing* (the string length), just at different times |
 | Number spinner hidden | CSS (static, no computation) |
 
 Consequences:
@@ -42,7 +42,7 @@ End-state (after JS gap-fill *or* fully server-rendered — identical):
 <label for="af-1">Belopp</label>
 <div class="AffixField" data-component="AffixField" data-initialized
      data-has-prefix data-has-suffix
-     style="--af-prefix-width: 14.2px; --af-suffix-width: 38.5px">
+     style="--af-prefix-chars: 1; --af-suffix-chars: 3">
   <span class="AffixField-prefix" id="af-1-prefix">$</span>
   <input class="AffixField-input" id="af-1" name="af-1" type="text" inputmode="decimal"
          aria-describedby="af-1-prefix af-1-suffix">
@@ -51,23 +51,25 @@ End-state (after JS gap-fill *or* fully server-rendered — identical):
 ```
 
 - Prefix and/or suffix may each be omitted; the component works with either or both.
-- The input keeps its own border/background — the native element stays the styled element. Its inline padding is gated on `data-has-prefix` / `data-has-suffix` and driven by the width custom properties (`padding-inline-start: calc(var(--af-prefix-width, 0px) + gap + inline padding)`, mirrored for the suffix); a side without an affix degrades to the plain inline padding.
+- The input keeps its own border/background — the native element stays the styled element. Its inline padding is gated on `data-has-prefix` / `data-has-suffix` and computed from the counts (`padding-inline-start: calc(var(--af-prefix-chars) * var(--af-ch-unit) + gap + inline padding)`, mirrored for the suffix); a side without an affix degrades to the plain inline padding.
 - Logical properties throughout — RTL flips for free.
 
 ## Where the logic lives (an honesty section)
 
-The reference implementation computes the end-state with client JS at `attach()` time. A server-rendered stack (e.g. an ASP.NET Tag Helper) can render the identical end-state with **no client JS at all** — the affix strings, ids and `aria-describedby` are known at render time, and the widths can be authored (see Width strategies). Both placements reach the same DOM; the e2e suite asserts the DOM, so both pass.
+The reference implementation computes the end-state with client JS at `attach()` time. A server-rendered stack (e.g. an ASP.NET Tag Helper) can render the identical end-state with **no client JS at all** — the affix strings, ids, `aria-describedby` and the character counts are known at render time (`prefix.Length` is the whole computation). Both placements reach the same DOM; the e2e suite asserts the DOM, so both pass.
 
-### Width strategies — two honest options
+### The character-unit model
 
-| Strategy | How | Tradeoff |
-|---|---|---|
-| **Client measurement** (this reference) | JS measures the rendered affix and sets `--af-prefix-width`/`--af-suffix-width` in px; re-measures once after `document.fonts.ready` | Exact, no caps, robust to fonts and translations. Requires JS |
-| **Server-side character counting** (the SVL model) | Author the custom properties from the affix string length in `ch`-math | Works without JS. An approximation with a practical length cap — a documented tradeoff, not hidden |
+The layout speaks **one unit** across the whole component: a calibrated character slot.
 
-The contract only requires that the custom properties end up set.
+- **`1ch`** is the width of the font's **"0" glyph** — nothing more. In a proportional font other characters vary around it ("i" is narrower, "W" is wider), so raw `ch`-math under- or over-shoots.
+- **`--af-ch-unit` (default `1.125ch`)** is the calibration factor: it maps "one character" to a practical average slot for the host's typeface. The default is the production-proven value from SVL — calibrate it against your typeface like any other design token.
+- **`--af-prefix-chars` / `--af-suffix-chars`** are plain numbers — the affix string lengths. They are **content facts**: the reference JS computes `textContent.trim().length`, a server computes `prefix.Length` — the *same computation at a different time*, which is what makes this end-state fully symmetric. Counts don't change with fonts, so there is no re-measure machinery of any kind.
+- **The CSS formulas own the math:** `count × unit + gap + padding` per affix side, gated on the presence attributes.
 
-One caveat either way: custom properties inherit, so a `--af-prefix-width` set on an *ancestor* counts as authored and disables measurement for every AffixField inside it — author width properties per instance (inline on the root, as the end-state example does).
+**Per-string variance, honestly:** the calibration factor matches the *average* string, not every string. Affixes are short (`$`, `kr`, `USD`, `timmar`), and `--af-gap` absorbs normal variance. For an outlier ("WWW" runs wide, "iii" runs narrow), author a **fractional count** — `--af-prefix-chars: 3.5` — as the tuning ventil; authored counts always win over the gap-fill.
+
+One caveat: custom properties inherit, so a `--af-prefix-chars` set on an *ancestor* bleeds into every AffixField inside it in a zero-JS stack — author counts per instance, inline on the root, as the end-state example does. (The reference gap-fill deliberately treats only inline-on-root values as authored: a count is an instance's content fact, so an inherited value is overridden with the correct one.)
 
 ## Attributes (on root)
 
@@ -75,7 +77,7 @@ One caveat either way: custom properties inherit, so a `--af-prefix-width` set o
 |---|---|---|
 | `data-component` | `"AffixField"` | Attach hook. |
 | `data-align` | `"end"` | Opt-in end-alignment of the input text (amounts). Default: `start`. There is no `center`. |
-| `data-input-characters` | number | Width of the **value area** in `ch` — JS (or the server) maps it to `--af-input-chars`, and the wrapper width becomes `calc(var(--af-input-chars) * 1ch + affix widths + gaps + paddings + borders)`. **When absent** (the default) no width is imposed: the field sizes via normal CSS. |
+| `data-input-characters` | number | Width of the **value area** in character units — JS (or the server) maps it to `--af-input-chars`, and the wrapper width becomes `calc(var(--af-input-chars) * var(--af-ch-unit) + affix slots + gaps + paddings + borders)`. **When absent** (the default) no width is imposed: the field sizes via normal CSS. |
 | `data-has-prefix` / `data-has-suffix` | boolean | **End-state contract** — present for each affix side that exists. The CSS padding gates key on these attribute selectors (affix presence is load-bearing layout data, so it is expressed as end-state data — never inferred with `:has()`). Server-rendered, or gap-filled by JS from affix presence; authored attributes are never touched. |
 | `data-disabled` | boolean | Styling hook (author also sets `disabled` on the input, as the kitchensink states do). |
 | `data-invalid` | boolean | Styling hook (author also sets `aria-invalid="true"` on the input). |
@@ -128,15 +130,15 @@ Robustness guideline (authoring, not component logic): when the unit is critical
 `AffixField` is the default export.
 
 - `AffixField.attach(parent = document)` — mounts every `[data-component="AffixField"]` under `parent`. Idempotent: an `__affixFieldInstance` guard on the element skips already-mounted instances, so it is safe to call again after dynamic injection.
-- `destroy()` (instance method) — clears the instance guard and cancels the pending `fonts.ready` re-measure. There are no event listeners to remove.
+- `destroy()` (instance method) — clears the instance guard. There are no event listeners, timers or pending callbacks to cancel.
 - `mergeTokenList(existing, additions)` — pure helper, exported for unit tests.
 
 What `attach()` does per instance (all of it optional in a server stack):
 
-1. Sets `data-has-prefix` / `data-has-suffix` for the affix sides that exist (skipped for authored attributes). Runs before measurement, so the affix is measured in its final, gated layout.
-2. `data-input-characters` → sets `--af-input-chars` on the root (skipped if already authored).
-3. Wires affix ids + `aria-describedby` per the accessibility model (skipped where authored/overridden).
-4. Measures each affix's rendered width → sets `--af-prefix-width`/`--af-suffix-width` inline on the root (skipped for any property already authored). Re-measured once after `document.fonts.ready` — at attach time a webfont may not have loaded yet, so the affix would be measured in the fallback font.
+1. Sets `data-has-prefix` / `data-has-suffix` for the affix sides that exist (skipped for authored attributes).
+2. Sets `--af-prefix-chars` / `--af-suffix-chars` inline on the root from each affix's `textContent.trim().length` (skipped for any count already authored inline on the root — including fractional tuning values).
+3. `data-input-characters` → sets `--af-input-chars` on the root (skipped if already authored).
+4. Wires affix ids + `aria-describedby` per the accessibility model (skipped where authored/overridden).
 5. Sets `data-initialized`.
 
 ## Events
@@ -149,6 +151,7 @@ All tokens are custom properties on `.AffixField`:
 
 | Token | Description |
 |---|---|
+| `--af-ch-unit` | **Calibration** — the width of one character slot for the host's typeface (default `1.125ch`, the production-proven SVL value). Calibrate against your font like any other token |
 | `--af-gap` | Space between an affix and the value area (default `0.5ch`) |
 | `--af-inline-padding` | Inline padding inside the input (default `0.75rem`) |
 | `--af-border-width` | Input border width (also part of the sized-width calc) |
@@ -158,7 +161,7 @@ All tokens are custom properties on `.AffixField`:
 | `--af-bg-hover` | Input background on hover |
 | `--af-bg-active` | Input background on active |
 | `--af-affix-color` | Affix text color |
-| `--af-prefix-width` / `--af-suffix-width` | **End-state contract** — measured (JS) or authored (server); consumed with `0px` fallbacks |
+| `--af-prefix-chars` / `--af-suffix-chars` | **End-state contract** — the affix string lengths as plain numbers; gap-filled (JS) or authored (server); fractional values are the tuning ventil for atypical strings |
 | `--af-input-chars` | **End-state contract** — set from `data-input-characters`; only consumed under the `[data-input-characters]` gate |
 
 ## Kernel dependencies
@@ -180,7 +183,7 @@ Map onto your design system from the **values** in `tokens.css`, not from the na
 - `password` and the date/time family (see the allowlist).
 - **Dynamic width / size-to-content while typing.** Static sizing only.
 - No validation, formatting, or masking of the value — the affix is presentation; the value is the input's own business.
-- No re-measure on media-query font-size changes (ResizeObserver is the future track if a consumer actually hits it).
+- No width measurement of any kind — counts × calibrated unit is the whole layout model (counts are font-independent, so nothing needs re-measuring, ever).
 - Vanilla TS only; no framework code.
 
 ## Manual accessibility testing

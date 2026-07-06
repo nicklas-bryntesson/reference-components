@@ -113,15 +113,16 @@ const states: StateDefinition[] = [
   // ── Variants — the spec's 6-example matrix ──────────────────────────────────
 
   // 1. Bare + JS-wired: minimal authored markup; JS fills ids, describedby,
-  //    widths AND the data-has-* presence attributes.
+  //    character counts AND the data-has-* presence attributes.
   { file: '_variant-bare', id: 'af-variant-bare', rootId: 'affixfield-bare', label: 'Belopp',
     input: decimalInput, ...money, bare: true },
 
-  // 2. Fully authored: the server end-state. JS verifiably touches nothing —
-  //    the widths are authored round values a live measurement would not
-  //    produce, and the e2e suite asserts strict equality with what is below.
+  // 2. Fully authored: the server end-state — a Tag Helper renders the counts
+  //    from the affix string lengths ("$".Length, "USD".Length). JS verifiably
+  //    touches nothing; the e2e suite asserts strict equality with what is
+  //    below (a JS write would re-serialize the style attribute).
   { file: '_variant-authored', id: 'af-variant-authored', rootId: 'affixfield-authored', label: 'Belopp',
-    root: { style: '--af-prefix-width: 17px; --af-suffix-width: 41px' },
+    root: { style: '--af-prefix-chars: 1; --af-suffix-chars: 3' },
     input: { ...decimalInput, 'aria-describedby': 'af-variant-authored-prefix af-variant-authored-suffix' },
     prefix: prefix('$', { id: 'af-variant-authored-prefix' }),
     suffix: suffix('USD', { id: 'af-variant-authored-suffix' }) },

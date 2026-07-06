@@ -5,11 +5,18 @@
 //
 // This component has NO interactivity: no popup, no keyboard model, no value
 // logic. Everything the JS below does is compute ATTRIBUTES — affix ids,
-// aria-describedby wiring, width custom properties. All of it is equally
-// computable server-side, so the contract is the finished DOM end-state, not
-// where it is computed. Consequently this JS is gap-filling, never
-// overwriting: if everything is already authored (as a server would render
-// it), it finds nothing to do and touches nothing. Authored values always win.
+// aria-describedby wiring, presence attributes, character counts. All of it is
+// equally computable server-side, so the contract is the finished DOM
+// end-state, not where it is computed. Consequently this JS is gap-filling,
+// never overwriting: if everything is already authored (as a server would
+// render it), it finds nothing to do and touches nothing. Authored values
+// always win.
+//
+// Widths are never measured. The layout model is character counts × one
+// calibrated character unit (--af-ch-unit, CSS): the counts below are content
+// facts (string lengths), the unit is typography, and the CSS formulas own the
+// math. Counts don't change with fonts, so there is no re-measure machinery of
+// any kind.
 //
 // It never reads or writes the input's value, dispatches no events, and
 // handles no keys — the input stays a fully native form control.
@@ -34,8 +41,8 @@ function generateId(): string {
 }
 
 const AFFIXES = [
-  ['prefix', '--af-prefix-width'],
-  ['suffix', '--af-suffix-width'],
+  ['prefix', '--af-prefix-chars'],
+  ['suffix', '--af-suffix-chars'],
 ] as const
 
 // ─── Global augmentation ─────────────────────────────────────────────────────
@@ -53,11 +60,6 @@ class AffixField {
   private input: HTMLInputElement | null
   private prefix: HTMLElement | null
   private suffix: HTMLElement | null
-  // Width props this instance owns (decided ONCE, before the first measurement):
-  // a custom property that is already authored — inline or via a stylesheet —
-  // is never written, not even by the fonts.ready re-measure.
-  private _ownedWidthProps: Array<[HTMLElement, string]> = []
-  private _destroyed = false
 
   static attach(parent: Document | HTMLElement = document): void {
     parent.querySelectorAll<HTMLElement>('[data-component="AffixField"]').forEach(el => {
@@ -76,49 +78,26 @@ class AffixField {
 
   private _init(): void {
     this._setAffixPresence()
+    this._setAffixCounts()
     this._setInputChars()
     this._wireAria()
-
-    for (const [kind, prop] of AFFIXES) {
-      const affix = kind === 'prefix' ? this.prefix : this.suffix
-      if (affix && !this._isAuthored(prop)) this._ownedWidthProps.push([affix, prop])
-    }
-    this._measure()
-
-    // Re-measure once after webfonts load: at attach() time a webfont may not
-    // have loaded yet, so the affix was measured in the fallback font and the
-    // width is wrong once the real font swaps in. That is the only known
-    // trigger — affix text is static, and browser zoom doesn't change CSS px.
-    // (A media query that changes the field's font-size would also invalidate
-    // the measurement — ResizeObserver is the future track if a consumer
-    // actually hits that; it is not built speculatively.)
-    document.fonts?.ready.then(() => {
-      if (!this._destroyed) this._measure()
-    })
-
     this.root.setAttribute('data-initialized', '')
   }
 
-  // A custom property counts as authored when it is set inline on the root or
-  // resolves through the cascade (a server-rendered end-state or a consumer
-  // stylesheet). Checked before this instance writes anything, so its own
-  // inline values never shadow the answer.
-  private _isAuthored(prop: string): boolean {
-    if (this.root.style.getPropertyValue(prop) !== '') return true
-    try {
-      return getComputedStyle(this.root).getPropertyValue(prop).trim() !== ''
-    } catch {
-      return false
-    }
+  // A count property counts as authored when it is set inline on the root
+  // itself. Counts are per-instance content facts, so an inherited value from
+  // an ancestor is deliberately NOT treated as authored — it would describe
+  // some other instance's content.
+  private _authoredInline(prop: string): boolean {
+    return this.root.style.getPropertyValue(prop) !== ''
   }
 
   // data-has-prefix / data-has-suffix are part of the end-state contract — the
   // CSS padding gates key on them (attribute selectors; affix presence is
   // load-bearing layout data and must not depend on :has() support). A server
   // renders them (it knows the affixes); this gap-fill sets them when the
-  // affix element exists. Runs BEFORE measurement so the layout the affix is
-  // measured in is already the final, gated one. Authored attributes are never
-  // removed — gap-filling, not overwriting.
+  // affix element exists. Authored attributes are never removed — gap-filling,
+  // not overwriting.
   private _setAffixPresence(): void {
     if (this.prefix && !this.root.hasAttribute('data-has-prefix')) {
       this.root.setAttribute('data-has-prefix', '')
@@ -128,13 +107,27 @@ class AffixField {
     }
   }
 
-  // data-input-characters (width of the value area in ch) → --af-input-chars.
-  // A plain attribute → custom property mapping; the CSS width calc is gated
-  // on the attribute so nothing happens when it is absent.
+  // --af-prefix-chars / --af-suffix-chars: the affix string length as a plain
+  // number. The reference JS and a server compute the SAME thing (the length
+  // of the affix string), just at different times — the end-state is fully
+  // symmetric. Authored counts always win, including fractional ones (the
+  // tuning ventil for atypical strings: "WWW" may want 3.5).
+  private _setAffixCounts(): void {
+    for (const [kind, prop] of AFFIXES) {
+      const affix = kind === 'prefix' ? this.prefix : this.suffix
+      if (!affix) continue
+      if (this._authoredInline(prop)) continue
+      this.root.style.setProperty(prop, String((affix.textContent ?? '').trim().length))
+    }
+  }
+
+  // data-input-characters (width of the value area in character units) →
+  // --af-input-chars. A plain attribute → custom property mapping; the CSS
+  // width calc is gated on the attribute so nothing happens when it is absent.
   private _setInputChars(): void {
     const raw = this.root.dataset.inputCharacters
     if (raw === undefined) return
-    if (this._isAuthored('--af-input-chars')) return
+    if (this._authoredInline('--af-input-chars')) return
     const chars = Number(raw)
     if (!Number.isFinite(chars) || chars <= 0) return
     this.root.style.setProperty('--af-input-chars', String(chars))
@@ -174,17 +167,7 @@ class AffixField {
     input.setAttribute('aria-describedby', mergeTokenList(describedby, missing))
   }
 
-  // Measure each affix's rendered width and set it inline on the root. Only
-  // props this instance owns are written (see _ownedWidthProps) — authored
-  // widths, e.g. server-side ch-math, always win.
-  private _measure(): void {
-    for (const [affix, prop] of this._ownedWidthProps) {
-      this.root.style.setProperty(prop, `${affix.getBoundingClientRect().width}px`)
-    }
-  }
-
   destroy(): void {
-    this._destroyed = true
     delete this.root.__affixFieldInstance
   }
 }
