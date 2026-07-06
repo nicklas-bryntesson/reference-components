@@ -77,23 +77,23 @@ test('an aria-hidden affix is skipped entirely — no id, no reference', async (
   expect(await page.locator(`${UNIT_IN_LABEL} .AffixField-input`).getAttribute('aria-describedby')).toBeNull()
 })
 
-// ── End-state: width custom properties ─────────────────────────────────────────
+// ── End-state: character-count custom properties ───────────────────────────────
 
-test('root carries --af-prefix-width / --af-suffix-width', async ({ page }) => {
-  // Assert the contract, not the unit: the reference JS measures in px, but the
-  // documented zero-JS server strategy authors ch-math (e.g. "3ch") — both are
-  // valid end-states. The geometry test below proves the values actually work.
-  const widths = await page.locator(AF).evaluate((root) => ({
-    prefix: root.style.getPropertyValue('--af-prefix-width'),
-    suffix: root.style.getPropertyValue('--af-suffix-width'),
+test('root carries --af-prefix-chars / --af-suffix-chars (the affix string lengths)', async ({ page }) => {
+  // Counts are content facts — the reference JS and a zero-JS server compute
+  // the same numbers ("$".length, "USD".length), so exact values are the contract.
+  const counts = await page.locator(AF).evaluate((root) => ({
+    prefix: root.style.getPropertyValue('--af-prefix-chars'),
+    suffix: root.style.getPropertyValue('--af-suffix-chars'),
   }))
-  expect(widths.prefix).not.toBe('')
-  expect(widths.suffix).not.toBe('')
-  expect(parseFloat(widths.prefix)).toBeGreaterThan(0)
-  expect(parseFloat(widths.suffix)).toBeGreaterThan(0)
+  expect(counts.prefix).toBe('1') // "$"
+  expect(counts.suffix).toBe('3') // "USD"
 })
 
 // ── Geometry: affix and value text never overlap ────────────────────────────────
+// The functional proof of the character-unit model in a real browser: if the
+// default --af-ch-unit calibration were wrong for the reference font, the
+// reserved padding would fall short of the rendered affix and this would fail.
 
 test('input value area clears both affixes (bounding boxes)', async ({ page }) => {
   // Fill a value so the geometry claim is about real text, not an empty field.
@@ -154,9 +154,9 @@ test('clicking an affix focuses the input (pointer-events pass-through)', async 
 test('the fully-authored variant is untouched — computed attributes strictly equal authored ones', async ({ page }) => {
   await page.locator(`${AUTHORED}[data-initialized]`).waitFor()
   const root = page.locator(AUTHORED)
-  // The style attribute is byte-identical to what the generator authored: a
-  // JS write (measurement would give fractional px) would re-serialize it.
-  await expect(root).toHaveAttribute('style', '--af-prefix-width: 17px; --af-suffix-width: 41px')
+  // The style attribute is byte-identical to what the generator authored: any
+  // JS write would re-serialize it (spacing/semicolon normalization).
+  await expect(root).toHaveAttribute('style', '--af-prefix-chars: 1; --af-suffix-chars: 3')
   // Presence attributes are authored (server end-state), values untouched.
   await expect(root).toHaveAttribute('data-has-prefix', '')
   await expect(root).toHaveAttribute('data-has-suffix', '')

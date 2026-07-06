@@ -5,13 +5,21 @@
  * ENTIRE component surface stays the native input's hit target — clicking an
  * affix focuses the field for free.
  *
- * The width custom properties (--af-prefix-width / --af-suffix-width) are set
- * by JS measurement in this reference — or authored server-side (e.g.
- * ch-math). This CSS only consumes them; it never cares who computed them.
+ * Layout model: character counts × one calibrated character unit. The count
+ * custom properties (--af-prefix-chars / --af-suffix-chars) are content facts
+ * — gap-filled by the reference JS from the affix string length, or authored
+ * server-side from the same string length. The formulas below own all the
+ * math; nothing is ever measured.
  */
 
 .AffixField {
   /* Public API */
+  /* Calibration: the width of ONE character slot for the host's typeface.
+     1ch is the width of the font's "0" glyph; in a proportional font other
+     characters vary around it, so a calibration factor maps "one character"
+     to a practical average slot. 1.125ch is the production-proven default
+     from SVL — calibrate it against your typeface like any other token. */
+  --af-ch-unit: 1.125ch;
   --af-gap: 0.5ch;              /* space between an affix and the value area */
   --af-inline-padding: 0.75rem; /* inline padding inside the input */
   --af-border-width: 1px;       /* input border (also part of the sized-width calc) */
@@ -23,7 +31,7 @@
   --af-bg-active: var(--SITE--POPOVER--HOVER-BG);
   --af-affix-color: var(--SITE--POPOVER--MUTED);
   /* Set by JS at init (or authored server-side) — never given base values here:
-     --af-prefix-width, --af-suffix-width  (measured affix width, px)
+     --af-prefix-chars, --af-suffix-chars  (affix string length, plain number)
      --af-input-chars                      (number, from data-input-characters) */
 
   /* Grid stack: one named area, all children overlap. minmax(0, 1fr) lets the
@@ -71,19 +79,20 @@
   }
 
   /* ── Inline padding gates ──────────────────────────────────────────────────
-     Each affix side reserves measured width + gap; a side without an affix is
-     plain inline padding. Gated on data-has-prefix / data-has-suffix, which are
-     part of the end-state contract (server-rendered or JS-gap-filled, exactly
-     like the ids and aria-describedby). Attribute selectors, not :has():
-     affix presence is load-bearing layout data, and load-bearing functionality
-     must never depend on :has() support. Exhaustive, self-contained branches
-     (deletability): the base rule only consumes the private props set here. */
+     Each affix side reserves count × character unit + gap; a side without an
+     affix is plain inline padding. Gated on data-has-prefix / data-has-suffix,
+     which are part of the end-state contract (server-rendered or JS-gap-filled,
+     exactly like the ids and aria-describedby). Attribute selectors, not
+     :has(): affix presence is load-bearing layout data, and load-bearing
+     functionality must never depend on :has() support. Exhaustive,
+     self-contained branches (deletability): the base rule only consumes the
+     private props set here. */
   &:not([data-has-prefix]) {
     --_af-pad-start: var(--af-inline-padding);
   }
 
   &[data-has-prefix] {
-    --_af-pad-start: calc(var(--af-prefix-width, 0px) + var(--af-gap) + var(--af-inline-padding));
+    --_af-pad-start: calc(var(--af-prefix-chars, 0) * var(--af-ch-unit) + var(--af-gap) + var(--af-inline-padding));
   }
 
   &:not([data-has-suffix]) {
@@ -91,17 +100,18 @@
   }
 
   &[data-has-suffix] {
-    --_af-pad-end: calc(var(--af-suffix-width, 0px) + var(--af-gap) + var(--af-inline-padding));
+    --_af-pad-end: calc(var(--af-suffix-chars, 0) * var(--af-ch-unit) + var(--af-gap) + var(--af-inline-padding));
   }
 
   /* ── Sized variant ─────────────────────────────────────────────────────────
      Only when data-input-characters is authored: the value area is exactly
-     N × 1ch, plus whatever the affixes/gaps/paddings consume. When
-     --af-input-chars is missing (no JS ran and nothing was authored) the calc
-     is invalid at computed-value time and the width gracefully stays auto. */
+     N character units — the same unit the affixes speak — plus whatever the
+     affixes/gaps/paddings consume. When --af-input-chars is missing (no JS
+     ran and nothing was authored) the calc is invalid at computed-value time
+     and the width gracefully stays auto. */
   &[data-input-characters] {
     inline-size: calc(
-      var(--af-input-chars) * 1ch
+      var(--af-input-chars) * var(--af-ch-unit)
       + var(--_af-pad-start) + var(--_af-pad-end)
       + 2 * var(--af-border-width)
     );
