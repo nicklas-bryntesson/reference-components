@@ -57,6 +57,7 @@ Components are built against [atomica11y](https://www.atomica11y.com) acceptance
 | TimeField | Reference implementation + full test suite |
 | MonthField | Reference implementation + full test suite |
 | WeekField | Reference implementation + full test suite |
+| AffixField | Reference implementation + full test suite |
 | FileUpload | Reference implementation + full test suite |
 | ToggleTip | Reference implementation + full test suite |
 | Combobox | Parked legacy reference |
