@@ -7,6 +7,8 @@
   --dtf-calendar-gap: 1.5rem;
   --dtf-site-max-width: var(--MAX--WIDTH--SITE, 100rem);
   --dtf-site-padding: var(--SITE--PADDING, 1rem);
+  /* Field-family height contract — every field's bordered box is min 2.5rem tall */
+  --dtf-field-min-block-size: 2.5rem;
   /* Design tokens — segments */
   --dtf-segments-border-color: currentColor;
   --dtf-segments-border-color-hover: CanvasText;
@@ -62,8 +64,10 @@
   &[data-input-mode="display"] .DateTimeField-overlay {
     display: inline-flex;
     align-items: center;
+    box-sizing: border-box;
+    min-block-size: var(--dtf-field-min-block-size);
     border: 1px solid var(--dtf-segments-border-color);
-    padding-inline-start: 0.5rem;
+    padding-inline: 0.5rem;
     padding-block: 0.25rem;
     gap: 0.125rem;
     border-radius: 4px;
@@ -135,6 +139,11 @@
     cursor: pointer;
     border-radius: 2px;
     vertical-align: middle;
+
+    & svg {
+      /* block — an inline svg reserves baseline descender space below the icon */
+      display: block;
+    }
 
     &:hover,
     .DateTimeField[data-test-state="hover"] & {

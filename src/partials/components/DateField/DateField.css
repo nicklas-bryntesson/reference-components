@@ -7,6 +7,8 @@
   --df-calendar-gap: 1.5rem;
   --df-site-max-width: var(--MAX--WIDTH--SITE, 100rem);
   --df-site-padding: var(--SITE--PADDING, 1rem);
+  /* Field-family height contract — every field's bordered box is min 2.5rem tall */
+  --df-field-min-block-size: 2.5rem;
   /* Design tokens — segments */
   --df-segments-border-color: currentColor;
   --df-segments-border-color-hover: CanvasText;
@@ -80,6 +82,8 @@
   & .Segments {
     display: inline-flex;
     align-items: center;
+    box-sizing: border-box;
+    min-block-size: var(--df-field-min-block-size);
     border: 1px solid var(--df-segments-border-color);
     padding-inline: 0.5rem;
     padding-block: 0.25rem;
@@ -134,6 +138,11 @@
     cursor: pointer;
     border-radius: 2px;
     vertical-align: middle;
+
+    & svg {
+      /* block — an inline svg reserves baseline descender space below the icon */
+      display: block;
+    }
 
     &:hover,
     .DateField[data-test-state="hover"] & {
