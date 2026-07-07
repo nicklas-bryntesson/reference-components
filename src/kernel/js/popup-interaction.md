@@ -57,3 +57,9 @@ by the five field e2e suites (focus stays inside the popup on Tab/Shift+Tab past
 button; a `wheel` on the popup surface is `defaultPrevented`).
 
 Consumed by: DateField, DateTimeField, TimeField, MonthField, WeekField.
+
+## Decision record
+
+This primitive owns focus containment *while the popup is open*. What happens on *close* —
+Escape refocuses the trigger, outside-click light-dismiss never does — is a per-component
+rule recorded in [ADR-0007](../../../docs/adr/0007-popover-light-dismiss-never-refocuses-trigger.md).

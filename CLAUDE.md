@@ -44,6 +44,7 @@ src/kernel/                       # shared primitives — ported once, composed 
   js/tests/, utils/tests/                    # kernel conformance tests
 src/js/script.js                  # entry point, imports all active components
 src/css/site/01-Setup/tokens.css  # host --SITE--* token contract (components read these)
+docs/adr/                         # Architecture Decision Records — tracked; the "why" behind every direction
 tasks/                            # current specs & implementation plans (gitignored, local)
 docs/superpowers/                 # historical specs/plans archive — no longer the active workflow
 ```
@@ -81,6 +82,21 @@ Read [`.claude/philosophy.md`](.claude/philosophy.md) before writing any CSS or 
 - **New features / design decisions:** subagent-driven development + full spec + quality review
 - **Mechanical tasks (migrations, renames, type annotations):** inline execution, skip brainstorming
 - **TypeScript migrations:** one component per session; no logic changes
+
+## Decisions (ADRs)
+
+Direction-level decisions are recorded as numbered, immutable ADRs in `docs/adr/`
+(tracked in git — the durable counterpart to the gitignored `tasks/` working docs).
+An ADR is written once; revisiting a decision means writing a new one that supersedes it.
+
+**Write an ADR when** a new component idea earns a place, a repo-wide convention is set
+or broken, a behaviour is promoted to `src/kernel/`, or a cross-cutting default flips.
+**Don't** for renames, type annotations, tests, or a single bug fix — those are commit messages.
+
+**Component ideas start as ADRs** (`Status: Proposed`) before the component directory
+exists; the ADR carries the scope boundary, non-goals, and kernel deps the eventual
+`<Name>.md` inherits, and flips to `Accepted` when the build starts. See
+[`docs/adr/README.md`](docs/adr/README.md); copy [`docs/adr/0000-adr-template.md`](docs/adr/0000-adr-template.md).
 
 ## Accessibility
 
