@@ -214,3 +214,11 @@ Test with a real screenreader before shipping. Sources: `docs/atomica11y/form/te
 - [ ] `inputmode="decimal"` / `type="number"` raises the numeric keyboard on double-tap edit
 - [ ] In unit-in-label mode the unit is announced exactly once
 - [ ] The affix text is not a separate swipe stop that traps exploration (it is plain text; the input is the only control)
+
+## Decision record
+
+The *why* behind this component's cross-cutting choices lives in [`docs/adr/`](../../../../docs/adr/README.md):
+
+- [ADR-0009](../../../../docs/adr/0009-end-state-contract-specifies-dom-not-computation-site.md) — the end-state contract (specify the finished DOM, not where it's computed)
+- [ADR-0005](../../../../docs/adr/0005-feature-detection-is-progressive-enhancement-only.md) — affix presence is `data-*` end-state data, never inferred with `:has()`
+- [ADR-0008](../../../../docs/adr/0008-family-wide-field-height-contract.md) — the `2.5rem` field-height contract shared with the date/time family

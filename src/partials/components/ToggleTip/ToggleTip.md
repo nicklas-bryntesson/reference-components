@@ -147,3 +147,9 @@ No CSS kernel dependency. The site tokens this component reads (`--SITE--PADDING
 - RTL support
 - CSS Anchor Positioning
 - Framework integration (port the JS class and adapt to your component model)
+
+## Decision record
+
+The *why* behind this component's cross-cutting choices lives in [`docs/adr/`](../../../../docs/adr/README.md):
+
+- [ADR-0007](../../../../docs/adr/0007-popover-light-dismiss-never-refocuses-trigger.md) — light-dismiss closes without refocusing the trigger; Escape refocuses

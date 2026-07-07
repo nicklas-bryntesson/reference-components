@@ -152,3 +152,11 @@ Test with a real screenreader before shipping. Sources: `docs/atomica11y/form/da
 - [ ] Double-tap opens the native month picker
 - [ ] I can set a month + year using the native picker
 - [ ] The field label is read when I enter the input
+
+## Decision record
+
+The *why* behind this component's cross-cutting choices lives in [`docs/adr/`](../../../../docs/adr/README.md):
+
+- [ADR-0006](../../../../docs/adr/0006-native-control-fallback-on-coarse-pointers.md) — the `data-input-mode` custom/display native fallback
+- [ADR-0007](../../../../docs/adr/0007-popover-light-dismiss-never-refocuses-trigger.md) — the picker's Escape-vs-outside-click close paths
+- [ADR-0008](../../../../docs/adr/0008-family-wide-field-height-contract.md) — the `2.5rem` field-height / `18px` icon contract

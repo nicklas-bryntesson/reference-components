@@ -2,6 +2,8 @@
 
 These rules govern how components are written in this repo. They apply to CSS, JavaScript, and markup. Deviating from them requires an explicit reason — not a preference for a familiar pattern.
 
+> These are the standing rules. The dated *decisions* behind them — with considered alternatives and reconsider triggers — live in [`docs/adr/`](../docs/adr/README.md): [ADR-0002](../docs/adr/0002-data-attributes-are-the-public-api.md) (`data-*` as the public API), [ADR-0003](../docs/adr/0003-bounded-css-over-mobile-first-cascade.md) (bounded CSS), [ADR-0005](../docs/adr/0005-feature-detection-is-progressive-enhancement-only.md) (`:has()` PE-only).
+
 ---
 
 ## The core principle
