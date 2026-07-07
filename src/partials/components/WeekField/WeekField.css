@@ -6,6 +6,8 @@
   --wf-popup-gap: 1.5rem;
   --wf-popup-width: 20rem;
   --wf-site-padding: var(--SITE--PADDING, 1rem);
+  /* Field-family height contract — every field's bordered box is min 2.5rem tall */
+  --wf-field-min-block-size: 2.5rem;
   /* Design tokens — segments */
   --wf-border-color: currentColor;
   --wf-border-color-hover: CanvasText;
@@ -55,7 +57,9 @@
     & .WeekField-overlay {
       display: inline-flex;
       align-items: center;
-      gap: 0;
+      box-sizing: border-box;
+      min-block-size: var(--wf-field-min-block-size);
+      gap: 0.125rem;
       border: 1px solid var(--wf-border-color);
       padding-inline: 0.5rem;
       padding-block: 0.25rem;
@@ -76,7 +80,9 @@
     & .WeekField-overlay {
       display: inline-flex;
       align-items: center;
-      gap: 0;
+      box-sizing: border-box;
+      min-block-size: var(--wf-field-min-block-size);
+      gap: 0.125rem;
       border: 1px solid var(--wf-border-color);
       padding-inline: 0.5rem;
       padding-block: 0.25rem;
@@ -141,13 +147,18 @@
   }
 
   & .WeekField-trigger {
-    margin-inline-start: 0;
+    margin-inline-start: 0.25rem;
     background: none;
     border: none;
     padding: 0.25rem;
     cursor: pointer;
     border-radius: 2px;
     vertical-align: middle;
+
+    & svg {
+      /* block — an inline svg reserves baseline descender space below the icon */
+      display: block;
+    }
 
     &:focus-visible {
       outline: 2px solid;

@@ -23,6 +23,8 @@
   --af-gap: 0.5ch;              /* space between an affix and the value area */
   --af-inline-padding: 0.75rem; /* inline padding inside the input */
   --af-border-width: 1px;       /* input border (also part of the sized-width calc) */
+  /* Field-family height contract — every field's bordered box is min 2.5rem tall */
+  --af-field-min-block-size: 2.5rem;
   /* Design tokens */
   --af-border-color: currentColor;
   --af-border-color-hover: CanvasText;
@@ -70,6 +72,7 @@
   & .AffixField-input {
     box-sizing: border-box;
     min-inline-size: 0; /* allow the sized variant to shrink below the input's UA minimum */
+    min-block-size: var(--af-field-min-block-size);
     font: inherit;      /* the wrapper's ch unit must equal the input's ch unit */
     border: var(--af-border-width) solid var(--af-border-color);
     border-radius: 4px;
