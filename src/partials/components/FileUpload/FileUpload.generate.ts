@@ -142,26 +142,26 @@ const states: StateDefinition[] = [
   // Interaction states — with files (single mode → FileUpload-selected).
   // Seeded via data-initial-files so the rendered chip is entry-backed and its
   // remove button works (static markup alone is display-only and not removable).
-  { file: '_with-files',        label: 'File', root: { 'data-has-files': ''                            }, input: {}, items: validSingleFile('report.pdf', '200 KB'), initialFiles: seedReport },
-  { file: '_with-files-hover',  label: 'File', root: { 'data-has-files': '', 'data-test-state': 'hover'  }, input: {}, items: validSingleFile('report.pdf', '200 KB'), initialFiles: seedReport },
-  { file: '_with-files-focus',  label: 'File', root: { 'data-has-files': '', 'data-test-state': 'focus'  }, input: {}, items: validSingleFile('report.pdf', '200 KB'), initialFiles: seedReport },
-  { file: '_with-files-active', label: 'File', root: { 'data-has-files': '', 'data-test-state': 'active' }, input: {}, items: validSingleFile('report.pdf', '200 KB'), initialFiles: seedReport },
+  { file: '_with-files',        label: 'File', root: { 'data-has-files': 'true'                            }, input: {}, items: validSingleFile('report.pdf', '200 KB'), initialFiles: seedReport },
+  { file: '_with-files-hover',  label: 'File', root: { 'data-has-files': 'true', 'data-test-state': 'hover'  }, input: {}, items: validSingleFile('report.pdf', '200 KB'), initialFiles: seedReport },
+  { file: '_with-files-focus',  label: 'File', root: { 'data-has-files': 'true', 'data-test-state': 'focus'  }, input: {}, items: validSingleFile('report.pdf', '200 KB'), initialFiles: seedReport },
+  { file: '_with-files-active', label: 'File', root: { 'data-has-files': 'true', 'data-test-state': 'active' }, input: {}, items: validSingleFile('report.pdf', '200 KB'), initialFiles: seedReport },
 
   // Disabled (chip is entry-backed too, but pointer-events:none correctly blocks removal)
-  { file: '_disabled-empty',      label: 'File', root: { 'data-disabled': '', 'aria-disabled': 'true'                     }, input: { disabled: '' }, items: '', triggerDisabled: true },
-  { file: '_disabled-with-files', label: 'File', root: { 'data-disabled': '', 'aria-disabled': 'true', 'data-has-files': '' }, input: { disabled: '' }, items: validSingleFile('report.pdf', '200 KB'), triggerDisabled: true, initialFiles: seedReport },
+  { file: '_disabled-empty',      label: 'File', root: { 'data-disabled': 'true', 'aria-disabled': 'true'                     }, input: { disabled: '' }, items: '', triggerDisabled: true },
+  { file: '_disabled-with-files', label: 'File', root: { 'data-disabled': 'true', 'aria-disabled': 'true', 'data-has-files': 'true' }, input: { disabled: '' }, items: validSingleFile('report.pdf', '200 KB'), triggerDisabled: true, initialFiles: seedReport },
 
   // Validation states (seeded files re-validate on bootstrap → correct status + removable)
-  { file: '_invalid-type',   label: 'File', root: { 'data-has-files': '', 'data-has-errors': '' }, input: { accept: '.pdf' }, items: invalidTypeSingleFile('image.exe', '14 KB'), initialFiles: seedInvalidType },
-  { file: '_invalid-size',   label: 'File', root: { 'data-has-files': '', 'data-has-errors': '', 'data-max-size': '5mb' }, input: {}, items: invalidSizeSingleFile('video.mp4', '48 MB'), initialFiles: seedInvalidSize },
-  { file: '_invalid-mixed',  label: 'File', root: { 'data-has-files': '', 'data-has-errors': '' }, input: { accept: '.pdf', multiple: '' }, isMultiple: true, items: validItem('report.pdf', '200 KB', 'static-1') + invalidTypeItem('image.exe', '14 KB'), initialFiles: seedMixed },
-  { file: '_required-empty', label: 'File', root: { 'data-required': '' }, input: { required: '' }, items: '' },
+  { file: '_invalid-type',   label: 'File', root: { 'data-has-files': 'true', 'data-has-errors': 'true' }, input: { accept: '.pdf' }, items: invalidTypeSingleFile('image.exe', '14 KB'), initialFiles: seedInvalidType },
+  { file: '_invalid-size',   label: 'File', root: { 'data-has-files': 'true', 'data-has-errors': 'true', 'data-max-size': '5mb' }, input: {}, items: invalidSizeSingleFile('video.mp4', '48 MB'), initialFiles: seedInvalidSize },
+  { file: '_invalid-mixed',  label: 'File', root: { 'data-has-files': 'true', 'data-has-errors': 'true' }, input: { accept: '.pdf', multiple: '' }, isMultiple: true, items: validItem('report.pdf', '200 KB', 'static-1') + invalidTypeItem('image.exe', '14 KB'), initialFiles: seedMixed },
+  { file: '_required-empty', label: 'File', root: { 'data-required': 'true' }, input: { required: '' }, items: '' },
 
   // Variants
-  { file: '_multiple',           label: 'Files', root: { 'data-has-files': '' }, input: { multiple: '' }, isMultiple: true, items: validItem('doc1.pdf', '200 KB', 'static-1') + validItem('doc2.pdf', '350 KB', 'static-2'), triggerText: 'Add files' },
-  { file: '_drop-zone',          label: 'File',  root: { 'data-drop-zone': '' }, input: {}, items: '' },
-  { file: '_drop-zone-dragging', label: 'File',  root: { 'data-drop-zone': '', 'data-dragging-over': '' }, input: {}, items: '' },
-  { file: '_server-files',       label: 'CV',    root: { 'data-has-files': '' },
+  { file: '_multiple',           label: 'Files', root: { 'data-has-files': 'true' }, input: { multiple: '' }, isMultiple: true, items: validItem('doc1.pdf', '200 KB', 'static-1') + validItem('doc2.pdf', '350 KB', 'static-2'), triggerText: 'Add files' },
+  { file: '_drop-zone',          label: 'File',  root: { 'data-drop-zone': 'true' }, input: {}, items: '' },
+  { file: '_drop-zone-dragging', label: 'File',  root: { 'data-drop-zone': 'true', 'data-dragging-over': 'true' }, input: {}, items: '' },
+  { file: '_server-files',       label: 'CV',    root: { 'data-has-files': 'true' },
     input: { multiple: '' },
     isMultiple: true,
     items: serverItem('contract.pdf', '200 KB', 'abc123'),

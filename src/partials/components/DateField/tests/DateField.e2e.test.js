@@ -78,7 +78,7 @@ test('calendar is removed on outside click', async ({ page }) => {
 
 test('date selection closes calendar and syncs native input', async ({ page }) => {
   await page.locator('[data-id="birthdate"] .DateField-trigger').click()
-  const firstDay = page.locator('.DateField-popup td:not([data-outside-month]):not([aria-disabled="true"]) button').first()
+  const firstDay = page.locator('.DateField-popup td:not([data-outside-month="true"]):not([aria-disabled="true"]) button').first()
   const dateLabel = await firstDay.getAttribute('data-date')
   await firstDay.click({ force: true })
   await expect(page.locator('.DateField-popup')).toHaveCount(0)
@@ -273,7 +273,7 @@ test('Enter opens calendar from trigger', async ({ page }) => {
 
 test('ArrowRight moves focus to next day in calendar grid', async ({ page }) => {
   await page.locator('[data-id="birthdate"] .DateField-trigger').click()
-  const firstDay = page.locator('.DateField-popup td:not([data-outside-month]):not([aria-disabled="true"]) button').first()
+  const firstDay = page.locator('.DateField-popup td:not([data-outside-month="true"]):not([aria-disabled="true"]) button').first()
   await firstDay.focus()
   const initialDate = await firstDay.getAttribute('data-date')
   await page.keyboard.press('ArrowRight')
@@ -285,7 +285,7 @@ test('ArrowRight moves focus to next day in calendar grid', async ({ page }) => 
 
 test('ArrowLeft moves focus to previous day in calendar grid', async ({ page }) => {
   await page.locator('[data-id="birthdate"] .DateField-trigger').click()
-  const days = page.locator('.DateField-popup td:not([data-outside-month]):not([aria-disabled="true"]) button')
+  const days = page.locator('.DateField-popup td:not([data-outside-month="true"]):not([aria-disabled="true"]) button')
   const secondDay = days.nth(1)
   await secondDay.focus()
   const initialDate = await secondDay.getAttribute('data-date')
@@ -298,7 +298,7 @@ test('ArrowLeft moves focus to previous day in calendar grid', async ({ page }) 
 
 test('ArrowDown moves focus one week forward in calendar grid', async ({ page }) => {
   await page.locator('[data-id="birthdate"] .DateField-trigger').click()
-  const firstDay = page.locator('.DateField-popup td:not([data-outside-month]):not([aria-disabled="true"]) button').first()
+  const firstDay = page.locator('.DateField-popup td:not([data-outside-month="true"]):not([aria-disabled="true"]) button').first()
   await firstDay.focus()
   const initialDate = await firstDay.getAttribute('data-date')
   await page.keyboard.press('ArrowDown')
@@ -362,7 +362,7 @@ test('Tab from a focused grid day exits the grid as one composite stop (→ Next
   await expect(page.locator('.DateField-popup')).toBeVisible()
   // Focus the grid's roving day cell. Tab must leave the grid (WAI-ARIA grid is
   // ONE tab stop), not step to the adjacent day.
-  const day = page.locator('.DateField-popup td:not([data-outside-month]):not([aria-disabled="true"]) button[tabindex="0"]')
+  const day = page.locator('.DateField-popup td:not([data-outside-month="true"]):not([aria-disabled="true"]) button[tabindex="0"]')
   await day.focus()
   await page.keyboard.press('Tab')
   const landedOnDay = await page.evaluate(() =>

@@ -9,14 +9,14 @@ const __dir = path.dirname(fileURLToPath(import.meta.url))
 
 test.beforeEach(async ({ page }) => {
   await page.goto(targetPath())
-  await page.locator('[data-component="FileUpload"][data-initialized]').first().scrollIntoViewIfNeeded()
+  await page.locator('[data-component="FileUpload"][data-initialized="true"]').first().scrollIntoViewIfNeeded()
   await injectAxe(page)
 })
 
 // ─── Accessibility audit ──────────────────────────────────────────────────────
 
 test('passes axe accessibility audit on empty state', async ({ page }) => {
-  await checkA11y(page, '[data-component="FileUpload"][data-initialized]', {
+  await checkA11y(page, '[data-component="FileUpload"][data-initialized="true"]', {
     detailedReport: true,
     axeOptions: {
       rules: {
@@ -55,7 +55,7 @@ test('all kitchensink states pass axe', async ({ page }) => {
 // ─── Role and labeling ────────────────────────────────────────────────────────
 
 test('root has role=group with aria-labelledby', async ({ page }) => {
-  const root = page.locator('[data-component="FileUpload"][data-initialized]').last()
+  const root = page.locator('[data-component="FileUpload"][data-initialized="true"]').last()
   await expect(root).toHaveAttribute('role', 'group')
   const labelledBy = await root.getAttribute('aria-labelledby')
   expect(labelledBy).toBeTruthy()
@@ -64,7 +64,7 @@ test('root has role=group with aria-labelledby', async ({ page }) => {
 })
 
 test('native input is aria-hidden', async ({ page }) => {
-  const input = page.locator('[data-component="FileUpload"][data-initialized] .FileUpload-input').last()
+  const input = page.locator('[data-component="FileUpload"][data-initialized="true"] .FileUpload-input').last()
   await expect(input).toHaveAttribute('aria-hidden', 'true')
   await expect(input).toHaveAttribute('tabindex', '-1')
 })
@@ -72,7 +72,7 @@ test('native input is aria-hidden', async ({ page }) => {
 // ─── Trigger button ───────────────────────────────────────────────────────────
 
 test('trigger button has accessible name', async ({ page }) => {
-  const trigger = page.locator('[data-component="FileUpload"][data-initialized] .FileUpload-trigger').last()
+  const trigger = page.locator('[data-component="FileUpload"][data-initialized="true"] .FileUpload-trigger').last()
   const label = await trigger.textContent()
   expect(label.trim().length).toBeGreaterThan(0)
 })
@@ -82,7 +82,7 @@ test('trigger button has accessible name', async ({ page }) => {
 test('selecting a file adds it to the list', async ({ page }) => {
   const tmpFile = path.join(__dir, 'fixtures', 'test.pdf')
 
-  const liveRoot = page.locator('[data-component="FileUpload"][data-initialized]').last()
+  const liveRoot = page.locator('[data-component="FileUpload"][data-initialized="true"]').last()
   const input = liveRoot.locator('.FileUpload-input')
   await input.setInputFiles(tmpFile)
 
@@ -92,7 +92,7 @@ test('selecting a file adds it to the list', async ({ page }) => {
 
 test('remove button removes the file from the list', async ({ page }) => {
   const tmpFile = path.join(__dir, 'fixtures', 'test.pdf')
-  const liveRoot = page.locator('[data-component="FileUpload"][data-initialized]').last()
+  const liveRoot = page.locator('[data-component="FileUpload"][data-initialized="true"]').last()
   const input = liveRoot.locator('.FileUpload-input')
   await input.setInputFiles(tmpFile)
 
@@ -104,7 +104,7 @@ test('remove button removes the file from the list', async ({ page }) => {
 
 test('focus moves to trigger after removing the only file', async ({ page }) => {
   const tmpFile = path.join(__dir, 'fixtures', 'test.pdf')
-  const liveRoot = page.locator('[data-component="FileUpload"][data-initialized]').last()
+  const liveRoot = page.locator('[data-component="FileUpload"][data-initialized="true"]').last()
   const input = liveRoot.locator('.FileUpload-input')
   await input.setInputFiles(tmpFile)
 
@@ -118,7 +118,7 @@ test('focus moves to trigger after removing the only file', async ({ page }) => 
 // ─── Keyboard navigation ──────────────────────────────────────────────────────
 
 test('trigger is reachable via Tab', async ({ page }) => {
-  const liveRoot = page.locator('[data-component="FileUpload"][data-initialized]').last()
+  const liveRoot = page.locator('[data-component="FileUpload"][data-initialized="true"]').last()
   const trigger = liveRoot.locator('.FileUpload-trigger')
   await trigger.focus()
   await expect(trigger).toBeFocused()
@@ -126,7 +126,7 @@ test('trigger is reachable via Tab', async ({ page }) => {
 
 test('remove button is reachable via Shift+Tab from trigger', async ({ page }) => {
   const tmpFile = path.join(__dir, 'fixtures', 'test.pdf')
-  const liveRoot = page.locator('[data-component="FileUpload"][data-initialized]').last()
+  const liveRoot = page.locator('[data-component="FileUpload"][data-initialized="true"]').last()
   const input = liveRoot.locator('.FileUpload-input')
   await input.setInputFiles(tmpFile)
 
@@ -155,13 +155,13 @@ test('file not matching accept shows invalid-type error', async ({ page }) => {
   // The static error items live in the hbs — JS wipes them. So we drive the live demo
   // with a file that has a disallowed extension.
 
-  const liveRoot = page.locator('[data-component="FileUpload"][data-initialized]').last()
+  const liveRoot = page.locator('[data-component="FileUpload"][data-initialized="true"]').last()
 
   // Temporarily observe: the live root has no accept restriction so any file is valid.
   // Use the instance that does have accept=".pdf": the _invalid-type partial instance.
   // Since JS clears its static list, we upload a non-pdf to the live demo with JS eval.
   await page.evaluate(() => {
-    const roots = document.querySelectorAll('[data-component="FileUpload"][data-initialized]')
+    const roots = document.querySelectorAll('[data-component="FileUpload"][data-initialized="true"]')
     const liveEl = roots[roots.length - 1]
     const inputEl = liveEl.querySelector('.FileUpload-input')
     inputEl.setAttribute('accept', '.pdf')
@@ -184,11 +184,11 @@ test('file not matching accept shows invalid-type error', async ({ page }) => {
 })
 
 test('file exceeding max size shows invalid-size error', async ({ page }) => {
-  const liveRoot = page.locator('[data-component="FileUpload"][data-initialized]').last()
+  const liveRoot = page.locator('[data-component="FileUpload"][data-initialized="true"]').last()
 
   // Set max-size to 1 byte so any real file exceeds it
   await page.evaluate(() => {
-    const roots = document.querySelectorAll('[data-component="FileUpload"][data-initialized]')
+    const roots = document.querySelectorAll('[data-component="FileUpload"][data-initialized="true"]')
     const liveEl = roots[roots.length - 1]
     liveEl.setAttribute('data-max-size', '1')
   })
@@ -208,7 +208,7 @@ test('file exceeding max size shows invalid-size error', async ({ page }) => {
 // ── atomica11y: button + alert-notification + text-input §1 ──────────────────
 
 test('file list has aria-live="polite" and aria-relevant="additions removals"', async ({ page }) => {
-  const liveRoot = page.locator('[data-component="FileUpload"][data-initialized]').last()
+  const liveRoot = page.locator('[data-component="FileUpload"][data-initialized="true"]').last()
   const list = liveRoot.locator('.FileUpload-list')
   await expect(list).toHaveAttribute('aria-live', 'polite')
   await expect(list).toHaveAttribute('aria-relevant', 'additions removals')
@@ -216,7 +216,7 @@ test('file list has aria-live="polite" and aria-relevant="additions removals"', 
 
 test('remove button has aria-label containing the filename', async ({ page }) => {
   const tmpFile = path.join(__dir, 'fixtures', 'test.pdf')
-  const liveRoot = page.locator('[data-component="FileUpload"][data-initialized]').last()
+  const liveRoot = page.locator('[data-component="FileUpload"][data-initialized="true"]').last()
   await liveRoot.locator('.FileUpload-input').setInputFiles(tmpFile)
 
   const removeBtn = liveRoot.locator('.FileUpload-item-remove')
@@ -226,7 +226,7 @@ test('remove button has aria-label containing the filename', async ({ page }) =>
 
 test('Enter on remove button removes the file', async ({ page }) => {
   const tmpFile = path.join(__dir, 'fixtures', 'test.pdf')
-  const liveRoot = page.locator('[data-component="FileUpload"][data-initialized]').last()
+  const liveRoot = page.locator('[data-component="FileUpload"][data-initialized="true"]').last()
   await liveRoot.locator('.FileUpload-input').setInputFiles(tmpFile)
 
   const removeBtn = liveRoot.locator('.FileUpload-item-remove')
@@ -238,7 +238,7 @@ test('Enter on remove button removes the file', async ({ page }) => {
 
 test('Space on remove button removes the file', async ({ page }) => {
   const tmpFile = path.join(__dir, 'fixtures', 'test.pdf')
-  const liveRoot = page.locator('[data-component="FileUpload"][data-initialized]').last()
+  const liveRoot = page.locator('[data-component="FileUpload"][data-initialized="true"]').last()
   await liveRoot.locator('.FileUpload-input').setInputFiles(tmpFile)
 
   const removeBtn = liveRoot.locator('.FileUpload-item-remove')
@@ -249,13 +249,13 @@ test('Space on remove button removes the file', async ({ page }) => {
 })
 
 test('error alert does not steal focus when invalid file is added', async ({ page }) => {
-  const liveRoot = page.locator('[data-component="FileUpload"][data-initialized]').last()
+  const liveRoot = page.locator('[data-component="FileUpload"][data-initialized="true"]').last()
 
   // Focus trigger first so we have a known focus position
   await liveRoot.locator('.FileUpload-trigger').focus()
 
   await page.evaluate(() => {
-    const el = Array.from(document.querySelectorAll('[data-component="FileUpload"][data-initialized]')).at(-1)
+    const el = Array.from(document.querySelectorAll('[data-component="FileUpload"][data-initialized="true"]')).at(-1)
     el.querySelector('.FileUpload-input').setAttribute('accept', '.pdf')
   })
 
@@ -274,11 +274,11 @@ test('error alert does not steal focus when invalid file is added', async ({ pag
 })
 
 test('focus moves to next sibling remove button when removing first of multiple files', async ({ page }) => {
-  const liveRoot = page.locator('[data-component="FileUpload"][data-initialized]').last()
+  const liveRoot = page.locator('[data-component="FileUpload"][data-initialized="true"]').last()
 
   // Enable multiple
   await page.evaluate(() => {
-    const el = Array.from(document.querySelectorAll('[data-component="FileUpload"][data-initialized]')).at(-1)
+    const el = Array.from(document.querySelectorAll('[data-component="FileUpload"][data-initialized="true"]')).at(-1)
     el.querySelector('.FileUpload-input').setAttribute('multiple', '')
   })
 
@@ -299,10 +299,10 @@ test('focus moves to next sibling remove button when removing first of multiple 
 })
 
 test('data-has-errors on root when invalid file type is added', async ({ page }) => {
-  const liveRoot = page.locator('[data-component="FileUpload"][data-initialized]').last()
+  const liveRoot = page.locator('[data-component="FileUpload"][data-initialized="true"]').last()
 
   await page.evaluate(() => {
-    const el = Array.from(document.querySelectorAll('[data-component="FileUpload"][data-initialized]')).at(-1)
+    const el = Array.from(document.querySelectorAll('[data-component="FileUpload"][data-initialized="true"]')).at(-1)
     el.querySelector('.FileUpload-input').setAttribute('accept', '.pdf')
   })
 
@@ -318,7 +318,7 @@ test('data-has-errors on root when invalid file type is added', async ({ page })
 // ─── Drop-zone: remove button must win over the full-coverage input ───────────
 
 test('drop-zone remove button removes the file instead of reopening the picker', async ({ page }) => {
-  const dropZone = page.locator('[data-component="FileUpload"][data-drop-zone][data-initialized]').first()
+  const dropZone = page.locator('[data-component="FileUpload"][data-drop-zone="true"][data-initialized="true"]').first()
   await dropZone.scrollIntoViewIfNeeded()
 
   await dropZone.locator('.FileUpload-input').setInputFiles({

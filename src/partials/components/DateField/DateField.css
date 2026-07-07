@@ -36,7 +36,7 @@
     display: none;
   }
 
-  &[data-disabled] {
+  &[data-disabled="true"] {
     opacity: 0.5;
     cursor: not-allowed;
 
@@ -95,12 +95,12 @@
     border-radius: 2px;
     cursor: default;
 
-    &[data-focused] {
+    &[data-focused="true"] {
       background-color: var(--SITE--POPOVER--ACCENT);
       color: var(--SITE--POPOVER--ACCENT-TEXT);
     }
 
-    &[data-placeholder] {
+    &[data-placeholder="true"] {
       color: var(--df-segments-color-muted);
     }
   }
@@ -122,7 +122,7 @@
     outline-offset: 1px;
   }
 
-  &[data-invalid] .Segments {
+  &[data-invalid="true"] .Segments {
     border-color: var(--df-segments-border-color-invalid);
   }
 
@@ -236,21 +236,21 @@
       }
     }
 
-    & td[data-today] button {
+    & td[data-today="true"] button {
       font-weight: bold;
     }
 
-    & td[data-selected] button {
+    & td[data-selected="true"] button {
       background-color: var(--SITE--POPOVER--ACCENT);
       color: var(--SITE--POPOVER--ACCENT-TEXT);
     }
 
-    & td[data-disabled] button {
+    & td[data-disabled="true"] button {
       color: var(--df-calendar-color-muted);
       cursor: not-allowed;
     }
 
-    & td[data-outside-month] button {
+    & td[data-outside-month="true"] button {
       color: var(--df-calendar-color-muted);
     }
   }
@@ -332,7 +332,7 @@
 }
 
 /* ── Initialisation gate ───────────────────────────────────────────────── */
-.DateField[data-initialized] {
+.DateField[data-initialized="true"] {
   overflow: visible;
 }
 

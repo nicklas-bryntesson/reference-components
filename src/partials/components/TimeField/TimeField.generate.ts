@@ -87,12 +87,12 @@ const states: StateDefinition[] = [
   { file: '_filled-active', id: 'tf-filled-active',  label: 'Tid', root: { 'data-value': '13:45', 'data-test-state': 'active' }, input: { value: '13:45' }, trigger: {} },
 
   // ── Disabled ────────────────────────────────────────────────────────────────
-  { file: '_disabled-empty',  id: 'tf-disabled-empty',  label: 'Tid', root: { 'data-disabled': '' }, input: { disabled: '' },                       trigger: { disabled: '' } },
-  { file: '_disabled-filled', id: 'tf-disabled-filled', label: 'Tid', root: { 'data-disabled': '', 'data-value': '13:45' }, input: { value: '13:45', disabled: '' }, trigger: { disabled: '' } },
+  { file: '_disabled-empty',  id: 'tf-disabled-empty',  label: 'Tid', root: { 'data-disabled': 'true' }, input: { disabled: '' },                       trigger: { disabled: '' } },
+  { file: '_disabled-filled', id: 'tf-disabled-filled', label: 'Tid', root: { 'data-disabled': 'true', 'data-value': '13:45' }, input: { value: '13:45', disabled: '' }, trigger: { disabled: '' } },
 
   // ── Invalid ─────────────────────────────────────────────────────────────────
-  { file: '_invalid-empty',  id: 'tf-invalid-empty',  label: 'Tid <span aria-hidden="true">*</span>', root: { 'data-invalid': '' }, input: { required: '', 'aria-invalid': 'true' }, trigger: {} },
-  { file: '_invalid-filled', id: 'tf-invalid-filled', label: 'Tid',                                   root: { 'data-invalid': '', 'data-value': '07:00' }, input: { value: '07:00', 'aria-invalid': 'true' }, trigger: {} },
+  { file: '_invalid-empty',  id: 'tf-invalid-empty',  label: 'Tid <span aria-hidden="true">*</span>', root: { 'data-invalid': 'true' }, input: { required: '', 'aria-invalid': 'true' }, trigger: {} },
+  { file: '_invalid-filled', id: 'tf-invalid-filled', label: 'Tid',                                   root: { 'data-invalid': 'true', 'data-value': '07:00' }, input: { value: '07:00', 'aria-invalid': 'true' }, trigger: {} },
 
   // ── With seconds (step < 60) ─────────────────────────────────────────────────
   { file: '_with-seconds', id: 'tf-with-seconds', label: 'Tid', root: { 'data-step': '1', 'data-value': '13:45:30' }, input: { value: '13:45:30', step: '1' }, trigger: {} },

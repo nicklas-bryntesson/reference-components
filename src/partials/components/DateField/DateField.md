@@ -80,8 +80,8 @@ All observable outcomes are state changes on `data-*` attributes or DOM changes:
 - **Calendar navigation:** `.PrevMonth` / `.NextMonth` step the displayed month. `.MonthYearTrigger` toggles between the two panels: `.Panel[data-panel="calendar"]` (the grid) and `.Panel[data-panel="picker"]` (the month/year wheels). Only one panel has `data-active="true"` at a time. The two `.Wheel` elements (`data-picker="month"` / `"year"`) are upgraded by the `WheelColumn` kernel primitive to `role="spinbutton"` — see [`src/kernel/js/WheelColumn.md`](../../../kernel/js/WheelColumn.md).
 - **Calendar date selection:** Clicking a day cell commits the date, closes the calendar (`aria-expanded="false"`), and focuses the trigger.
 - **Calendar close (Escape):** Escape is two-step. When the month/year picker panel is open, Escape reverts to the month/year the picker opened on and closes only the picker (back to the calendar panel); a second Escape closes the calendar.
-- **Disabled:** When `data-disabled` is present on the root, all interaction is blocked (`pointer-events: none` via CSS). The server renders it, and JS also mirrors it onto the root at init when the native input has the `disabled` attribute.
-- **Invalid:** When `data-invalid` is present, CSS applies error styling. JS does not set this attribute — the server renders it.
+- **Disabled:** When `data-disabled="true"` is present on the root, all interaction is blocked (`pointer-events: none` via CSS). The server renders it, and JS also mirrors it onto the root at init when the native input has the `disabled` attribute.
+- **Invalid:** When `data-invalid="true"` is present, CSS applies error styling. JS does not set this attribute — the server renders it.
 - **Announcement:** After a date is committed, JS writes a human-readable string to `.Announce` (e.g. "15 juni 1990") so screen readers announce the selection.
 
 ## Accessibility
@@ -106,8 +106,8 @@ All observable outcomes are state changes on `data-*` attributes or DOM changes:
 | `data-min` | ISO 8601 date | no | Earliest selectable date (`YYYY-MM-DD`). Defaults to none — year segment/wheel then spans 1900–2100 |
 | `data-max` | ISO 8601 date | no | Latest selectable date (`YYYY-MM-DD`). Defaults to none — year segment/wheel then spans 1900–2100 |
 | `data-label-field` | string | no | Fallback `aria-label` for `.Segments` when no matching `<label for>` exists |
-| `data-disabled` | boolean | no | Disables all interaction; renders CSS disabled state |
-| `data-invalid` | boolean | no | Renders CSS error state; does not block interaction |
+| `data-disabled` | `"true"` | no | Disables all interaction; renders CSS disabled state |
+| `data-invalid` | `"true"` | no | Renders CSS error state; does not block interaction |
 | `data-test-state` | `"hover"` / `"focus"` / `"active"` | no | Kitchensink / visual-test only — simulates CSS pseudo-state without user interaction |
 
 ### On native input (authored)
@@ -117,13 +117,13 @@ All observable outcomes are state changes on `data-*` attributes or DOM changes:
 | `value` | Pre-filled date in `YYYY-MM-DD` format |
 | `required` | Marks the field as required for form validation |
 | `aria-invalid` | Set to `"true"` when the field has a validation error |
-| `disabled` | Mirrors `data-disabled`; set together with the root attribute |
+| `disabled` | Mirrors `data-disabled="true"`; set together with the root attribute |
 
 ### State attributes (set by JS)
 
 | Attribute | Set when |
 |-----------|----------|
-| `data-initialized` | Component has been mounted |
+| `data-initialized="true"` | Component has been mounted |
 | `data-input-mode` | `"custom"` or `"display"` — chosen at init via `matchMedia('(pointer: coarse)')` |
 | `data-state` | `"open"` while the calendar is open, `"idle"` after close |
 | `data-direction` | `"top"` or `"bottom"` — which side of the trigger the popup opens on |
@@ -182,7 +182,7 @@ Test with a real screenreader before shipping. Sources: `docs/atomica11y/form/da
 - [ ] Prev/next month buttons have clear purpose
 
 **Invalid state**
-- [ ] When `data-invalid` is set, the error is announced automatically
+- [ ] When `data-invalid="true"` is set, the error is announced automatically
 - [ ] Error is read after the input name, role, and state
 
 ### Mobile screenreader (VoiceOver iOS, TalkBack Android)

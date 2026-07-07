@@ -23,11 +23,11 @@ Completes the date family alongside DateField, DateTimeField, TimeField, and Mon
 | `data-value` | `YYYY-Www` | Initial value (server-side render) |
 | `data-min` | `YYYY-Www` | Minimum allowed week; bounds the segments and disables earlier week rows |
 | `data-max` | `YYYY-Www` | Maximum allowed week; bounds the segments and disables later week rows |
-| `data-disabled` | boolean | Disables the entire field |
-| `data-invalid` | boolean | Marks the field invalid — styling hook only; the author must also set `aria-invalid="true"` on the native input (as the kitchensink states do) |
+| `data-disabled` | `"true"` | Disables the entire field |
+| `data-invalid` | `"true"` | Marks the field invalid — styling hook only; the author must also set `aria-invalid="true"` on the native input (as the kitchensink states do) |
 | `data-input-mode` | `custom` \| `display` | Set by JS: `custom` on desktop / where native week is unsupported, `display` on touch with native week support |
 
-State attributes set by JS: `data-initialized`, `data-open`, `data-has-value`, `data-direction`, and `aria-expanded` on the trigger.
+State attributes set by JS: `data-initialized="true"`, `data-open="true"`, `data-has-value="true"` (boolean state always carries the literal value `"true"`, absent when off), `data-direction`, and `aria-expanded` on the trigger.
 
 ## Native fallback (feature detection)
 
@@ -177,7 +177,7 @@ Test with a real screenreader before shipping. Sources: `docs/atomica11y/form/da
 - [ ] Content behind the dialog is not the focus target while open
 
 **Invalid state**
-- [ ] When `data-invalid` is set, the error is announced automatically
+- [ ] When `data-invalid="true"` is set, the error is announced automatically
 - [ ] Error is read after the input name, role, and state
 
 ### Mobile screenreader (VoiceOver iOS, TalkBack Android)

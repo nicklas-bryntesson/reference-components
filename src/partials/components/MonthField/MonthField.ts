@@ -177,7 +177,7 @@ class MonthField {
       this._initInteractiveMode()
     }
 
-    this.root.setAttribute('data-initialized', '')
+    this.root.setAttribute('data-initialized', 'true')
   }
 
   // ─── Display mode (touch / coarse pointer) ────────────────────────────────
@@ -192,7 +192,7 @@ class MonthField {
     this.overlay.setAttribute('aria-hidden', 'true')
 
     if (this.native.disabled || this.root.hasAttribute('data-disabled')) {
-      this.root.dataset.disabled = ''
+      this.root.dataset.disabled = 'true'
     }
 
     this._buildSegments()
@@ -224,7 +224,7 @@ class MonthField {
 
     // Disabled state
     if (this.native.disabled || this.root.hasAttribute('data-disabled')) {
-      this.root.dataset.disabled = ''
+      this.root.dataset.disabled = 'true'
     }
 
     this._buildSegments()
@@ -288,7 +288,7 @@ class MonthField {
     const { min, max } = this._getSegmentLimits(type)
     span.setAttribute('aria-valuemin', String(min))
     span.setAttribute('aria-valuemax', String(max))
-    span.setAttribute('data-placeholder', '')
+    span.setAttribute('data-placeholder', 'true')
     span.setAttribute('aria-valuetext', '--')
     span.textContent = type === 'year' ? '----' : '--'
 
@@ -315,7 +315,7 @@ class MonthField {
       s.removeAttribute('data-focused')
       s.setAttribute('tabindex', '-1')
     })
-    seg.setAttribute('data-focused', '')
+    seg.setAttribute('data-focused', 'true')
     seg.setAttribute('tabindex', '0')
   }
 
@@ -460,7 +460,7 @@ class MonthField {
 
   _clearSegment(seg: HTMLSpanElement): void {
     const type = seg.dataset.segment as MonthSegmentType
-    seg.setAttribute('data-placeholder', '')
+    seg.setAttribute('data-placeholder', 'true')
     seg.removeAttribute('aria-valuenow')
     seg.setAttribute('aria-valuetext', '--')
     seg.textContent = type === 'year' ? '----' : '--'
@@ -631,7 +631,7 @@ class MonthField {
     const monthStr = formatMonthISO(year, month)
 
     this.native.value = monthStr
-    this.root.dataset.hasValue = ''
+    this.root.dataset.hasValue = 'true'
 
     if (!this._suppressEvents) {
       this.native.dispatchEvent(new Event('input', { bubbles: true }))
@@ -715,7 +715,7 @@ class MonthField {
     this.popupEl.addEventListener('keydown', (e) => this._handlePopupKeydown(e))
 
     this._slideContainer.appendChild(this.popupEl)
-    this.root.setAttribute('data-open', '')
+    this.root.setAttribute('data-open', 'true')
     this.trigger.setAttribute('aria-expanded', 'true')
 
     this._updateLayout()
@@ -848,7 +848,7 @@ class MonthField {
     this._suppressEvents = true
     this._syncFromNative(iso)
     this.native.value = iso
-    this.root.dataset.hasValue = ''
+    this.root.dataset.hasValue = 'true'
     this._suppressEvents = false
     // "This month" is a value change — fire both once (the suppressed segment
     // cascade above would otherwise fire per segment).

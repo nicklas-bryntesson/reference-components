@@ -10,7 +10,7 @@ const TF = targetId('TimeField')
 test.beforeEach(async ({ page }) => {
   await page.goto(targetPath())
   await page.locator(TF).scrollIntoViewIfNeeded()
-  await page.locator(`${TF}[data-initialized]`).waitFor()
+  await page.locator(`${TF}[data-initialized="true"]`).waitFor()
   await injectAxe(page)
 })
 
@@ -168,7 +168,7 @@ test('Tab from last segment moves focus to trigger', async ({ page }) => {
 
 test('disabled field trigger is disabled', async ({ page }) => {
   // The kitchensink has disabled TimeField instances — find the first one
-  const disabledTrigger = page.locator('.TimeField[data-disabled] .TimeField-trigger').first()
+  const disabledTrigger = page.locator('.TimeField[data-disabled="true"] .TimeField-trigger').first()
   if (await disabledTrigger.count() > 0) {
     await expect(disabledTrigger).toBeDisabled()
   }

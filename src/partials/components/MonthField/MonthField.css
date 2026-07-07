@@ -35,7 +35,7 @@
     display: none;
   }
 
-  &[data-disabled] {
+  &[data-disabled="true"] {
     opacity: 0.5;
     pointer-events: none;
   }
@@ -102,12 +102,12 @@
       min-inline-size: 4ch;
     }
 
-    &[data-focused] {
+    &[data-focused="true"] {
       background-color: var(--SITE--POPOVER--ACCENT);
       color: var(--SITE--POPOVER--ACCENT-TEXT);
     }
 
-    &[data-placeholder] {
+    &[data-placeholder="true"] {
       color: var(--mf-color-muted);
     }
   }
@@ -129,7 +129,7 @@
     outline-offset: 1px;
   }
 
-  &[data-invalid] .MonthField-overlay {
+  &[data-invalid="true"] .MonthField-overlay {
     border-color: var(--mf-border-color-invalid);
   }
 
@@ -166,7 +166,7 @@
   }
 
   /* ── Initialisation gate ─────────────────────────────────────────────────── */
-  &[data-initialized] {
+  &[data-initialized="true"] {
     overflow: visible;
   }
 

@@ -103,8 +103,10 @@ Variants and states are expressed through `data-*` attributes. CSS class is alwa
 
 All component state is expressed as `data-*` attributes on the root element. JavaScript reads and writes these attributes; CSS responds to them. Neither reaches into the other's internals.
 
+Boolean state always carries the explicit literal value `"true"` — never a bare/empty attribute. An empty declaration is harder to read than a stated value, in the HTML and in the CSS alike: `[data-disabled="true"]` reads as a condition, not an existence check. The off state is expressed by removing the attribute.
+
 ```html
-<div class="DateField" data-component="DateField" data-disabled>
+<div class="DateField" data-component="DateField" data-disabled="true">
 ```
 
 ### No impossible states in markup
@@ -113,7 +115,7 @@ The component's source of truth (JS logic + `generate.ts` for state partials) de
 
 ### Disabled is a functional state, not an interaction state
 
-`data-disabled` / `disabled` means `pointer-events: none`. Hover, focus, and active are therefore impossible. Disabled never appears as a column in the interaction state table — it gets its own table.
+`data-disabled="true"` / `disabled` means `pointer-events: none`. Hover, focus, and active are therefore impossible. Disabled never appears as a column in the interaction state table — it gets its own table.
 
 ---
 

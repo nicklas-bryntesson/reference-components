@@ -8,7 +8,7 @@ const WF = targetId('WeekField')
 test.beforeEach(async ({ page }) => {
   await page.goto(targetPath())
   await page.locator(WF).scrollIntoViewIfNeeded()
-  await page.locator(`${WF}[data-initialized]`).waitFor()
+  await page.locator(`${WF}[data-initialized="true"]`).waitFor()
   await injectAxe(page)
 })
 
@@ -136,7 +136,7 @@ test('Tab from last segment (year) moves focus to trigger', async ({ page }) => 
 
 test('clicking a week row selects that whole week and closes', async ({ page }) => {
   await page.locator(`${WF} .WeekField-trigger`).click()
-  const firstRow = page.locator('.WeekGrid tbody tr:not([data-disabled])').first()
+  const firstRow = page.locator('.WeekGrid tbody tr:not([data-disabled="true"])').first()
   const iso = await firstRow.getAttribute('data-week')
   await firstRow.click()
   await expect(page.locator('.WeekField-popup')).toHaveCount(0)
@@ -146,7 +146,7 @@ test('clicking a week row selects that whole week and closes', async ({ page }) 
 test('clicking a day cell in a row selects the whole week (row highlight)', async ({ page }) => {
   await page.locator(`${WF} .WeekField-trigger`).click()
   // Click a day cell (not the week-number cell) in the second row.
-  const row = page.locator('.WeekGrid tbody tr:not([data-disabled])').nth(1)
+  const row = page.locator('.WeekGrid tbody tr:not([data-disabled="true"])').nth(1)
   const iso = await row.getAttribute('data-week')
   await row.locator('td[role="gridcell"]').nth(2).click()
   await expect(page.locator(`${WF} .WeekField-native`)).toHaveValue(iso)
@@ -180,7 +180,7 @@ test('selected week row is highlighted end-to-end when reopened', async ({ page 
   await page.keyboard.press('Enter')
   // Reopen — the selected week's row carries data-selected.
   await page.locator(`${WF} .WeekField-trigger`).click()
-  await expect(page.locator(`.WeekGrid tbody tr[data-week="${iso}"]`)).toHaveAttribute('data-selected', '')
+  await expect(page.locator(`.WeekGrid tbody tr[data-week="${iso}"]`)).toHaveAttribute('data-selected', 'true')
 })
 
 // ── ISO week-year boundary ──────────────────────────────────────────────────────
@@ -233,7 +233,7 @@ test('"Clear" button empties the native value', async ({ page }) => {
 // ── Disabled ────────────────────────────────────────────────────────────────────
 
 test('disabled field trigger is disabled', async ({ page }) => {
-  const disabledTrigger = page.locator('.WeekField[data-disabled] .WeekField-trigger').first()
+  const disabledTrigger = page.locator('.WeekField[data-disabled="true"] .WeekField-trigger').first()
   if (await disabledTrigger.count() > 0) {
     await expect(disabledTrigger).toBeDisabled()
   }

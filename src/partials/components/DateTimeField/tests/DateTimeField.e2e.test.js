@@ -11,7 +11,7 @@ const ROOT = targetId('DateTimeField')
 test.beforeEach(async ({ page }) => {
   await page.goto(targetPath())
   await page.locator(ROOT).scrollIntoViewIfNeeded()
-  await page.locator(`${ROOT}[data-initialized]`).waitFor()
+  await page.locator(`${ROOT}[data-initialized="true"]`).waitFor()
   await injectAxe(page)
 })
 
@@ -110,7 +110,7 @@ test('Escape closes the calendar and restores focus to trigger', async ({ page }
 
 test('clicking a date closes the popup and updates segments', async ({ page }) => {
   await page.locator(`${ROOT} .DateTimeField-trigger`).click()
-  const dateBtn = page.locator(`${ROOT} .DateTimeField-popup td:not([data-outside-month]):not([aria-disabled]) button`).first()
+  const dateBtn = page.locator(`${ROOT} .DateTimeField-popup td:not([data-outside-month="true"]):not([aria-disabled]) button`).first()
   await dateBtn.click({ force: true })
   // Date segments should now be filled
   const daySeg = page.locator(`${ROOT} .Segment[data-segment="day"]`)
@@ -194,7 +194,7 @@ test('clear button empties all segments', async ({ page }) => {
 
 test('ArrowRight moves focus to next day', async ({ page }) => {
   await page.locator(`${ROOT} .DateTimeField-trigger`).click()
-  const firstBtn = page.locator(`${ROOT} .DateTimeField-popup td:not([data-outside-month]):not([aria-disabled]) button`).first()
+  const firstBtn = page.locator(`${ROOT} .DateTimeField-popup td:not([data-outside-month="true"]):not([aria-disabled]) button`).first()
   await firstBtn.focus()
   const firstDate = await firstBtn.getAttribute('data-date')
   await page.keyboard.press('ArrowRight')
@@ -204,7 +204,7 @@ test('ArrowRight moves focus to next day', async ({ page }) => {
 
 test('PageDown navigates to next month', async ({ page }) => {
   await page.locator(`${ROOT} .DateTimeField-trigger`).click()
-  const firstBtn = page.locator(`${ROOT} .DateTimeField-popup td:not([data-outside-month]):not([aria-disabled]) button`).first()
+  const firstBtn = page.locator(`${ROOT} .DateTimeField-popup td:not([data-outside-month="true"]):not([aria-disabled]) button`).first()
   await firstBtn.focus()
   const before = await page.locator(`${ROOT} .CalendarMonthYear`).textContent()
   await page.keyboard.press('PageDown')
@@ -306,7 +306,7 @@ test('Tab from a focused grid day exits the grid as one composite stop (→ time
   await expect(page.locator(`${ROOT} .DateTimeField-popup`)).toBeVisible()
   // Focus the grid's roving day cell. Tab must leave the grid (WAI-ARIA grid is
   // ONE tab stop) and land on the first time wheel, not the adjacent day.
-  const day = page.locator(`${ROOT} .DateTimeField-popup .CalendarGrid td:not([data-outside-month]):not([aria-disabled]) button[tabindex="0"]`)
+  const day = page.locator(`${ROOT} .DateTimeField-popup .CalendarGrid td:not([data-outside-month="true"]):not([aria-disabled]) button[tabindex="0"]`)
   await day.focus()
   await page.keyboard.press('Tab')
   const landedOnDay = await page.evaluate((rootSel) => {

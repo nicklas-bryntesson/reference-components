@@ -96,12 +96,12 @@ const states: StateDefinition[] = [
   { file: '_filled-active', id: 'wf-filled-active',  label: 'Vecka', root: { 'data-value': '2026-W27', 'data-test-state': 'active' }, input: { value: '2026-W27' }, trigger: {} },
 
   // ── Disabled ────────────────────────────────────────────────────────────────
-  { file: '_disabled-empty',  id: 'wf-disabled-empty',  label: 'Vecka', root: { 'data-disabled': '' }, input: { disabled: '' }, trigger: { disabled: '' } },
-  { file: '_disabled-filled', id: 'wf-disabled-filled', label: 'Vecka', root: { 'data-disabled': '', 'data-value': '2026-W27' }, input: { value: '2026-W27', disabled: '' }, trigger: { disabled: '' } },
+  { file: '_disabled-empty',  id: 'wf-disabled-empty',  label: 'Vecka', root: { 'data-disabled': 'true' }, input: { disabled: '' }, trigger: { disabled: '' } },
+  { file: '_disabled-filled', id: 'wf-disabled-filled', label: 'Vecka', root: { 'data-disabled': 'true', 'data-value': '2026-W27' }, input: { value: '2026-W27', disabled: '' }, trigger: { disabled: '' } },
 
   // ── Invalid ─────────────────────────────────────────────────────────────────
-  { file: '_invalid-empty',  id: 'wf-invalid-empty',  label: 'Vecka <span aria-hidden="true">*</span>', root: { 'data-invalid': '' }, input: { required: '', 'aria-invalid': 'true' }, trigger: {} },
-  { file: '_invalid-filled', id: 'wf-invalid-filled', label: 'Vecka',                                   root: { 'data-invalid': '', 'data-value': '2020-W01' }, input: { value: '2020-W01', 'aria-invalid': 'true' }, trigger: {} },
+  { file: '_invalid-empty',  id: 'wf-invalid-empty',  label: 'Vecka <span aria-hidden="true">*</span>', root: { 'data-invalid': 'true' }, input: { required: '', 'aria-invalid': 'true' }, trigger: {} },
+  { file: '_invalid-filled', id: 'wf-invalid-filled', label: 'Vecka',                                   root: { 'data-invalid': 'true', 'data-value': '2020-W01' }, input: { value: '2020-W01', 'aria-invalid': 'true' }, trigger: {} },
 
   // ── With min/max range ───────────────────────────────────────────────────────
   { file: '_with-range', id: 'wf-with-range', label: 'Vecka', root: { 'data-min': '2026-W10', 'data-max': '2026-W40', 'data-value': '2026-W27' }, input: { value: '2026-W27', min: '2026-W10', max: '2026-W40' }, trigger: {} },

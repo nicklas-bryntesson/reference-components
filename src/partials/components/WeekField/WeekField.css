@@ -36,7 +36,7 @@
     display: none;
   }
 
-  &[data-disabled] {
+  &[data-disabled="true"] {
     opacity: 0.5;
     pointer-events: none;
   }
@@ -109,12 +109,12 @@
       min-inline-size: 4ch;
     }
 
-    &[data-focused] {
+    &[data-focused="true"] {
       background-color: var(--SITE--POPOVER--ACCENT);
       color: var(--SITE--POPOVER--ACCENT-TEXT);
     }
 
-    &[data-placeholder] {
+    &[data-placeholder="true"] {
       color: var(--wf-color-muted);
     }
   }
@@ -136,7 +136,7 @@
     outline-offset: 1px;
   }
 
-  &[data-invalid] .WeekField-overlay {
+  &[data-invalid="true"] .WeekField-overlay {
     border-color: var(--wf-border-color-invalid);
   }
 
@@ -173,7 +173,7 @@
   }
 
   /* ── Initialisation gate ─────────────────────────────────────────────────── */
-  &[data-initialized] {
+  &[data-initialized="true"] {
     overflow: visible;
   }
 
@@ -267,12 +267,12 @@
       border-inline-end: 1px solid var(--wf-popup-border-color);
     }
 
-    & td[data-today] {
+    & td[data-today="true"] {
       font-weight: bold;
       text-decoration: underline;
     }
 
-    & td[data-outside-month] {
+    & td[data-outside-month="true"] {
       color: var(--wf-popup-color-muted);
     }
 
@@ -289,16 +289,16 @@
       }
     }
 
-    & tbody tr[data-preview] td:not(.WeekNumCell) {
+    & tbody tr[data-preview="true"] td:not(.WeekNumCell) {
       background-color: var(--wf-bg-hover);
     }
 
-    & tbody tr[data-selected] td {
+    & tbody tr[data-selected="true"] td {
       background-color: var(--wf-option-bg-selected);
       color: var(--wf-option-color-selected);
     }
 
-    & tbody tr[data-disabled] {
+    & tbody tr[data-disabled="true"] {
       cursor: not-allowed;
 
       & td {

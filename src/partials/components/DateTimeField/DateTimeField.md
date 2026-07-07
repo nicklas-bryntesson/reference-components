@@ -78,8 +78,8 @@ not a listbox popup).
 | `data-locale` | BCP 47 | Controls segment order and 12h/24h |
 | `data-min` | `YYYY-MM-DDTHH:mm` | Constrains the calendar grid (day granularity) and the year segment/wheel range. Typed segment values are not clamped to it on write |
 | `data-max` | `YYYY-MM-DDTHH:mm` | Constrains the calendar grid (day granularity) and the year segment/wheel range. Typed segment values are not clamped to it on write |
-| `data-disabled` | boolean | Disables the component |
-| `data-invalid` | boolean | Marks field invalid, adds `aria-invalid` |
+| `data-disabled` | `"true"` | Disables the component |
+| `data-invalid` | `"true"` | Marks field invalid, adds `aria-invalid` |
 | `data-value` | `YYYY-MM-DDTHH:mm` | Initial value (server-render) |
 | `data-step` | number (seconds) | Shows second segment when < 60 |
 
@@ -87,8 +87,8 @@ not a listbox popup).
 
 | Attribute | Set when |
 |---|---|
-| `data-initialized` | Component mounted |
-| `data-open` | Popup is open |
+| `data-initialized="true"` | Component mounted |
+| `data-open="true"` | Popup is open |
 | `data-input-mode` | `"custom"` or `"display"` — chosen at init via `matchMedia('(pointer: coarse)')` |
 | `data-direction` | `"top"` or `"bottom"` — which side of the trigger the popup opens on |
 

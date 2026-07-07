@@ -197,12 +197,12 @@ class DateField {
       : false
     if (coarse) {
       this._initDisplay()
-      this.root.setAttribute('data-initialized', '')
+      this.root.setAttribute('data-initialized', 'true')
       return
     }
     this._initInteractive()
     window.addEventListener('resize', this._handleResize)
-    this.root.setAttribute('data-initialized', '')
+    this.root.setAttribute('data-initialized', 'true')
   }
 
   _initInteractive(): void {
@@ -220,7 +220,7 @@ class DateField {
     }
     this.segments.setAttribute('aria-roledescription', this.t.dateField)
 
-    if (this.native.disabled) this.root.dataset.disabled = ''
+    if (this.native.disabled) this.root.dataset.disabled = 'true'
     this._buildSegments()
     this._bindSegmentEvents()
     this._bindTrigger()
@@ -268,7 +268,7 @@ class DateField {
     span.setAttribute('role', 'spinbutton')
     span.setAttribute('aria-label', this.t[type] || type)
     span.setAttribute('data-segment', type)
-    span.setAttribute('data-placeholder', '')
+    span.setAttribute('data-placeholder', 'true')
     span.setAttribute('tabindex', '-1')
 
     const limits = this._getSegmentLimits(type)
@@ -328,7 +328,7 @@ class DateField {
 
   _initDisplay(): void {
     this.root.dataset.inputMode = 'display'
-    if (this.native.disabled) this.root.dataset.disabled = ''
+    if (this.native.disabled) this.root.dataset.disabled = 'true'
 
     this._buildSegments()
     this._segmentEls.forEach(seg => seg.setAttribute('tabindex', '-1'))
@@ -345,7 +345,7 @@ class DateField {
       s.removeAttribute('data-focused')
       s.setAttribute('tabindex', '-1')
     })
-    seg.setAttribute('data-focused', '')
+    seg.setAttribute('data-focused', 'true')
     seg.setAttribute('tabindex', '0')
   }
 
@@ -463,7 +463,7 @@ class DateField {
 
   _clearSegment(seg: HTMLSpanElement): void {
     const type = seg.dataset.segment as DateSegmentType
-    seg.setAttribute('data-placeholder', '')
+    seg.setAttribute('data-placeholder', 'true')
     seg.removeAttribute('aria-valuenow')
     const placeholder = type === 'day' ? 'dd' : type === 'month' ? 'mm' : 'yyyy'
     seg.setAttribute('aria-valuetext', placeholder)
@@ -929,11 +929,11 @@ class DateField {
     const isSelected = this.selectedDate != null && date.toDateString() === this.selectedDate.toDateString()
     const isDisabled = isDayDisabled(date, this.min, this.max)
 
-    if (isOutsideMonth) td.dataset.outsideMonth = ''
-    if (isToday) td.dataset.today = ''
-    if (isSelected) { td.dataset.selected = ''; td.setAttribute('aria-selected', 'true') }
+    if (isOutsideMonth) td.dataset.outsideMonth = 'true'
+    if (isToday) td.dataset.today = 'true'
+    if (isSelected) { td.dataset.selected = 'true'; td.setAttribute('aria-selected', 'true') }
     else td.setAttribute('aria-selected', 'false')
-    if (isDisabled) { td.dataset.disabled = ''; td.setAttribute('aria-disabled', 'true') }
+    if (isDisabled) { td.dataset.disabled = 'true'; td.setAttribute('aria-disabled', 'true') }
 
     const btn = document.createElement('button')
     btn.type = 'button'

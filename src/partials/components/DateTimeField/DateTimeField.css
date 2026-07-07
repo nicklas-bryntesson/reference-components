@@ -73,7 +73,7 @@
     pointer-events: none;
   }
 
-  &[data-disabled] {
+  &[data-disabled="true"] {
     opacity: 0.5;
     cursor: not-allowed;
 
@@ -96,12 +96,12 @@
     border-radius: 2px;
     cursor: default;
 
-    &[data-focused] {
+    &[data-focused="true"] {
       background-color: var(--SITE--POPOVER--ACCENT);
       color: var(--SITE--POPOVER--ACCENT-TEXT);
     }
 
-    &[data-placeholder] {
+    &[data-placeholder="true"] {
       color: var(--dtf-segments-color-muted);
     }
   }
@@ -123,7 +123,7 @@
     outline-offset: 1px;
   }
 
-  &[data-invalid] .DateTimeField-overlay {
+  &[data-invalid="true"] .DateTimeField-overlay {
     border-color: var(--dtf-segments-border-color-invalid);
   }
 
@@ -237,7 +237,7 @@
       }
     }
 
-    & td[data-today] button {
+    & td[data-today="true"] button {
       font-weight: bold;
     }
 
@@ -246,12 +246,12 @@
       color: var(--SITE--POPOVER--ACCENT-TEXT);
     }
 
-    & td[data-disabled] button {
+    & td[data-disabled="true"] button {
       color: var(--dtf-calendar-color-muted);
       cursor: not-allowed;
     }
 
-    & td[data-outside-month] button {
+    & td[data-outside-month="true"] button {
       color: var(--dtf-calendar-color-muted);
     }
   }
@@ -333,7 +333,7 @@
 }
 
 /* ── Initialisation gate ───────────────────────────────────────────────── */
-.DateTimeField[data-initialized] {
+.DateTimeField[data-initialized="true"] {
   overflow: visible;
 }
 

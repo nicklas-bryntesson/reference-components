@@ -99,12 +99,12 @@ const states: StateDefinition[] = [
   { file: '_filled-active', id: 'state-filled-active',  label: 'Datum', root: { 'data-test-state': 'active' }, input: { value: '1990-06-15' },           trigger: {} },
 
   // ── Disabled ────────────────────────────────────────────────────────────────
-  { file: '_disabled-empty',  id: 'state-disabled-empty',  label: 'Datum', root: { 'data-disabled': '' }, input: { disabled: '' },                    trigger: { disabled: '' } },
-  { file: '_disabled-filled', id: 'state-disabled-filled', label: 'Datum', root: { 'data-disabled': '' }, input: { value: '1990-06-15', disabled: '' }, trigger: { disabled: '' } },
+  { file: '_disabled-empty',  id: 'state-disabled-empty',  label: 'Datum', root: { 'data-disabled': 'true' }, input: { disabled: '' },                    trigger: { disabled: '' } },
+  { file: '_disabled-filled', id: 'state-disabled-filled', label: 'Datum', root: { 'data-disabled': 'true' }, input: { value: '1990-06-15', disabled: '' }, trigger: { disabled: '' } },
 
   // ── Invalid ─────────────────────────────────────────────────────────────────
-  { file: '_invalid-empty',  id: 'state-invalid-empty',  label: 'Datum <span aria-hidden="true">*</span>', root: { 'data-invalid': '' }, input: { required: '', 'aria-invalid': 'true' }, trigger: {} },
-  { file: '_invalid-filled', id: 'state-invalid-filled', label: 'Datum',                                   root: { 'data-invalid': '' }, input: { value: '1800-01-01', 'aria-invalid': 'true' }, trigger: {} },
+  { file: '_invalid-empty',  id: 'state-invalid-empty',  label: 'Datum <span aria-hidden="true">*</span>', root: { 'data-invalid': 'true' }, input: { required: '', 'aria-invalid': 'true' }, trigger: {} },
+  { file: '_invalid-filled', id: 'state-invalid-filled', label: 'Datum',                                   root: { 'data-invalid': 'true' }, input: { value: '1800-01-01', 'aria-invalid': 'true' }, trigger: {} },
 
   // ── Live demo (e2e test target) ──────────────────────────────────────────────
   { file: '_live', id: 'birthdate', label: 'Datum', root: {}, input: {}, trigger: {} },

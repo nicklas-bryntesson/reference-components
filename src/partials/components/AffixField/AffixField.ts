@@ -81,7 +81,7 @@ class AffixField {
     this._setAffixCounts()
     this._setInputChars()
     this._wireAria()
-    this.root.setAttribute('data-initialized', '')
+    this.root.setAttribute('data-initialized', 'true')
   }
 
   // A count property counts as authored when it is set inline on the root

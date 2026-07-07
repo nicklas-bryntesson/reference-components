@@ -103,12 +103,12 @@ const states: StateDefinition[] = [
   { file: '_filled-active', id: 'af-filled-active',  label: 'Belopp', root: { 'data-test-state': 'active' }, input: { ...decimalInput, value: '100' }, ...money },
 
   // ── Disabled (author sets data-disabled on root AND disabled on the input) ──
-  { file: '_disabled-empty',  id: 'af-disabled-empty',  label: 'Belopp', root: { 'data-disabled': '' }, input: { ...decimalInput, disabled: '' }, ...money },
-  { file: '_disabled-filled', id: 'af-disabled-filled', label: 'Belopp', root: { 'data-disabled': '' }, input: { ...decimalInput, value: '100', disabled: '' }, ...money },
+  { file: '_disabled-empty',  id: 'af-disabled-empty',  label: 'Belopp', root: { 'data-disabled': 'true' }, input: { ...decimalInput, disabled: '' }, ...money },
+  { file: '_disabled-filled', id: 'af-disabled-filled', label: 'Belopp', root: { 'data-disabled': 'true' }, input: { ...decimalInput, value: '100', disabled: '' }, ...money },
 
   // ── Invalid (author sets data-invalid on root AND aria-invalid on the input) ─
-  { file: '_invalid-empty',  id: 'af-invalid-empty',  label: 'Belopp <span aria-hidden="true">*</span>', root: { 'data-invalid': '' }, input: { ...decimalInput, required: '', 'aria-invalid': 'true' }, ...money },
-  { file: '_invalid-filled', id: 'af-invalid-filled', label: 'Belopp', root: { 'data-invalid': '' }, input: { ...decimalInput, value: '-1', 'aria-invalid': 'true' }, ...money },
+  { file: '_invalid-empty',  id: 'af-invalid-empty',  label: 'Belopp <span aria-hidden="true">*</span>', root: { 'data-invalid': 'true' }, input: { ...decimalInput, required: '', 'aria-invalid': 'true' }, ...money },
+  { file: '_invalid-filled', id: 'af-invalid-filled', label: 'Belopp', root: { 'data-invalid': 'true' }, input: { ...decimalInput, value: '-1', 'aria-invalid': 'true' }, ...money },
 
   // ── Variants — the spec's 6-example matrix ──────────────────────────────────
 
