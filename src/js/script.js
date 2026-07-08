@@ -5,6 +5,7 @@ import TimeField from "../partials/components/TimeField/TimeField.ts";
 import MonthField from "../partials/components/MonthField/MonthField.ts";
 import WeekField from "../partials/components/WeekField/WeekField.ts";
 import AffixField from "../partials/components/AffixField/AffixField.ts";
+import MotionRegion from "../partials/components/MotionRegion/MotionRegion.ts";
 
 import "../partials/components/ToggleTip/ToggleTip";
 
@@ -20,5 +21,6 @@ TimeField.attach();
 MonthField.attach();
 WeekField.attach();
 AffixField.attach();
+MotionRegion.attach();
 
 import('./debug-panel.js').then(({ init }) => init());
