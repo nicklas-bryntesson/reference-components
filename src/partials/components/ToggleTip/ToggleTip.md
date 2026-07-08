@@ -153,12 +153,5 @@ No CSS kernel dependency. The site tokens this component reads (`--SITE--PADDING
 **Popover clipping in overflow ancestors.** The popup is positioned in normal flow, so a scroll
 container — or a scrolling table cell — around this component clips it. The escape (top layer via
 the Popover API, or a portal) and its feature-detection are the consuming project's layer: see
-[`popup-position`](../../../kernel/js/popup-position.md#known-limitations) and
-[ADR-0012](../../../../docs/adr/0012-popover-clipping-is-a-documented-limitation.md). (This is
+[`popup-position`](../../../kernel/js/popup-position.md#known-limitations). (This is
 *ancestor* clipping; the component does not clip its own popup.)
-
-## Decision record
-
-The *why* behind this component's cross-cutting choices lives in [`docs/adr/`](../../../../docs/adr/README.md):
-
-- [ADR-0007](../../../../docs/adr/0007-popover-light-dismiss-never-refocuses-trigger.md) — light-dismiss closes without refocusing the trigger; Escape refocuses

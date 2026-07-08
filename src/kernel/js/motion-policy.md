@@ -1,12 +1,12 @@
 # motion-policy (kernel / pure logic)
 
 Whether decorative motion in a region should run **right now**, given the environment and
-the user's intent. The pure heart of the `MotionRegion` component (ADR-0010), extracted so
+the user's intent. The pure heart of the `MotionRegion` component, extracted so
 the governance is specified once and unit-tested exhaustively — never re-derived (and
 drifted) per motion backend.
 
 No DOM, no browser globals. The component reads the live signals from the platform and
-projects the result onto the region root as `data-motion` (ADR-0002); each backend obeys
+projects the result onto the region root as `data-motion`; each backend obeys
 that attribute in its own idiom.
 
 ## The three tiers (why this isn't a flat blocker list)
@@ -63,7 +63,7 @@ interface MotionIntent {
   4. `autostart` → `running` (opted in, no cost blocker; visibility already cleared at step 2).
   5. otherwise → `paused`.
 - **Intent is owned by the component**, never recovered from a DOM event. (The source stashed
-  intent before `.pause()` and read it back in the handler; ADR-0010 designs that away.)
+  intent before `.pause()` and read it back in the handler; the controller owns intent instead.)
 
 ## Conformance
 
@@ -75,5 +75,5 @@ got wrong). Pure functions → no jsdom needed.
 
 ## Consumed by
 
-`MotionRegion` (ADR-0010). The component's e2e suite proves the live browser signals reach
+`MotionRegion`. The component's e2e suite proves the live browser signals reach
 these functions and the DOM reflects the result (`data-motion`).

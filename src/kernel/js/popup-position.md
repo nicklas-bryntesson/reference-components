@@ -43,7 +43,7 @@ family). The escape is to render the popup in the **top layer** (the Popover API
 escape, and the feature-detection / browser-baseline policy around it, is the **consuming
 project's** call (it differs per stack: Tailwind `supports-[…]`, a React conditional, a plain
 `@supports`). This module keeps the maths portable and documents the limit; it does not bake
-in a top-layer strategy. See [ADR-0012](../../../docs/adr/0012-popover-clipping-is-a-documented-limitation.md).
+in a top-layer strategy.
 
 ## Conformance
 
