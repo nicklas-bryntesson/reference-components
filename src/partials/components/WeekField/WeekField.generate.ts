@@ -32,13 +32,13 @@ function canonical(id: string, label: string, rootAttrs: string, inputAttrs: str
   data-component="WeekField"
   data-id="${id}"
   data-name="${id}"
-  data-locale="sv-SE"${rootExtra}
+  data-locale="en-GB"${rootExtra}
 >
   <input class="WeekField-native" type="week" aria-hidden="true" tabindex="-1"${inputAttrs} />
   <div class="WeekField-overlay" aria-hidden="true">
     <div class="WeekField-segments" role="group">
     </div>
-    <button type="button" class="WeekField-trigger" aria-label="Öppna veckoväljare" aria-expanded="false" aria-haspopup="dialog"${triggerAttrs}>
+    <button type="button" class="WeekField-trigger" aria-label="Open week picker" aria-expanded="false" aria-haspopup="dialog"${triggerAttrs}>
       <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar-icon lucide-calendar"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>
     </button>
     <div class="slideContainer">
@@ -84,30 +84,30 @@ function attrs(obj: Attrs): string {
 
 const states: StateDefinition[] = [
   // ── Interaction states — empty ──────────────────────────────────────────────
-  { file: '_empty',        id: 'wf-empty-default', label: 'Vecka', root: {},                              input: {}, trigger: {} },
-  { file: '_empty-hover',  id: 'wf-empty-hover',   label: 'Vecka', root: { 'data-test-state': 'hover'  }, input: {}, trigger: {} },
-  { file: '_empty-focus',  id: 'wf-empty-focus',   label: 'Vecka', root: { 'data-test-state': 'focus'  }, input: {}, trigger: {} },
-  { file: '_empty-active', id: 'wf-empty-active',  label: 'Vecka', root: { 'data-test-state': 'active' }, input: {}, trigger: {} },
+  { file: '_empty',        id: 'wf-empty-default', label: 'Week', root: {},                              input: {}, trigger: {} },
+  { file: '_empty-hover',  id: 'wf-empty-hover',   label: 'Week', root: { 'data-test-state': 'hover'  }, input: {}, trigger: {} },
+  { file: '_empty-focus',  id: 'wf-empty-focus',   label: 'Week', root: { 'data-test-state': 'focus'  }, input: {}, trigger: {} },
+  { file: '_empty-active', id: 'wf-empty-active',  label: 'Week', root: { 'data-test-state': 'active' }, input: {}, trigger: {} },
 
   // ── Interaction states — filled ─────────────────────────────────────────────
-  { file: '_filled',        id: 'wf-filled-default', label: 'Vecka', root: { 'data-value': '2026-W27' },                              input: { value: '2026-W27' }, trigger: {} },
-  { file: '_filled-hover',  id: 'wf-filled-hover',   label: 'Vecka', root: { 'data-value': '2026-W27', 'data-test-state': 'hover'  }, input: { value: '2026-W27' }, trigger: {} },
-  { file: '_filled-focus',  id: 'wf-filled-focus',   label: 'Vecka', root: { 'data-value': '2026-W27', 'data-test-state': 'focus'  }, input: { value: '2026-W27' }, trigger: {} },
-  { file: '_filled-active', id: 'wf-filled-active',  label: 'Vecka', root: { 'data-value': '2026-W27', 'data-test-state': 'active' }, input: { value: '2026-W27' }, trigger: {} },
+  { file: '_filled',        id: 'wf-filled-default', label: 'Week', root: { 'data-value': '2026-W27' },                              input: { value: '2026-W27' }, trigger: {} },
+  { file: '_filled-hover',  id: 'wf-filled-hover',   label: 'Week', root: { 'data-value': '2026-W27', 'data-test-state': 'hover'  }, input: { value: '2026-W27' }, trigger: {} },
+  { file: '_filled-focus',  id: 'wf-filled-focus',   label: 'Week', root: { 'data-value': '2026-W27', 'data-test-state': 'focus'  }, input: { value: '2026-W27' }, trigger: {} },
+  { file: '_filled-active', id: 'wf-filled-active',  label: 'Week', root: { 'data-value': '2026-W27', 'data-test-state': 'active' }, input: { value: '2026-W27' }, trigger: {} },
 
   // ── Disabled ────────────────────────────────────────────────────────────────
-  { file: '_disabled-empty',  id: 'wf-disabled-empty',  label: 'Vecka', root: { 'data-disabled': 'true' }, input: { disabled: '' }, trigger: { disabled: '' } },
-  { file: '_disabled-filled', id: 'wf-disabled-filled', label: 'Vecka', root: { 'data-disabled': 'true', 'data-value': '2026-W27' }, input: { value: '2026-W27', disabled: '' }, trigger: { disabled: '' } },
+  { file: '_disabled-empty',  id: 'wf-disabled-empty',  label: 'Week', root: { 'data-disabled': 'true' }, input: { disabled: '' }, trigger: { disabled: '' } },
+  { file: '_disabled-filled', id: 'wf-disabled-filled', label: 'Week', root: { 'data-disabled': 'true', 'data-value': '2026-W27' }, input: { value: '2026-W27', disabled: '' }, trigger: { disabled: '' } },
 
   // ── Invalid ─────────────────────────────────────────────────────────────────
-  { file: '_invalid-empty',  id: 'wf-invalid-empty',  label: 'Vecka <span aria-hidden="true">*</span>', root: { 'data-invalid': 'true' }, input: { required: '', 'aria-invalid': 'true' }, trigger: {} },
-  { file: '_invalid-filled', id: 'wf-invalid-filled', label: 'Vecka',                                   root: { 'data-invalid': 'true', 'data-value': '2020-W01' }, input: { value: '2020-W01', 'aria-invalid': 'true' }, trigger: {} },
+  { file: '_invalid-empty',  id: 'wf-invalid-empty',  label: 'Week <span aria-hidden="true">*</span>', root: { 'data-invalid': 'true' }, input: { required: '', 'aria-invalid': 'true' }, trigger: {} },
+  { file: '_invalid-filled', id: 'wf-invalid-filled', label: 'Week',                                   root: { 'data-invalid': 'true', 'data-value': '2020-W01' }, input: { value: '2020-W01', 'aria-invalid': 'true' }, trigger: {} },
 
   // ── With min/max range ───────────────────────────────────────────────────────
-  { file: '_with-range', id: 'wf-with-range', label: 'Vecka', root: { 'data-min': '2026-W10', 'data-max': '2026-W40', 'data-value': '2026-W27' }, input: { value: '2026-W27', min: '2026-W10', max: '2026-W40' }, trigger: {} },
+  { file: '_with-range', id: 'wf-with-range', label: 'Week', root: { 'data-min': '2026-W10', 'data-max': '2026-W40', 'data-value': '2026-W27' }, input: { value: '2026-W27', min: '2026-W10', max: '2026-W40' }, trigger: {} },
 
   // ── Live demo (e2e test target) ──────────────────────────────────────────────
-  { file: '_live', id: 'meeting-week', label: 'Mötesvecka', root: {}, input: {}, trigger: {} },
+  { file: '_live', id: 'meeting-week', label: 'Meeting week', root: {}, input: {}, trigger: {} },
 ]
 
 // ─── Generate ─────────────────────────────────────────────────────────────────
@@ -127,11 +127,11 @@ for (const state of states) {
 // Native reference partials (no WeekField wrapper)
 writeFileSync(
   out('_native-default.hbs'),
-  '<label for="wf-native-default">Vecka</label>\n<input type="week" id="wf-native-default" name="wf-native-default" />\n'
+  '<label for="wf-native-default">Week</label>\n<input type="week" id="wf-native-default" name="wf-native-default" />\n'
 )
 writeFileSync(
   out('_native-disabled.hbs'),
-  '<label for="wf-native-disabled">Vecka</label>\n<input type="week" id="wf-native-disabled" name="wf-native-disabled" value="2026-W27" disabled />\n'
+  '<label for="wf-native-disabled">Week</label>\n<input type="week" id="wf-native-disabled" name="wf-native-disabled" value="2026-W27" disabled />\n'
 )
 
 console.log('  _native-default.hbs')

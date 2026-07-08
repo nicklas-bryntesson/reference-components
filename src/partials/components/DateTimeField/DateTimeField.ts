@@ -122,6 +122,7 @@ export class DateTimeField {
   instanceId: number
   fieldId: string
   locale: string
+  localeTag: string
   t: TranslationStrings
   min: Date | null
   max: Date | null
@@ -176,6 +177,9 @@ export class DateTimeField {
     this.currentYear = new Date().getFullYear()
     this.currentMonth = new Date().getMonth()
     this.fieldId = ''
+    // Raw tag drives Intl format (hour cycle + segment order); the collapsed key
+    // only picks the UI-string translations (en-GB → 'en' strings, but 24h D/M/Y).
+    this.localeTag = readLocale(this.root)
     this.locale = this._resolveLocale()
     this.t = DateTimeField.translations[this.locale] ?? DateTimeField.translations['en']
 
@@ -210,7 +214,7 @@ export class DateTimeField {
   }
 
   _is12h(): boolean {
-    return new Intl.DateTimeFormat(this.locale, { hour: 'numeric' }).resolvedOptions().hour12 ?? false
+    return new Intl.DateTimeFormat(this.localeTag, { hour: 'numeric' }).resolvedOptions().hour12 ?? false
   }
 
   _showSeconds(): boolean {
@@ -379,7 +383,7 @@ export class DateTimeField {
     this.segments.innerHTML = ''
     this._segmentEls = []
 
-    const { order, separator } = getSegmentOrder(this.locale)
+    const { order, separator } = getSegmentOrder(this.localeTag)
 
     // Date segments (locale-ordered)
     order.forEach((type, i) => {

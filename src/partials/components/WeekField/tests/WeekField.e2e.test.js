@@ -94,7 +94,7 @@ test('popup has role=dialog and aria-modal=true', async ({ page }) => {
 
 test('popup has localized aria-label', async ({ page }) => {
   await page.locator(`${WF} .WeekField-trigger`).click()
-  await expect(page.locator('.WeekField-popup')).toHaveAttribute('aria-label', 'Välj vecka')
+  await expect(page.locator('.WeekField-popup')).toHaveAttribute('aria-label', 'Choose week')
 })
 
 test('week grid has role=grid with a week-number column', async ({ page }) => {
@@ -111,7 +111,7 @@ test('week rows are selectable rows with an aria-label naming the week', async (
   const firstRow = page.locator('.WeekGrid tbody tr').first()
   await expect(firstRow).toHaveAttribute('role', 'row')
   await expect(firstRow).toHaveAttribute('data-week', /^\d{4}-W\d{2}$/)
-  await expect(firstRow).toHaveAttribute('aria-label', /Vecka \d+/)
+  await expect(firstRow).toHaveAttribute('aria-label', /Week \d+/)
 })
 
 // ── Keyboard: segment interaction ─────────────────────────────────────────────

@@ -94,7 +94,7 @@ test('popup has role=dialog and aria-modal=true', async ({ page }) => {
 
 test('popup has localized aria-label', async ({ page }) => {
   await page.locator(`${MF} .MonthField-trigger`).click()
-  await expect(page.locator('.MonthField-popup')).toHaveAttribute('aria-label', 'Välj månad')
+  await expect(page.locator('.MonthField-popup')).toHaveAttribute('aria-label', 'Choose month')
 })
 
 test('popup month column has role=spinbutton with 0–11 bounds', async ({ page }) => {

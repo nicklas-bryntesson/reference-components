@@ -134,8 +134,12 @@ class TimeField {
     this.announce = el.querySelector<HTMLElement>('.TimeField-announce')!
 
     this.fieldId = el.dataset.id ?? `timefield-${this.instanceId}`
-    this.locale = resolveLocale(readLocale(el), TimeField.translations)
-    this.is12h = is12hLocale(this.locale)
+    // The translation key collapses region variants to a base language ('en-GB'
+    // → 'en'), but the hour cycle is region-specific (en-GB is 24h, en-US 12h) —
+    // so derive it from the raw locale tag, not the collapsed translation key.
+    const localeTag = readLocale(el)
+    this.locale = resolveLocale(localeTag, TimeField.translations)
+    this.is12h = is12hLocale(localeTag)
     const step = parseInt(el.dataset.step ?? '60', 10)
     this.showSeconds = step < 60
 

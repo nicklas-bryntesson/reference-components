@@ -96,6 +96,7 @@ class DateField {
   instanceId: number
   fieldId: string
   locale: string
+  localeTag: string
   t: TranslationStrings
   min: Date | null
   max: Date | null
@@ -167,6 +168,9 @@ class DateField {
     this.min = el.dataset.min ? this._parseDate(el.dataset.min) : null
     this.max = el.dataset.max ? this._parseDate(el.dataset.max) : null
 
+    // Raw tag drives Intl format (segment order: en-GB is D/M/Y, en-US M/D/Y);
+    // the collapsed key only picks the UI-string translations.
+    this.localeTag = readLocale(this.root)
     this.locale = this._resolveLocale()
     this.t = DateField.translations[this.locale] ?? DateField.translations['en']
 
@@ -285,7 +289,7 @@ class DateField {
   _buildSegments(): void {
     this.segments.querySelectorAll('.Segment, .Separator').forEach(el => el.remove())
 
-    const { order, separator } = getSegmentOrder(this.locale)
+    const { order, separator } = getSegmentOrder(this.localeTag)
 
     order.forEach((type, i) => {
       this.trigger.before(this._createSegmentEl(type))

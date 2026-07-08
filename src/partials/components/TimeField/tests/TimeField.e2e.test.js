@@ -108,7 +108,7 @@ test('popup has role=dialog and aria-modal=true', async ({ page }) => {
 test('popup has aria-label', async ({ page }) => {
   await page.locator(`${TF} .TimeField-trigger`).click()
   const popup = page.locator('.TimeField-popup')
-  await expect(popup).toHaveAttribute('aria-label', 'Välj tid')
+  await expect(popup).toHaveAttribute('aria-label', 'Choose time')
 })
 
 test('popup hour column has role=spinbutton', async ({ page }) => {
@@ -157,7 +157,7 @@ test('ArrowDown on hour segment sets a value', async ({ page }) => {
 // ── Keyboard: Tab focus order ──────────────────────────────────────────────────
 
 test('Tab from last segment moves focus to trigger', async ({ page }) => {
-  // Focus the minute segment (last in default 24h sv-SE without seconds)
+  // Focus the minute segment (last in default 24h en-GB without seconds)
   const minute = page.locator(`${TF} [data-segment="minute"]`)
   await minute.focus()
   await page.keyboard.press('Tab')
