@@ -60,6 +60,7 @@ Components are built against [atomica11y](https://www.atomica11y.com) acceptance
 | AffixField | Reference implementation + full test suite |
 | FileUpload | Reference implementation + full test suite |
 | ToggleTip | Reference implementation + full test suite |
+| MotionRegion | Reference implementation + full test suite |
 | Combobox | Parked legacy reference |
 | TabAccordion | Parked legacy reference — rebuild planned |
 

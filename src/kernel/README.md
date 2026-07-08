@@ -21,6 +21,7 @@ just hygiene. This folder makes that coupling **explicit** instead of hidden beh
 | [`utils/dates.ts`](utils/dates.md) | pure functions | `utils/tests/dates.unit.test.ts` | DateField, DateTimeField, MonthField, WeekField |
 | [`utils/locale.ts`](utils/locale.md) | pure functions | (covered via component tests) | DateField, DateTimeField, TimeField, MonthField, WeekField |
 | [`css/Wheel.css`](css/Wheel.md) | CSS primitive | visual/axe **deferred** (paired with WheelColumn) | DateField, DateTimeField, TimeField, MonthField |
+| [`js/motion-policy.ts`](js/motion-policy.md) | pure functions | `js/tests/motion-policy.unit.test.ts` | MotionRegion |
 
 The kernel modules have **zero dependencies on each other** — each can be ported independently.
 The pure-function modules (`popup-position`, `dates`, `locale`) are black-box-portable: port the

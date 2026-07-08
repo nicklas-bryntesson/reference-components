@@ -1,6 +1,6 @@
 # ADR 0010: A decorative motion region governed by a `motion-policy` kernel
 
-**Status:** Proposed
+**Status:** Accepted
 **Date:** 2026-07-08
 **Decider:** Nicklas Bryntesson
 

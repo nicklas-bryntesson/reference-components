@@ -75,5 +75,5 @@ got wrong). Pure functions → no jsdom needed.
 
 ## Consumed by
 
-`MotionRegion` (proposed — ADR-0010). The component's e2e suite proves the live browser
-signals reach these functions and the DOM reflects the result (`data-motion`).
+`MotionRegion` (ADR-0010). The component's e2e suite proves the live browser signals reach
+these functions and the DOM reflects the result (`data-motion`).

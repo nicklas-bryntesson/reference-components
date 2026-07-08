@@ -141,6 +141,26 @@ is unit-tested and e2e only proves the wiring.
   governs motion, not arrangement.
 - Vanilla TS only; no framework code.
 
+## Manual accessibility testing
+
+Test with a real screenreader before shipping. The animated media is decorative
+(`role="presentation"`); the only interactive surface is the pause/play control. Source:
+`docs/atomica11y/main/` (decorative media) + button-control criteria.
+
+### Desktop screenreader (NVDA, JAWS, VoiceOver)
+
+- [ ] The animated media is NOT announced as content — no stray image/video node in the reading order
+- [ ] Tab reaches the control; it is announced as a button with a clear label ("Pause background animation" / "Play background animation")
+- [ ] Space/Enter toggles motion; the label updates to the next action and the state change is perceivable
+- [ ] With OS reduced-motion on, motion does not autostart; the control still starts it and is labelled "Play…"
+- [ ] The control's `aria-controls` points at the media it governs (video backend)
+
+### Mobile screenreader (VoiceOver iOS, TalkBack Android)
+
+- [ ] Swipe reaches the control and announces it as a button with the play/pause label
+- [ ] Double-tap toggles motion; the label updates
+- [ ] The decorative media is not a separate swipe stop that traps exploration
+
 ## Decision record
 
 The *why* — scope, the three-tier architecture, the naming, and the testability model — lives in
