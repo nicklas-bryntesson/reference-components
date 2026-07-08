@@ -7,21 +7,26 @@
 // (reducedMotion=false, visible=true, no connection) — deterministic here.
 // Real browser signals (reduced-motion, visibility, connection, preload) are
 // proven in the Playwright e2e suite, per ADR-0010's testability split.
-import { describe, it, expect, afterEach } from 'vitest'
+import { describe, it, expect, afterEach, beforeEach, vi } from 'vitest'
 import MotionRegion from '../MotionRegion'
 
 type MountedElement = HTMLElement & { __motionRegionInstance?: MotionRegion }
 
-function createRegion(attrs: Record<string, string> = {}): HTMLElement {
+function createRegion(attrs: Record<string, string> = {}, withVideo = false): HTMLElement {
   const el = document.createElement('div')
   el.className = 'MotionRegion'
   el.setAttribute('data-component', 'MotionRegion')
   for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v)
   const media = document.createElement('div')
   media.className = 'media-container'
+  if (withVideo) media.appendChild(document.createElement('video'))
   el.appendChild(media)
   document.body.appendChild(el)
   return el
+}
+
+function video(el: HTMLElement): HTMLVideoElement {
+  return el.querySelector('video')!
 }
 
 function control(el: HTMLElement): HTMLButtonElement | null {
@@ -110,6 +115,57 @@ describe('MotionRegion — user intent via the control', () => {
     btn.click() // pause
     btn.click() // play again
     expect(el.getAttribute('data-motion')).toBe('running')
+  })
+})
+
+describe('MotionRegion — video adapter', () => {
+  let playSpy: ReturnType<typeof vi.spyOn>
+  let pauseSpy: ReturnType<typeof vi.spyOn>
+
+  beforeEach(() => {
+    // jsdom does not implement media playback; spy on the API to assert the
+    // adapter drives it, and give play() a resolved promise to await.
+    playSpy = vi.spyOn(HTMLMediaElement.prototype, 'play').mockResolvedValue(undefined)
+    pauseSpy = vi.spyOn(HTMLMediaElement.prototype, 'pause').mockImplementation(() => {})
+  })
+
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
+  it('plays the video when motion resolves to running', () => {
+    createRegion({ 'data-autoplay': 'policy' }, true)
+    MotionRegion.attach(document.body)
+    expect(playSpy).toHaveBeenCalled()
+  })
+
+  it('does not play (no bytes load) when paused, and keeps preload="none"', () => {
+    const el = createRegion({ 'data-autoplay': 'off' }, true)
+    MotionRegion.attach(document.body)
+    expect(playSpy).not.toHaveBeenCalled()
+    expect(video(el).preload).toBe('none')
+  })
+
+  it('pauses the video when the user pauses', () => {
+    const el = createRegion({ 'data-autoplay': 'policy' }, true)
+    MotionRegion.attach(document.body)
+    el.querySelector<HTMLButtonElement>('button.MotionRegion-control')!.click()
+    expect(pauseSpy).toHaveBeenCalled()
+  })
+
+  it('enforces muted + playsinline for autoplay eligibility', () => {
+    const el = createRegion({ 'data-autoplay': 'policy' }, true)
+    MotionRegion.attach(document.body)
+    expect(video(el).muted).toBe(true)
+    expect(video(el).hasAttribute('playsinline')).toBe(true)
+  })
+
+  it('wires aria-controls from the control to the video id', () => {
+    const el = createRegion({ 'data-autoplay': 'policy' }, true)
+    MotionRegion.attach(document.body)
+    const v = video(el)
+    expect(v.id).toBeTruthy()
+    expect(el.querySelector('button.MotionRegion-control')!.getAttribute('aria-controls')).toBe(v.id)
   })
 })
 

@@ -35,6 +35,8 @@ const ICON_PATHS = {
 } as const
 
 export default class MotionRegion {
+  static instanceCount = 0
+
   root: HTMLElement
   autoplay: 'off' | 'policy'
   playLabel: string
@@ -45,6 +47,8 @@ export default class MotionRegion {
   visible = true
   state: MotionState = 'paused'
 
+  video: HTMLVideoElement | null = null
+  appliedVideoState: MotionState | null = null
   control: HTMLButtonElement | null = null
   iconPath: SVGPathElement | null = null
   reducedMotionQuery: MediaQueryList | null = null
@@ -73,16 +77,38 @@ export default class MotionRegion {
   }
 
   init(): void {
+    this.setupVideo()
     this.setupControl()
     this.setupSignals()
     this.resolve()
     this.root.setAttribute('data-initialized', 'true')
   }
 
+  // Prepare a video backend, if present, for governed autoplay. muted + playsinline
+  // are autoplay-eligibility requirements (browsers only autostart muted video);
+  // preload="none" is the performance gate — no media bytes load until the adapter
+  // actually calls play() (which only happens when motion resolves to running).
+  setupVideo(): void {
+    this.video = this.root.querySelector('video')
+    if (!this.video) return
+    this.video.muted = true
+    this.video.setAttribute('playsinline', '')
+    this.video.controls = false
+    this.video.preload = 'none'
+    this.ensureVideoId()
+  }
+
+  ensureVideoId(): void {
+    if (!this.video || this.video.id) return
+    MotionRegion.instanceCount += 1
+    this.video.id = `motion-region-video-${MotionRegion.instanceCount}`
+  }
+
   setupControl(): void {
     const control = document.createElement('button')
     control.type = 'button'
     control.className = 'MotionRegion-control'
+    if (this.video?.id) control.setAttribute('aria-controls', this.video.id)
 
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
     svg.setAttribute('aria-hidden', 'true')
@@ -137,6 +163,21 @@ export default class MotionRegion {
     this.state = resolveMotion(policy, { userPaused: this.userPaused, userStarted: this.userStarted })
     this.root.setAttribute('data-motion', this.state)
     this.updateControl()
+    this.driveVideo()
+  }
+
+  // The video adapter: map the resolved state onto the element's play/pause API.
+  // Guarded on the last-applied state so a redundant resolve() never fires
+  // overlapping play()/pause() calls (the "play() interrupted by pause()" warning).
+  driveVideo(): void {
+    if (!this.video || this.state === this.appliedVideoState) return
+    this.appliedVideoState = this.state
+    if (this.state === 'running') {
+      // play() rejects if the platform blocks autoplay; motion simply stays paused.
+      void Promise.resolve(this.video.play()).catch(() => {})
+    } else {
+      this.video.pause()
+    }
   }
 
   updateControl(): void {
@@ -179,6 +220,8 @@ export default class MotionRegion {
     this.control?.remove()
     this.control = null
     this.iconPath = null
+    this.video = null
+    this.appliedVideoState = null
     delete (this.root as MountedElement).__motionRegionInstance
   }
 }
