@@ -18,13 +18,14 @@ interface StateDefinition {
   root: Attrs
   input: Attrs
   trigger: Attrs
+  locale?: string
 }
 
 // ─── Canonical markup ─────────────────────────────────────────────────────────
 // Single source of truth for DateField HTML structure.
 // Update this function when the component markup changes, then re-run this script.
 
-function canonical(id: string, label: string, rootAttrs: string, inputAttrs: string, triggerAttrs: string): string {
+function canonical(id: string, label: string, rootAttrs: string, inputAttrs: string, triggerAttrs: string, locale = 'en-GB'): string {
   const rootExtra = rootAttrs ? `\n  ${rootAttrs.trim()}` : ''
   return `<label for="${id}">${label}</label>
 <div
@@ -32,7 +33,7 @@ function canonical(id: string, label: string, rootAttrs: string, inputAttrs: str
   data-component="DateField"
   data-id="${id}"
   data-name="${id}"
-  data-locale="en-GB"
+  data-locale="${locale}"
   data-min="1900-01-01"
   data-max="2100-12-31"${rootExtra}
 >
@@ -108,6 +109,11 @@ const states: StateDefinition[] = [
 
   // ── Live demo (e2e test target) ──────────────────────────────────────────────
   { file: '_live', id: 'birthdate', label: 'Date', root: {}, input: {}, trigger: {} },
+
+  // ── Localization showcase (ADR-0011): same field, three locales — segment order + language ──
+  { file: '_locale-en-gb', id: 'df-locale-en-gb', label: 'Date (en-GB — D/M/Y)', locale: 'en-GB', root: {}, input: { value: '1990-06-15' }, trigger: {} },
+  { file: '_locale-en-us', id: 'df-locale-en-us', label: 'Date (en-US — M/D/Y)', locale: 'en-US', root: {}, input: { value: '1990-06-15' }, trigger: {} },
+  { file: '_locale-sv-se', id: 'df-locale-sv-se', label: 'Date (sv-SE — Y/M/D)', locale: 'sv-SE', root: {}, input: { value: '1990-06-15' }, trigger: {} },
 ]
 
 // ─── Generate ─────────────────────────────────────────────────────────────────
@@ -119,6 +125,7 @@ for (const state of states) {
     attrs(state.root),
     attrs(state.input),
     attrs(state.trigger),
+    state.locale,
   )
   writeFileSync(out(`${state.file}.hbs`), content)
   console.log(`  ${state.file}.hbs`)

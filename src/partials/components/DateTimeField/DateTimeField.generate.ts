@@ -77,6 +77,8 @@ const states: { name: string; id: string; attrs: Record<string, string>; locale?
   { name: '_with-seconds', id: 'dtf-with-seconds', attrs: { 'data-step': '30', 'data-value': '2026-05-27T14:35:00' } },
   // 12-hour locale — shows the AM/PM toggle next to the wheels
   { name: '_twelve-hour', id: 'dtf-12h', attrs: { 'data-value': '2026-05-27T14:35' }, locale: 'en' },
+  // Localization showcase (ADR-0011): Swedish — 24h, Y/M/D order, Swedish names
+  { name: '_localized-sv', id: 'dtf-sv', attrs: { 'data-value': '2026-05-27T14:35' }, locale: 'sv-SE' },
   // Live demo (e2e test target) — unique id so the e2e can scope to a single instance on /
   { name: '_live-demo', id: 'meeting-time', attrs: {} },
 ]

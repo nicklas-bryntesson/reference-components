@@ -26,11 +26,20 @@ default locale is `en` (`translations[locale] ?? translations['en']`), with a re
 1. All *incidental* demo strings are English — AffixField labels/hints, hardcoded trigger
    labels, `<html lang>`, native-reference labels.
 2. Locale-aware components (the date/time family) default their kitchensink instances to
-   `data-locale="en"`, and **localization is demonstrated deliberately** via one explicit
-   `data-locale="sv-SE"` variant per component — not by making Swedish the default.
+   **`data-locale="en-GB"`** (English strings, 24h, D/M/Y), and **localization is
+   demonstrated deliberately** via a `Localization` kitchensink section on each component,
+   showing the axes that actually differ: **DateField** — segment order across en-GB
+   (D/M/Y) · en-US (M/D/Y) · sv-SE (Y/M/D); **TimeField** — hour cycle across en-GB (24h) ·
+   en-US (12h); **DateTimeField** — both axes (en-US 12h · sv-SE 24h/Y-M-D); **MonthField /
+   WeekField** — language across en-GB · sv-SE. Not by making one locale the silent default.
 3. The locale machinery is untouched: `en.json`, the bundled `sv` translations, and
    `data-locale` support all stay. Swedish remains a first-class *supported* locale; it is
    just no longer the *default demo*.
+4. **The drift surfaced a real i18n bug, fixed here:** the components derived the hour cycle
+   and date-segment order from the *collapsed* translation key (`en-GB` → `en`), so an en-GB
+   user wrongly got 12h + M/D/Y. Format is now derived from the **raw locale tag** (Intl),
+   while the collapsed key is used only for UI-string translations — so en-GB is correctly
+   24h D/M/Y. Guarded by a TimeField unit test.
 
 ## Considered alternatives
 

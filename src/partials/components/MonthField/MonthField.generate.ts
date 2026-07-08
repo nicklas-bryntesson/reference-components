@@ -18,13 +18,14 @@ interface StateDefinition {
   root: Attrs
   input: Attrs
   trigger: Attrs
+  locale?: string
 }
 
 // ─── Canonical markup ─────────────────────────────────────────────────────────
 // Single source of truth for MonthField HTML structure.
 // Update this function when the component markup changes, then re-run this script.
 
-function canonical(id: string, label: string, rootAttrs: string, inputAttrs: string, triggerAttrs: string): string {
+function canonical(id: string, label: string, rootAttrs: string, inputAttrs: string, triggerAttrs: string, locale = 'en-GB'): string {
   const rootExtra = rootAttrs ? `\n  ${rootAttrs.trim()}` : ''
   return `<label for="${id}">${label}</label>
 <div
@@ -32,7 +33,7 @@ function canonical(id: string, label: string, rootAttrs: string, inputAttrs: str
   data-component="MonthField"
   data-id="${id}"
   data-name="${id}"
-  data-locale="en-GB"${rootExtra}
+  data-locale="${locale}"${rootExtra}
 >
   <input class="MonthField-native" type="month" aria-hidden="true" tabindex="-1"${inputAttrs} />
   <div class="MonthField-overlay" aria-hidden="true">
@@ -98,6 +99,10 @@ const states: StateDefinition[] = [
 
   // ── Live demo (e2e test target) ──────────────────────────────────────────────
   { file: '_live', id: 'meeting-month', label: 'Meeting month', root: {}, input: {}, trigger: {} },
+
+  // ── Localization showcase (ADR-0011): month names + language ──
+  { file: '_locale-en-gb', id: 'mf-locale-en-gb', label: 'Month (en-GB)', locale: 'en-GB', root: { 'data-value': '2026-06' }, input: { value: '2026-06' }, trigger: {} },
+  { file: '_locale-sv-se', id: 'mf-locale-sv-se', label: 'Month (sv-SE)', locale: 'sv-SE', root: { 'data-value': '2026-06' }, input: { value: '2026-06' }, trigger: {} },
 ]
 
 // ─── Generate ─────────────────────────────────────────────────────────────────
@@ -109,6 +114,7 @@ for (const state of states) {
     attrs(state.root),
     attrs(state.input),
     attrs(state.trigger),
+    state.locale,
   )
   writeFileSync(out(`${state.file}.hbs`), content)
   console.log(`  ${state.file}.hbs`)

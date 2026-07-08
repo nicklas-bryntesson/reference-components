@@ -73,13 +73,17 @@
     </tbody>
   </table>
 
-  <!-- ─── 12-hour locale (AM/PM toggle) ──────────────────────────────────── -->
-  <h3>12-hour (en)</h3>
+  <!-- ─── Localization (ADR-0011): both axes — hour cycle + order + language ── -->
+  <h3>Localization</h3>
   <table class="state-table">
     <tbody>
       <tr>
-        <th scope="row">en, AM/PM</th>
+        <th scope="row">en-US (12h, AM/PM)</th>
         <td>{{> components/DateTimeField/states/_twelve-hour}}</td>
+      </tr>
+      <tr>
+        <th scope="row">sv-SE (24h, Y/M/D)</th>
+        <td>{{> components/DateTimeField/states/_localized-sv}}</td>
       </tr>
     </tbody>
   </table>
