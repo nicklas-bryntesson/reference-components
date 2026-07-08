@@ -32,6 +32,19 @@ detectDirection(
   detaches from a rounded corner.
 - `detectDirection` only compares available space; the component decides what to do with the result.
 
+## Known limitations
+
+**Clipping in overflow ancestors.** The popup is positioned in normal flow (`position:
+absolute` + these offsets), so any ancestor with `overflow: hidden | auto | scroll` — a
+scroll container, a table cell that scrolls — clips or scrolls it. This is inherent to
+absolute-in-flow positioning and affects every popover component (ToggleTip + the date/time
+family). The escape is to render the popup in the **top layer** (the Popover API) or a
+**portal** to `document.body` (`position: fixed` + reposition-on-scroll) — but *which*
+escape, and the feature-detection / browser-baseline policy around it, is the **consuming
+project's** call (it differs per stack: Tailwind `supports-[…]`, a React conditional, a plain
+`@supports`). This module keeps the maths portable and documents the limit; it does not bake
+in a top-layer strategy.
+
 ## Conformance
 
 Black-box: [`tests/popup-position.unit.test.ts`](tests/popup-position.unit.test.ts). Port the three

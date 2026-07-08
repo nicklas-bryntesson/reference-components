@@ -35,9 +35,3 @@ wheel-scroll containment onto any popup container given its ordered tab stops.
 1. Port the kernel modules a component declares (see each component's `## Kernel dependencies`).
 2. Run the kernel conformance tests against your port.
 3. Then port the component — it composes the kernel and adds only its own thin layer.
-
-## Decision record
-
-Why this tier exists at all — the one deliberate exception to the repo's clarity-over-DRY
-stance — is recorded in [ADR-0004](../../docs/adr/0004-clarity-over-dry-kernel-is-the-exception.md).
-Promoting a new piece of shared behaviour into the kernel is itself a direction → write an ADR.

@@ -111,7 +111,7 @@ reduced-motion — that is an accessibility footgun (WCAG 2.3.3), and a non-goal
 - `destroy()` (instance) — disconnects the observer, removes listeners and the injected control.
 
 Intent is owned by the instance and never recovered from a DOM event — the native `pause` event
-carries no "who paused" information, so the controller tracks it directly (ADR-0010).
+carries no "who paused" information, so the controller tracks it directly.
 
 ## Kernel dependencies
 
@@ -160,8 +160,3 @@ Test with a real screenreader before shipping. The animated media is decorative
 - [ ] Swipe reaches the control and announces it as a button with the play/pause label
 - [ ] Double-tap toggles motion; the label updates
 - [ ] The decorative media is not a separate swipe stop that traps exploration
-
-## Decision record
-
-The *why* — scope, the three-tier architecture, the naming, and the testability model — lives in
-[ADR-0010](../../../../docs/adr/0010-decorative-motion-region-and-motion-policy-kernel.md).

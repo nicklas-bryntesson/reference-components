@@ -145,10 +145,9 @@ If seconds precision must be editable on iOS, do not rely on the native picker �
 - [ ] (seconds fields) On iOS, the native picker shows only hour/minute — seconds cannot be set there (see Platform gotchas)
 - [ ] The field label is read when I enter the input
 
-## Decision record
+## Known limitations
 
-The *why* behind this component's cross-cutting choices lives in [`docs/adr/`](../../../../docs/adr/README.md):
-
-- [ADR-0006](../../../../docs/adr/0006-native-control-fallback-on-coarse-pointers.md) — the `data-input-mode` custom/display native fallback
-- [ADR-0007](../../../../docs/adr/0007-popover-light-dismiss-never-refocuses-trigger.md) — the Escape-vs-outside-click close paths (TimeField is the reference)
-- [ADR-0008](../../../../docs/adr/0008-family-wide-field-height-contract.md) — the `2.5rem` field-height / `18px` icon contract
+**Popover clipping in overflow ancestors.** The picker popup is positioned in normal flow, so a
+scroll container — or a scrolling table cell — around this component clips it. The escape (top layer
+via the Popover API, or a portal) and its feature-detection are the consuming project's layer: see
+[`popup-position`](../../../kernel/js/popup-position.md#known-limitations).
