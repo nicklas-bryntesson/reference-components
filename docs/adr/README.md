@@ -65,3 +65,4 @@ holds the *why-we-built-it*; the `.md` holds the *how-it-works*.
 | [0009](0009-end-state-contract-specifies-dom-not-computation-site.md) | End-state contract — specify the finished DOM, not where it's computed | Architecture | Accepted |
 | [0010](0010-decorative-motion-region-and-motion-policy-kernel.md) | A decorative motion region governed by a `motion-policy` kernel | Component | Accepted |
 | [0011](0011-demos-default-to-english.md) | Demos default to English; localization is shown deliberately | Convention | Accepted |
+| [0012](0012-popover-clipping-is-a-documented-limitation.md) | Popover clipping in overflow ancestors is a documented limitation, not a reference fix | Architecture | Accepted |

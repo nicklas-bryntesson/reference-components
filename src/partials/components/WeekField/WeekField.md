@@ -189,6 +189,14 @@ Test with a real screenreader before shipping. Sources: `docs/atomica11y/form/da
 - [ ] The field label is read when I enter the input
 - [ ] On a browser without native week support, the custom grid is used and behaves as the desktop dialog above
 
+## Known limitations
+
+**Popover clipping in overflow ancestors.** The picker popup is positioned in normal flow, so a
+scroll container — or a scrolling table cell — around this component clips it. The escape (top layer
+via the Popover API, or a portal) and its feature-detection are the consuming project's layer: see
+[`popup-position`](../../../kernel/js/popup-position.md#known-limitations) and
+[ADR-0012](../../../../docs/adr/0012-popover-clipping-is-a-documented-limitation.md).
+
 ## Decision record
 
 The *why* behind this component's cross-cutting choices lives in [`docs/adr/`](../../../../docs/adr/README.md):
