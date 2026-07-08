@@ -24,6 +24,7 @@ const DEFAULT_TARGET = {
   WeekField: '[data-component="WeekField"][data-id="meeting-week"]',
   FileUpload: '[data-component="FileUpload"][data-initialized]',
   AffixField: '[data-component="AffixField"][data-id="affixfield-live"]',
+  MotionRegion: '[data-component="MotionRegion"][data-id="motion-region-live"]',
 }
 
 export function targetId(component) {

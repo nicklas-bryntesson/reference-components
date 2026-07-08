@@ -1,0 +1,81 @@
+<section class="kitchensink-section">
+
+  <h2>MotionRegion</h2>
+
+  <p>
+    Governs decorative motion for accessibility and performance (ADR-0010). The animated
+    backend is authored content that obeys <code>data-motion</code>; below it is a CSS
+    animation gated with zero JS. Toggle the control, enable your OS “reduce motion”
+    setting, or scroll a region out of view to see the policy react.
+  </p>
+
+  <style>
+    /* Demo backend: an authored CSS animation that obeys the region's data-motion.
+       This gate is the ENTIRE integration for a CSS backend — no JavaScript. */
+    .MotionRegion-demo {
+      block-size: 12rem;
+      background: linear-gradient(120deg, #6a5acd, #ff6b6b, #4ecdc4, #6a5acd);
+      background-size: 300% 300%;
+      animation: motionRegionDemo 6s ease infinite;
+    }
+
+    .MotionRegion[data-motion="paused"] .MotionRegion-demo {
+      animation-play-state: paused;
+    }
+
+    @keyframes motionRegionDemo {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .MotionRegion video {
+      display: block;
+      inline-size: 100%;
+      block-size: 12rem;
+      object-fit: cover;
+    }
+  </style>
+
+  <!-- ─── Live demo (e2e target): CSS-animated backend, autostart ───────── -->
+  <h3>Live demo — CSS-animated backend (autostart)</h3>
+  <div
+    class="MotionRegion"
+    data-component="MotionRegion"
+    data-id="motion-region-live"
+    data-autoplay="policy"
+    data-play-text="Play background animation"
+    data-pause-text="Pause background animation">
+    <div class="MotionRegion-demo" role="presentation"></div>
+  </div>
+
+  <!-- ─── Autoplay off — waits for the user ─────────────────────────────── -->
+  <h3>Autoplay off — waits for the user</h3>
+  <div
+    class="MotionRegion"
+    data-component="MotionRegion"
+    data-id="motion-region-off"
+    data-autoplay="off"
+    data-play-text="Play background animation"
+    data-pause-text="Pause background animation">
+    <div class="MotionRegion-demo" role="presentation"></div>
+  </div>
+
+  <!-- ─── Video backend ─────────────────────────────────────────────────── -->
+  <h3>Video backend (preload none until policy plays)</h3>
+  <div
+    class="MotionRegion"
+    data-component="MotionRegion"
+    data-id="motion-region-video"
+    data-autoplay="policy"
+    data-play-text="Play background video"
+    data-pause-text="Pause background video">
+    <div class="media-container" role="presentation">
+      <video loop muted playsinline preload="none" poster="{{poc 'video-src/multicolored-background-1280x720.jpg'}}">
+        <source src="{{poc 'video-src/multicolored-background-1280x720.webm'}}" type="video/webm" />
+        <source src="{{poc 'video-src/multicolored-background-1280x720.mp4'}}" type="video/mp4" />
+      </video>
+    </div>
+  </div>
+
+</section>
