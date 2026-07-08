@@ -151,6 +151,27 @@ describe('wrapValue', () => {
 
 // ─── Segment construction: 24h (sv-SE) ───────────────────────────────────────
 
+describe('hour cycle is region-aware (from the raw locale tag, not the collapsed key)', () => {
+  // Regression guard (ADR-0011): the translation key collapses 'en-GB' → 'en',
+  // but the hour cycle is region-specific. Deriving is12h from the collapsed key
+  // wrongly rendered en-GB as 12h; it must come from the raw locale tag.
+  it('en-GB → 24h: no ampm segment, hours 0–23', () => {
+    const el = createTimeFieldEl({ locale: 'en-GB' })
+    const tf = new TimeField(el)
+    expect(tf.is12h).toBe(false)
+    expect(tf._getSegmentEl('ampm')).toBeNull()
+    expect(tf._segmentEls[0].getAttribute('aria-valuemax')).toBe('23')
+  })
+
+  it('en-US → 12h: ampm segment present, hours 1–12', () => {
+    const el = createTimeFieldEl({ locale: 'en-US' })
+    const tf = new TimeField(el)
+    expect(tf.is12h).toBe(true)
+    expect(tf._getSegmentEl('ampm')).not.toBeNull()
+    expect(tf._segmentEls[0].getAttribute('aria-valuemax')).toBe('12')
+  })
+})
+
 describe('segment construction (sv-SE, no seconds)', () => {
   it('constructs exactly 2 segments: hour and minute', () => {
     const el = createTimeFieldEl()

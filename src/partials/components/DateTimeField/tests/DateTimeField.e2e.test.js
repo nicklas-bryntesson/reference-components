@@ -147,7 +147,7 @@ test('ArrowDown on the hour wheel sets the hour segment', async ({ page }) => {
 
 // ─── AM/PM toggle ───────────────────────────────────────────────────────────────
 
-test('AM/PM toggle is hidden in the 24h (sv-SE) locale', async ({ page }) => {
+test('AM/PM toggle is hidden in the 24h (en-GB) locale', async ({ page }) => {
   await page.locator(`${ROOT} .DateTimeField-trigger`).click()
   await expect(page.locator(`${ROOT} .DateTimeField-ampm`)).toBeHidden()
 })

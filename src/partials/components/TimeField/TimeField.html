@@ -79,6 +79,15 @@
     {{> components/TimeField/states/_live}}
   </div>
 
+  <!-- Localization (ADR-0011): hour cycle differs by locale -->
+  <h3>Localization</h3>
+  <table class="state-table">
+    <tbody>
+      <tr><th scope="row">en-GB (24h)</th><td>{{> components/TimeField/states/_locale-en-gb}}</td></tr>
+      <tr><th scope="row">en-US (12h)</th><td>{{> components/TimeField/states/_locale-en-us}}</td></tr>
+    </tbody>
+  </table>
+
   <!-- Native reference -->
   <h3>Native reference</h3>
   <table class="state-table">

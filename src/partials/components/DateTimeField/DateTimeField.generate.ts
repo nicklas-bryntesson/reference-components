@@ -6,7 +6,7 @@ const __dir = dirname(fileURLToPath(import.meta.url))
 const statesDir = resolve(__dir, 'states')
 mkdirSync(statesDir, { recursive: true })
 
-function canonical(id: string, attrs: Record<string, string> = {}, locale = 'sv-SE'): string {
+function canonical(id: string, attrs: Record<string, string> = {}, locale = 'en-GB'): string {
   const attrStr = Object.entries(attrs)
     .map(([k, v]) => v === '' ? k : `${k}="${v}"`)
     .join(' ')
@@ -77,6 +77,8 @@ const states: { name: string; id: string; attrs: Record<string, string>; locale?
   { name: '_with-seconds', id: 'dtf-with-seconds', attrs: { 'data-step': '30', 'data-value': '2026-05-27T14:35:00' } },
   // 12-hour locale — shows the AM/PM toggle next to the wheels
   { name: '_twelve-hour', id: 'dtf-12h', attrs: { 'data-value': '2026-05-27T14:35' }, locale: 'en' },
+  // Localization showcase (ADR-0011): Swedish — 24h, Y/M/D order, Swedish names
+  { name: '_localized-sv', id: 'dtf-sv', attrs: { 'data-value': '2026-05-27T14:35' }, locale: 'sv-SE' },
   // Live demo (e2e test target) — unique id so the e2e can scope to a single instance on /
   { name: '_live-demo', id: 'meeting-time', attrs: {} },
 ]
@@ -99,9 +101,9 @@ const nativeInput = (file: string, label: string, attrs: string): void => {
 }
 
 console.log(`Generated ${states.length} state partials in ${statesDir}`)
-nativeInput('default', 'Datum och tid', ' min="1900-01-01T00:00" max="2100-12-31T23:59" value="2026-05-27T14:35"')
-nativeInput('seconds', 'Datum och tid (sekunder)', ' step="1" value="2026-05-27T14:35:30"')
-nativeInput('step', 'Datum och tid (15-min steg)', ' step="900" value="2026-05-27T14:30"')
+nativeInput('default', 'Date and time', ' min="1900-01-01T00:00" max="2100-12-31T23:59" value="2026-05-27T14:35"')
+nativeInput('seconds', 'Date and time (seconds)', ' step="1" value="2026-05-27T14:35:30"')
+nativeInput('step', 'Date and time (15-min step)', ' step="900" value="2026-05-27T14:30"')
 // 12h is decided by the device locale, not an attribute — lang is only honoured by some browsers.
-nativeInput('lang-en', 'Datum och tid (lang="en-US")', ' lang="en-US" value="2026-05-27T14:35"')
-nativeInput('disabled', 'Datum och tid', ' value="2026-05-27T14:35" disabled')
+nativeInput('lang-en', 'Date and time (lang="en-US")', ' lang="en-US" value="2026-05-27T14:35"')
+nativeInput('disabled', 'Date and time', ' value="2026-05-27T14:35" disabled')
