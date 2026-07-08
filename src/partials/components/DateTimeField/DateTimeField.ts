@@ -1260,7 +1260,10 @@ export class DateTimeField {
   }
 
   // Deterministic panel switch: set data-active="true" on the named panel and
-  // "false" on its siblings. Exactly one body panel is active at a time.
+  // "false" on its siblings. Exactly one body panel is active at a time. The off
+  // value is explicit (not the removed-attribute default) so CSS can style AND
+  // transition the inactive panel — you can't animate an attribute's removal.
+  // See `.claude/philosophy.md` → boolean state exception.
   _setPanel(active: 'calendar' | 'picker'): void {
     this.calendarEl?.querySelectorAll<HTMLElement>('[data-panel]').forEach(panel => {
       panel.setAttribute('data-active', String(panel.dataset.panel === active))

@@ -79,7 +79,7 @@ If a property applies to every instance with no variation — it belongs in the 
 
 ### Private props (`--_*`) carry no value in the base
 
-Use `--_` prefix for internal variables. They have no value until a variant sets them — the gate consumes them.
+Use `--_` prefix for internal variables. **Gate-consumed** props have no value in the base — they get one only when a variant/gate sets it, and the gate consumes it (the `box-shadow`/`--_shadow` example above). A `--_*` used as a plain **internal constant** (a fixed rail width, an arrow size) is the exception: it legitimately holds its value in the base, because it never varies by state — it is a named constant, not a gated variable.
 
 ### Interaction states are paired selectors
 
@@ -106,6 +106,8 @@ Variants and states are expressed through `data-*` attributes. CSS class is alwa
 All component state is expressed as `data-*` attributes on the root element. JavaScript reads and writes these attributes; CSS responds to them. Neither reaches into the other's internals.
 
 Boolean state always carries the explicit literal value `"true"` — never a bare/empty attribute. An empty declaration is harder to read than a stated value, in the HTML and in the CSS alike: `[data-disabled="true"]` reads as a condition, not an existence check. The off state is expressed by removing the attribute.
+
+**Exception — explicit `"false"` when the off-state needs CSS.** When *both* states must be selectable — most often to **transition/animate between them** — write the value explicitly (`data-x="true"` *and* `data-x="false"`) instead of removing the attribute. You cannot animate the *removal* of an attribute or class, so a deterministic two-value switch (exactly one panel `"true"`, its siblings `"false"`) is what lets the inactive state carry its own style and run its transition. Presence/absence stays the default; make `"false"` explicit only when the off-state is itself styled.
 
 ```html
 <div class="DateField" data-component="DateField" data-disabled="true">
