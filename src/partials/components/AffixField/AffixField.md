@@ -99,6 +99,8 @@ One caveat: custom properties inherit, so a `--af-prefix-chars` set on an *ances
 | `date`/`time`/`month`/`week`/`datetime-local` | ❌ non-goal | The family has dedicated fields; native picker internals clash with the overlay. |
 | `color` / `range` / `file` / checkbox / radio / buttons | ❌ non-goal | Meaningless. |
 
+> **Known gap — a steppable, garbage-proof amount.** Neither supported type gives a cost field everything at once: `type="number"` steps by keyboard but rejects grouped/locale-decimal input and its click-spinner is hidden; `type="text" inputmode="decimal"` formats freely and raises the decimal keypad but has *no* stepping and leans on `inputmode` alone to discourage letters. A visible, constrained stepper for amounts like `$ 100.75 USD` is more likely to come from a **segmented numeric input** — the same model the date/time fields use to make invalid input unrepresentable — than from either native type. Not built; recorded here as a known gap.
+
 Enforcement: documented allowlist, not runtime policing. JS does not error on other types (it can't know better than the author) — but this table is the scope.
 
 ## Accessibility model
