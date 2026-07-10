@@ -1,0 +1,117 @@
+<section class="kitchensink-section">
+  <h2>ScrollArea</h2>
+
+  <p>
+    Wraps horizontally-overflowing content in an edge-to-edge scroller with edge
+    fades and a custom horizontal scrollbar. The scroller is a focusable
+    <code>role="region"</code>: once it overflows, tab to it and the arrow keys scroll
+    it natively. The custom bar is a pointer/visual affordance (drag the thumb or click
+    the track) — it appears only on overflow and auto-hides on idle.
+  </p>
+
+  <!-- Primary use: a wide table that overflows on smaller screens -->
+  <h3>Wide table</h3>
+  <div class="ScrollArea" data-component="ScrollArea" data-id="scrollarea-live">
+    <div class="ScrollArea-viewport" data-scroll-viewport role="region" aria-label="Members table">
+      <div class="ScrollArea-content">
+        <table class="state-table" style="white-space: nowrap; margin: 0;">
+          <thead>
+            <tr>
+              <th scope="col">Name</th>
+              <th scope="col">Member ID</th>
+              <th scope="col">Joined</th>
+              <th scope="col">Renewed</th>
+              <th scope="col">Plan</th>
+              <th scope="col">Region</th>
+              <th scope="col">Status</th>
+              <th scope="col">Balance</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">Margaret Nguyen</th>
+              <td>427311</td>
+              <td><time datetime="2010-06-03">June 3, 2010</time></td>
+              <td><time datetime="2024-06-03">June 3, 2024</time></td>
+              <td>Professional</td>
+              <td>Nordics</td>
+              <td>Active</td>
+              <td>0.00</td>
+            </tr>
+            <tr>
+              <th scope="row">Edvard Galinski</th>
+              <td>533175</td>
+              <td><time datetime="2011-01-13">January 13, 2011</time></td>
+              <td><time datetime="2024-01-13">January 13, 2024</time></td>
+              <td>Student</td>
+              <td>Central Europe</td>
+              <td>Active</td>
+              <td>37.00</td>
+            </tr>
+            <tr>
+              <th scope="row">Hoshi Nakamura</th>
+              <td>601942</td>
+              <td><time datetime="2012-07-23">July 23, 2012</time></td>
+              <td><time datetime="2023-07-23">July 23, 2023</time></td>
+              <td>Professional</td>
+              <td>Asia Pacific</td>
+              <td>Lapsed</td>
+              <td>15.00</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="ScrollArea-fades" aria-hidden="true"></div>
+  </div>
+
+  <!-- Deliberate clipping demo: a horizontal scroller forces overflow-y to a
+       non-visible value, so a popover opened inside it is clipped. This is
+       inherent to scroll containers, shown here on purpose. -->
+  <h3>Popover clipping (a known limitation)</h3>
+  <p>
+    A ToggleTip <em>inside</em> the scroller: its bubble is clipped at the
+    scroller's edge, because horizontal scrolling makes the vertical axis
+    non-visible. Compare the same ToggleTip outside a ScrollArea, where it is not
+    clipped. This is why popover-bearing demos are not wrapped in a ScrollArea.
+  </p>
+  <div class="ScrollArea" data-component="ScrollArea" data-id="scrollarea-clip-demo" style="max-inline-size: 22rem;">
+    <div class="ScrollArea-viewport" data-scroll-viewport role="region" aria-label="Clipping example">
+      <div class="ScrollArea-content" style="display: flex; gap: 0.5rem; align-items: center; white-space: nowrap;">
+        <toggle-tip data-id="scrollarea-clip" title="Clipped inside a scroller">
+          <p>This bubble is clipped by the scroller's overflow.</p>
+        </toggle-tip>
+        <span>Open me — the bubble is clipped by the scroll container.</span>
+      </div>
+    </div>
+    <div class="ScrollArea-fades" aria-hidden="true"></div>
+  </div>
+
+  <!-- Native reference: a plain overflow-x scroller with the native bar -->
+  <h3>Native reference</h3>
+  <p>The browser's own horizontal scroller — native bar, no fades, no inset.</p>
+  <div style="overflow-x: auto;">
+    <table class="state-table" style="white-space: nowrap; min-inline-size: 40rem; margin: 0;">
+      <thead>
+        <tr>
+          <th scope="col">Name</th>
+          <th scope="col">Member ID</th>
+          <th scope="col">Joined</th>
+          <th scope="col">Plan</th>
+          <th scope="col">Region</th>
+          <th scope="col">Balance</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th scope="row">Margaret Nguyen</th>
+          <td>427311</td>
+          <td><time datetime="2010-06-03">June 3, 2010</time></td>
+          <td>Professional</td>
+          <td>Nordics</td>
+          <td>0.00</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
