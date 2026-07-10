@@ -25,6 +25,7 @@ const DEFAULT_TARGET = {
   FileUpload: '[data-component="FileUpload"][data-initialized]',
   AffixField: '[data-component="AffixField"][data-id="affixfield-live"]',
   MotionRegion: '[data-component="MotionRegion"][data-id="motion-region-live"]',
+  ScrollArea: '[data-component="ScrollArea"][data-id="scrollarea-live"]',
 }
 
 export function targetId(component) {

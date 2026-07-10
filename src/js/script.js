@@ -6,6 +6,7 @@ import MonthField from "../partials/components/MonthField/MonthField.ts";
 import WeekField from "../partials/components/WeekField/WeekField.ts";
 import AffixField from "../partials/components/AffixField/AffixField.ts";
 import MotionRegion from "../partials/components/MotionRegion/MotionRegion.ts";
+import ScrollArea from "../partials/components/ScrollArea/ScrollArea.ts";
 
 import "../partials/components/ToggleTip/ToggleTip";
 
@@ -22,5 +23,6 @@ MonthField.attach();
 WeekField.attach();
 AffixField.attach();
 MotionRegion.attach();
+ScrollArea.attach();
 
 import('./debug-panel.js').then(({ init }) => init());
