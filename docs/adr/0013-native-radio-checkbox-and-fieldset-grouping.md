@@ -1,6 +1,6 @@
 # ADR 0013: Radio and checkbox are native primitives; ChoiceGroup names the fieldset *use*, not the element
 
-**Status:** Proposed
+**Status:** Accepted · the RadioField/CheckboxField split is superseded by ADR-0015 (native primitives + ChoiceGroup stand)
 **Date:** 2026-07-09
 **Decider:** Nicklas Bryntesson
 

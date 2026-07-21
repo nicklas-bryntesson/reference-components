@@ -1,0 +1,134 @@
+<section class="kitchensink-section" id="ChoiceField">
+
+  <h2>ChoiceField</h2>
+
+  <!-- Interaction states — one skeleton, both types. hover/focus/active are
+       simulated via data-test-state on the root. -->
+  <h3>Interaction states</h3>
+  <table class="state-table">
+    <thead>
+      <tr>
+        <th scope="col">State</th>
+        <th scope="col">default</th>
+        <th scope="col">hover</th>
+        <th scope="col">focus</th>
+        <th scope="col">active</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th scope="row">checkbox · empty</th>
+        <td><span class="ChoiceField"><input type="checkbox" id="cf-cb-def-e" name="cf-cb-def-e"><label for="cf-cb-def-e">Label</label></span></td>
+        <td><span class="ChoiceField" data-test-state="hover"><input type="checkbox" id="cf-cb-hov-e" name="cf-cb-hov-e"><label for="cf-cb-hov-e">Label</label></span></td>
+        <td><span class="ChoiceField" data-test-state="focus"><input type="checkbox" id="cf-cb-foc-e" name="cf-cb-foc-e"><label for="cf-cb-foc-e">Label</label></span></td>
+        <td><span class="ChoiceField" data-test-state="active"><input type="checkbox" id="cf-cb-act-e" name="cf-cb-act-e"><label for="cf-cb-act-e">Label</label></span></td>
+      </tr>
+      <tr>
+        <th scope="row">checkbox · checked</th>
+        <td><span class="ChoiceField"><input type="checkbox" id="cf-cb-def-f" name="cf-cb-def-f" checked><label for="cf-cb-def-f">Label</label></span></td>
+        <td><span class="ChoiceField" data-test-state="hover"><input type="checkbox" id="cf-cb-hov-f" name="cf-cb-hov-f" checked><label for="cf-cb-hov-f">Label</label></span></td>
+        <td><span class="ChoiceField" data-test-state="focus"><input type="checkbox" id="cf-cb-foc-f" name="cf-cb-foc-f" checked><label for="cf-cb-foc-f">Label</label></span></td>
+        <td><span class="ChoiceField" data-test-state="active"><input type="checkbox" id="cf-cb-act-f" name="cf-cb-act-f" checked><label for="cf-cb-act-f">Label</label></span></td>
+      </tr>
+      <tr>
+        <th scope="row">radio · unselected</th>
+        <td><span class="ChoiceField"><input type="radio" id="cf-rd-def-e" name="cf-rd-def-e"><label for="cf-rd-def-e">Label</label></span></td>
+        <td><span class="ChoiceField" data-test-state="hover"><input type="radio" id="cf-rd-hov-e" name="cf-rd-hov-e"><label for="cf-rd-hov-e">Label</label></span></td>
+        <td><span class="ChoiceField" data-test-state="focus"><input type="radio" id="cf-rd-foc-e" name="cf-rd-foc-e"><label for="cf-rd-foc-e">Label</label></span></td>
+        <td><span class="ChoiceField" data-test-state="active"><input type="radio" id="cf-rd-act-e" name="cf-rd-act-e"><label for="cf-rd-act-e">Label</label></span></td>
+      </tr>
+      <tr>
+        <th scope="row">radio · selected</th>
+        <td><span class="ChoiceField"><input type="radio" id="cf-rd-def-f" name="cf-rd-def-f" checked><label for="cf-rd-def-f">Label</label></span></td>
+        <td><span class="ChoiceField" data-test-state="hover"><input type="radio" id="cf-rd-hov-f" name="cf-rd-hov-f" checked><label for="cf-rd-hov-f">Label</label></span></td>
+        <td><span class="ChoiceField" data-test-state="focus"><input type="radio" id="cf-rd-foc-f" name="cf-rd-foc-f" checked><label for="cf-rd-foc-f">Label</label></span></td>
+        <td><span class="ChoiceField" data-test-state="active"><input type="radio" id="cf-rd-act-f" name="cf-rd-act-f" checked><label for="cf-rd-act-f">Label</label></span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Disabled — its own table: pointer-events:none makes hover/focus impossible -->
+  <h3>Disabled</h3>
+  <table class="state-table">
+    <tbody>
+      <tr>
+        <th scope="row">checkbox · empty</th>
+        <td><span class="ChoiceField"><input type="checkbox" id="cf-dis-cb-e" name="cf-dis-cb-e" disabled><label for="cf-dis-cb-e">Label</label></span></td>
+      </tr>
+      <tr>
+        <th scope="row">checkbox · checked</th>
+        <td><span class="ChoiceField"><input type="checkbox" id="cf-dis-cb-f" name="cf-dis-cb-f" checked disabled><label for="cf-dis-cb-f">Label</label></span></td>
+      </tr>
+      <tr>
+        <th scope="row">radio · selected</th>
+        <td><span class="ChoiceField"><input type="radio" id="cf-dis-rd-f" name="cf-dis-rd-f" checked disabled><label for="cf-dis-rd-f">Label</label></span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Invalid -->
+  <h3>Invalid</h3>
+  <table class="state-table">
+    <tbody>
+      <tr>
+        <th scope="row">checkbox · required + empty</th>
+        <td><span class="ChoiceField" data-invalid="true"><input type="checkbox" id="cf-inv-cb" name="cf-inv-cb" required aria-invalid="true"><label for="cf-inv-cb">Accept the terms</label></span></td>
+      </tr>
+      <tr>
+        <th scope="row">radio · required + unselected</th>
+        <td><span class="ChoiceField" data-invalid="true"><input type="radio" id="cf-inv-rd" name="cf-inv-rd" required aria-invalid="true"><label for="cf-inv-rd">Pick one</label></span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Variants — the host "pushes" an accent by overriding --cf-selected -->
+  <h3>Variants</h3>
+  <table class="state-table">
+    <tbody>
+      <tr>
+        <th scope="row">accent-themed (host token)</th>
+        <td style="--cf-selected:#0066cc; --cf-mark-color:#fff;">
+          <span class="ChoiceField"><input type="checkbox" id="cf-var-cb" name="cf-var-cb" checked><label for="cf-var-cb">Checkbox</label></span>
+          &nbsp;
+          <span class="ChoiceField"><input type="radio" id="cf-var-rd" name="cf-var-rd" checked><label for="cf-var-rd">Radio</label></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Live demo — independent checkboxes + a real single-selection radio group -->
+  <h3>Live demo</h3>
+  <div style="display:flex; gap:3rem; flex-wrap:wrap;">
+    <div id="cf-live-checkbox" style="display:flex; flex-direction:column; gap:0.5rem; align-items:flex-start;">
+      <strong>Notifications (choose any)</strong>
+      <span class="ChoiceField"><input type="checkbox" id="cf-live-cb-1" name="cf-live-cb-1"><label for="cf-live-cb-1">Email</label></span>
+      <span class="ChoiceField"><input type="checkbox" id="cf-live-cb-2" name="cf-live-cb-2" checked><label for="cf-live-cb-2">SMS</label></span>
+      <span class="ChoiceField"><input type="checkbox" id="cf-live-cb-3" name="cf-live-cb-3"><label for="cf-live-cb-3">Push</label></span>
+    </div>
+    <div id="cf-live-radio" style="display:flex; flex-direction:column; gap:0.5rem; align-items:flex-start;">
+      <strong>Shipping (choose one)</strong>
+      <span class="ChoiceField"><input type="radio" id="cf-live-rd-1" name="shipping" checked><label for="cf-live-rd-1">Standard</label></span>
+      <span class="ChoiceField"><input type="radio" id="cf-live-rd-2" name="shipping"><label for="cf-live-rd-2">Express</label></span>
+      <span class="ChoiceField"><input type="radio" id="cf-live-rd-3" name="shipping"><label for="cf-live-rd-3">Overnight</label></span>
+    </div>
+  </div>
+
+  <!-- Native reference — the browser's built-in controls, unstyled -->
+  <h3>Native reference</h3>
+  <table class="state-table">
+    <tbody>
+      <tr>
+        <th scope="row">native checkbox</th>
+        <td><input type="checkbox" id="cf-native-cb"> <label for="cf-native-cb">Label</label></td>
+      </tr>
+      <tr>
+        <th scope="row">native radio</th>
+        <td>
+          <input type="radio" id="cf-native-rd-1" name="cf-native-rd" checked> <label for="cf-native-rd-1">One</label>
+          <input type="radio" id="cf-native-rd-2" name="cf-native-rd"> <label for="cf-native-rd-2">Two</label>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+</section>
