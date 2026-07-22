@@ -1,7 +1,7 @@
 # ChoiceGroup
 
 The `<fieldset><legend>` wrapper that groups **ChoiceField** items into one labelled
-selection group (ADR-0013). ChoiceGroup owns the group label, the layout (orientation +
+selection group. ChoiceGroup owns the group label, the layout (orientation +
 legend placement) and an optional hint/error — and knows nothing about how an individual
 field is drawn. ChoiceField knows nothing about the group. They compose in the DOM.
 
@@ -39,7 +39,7 @@ With a hint (and an error when invalid):
 Contract rules (enforced by the unit test):
 
 - **`<legend>` is the first child of `<fieldset>`** — a spec requirement, and the only
-  *intrinsic* group label (no id plumbing, no document-outline dependency; ADR-0013).
+  *intrinsic* group label (no id plumbing, no document-outline dependency).
 - **The `.Body` wrapper holds hint + options + error.** It establishes a formatting
   context that clears the floated legend in the `above` recipe, and stacks the parts.
 - **`.Options` holds the fields.** Its layout follows `data-orientation`.
@@ -57,7 +57,7 @@ Contract rules (enforced by the unit test):
 
 ### Cardinality is implicit, not an attribute
 
-Single-vs-multiple selection is a property of the **children's `type`** (ADR-0015): radios
+Single-vs-multiple selection is a property of the **children's `type`**: radios
 sharing a `name` are single-select; checkboxes are multi-select. ChoiceGroup encodes no
 cardinality — native already carries it. (This is why the item is `ChoiceField`, not
 `SingleChoiceField`: a lone radio is not "a single choice"; the *group* is.)
@@ -66,7 +66,7 @@ cardinality — native already carries it. (This is why the item is `ChoiceField
 
 | `data-legend` | Recipe | Notes |
 |---|---|---|
-| `above` | `legend { float: left; inline-size: 100% }`; `.Body` (flow-root) clears it | The documented `<fieldset>` cost (ADR-0013). Legend sits on its own line above the fields |
+| `above` | `legend { float: left; inline-size: 100% }`; `.Body` (flow-root) clears it | The documented `<fieldset>` cost. Legend sits on its own line above the fields |
 | `beside` | fieldset becomes `display: grid` (`auto minmax(0,1fr)`); legend left, `.Body` right | Legend `float: none` here |
 | `hidden` | legend clipped to 1px (SR-only) | Still the group's accessible name — verified by e2e |
 
@@ -87,17 +87,23 @@ cardinality — native already carries it. (This is why the item is `ChoiceField
 ### Why `<legend>`, not `role="group"` + `aria-labelledby`
 
 For a selection group, `<legend>` is the only intrinsic group label — no id plumbing, no
-heading-structure dependency, both of which authors routinely break (ADR-0013). A hidden
+heading-structure dependency, both of which authors routinely break. A hidden
 legend (`data-legend="hidden"`) is still the accessible name; the e2e suite asserts the
 group is reachable by that name even when the legend is visually clipped.
 
 ### Hint and error
 
 The `.Hint` / `.Error` are referenced from the fieldset's `aria-describedby`, so screen
-readers read them **after** the group name (atomica11y radio/checkbox §2). The error
-carries `role="alert"` so it is announced when it appears. Support note: description on a
-grouping element is well-supported in current NVDA/JAWS/VoiceOver; if you must support an
-older stack, mirror the description onto each field's `aria-describedby` instead.
+readers read them **after** the group name (atomica11y radio/checkbox §2). Support note:
+description on a grouping element is well-supported in current NVDA/JAWS/VoiceOver; if you
+must support an older stack, mirror the description onto each field's `aria-describedby`.
+
+> **Note — the `.Error` here is a placeholder.** `role="alert"` announces a *content change
+> inside a live region that already exists*; a pre-filled alert that is injected as one node
+> (or present at page load) is not reliably announced. The real error will be a reusable
+> **Notice** rendered into a persistent, initially-empty `role="alert"` container — the
+> container stays mounted and its contents are swapped (clear → next frame → set). Until
+> that component lands, treat this markup as visual reference only.
 
 ### Keyboard & selection
 
@@ -124,17 +130,11 @@ tabindex and no key handlers.
 
 ## Non-goals
 
-- **Not a state machine** — no roving-tabindex or selection JS; native does it (ADR-0013).
+- **Not a state machine** — no roving-tabindex or selection JS; native does it.
 - **Does not draw fields** — that is ChoiceField. ChoiceGroup is layout + label only.
 - **Does not lock `<fieldset>`** to this use — `<fieldset>` stays a general grouping element
-  elsewhere; this component governs only the radio/checkbox grouping use (ADR-0013).
-- **No card / chip / segmented group** — those are their own components (Picklist, Toggle,
-  CardChoice) per ADR-0014, not skins of ChoiceGroup.
+  elsewhere; this component governs only the radio/checkbox grouping use.
+- **No card / chip / segmented group** — those are their own components (a chip Picklist, a
+  segmented Toggle, a CardChoice), not skins of ChoiceGroup.
 - **No cross-field validation logic** — `data-invalid` + `.Error` are presentational; the
   host owns when to set them.
-
-## Decision record
-
-- [ADR-0013](../../../../docs/adr/0013-native-radio-checkbox-and-fieldset-grouping.md) — ChoiceGroup names the fieldset *use*; `<legend>` over `role="group"`.
-- [ADR-0014](../../../../docs/adr/0014-picklist-toggle-buttongroup-selection-vs-action.md) — sibling boundaries (Picklist/Toggle/ButtonGroup).
-- [ADR-0015](../../../../docs/adr/0015-choicefield-one-component-keyed-on-native-type.md) — cardinality is a group property, not a field one.

@@ -1,7 +1,7 @@
 # ChoiceField
 
 A styled **native** `<input type="radio">` or `<input type="checkbox">` + `<label>` —
-**one component, keyed on the native `type` attribute** (ADR-0015). Radio and checkbox
+**one component, keyed on the native `type` attribute**. Radio and checkbox
 share a single skeleton: the input itself is the box (`appearance: none` + border), and
 the `::after` is the mark. `type` is the discriminator, not an invented API — so both the
 behaviour (single-select via a shared `name` + arrow roving, vs independent toggle) and
@@ -40,7 +40,8 @@ Contract rules (enforced by the unit test against this file's kitchensink):
   control or nothing.
 - **Radio: one unique `name` per group.** All options in a single-selection group share
   exactly one `name` — that is what makes them mutually exclusive. `name` is an authored
-  end-state, not a JS-distributed prop (ADR-0009).
+  end-state, not a JS-distributed prop (a framework may distribute it from a prop, a
+  server may render it, our reference authors it — the contract is the finished DOM).
 - **Checkbox: independent** — no shared `name`.
 
 ## HTML Authoring API
@@ -133,17 +134,11 @@ Because behaviour is native, the test centre of gravity differs from the date fa
 
 ## Non-goals
 
-- **No JS / no roving-tabindex reimplementation** — native does it (exactly why ADR-0013
-  chose native over a stateful group component).
+- **No JS / no roving-tabindex reimplementation** — native does it; that is the whole
+  reason to stay native rather than build a stateful group component.
 - **No grouping here** — `<fieldset><legend>` grouping (and single-vs-multiple cardinality)
-  is ChoiceGroup's job. Cardinality is a *group* property, not a field one (ADR-0015).
+  is ChoiceGroup's job. Cardinality is a *group* property, not a field one.
 - **No card / chip / segmented layouts** — those are skins (ChoiceGroup) or their own
-  components (Picklist, Toggle), per ADR-0014.
+  components (a chip Picklist, a segmented Toggle).
 - **Not an action control** — if it triggers something instead of submitting a value, it's
-  a ButtonGroup, not a ChoiceField (ADR-0014 selection-vs-action test).
-
-## Decision record
-
-- [ADR-0013](../../../../docs/adr/0013-native-radio-checkbox-and-fieldset-grouping.md) — native primitives + use-named grouping.
-- [ADR-0014](../../../../docs/adr/0014-picklist-toggle-buttongroup-selection-vs-action.md) — the selection-vs-action boundary against ButtonGroup.
-- [ADR-0015](../../../../docs/adr/0015-choicefield-one-component-keyed-on-native-type.md) — one ChoiceField keyed on native `type`, superseding the RadioField/CheckboxField split.
+  a ButtonGroup, not a ChoiceField (the selection-vs-action test).
