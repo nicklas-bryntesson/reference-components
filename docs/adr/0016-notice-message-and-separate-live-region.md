@@ -1,6 +1,6 @@
 # ADR 0016: Notice is a presentational message; the live region is a separate, persistent container
 
-**Status:** Proposed
+**Status:** Accepted
 **Date:** 2026-07-22
 **Decider:** Nicklas Bryntesson
 
