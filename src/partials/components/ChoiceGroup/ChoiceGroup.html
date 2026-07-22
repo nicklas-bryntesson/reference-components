@@ -68,7 +68,10 @@
     </div>
   </fieldset>
 
-  <!-- Invalid — group-level error, role="alert", read after the legend -->
+  <!-- Invalid — the group error is a Notice inside a persistent live region.
+       NoticeRegion (role="alert") announces it when it appears; the fieldset's
+       aria-describedby points at the Notice text id so it also describes the
+       group on focus. (With a hint too, describedby lists both ids.) -->
   <h3>Invalid (group error)</h3>
   <fieldset class="ChoiceGroup" data-id="invalid" data-orientation="vertical" data-legend="above" data-invalid="true" aria-describedby="cg-err-text">
     <legend>Terms</legend>
@@ -76,7 +79,16 @@
       <div class="Options">
         <span class="ChoiceField" data-invalid="true"><input type="checkbox" id="cg-err-1" name="cg-err-1" required aria-invalid="true"><label for="cg-err-1">I accept the terms</label></span>
       </div>
-      <p class="Error" id="cg-err-text" role="alert">You must accept the terms to continue.</p>
+      <div class="NoticeRegion" role="alert" aria-live="assertive">
+        <div class="Notice" data-variant="error">
+          <div class="Icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          </div>
+          <div class="Content">
+            <p id="cg-err-text">You must accept the terms to continue.</p>
+          </div>
+        </div>
+      </div>
     </div>
   </fieldset>
 

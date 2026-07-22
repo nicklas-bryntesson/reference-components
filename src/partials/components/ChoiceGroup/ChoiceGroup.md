@@ -31,7 +31,13 @@ With a hint (and an error when invalid):
   <div class="Body">
     <p class="Hint" id="acct-hint">Choose the plan that fits your team.</p>
     <div class="Options"> …fields… </div>
-    <p class="Error" id="acct-err" role="alert">Pick an account type to continue.</p>
+    <!-- error = a Notice inside a persistent live region (the announcer) -->
+    <div class="NoticeRegion" role="alert" aria-live="assertive">
+      <div class="Notice" data-variant="error">
+        <div class="Icon"><svg aria-hidden="true"><!-- … --></svg></div>
+        <div class="Content"><p id="acct-err">Pick an account type to continue.</p></div>
+      </div>
+    </div>
   </div>
 </fieldset>
 ```
@@ -52,8 +58,8 @@ Contract rules (enforced by the unit test):
 |---|---|---|---|
 | `data-orientation` | `vertical` · `horizontal` | `vertical` | `.Options` stacks (column) or flows + wraps (row) |
 | `data-legend` | `above` · `beside` · `hidden` | `above` | Legend placement recipe (see below) |
-| `data-invalid` | `"true"` | — | Group-level invalid; pair with a `.Error` and `aria-describedby` |
-| `aria-describedby` | id ref list | — | Points at the `.Hint` and/or `.Error` ids so SRs read them after the group name |
+| `data-invalid` | `"true"` | — | Group-level invalid; pair with an error Notice in a live region + `aria-describedby` |
+| `aria-describedby` | id ref list | — | Points at the `.Hint` and/or the error Notice's text id so SRs read them after the group name |
 
 ### Cardinality is implicit, not an attribute
 
@@ -80,7 +86,6 @@ cardinality — native already carries it. (This is why the item is `ChoiceField
 | `--cg-max-inline-size` | `30rem` | Caps the group width |
 | `--cg-legend-weight` | `600` | Legend font weight |
 | `--cg-hint-color` | `var(--SITE--POPOVER--MUTED, #6e6e6e)` | Hint text colour |
-| `--cg-error-color` | `#c00` | Error text colour |
 
 ## Accessibility
 
@@ -93,17 +98,21 @@ group is reachable by that name even when the legend is visually clipped.
 
 ### Hint and error
 
-The `.Hint` / `.Error` are referenced from the fieldset's `aria-describedby`, so screen
-readers read them **after** the group name (atomica11y radio/checkbox §2). Support note:
-description on a grouping element is well-supported in current NVDA/JAWS/VoiceOver; if you
-must support an older stack, mirror the description onto each field's `aria-describedby`.
+The `.Hint` and the error text are referenced from the fieldset's `aria-describedby`, so
+screen readers read them **after** the group name (atomica11y radio/checkbox §2). Support
+note: description on a grouping element is well-supported in current NVDA/JAWS/VoiceOver; if
+you must support an older stack, mirror the description onto each field's `aria-describedby`.
 
-> **Note — the `.Error` here is a placeholder.** `role="alert"` announces a *content change
-> inside a live region that already exists*; a pre-filled alert that is injected as one node
-> (or present at page load) is not reliably announced. The real error will be a reusable
-> **Notice** rendered into a persistent, initially-empty `role="alert"` container — the
-> container stays mounted and its contents are swapped (clear → next frame → set). Until
-> that component lands, treat this markup as visual reference only.
+The error uses the **Notice** component inside a persistent live region, giving two
+complementary behaviours:
+
+- **Announce on appear** — `.NoticeRegion` (`role="alert"`) is mounted from the start; when
+  the error content is swapped in, screen readers announce it. (A pre-filled alert injected
+  as one node, or present at page load, is not reliably announced — hence the persistent,
+  initially-empty region.)
+- **Describe on focus** — the fieldset's `aria-describedby` points at the Notice's text id,
+  so re-entering the group re-reads the error as the group's description. With a hint too,
+  `aria-describedby` lists both ids.
 
 ### Keyboard & selection
 
@@ -136,5 +145,5 @@ tabindex and no key handlers.
   elsewhere; this component governs only the radio/checkbox grouping use.
 - **No card / chip / segmented group** — those are their own components (a chip Picklist, a
   segmented Toggle, a CardChoice), not skins of ChoiceGroup.
-- **No cross-field validation logic** — `data-invalid` + `.Error` are presentational; the
-  host owns when to set them.
+- **No cross-field validation logic** — `data-invalid` + the error Notice are presentational;
+  the host owns when to set them and what to swap into the live region.
