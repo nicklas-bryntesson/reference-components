@@ -1,0 +1,97 @@
+<section class="kitchensink-section" id="ChoiceGroup">
+
+  <h2>ChoiceGroup</h2>
+
+  <!-- Legend: above (default) — radios (single-select via shared name) -->
+  <h3>Legend above (default) · radios</h3>
+  <fieldset class="ChoiceGroup" data-id="above" data-orientation="vertical" data-legend="above">
+    <legend>Shipping speed</legend>
+    <div class="Body">
+      <div class="Options">
+        <span class="ChoiceField"><input type="radio" id="cg-a-1" name="cg-above" checked><label for="cg-a-1">Standard</label></span>
+        <span class="ChoiceField"><input type="radio" id="cg-a-2" name="cg-above"><label for="cg-a-2">Express</label></span>
+        <span class="ChoiceField"><input type="radio" id="cg-a-3" name="cg-above"><label for="cg-a-3">Overnight</label></span>
+      </div>
+    </div>
+  </fieldset>
+
+  <!-- Legend: beside — grid, legend left / options right -->
+  <h3>Legend beside · checkboxes</h3>
+  <fieldset class="ChoiceGroup" data-id="beside" data-orientation="vertical" data-legend="beside">
+    <legend>Notifications</legend>
+    <div class="Body">
+      <div class="Options">
+        <span class="ChoiceField"><input type="checkbox" id="cg-b-1" name="cg-b-1" checked><label for="cg-b-1">Email</label></span>
+        <span class="ChoiceField"><input type="checkbox" id="cg-b-2" name="cg-b-2"><label for="cg-b-2">SMS</label></span>
+        <span class="ChoiceField"><input type="checkbox" id="cg-b-3" name="cg-b-3"><label for="cg-b-3">Push</label></span>
+      </div>
+    </div>
+  </fieldset>
+
+  <!-- Legend: hidden — visually gone, still the SR group name -->
+  <h3>Legend hidden (SR-only name)</h3>
+  <fieldset class="ChoiceGroup" data-id="hidden" data-orientation="vertical" data-legend="hidden">
+    <legend>Payment method</legend>
+    <div class="Body">
+      <div class="Options">
+        <span class="ChoiceField"><input type="radio" id="cg-h-1" name="cg-hidden" checked><label for="cg-h-1">Card</label></span>
+        <span class="ChoiceField"><input type="radio" id="cg-h-2" name="cg-hidden"><label for="cg-h-2">Invoice</label></span>
+      </div>
+    </div>
+  </fieldset>
+
+  <!-- Orientation: horizontal — fields flow in a row and wrap -->
+  <h3>Orientation horizontal</h3>
+  <fieldset class="ChoiceGroup" data-id="horizontal" data-orientation="horizontal" data-legend="above">
+    <legend>Flavor profile (choose any)</legend>
+    <div class="Body">
+      <div class="Options">
+        <span class="ChoiceField"><input type="checkbox" id="cg-hz-1" name="cg-hz-1"><label for="cg-hz-1">Floral</label></span>
+        <span class="ChoiceField"><input type="checkbox" id="cg-hz-2" name="cg-hz-2" checked><label for="cg-hz-2">Peachy</label></span>
+        <span class="ChoiceField"><input type="checkbox" id="cg-hz-3" name="cg-hz-3"><label for="cg-hz-3">Citrus</label></span>
+        <span class="ChoiceField"><input type="checkbox" id="cg-hz-4" name="cg-hz-4"><label for="cg-hz-4">Piney</label></span>
+      </div>
+    </div>
+  </fieldset>
+
+  <!-- With hint — group description read after the legend (aria-describedby) -->
+  <h3>With hint</h3>
+  <fieldset class="ChoiceGroup" data-id="hint" data-orientation="vertical" data-legend="above" aria-describedby="cg-hint-text">
+    <legend>Account type</legend>
+    <div class="Body">
+      <p class="Hint" id="cg-hint-text">Choose the plan that fits your team. You can change this later.</p>
+      <div class="Options">
+        <span class="ChoiceField"><input type="radio" id="cg-hint-1" name="cg-hint" checked><label for="cg-hint-1">Personal</label></span>
+        <span class="ChoiceField"><input type="radio" id="cg-hint-2" name="cg-hint"><label for="cg-hint-2">Team</label></span>
+        <span class="ChoiceField"><input type="radio" id="cg-hint-3" name="cg-hint"><label for="cg-hint-3">Enterprise</label></span>
+      </div>
+    </div>
+  </fieldset>
+
+  <!-- Invalid — group-level error, role="alert", read after the legend -->
+  <h3>Invalid (group error)</h3>
+  <fieldset class="ChoiceGroup" data-id="invalid" data-orientation="vertical" data-legend="above" data-invalid="true" aria-describedby="cg-err-text">
+    <legend>Terms</legend>
+    <div class="Body">
+      <div class="Options">
+        <span class="ChoiceField" data-invalid="true"><input type="checkbox" id="cg-err-1" name="cg-err-1" required aria-invalid="true"><label for="cg-err-1">I accept the terms</label></span>
+      </div>
+      <p class="Error" id="cg-err-text" role="alert">You must accept the terms to continue.</p>
+    </div>
+  </fieldset>
+
+  <!-- Live demo -->
+  <h3>Live demo</h3>
+  <fieldset class="ChoiceGroup" data-id="live" data-orientation="vertical" data-legend="above" aria-describedby="cg-live-hint">
+    <legend>Contact preference</legend>
+    <div class="Body">
+      <p class="Hint" id="cg-live-hint">How should we reach you?</p>
+      <div class="Options">
+        <span class="ChoiceField"><input type="radio" id="cg-live-1" name="cg-live" checked><label for="cg-live-1">Email</label></span>
+        <span class="ChoiceField"><input type="radio" id="cg-live-2" name="cg-live"><label for="cg-live-2">Phone</label></span>
+        <span class="ChoiceField"><input type="radio" id="cg-live-3" name="cg-live"><label for="cg-live-3">Post</label></span>
+      </div>
+    </div>
+  </fieldset>
+
+</section>

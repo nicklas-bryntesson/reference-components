@@ -1,0 +1,103 @@
+/* src/partials/components/ChoiceGroup/ChoiceGroup.css */
+/*
+ * ChoiceGroup — the <fieldset><legend> wrapper that groups ChoiceFields
+ * (ADR-0013). The WRAPPER pattern: it owns the group label, layout
+ * (orientation + legend placement) and an optional hint/error — and knows
+ * nothing about how an individual field is drawn. ChoiceField knows nothing
+ * about the group. They meet only in the DOM.
+ *
+ * Cardinality is IMPLICIT in the children's `type` (ADR-0015): radios sharing a
+ * `name` are single-select; checkboxes are multi-select. The group encodes no
+ * cardinality attribute — native already carries it.
+ *
+ * Legend layout is the only real cost of <fieldset>, and it is done with ONE
+ * mechanism — a floated legend — across all three placements (avoiding the
+ * cross-browser quirks of display:grid/flex on a fieldset):
+ *   above  (default) — legend floats full width; .Body clears it → legend on top
+ *   beside           — legend floats auto width; .Body (flow-root) fills beside it
+ *   hidden           — legend removed from flow (SR-only); .Body is the whole box
+ * .Body is a flow-root so it forms its own block-formatting context.
+ */
+
+.ChoiceGroup {
+  /* ── Public API ──────────────────────────────────────────────────────── */
+  --cg-gap: 0.5rem;                                   /* between fields / parts */
+  --cg-gap-horizontal: 1rem;                          /* row gap; legend→body for beside */
+  --cg-legend-gap: 0.5rem;                            /* legend → body (above) */
+  --cg-max-inline-size: 30rem;
+  --cg-legend-weight: 600;
+  --cg-hint-color: var(--SITE--POPOVER--MUTED, #6e6e6e);
+  --cg-error-color: #c00;
+
+  /* Legend hygiene — the documented cost of <fieldset> (ADR-0013).
+     min-inline-size:0 kills the implicit min-content width in flex/grid hosts. */
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-inline-size: 0;
+  max-inline-size: var(--cg-max-inline-size);
+
+  & > legend {
+    padding: 0;
+    font-weight: var(--cg-legend-weight);
+  }
+
+  /* Body forms its own formatting context (holds hint + options + error). */
+  & .Body { display: flow-root; }
+
+  & .Hint {
+    margin-block: 0 var(--cg-gap);
+    color: var(--cg-hint-color);
+  }
+
+  & .Options {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-gap);
+  }
+
+  & .Error {
+    margin-block: var(--cg-gap) 0;
+    color: var(--cg-error-color);
+  }
+
+  /* ── Orientation ─────────────────────────────────────────────────────── */
+  &[data-orientation="horizontal"] .Options {
+    flex-direction: row;
+    flex-wrap: wrap;
+    column-gap: var(--cg-gap-horizontal);
+  }
+
+  /* ── Legend: above (default) — full-width float, Body clears below ───── */
+  &[data-legend="above"] > legend,
+  &:not([data-legend]) > legend {
+    float: left;
+    inline-size: 100%;
+    margin-block-end: var(--cg-legend-gap);
+  }
+  &[data-legend="above"] > .Body,
+  &:not([data-legend]) > .Body {
+    clear: both;                 /* drop the whole body below the full-width legend */
+  }
+
+  /* ── Legend: beside — auto-width float, Body fills the space beside it ─ */
+  &[data-legend="beside"] > legend {
+    float: left;
+    inline-size: auto;
+    margin-inline-end: var(--cg-gap-horizontal);
+  }
+  /* .Body stays flow-root (not cleared) → shrinks to the room right of the float */
+
+  /* ── Legend: hidden — removed visually, kept as the SR group name ────── */
+  &[data-legend="hidden"] > legend {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+  }
+}

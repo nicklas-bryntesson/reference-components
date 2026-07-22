@@ -66,4 +66,7 @@ holds the *why-we-built-it*; the `.md` holds the *how-it-works*.
 | [0010](0010-decorative-motion-region-and-motion-policy-kernel.md) | A decorative motion region governed by a `motion-policy` kernel | Component | Accepted |
 | [0011](0011-demos-default-to-english.md) | Demos default to English; localization is shown deliberately | Convention | Accepted |
 | [0012](0012-popover-clipping-is-a-documented-limitation.md) | Popover clipping in overflow ancestors is a documented limitation, not a reference fix | Architecture | Accepted |
-| [0013](0013-native-radio-checkbox-and-fieldset-grouping.md) | Radio and checkbox are native primitives; ChoiceGroup names the fieldset use | Component | Proposed |
+| [0013](0013-native-radio-checkbox-and-fieldset-grouping.md) | Radio and checkbox are native primitives; ChoiceGroup names the fieldset use | Component | Accepted |
+| [0014](0014-picklist-toggle-buttongroup-selection-vs-action.md) | Picklist, Toggle and ButtonGroup are distinct components; selection-vs-action draws the line | Architecture | Proposed |
+| [0015](0015-choicefield-one-component-keyed-on-native-type.md) | ChoiceField — one component keyed on native `type` (supersedes the 0013 radio/checkbox split) | Component | Accepted |
+| [0016](0016-notice-message-and-separate-live-region.md) | Notice is a presentational message; the live region is a separate persistent container | Component | Proposed |

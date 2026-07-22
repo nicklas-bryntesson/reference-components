@@ -23,3 +23,5 @@
 @import "./../../partials/components/AffixField/AffixField.css";
 @import "./../../partials/components/MotionRegion/MotionRegion.css";
 @import "./../../partials/components/ScrollArea/ScrollArea.css";
+@import "./../../partials/components/ChoiceField/ChoiceField.css";
+@import "./../../partials/components/ChoiceGroup/ChoiceGroup.css";
