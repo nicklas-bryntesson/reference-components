@@ -66,8 +66,8 @@
   /* ── Checkbox branch: square box, filled + tick ──────────────────────── */
   & input[type="checkbox"] { border-radius: var(--cf-radius); }
   & input[type="checkbox"]::after {
-    inline-size: calc(var(--cf-size) * 0.7);
-    block-size: calc(var(--cf-size) * 0.7);
+    inline-size: calc(var(--cf-size) * 0.82);
+    block-size: calc(var(--cf-size) * 0.82);
     background-color: var(--cf-mark-color);
     -webkit-mask: var(--cf-mark) center / contain no-repeat;
             mask: var(--cf-mark) center / contain no-repeat;
@@ -81,8 +81,8 @@
   /* ── Radio branch: circle box, ring + dot (box stays unfilled) ───────── */
   & input[type="radio"] { border-radius: 50%; }
   & input[type="radio"]::after {
-    inline-size: calc(var(--cf-size) * 0.5);
-    block-size: calc(var(--cf-size) * 0.5);
+    inline-size: calc(var(--cf-size) * 0.6);
+    block-size: calc(var(--cf-size) * 0.6);
     border-radius: 50%;
     background-color: var(--cf-selected);
     transform: scale(0.4);
