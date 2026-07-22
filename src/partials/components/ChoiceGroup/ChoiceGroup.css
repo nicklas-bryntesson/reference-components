@@ -27,7 +27,6 @@
   --cg-max-inline-size: 30rem;
   --cg-legend-weight: 600;
   --cg-hint-color: var(--SITE--POPOVER--MUTED, #6e6e6e);
-  --cg-error-color: #c00;
 
   /* Legend hygiene — the documented cost of <fieldset> (ADR-0013).
      min-inline-size:0 kills the implicit min-content width in flex/grid hosts. */
@@ -56,9 +55,10 @@
     gap: var(--cg-gap);
   }
 
-  & .Error {
-    margin-block: var(--cg-gap) 0;
-    color: var(--cg-error-color);
+  /* Group-level error is a Notice inside a persistent live region; ChoiceGroup
+     only owns the spacing (the announcer + payload are the Notice component). */
+  & .NoticeRegion {
+    margin-block-start: var(--cg-gap);
   }
 
   /* ── Orientation ─────────────────────────────────────────────────────── */
