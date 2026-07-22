@@ -19,7 +19,7 @@
 
 .ChoiceField {
   /* ── Public API ──────────────────────────────────────────────────────── */
-  --cf-size: 1.25rem;                             /* control box */
+  --cf-size: 1.5em;                               /* control box — em so it scales with the local text (≈24px at 16px) */
   --cf-gap: 0.5rem;                               /* box → label */
   --cf-border-width: 1px;
   --cf-radius: 0.25rem;                           /* checkbox corner (radio is always 50%) */
@@ -41,6 +41,9 @@
   & input {
     appearance: none;
     -webkit-appearance: none;
+    /* inherit the surrounding type so --cf-size (em) tracks the label/context
+       font-size, not the UA input default (~13px) */
+    font: inherit;
     margin: 0;
     flex-shrink: 0;
     inline-size: var(--cf-size);
@@ -56,11 +59,14 @@
       content: "";
       /* Fixed size, not %: the box is a place-content:center grid, so a
          percentage resolves against an auto track sized by this very element
-         → 0. Size the mark off the token instead. */
+         → 0. Size the mark off the token in the type branches below. */
       opacity: 0;
+      transform: scale(0.6);          /* initial: shrunk; :checked restores to full */
       transition: opacity var(--cf-transition), transform var(--cf-transition);
     }
   }
+  /* :checked has higher specificity than the type branches, so it wins the
+     final size regardless of source order — the mark reaches its full size. */
   & input:checked::after { opacity: 1; transform: none; }
 
   /* ── Checkbox branch: square box, filled + tick ──────────────────────── */
@@ -71,7 +77,6 @@
     background-color: var(--cf-mark-color);
     -webkit-mask: var(--cf-mark) center / contain no-repeat;
             mask: var(--cf-mark) center / contain no-repeat;
-    transform: scale(0.6);
   }
   & input[type="checkbox"]:checked {
     background-color: var(--cf-selected);
@@ -85,7 +90,6 @@
     block-size: calc(var(--cf-size) * 0.6);
     border-radius: 50%;
     background-color: var(--cf-selected);
-    transform: scale(0.4);
   }
   & input[type="radio"]:checked { border-color: var(--cf-selected); }
 

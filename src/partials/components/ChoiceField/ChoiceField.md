@@ -57,12 +57,15 @@ Contract rules (enforced by the unit test against this file's kitchensink):
 
 ## CSS Variable API
 
-Override at `:root` or on the `.ChoiceField` element. Neutral, monochrome defaults on
-system colours — the component **takes** design; override `--cf-selected` to push an accent.
+Override on the `.ChoiceField` element (or any rule that targets it — e.g.
+`.my-theme .ChoiceField { --cf-selected: … }`). An ancestor or `:root` override is
+**shadowed** by the component's own defaults on the root, so it must target `.ChoiceField`
+itself. Neutral, monochrome defaults on system colours — the component **takes** design;
+override `--cf-selected` to push an accent.
 
 | Variable | Default | Description |
 |---|---|---|
-| `--cf-size` | `1.25rem` | Control box size |
+| `--cf-size` | `1.5em` | Control box size — `em` so the control scales with its local text (≈24px at 16px); the tick (0.82×) and dot (0.6×) follow proportionally |
 | `--cf-gap` | `0.5rem` | Space between box and label |
 | `--cf-border-width` | `1px` | Box border |
 | `--cf-radius` | `0.25rem` | Checkbox corner (radio is always `50%`) |
