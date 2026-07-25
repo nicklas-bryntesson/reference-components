@@ -40,27 +40,27 @@ a thick leading accent bar, the richest look). Severity is always carried by the
 
 ## CSS Variable API
 
-Override on `.Notice` (or a rule targeting it). Set **one** token per variant — `--nt-accent` —
+Override on `.Notice` (or a rule targeting it). Set **one** token per variant — `--_nt-accent` —
 and the tint derives from it; adjust the rest globally.
 
 | Variable | Default | Description |
 |---|---|---|
-| `--nt-accent` | per variant (`error #c0362c`, `warning #a85a00`, `success #1a7f37`, `info #0b6bcb`, `neutral CanvasText`) | Drives the tint, the icon, and the `data-border` / `data-emphasis` chrome; each variant reads `var(--SITE--NOTICE-*, <fallback>)` |
-| `--nt-bg` | `color-mix(in srgb, var(--nt-accent) 8%, Canvas)` | Base surface tint (always on) — derived from the accent so it adapts to light/dark |
-| `--nt-text-color` | `CanvasText` | Body text |
-| `--nt-title-color` | `currentColor` | Title colour (bold regardless) |
-| `--nt-border-width` | `1px` | `data-border` border width |
-| `--nt-bar-width` | `0.25rem` | `data-emphasis` leading bar width |
-| `--nt-radius` | `0.375rem` | Corner radius |
-| `--nt-padding` | `1rem` | Inner padding |
-| `--nt-gap` | `1rem` | Icon → content |
-| `--nt-content-gap` | `0.25rem` | Title → body |
-| `--nt-icon-size` | `1.5rem` | Icon box |
-| `--nt-max-inline-size` | `50rem` | Max width |
+| `--_nt-accent` | per variant (`error #c0362c`, `warning #a85a00`, `success #1a7f37`, `info #0b6bcb`, `neutral CanvasText`) | Drives the tint, the icon, and the `data-border` / `data-emphasis` chrome; each variant reads `var(--SITE--NOTICE-*, <fallback>)` |
+| `--_nt-bg` | `color-mix(in srgb, var(--_nt-accent) 8%, Canvas)` | Base surface tint (always on) — derived from the accent so it adapts to light/dark |
+| `--_nt-text-color` | `CanvasText` | Body text |
+| `--_nt-title-color` | `currentColor` | Title colour (bold regardless) |
+| `--_nt-border-width` | `1px` | `data-border` border width |
+| `--_nt-bar-width` | `0.25rem` | `data-emphasis` leading bar width |
+| `--_nt-radius` | `0.375rem` | Corner radius |
+| `--_nt-padding` | `1rem` | Inner padding |
+| `--_nt-gap` | `1rem` | Icon → content |
+| `--_nt-content-gap` | `0.25rem` | Title → body |
+| `--_nt-icon-size` | `1.5rem` | Icon box |
+| `--_nt-max-inline-size` | `50rem` | Max width |
 
 ### Icons: inline SVG + currentColor
 
-Icons are authored inline as stroke SVGs; the CSS points `.Icon { color: var(--nt-accent) }`
+Icons are authored inline as stroke SVGs; the CSS points `.Icon { color: var(--_nt-accent) }`
 and the SVG uses `stroke: currentColor`, so the mark re-tints with the variant and needs no
 sprite sheet. Deliberately **not** a CSS `mask`/`background` icon — this keeps the icon
 colour bound to the accent via `currentColor` and the component fully self-contained.

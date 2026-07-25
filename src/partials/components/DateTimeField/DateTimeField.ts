@@ -326,7 +326,7 @@ export class DateTimeField {
     this.root.dataset.direction = detectDirection(triggerRect)
 
     const triggerCenterX = triggerRect.left + triggerRect.width / 2
-    const viewportInset = this._getCSSPx('--dtf-site-padding') / 2
+    const viewportInset = this._getCSSPx('--_dtf-site-padding') / 2
 
     const offset = calculatePopupOffset(
       triggerCenterX,
@@ -336,7 +336,7 @@ export class DateTimeField {
       window.innerWidth,
       viewportInset,
     )
-    this.root.style.setProperty('--dtf-popup-offset', `${offset}%`)
+    this.root.style.setProperty('--_dtf-popup-offset', `${offset}%`)
 
     const calendarLeft = containerRect.left + (offset / 100 * containerRect.width) - calendarWidth / 2
     const arrowOffset = calculateArrowOffset(
@@ -346,13 +346,13 @@ export class DateTimeField {
       this._getCSSPx('--_dtf-arrow-corner-radius'),
       this._getCSSPx('--_dtf-arrow-size'),
     )
-    this.root.style.setProperty('--dtf-arrow-offset', `${arrowOffset}px`)
+    this.root.style.setProperty('--_dtf-arrow-offset', `${arrowOffset}px`)
   }
 
   _getCSSPx(property: string): number {
     const probe = document.createElement('div')
     probe.style.cssText = `position:absolute;visibility:hidden;pointer-events:none;width:var(${property},0px)`
-    // Append inside the component root so component-scoped tokens (--dtf-*) resolve;
+    // Append inside the component root so component-scoped tokens (--_dtf-*) resolve;
     // appending to document.body would resolve them to the var() fallback (0).
     this.root.appendChild(probe)
     const value = parseFloat(getComputedStyle(probe).width) || 0

@@ -108,12 +108,12 @@ class ToggleTip {
       window.innerWidth,
       viewportInset,
     )
-    this.element.style.setProperty('--tt-popup-offset', `${offset}%`)
+    this.element.style.setProperty('--_tt-popup-offset', `${offset}%`)
 
     // Calculate popup left mathematically (CSS var change not yet in layout)
     const popupLeft = containerRect.left + (offset / 100 * containerRect.width) - popupRect.width / 2
     const arrowOffset = calculateArrowOffset(triggerCenterX, popupLeft, popupRect.width, borderRadius, arrowSize)
-    this.element.style.setProperty('--tt-arrow-offset', `${arrowOffset}px`)
+    this.element.style.setProperty('--_tt-arrow-offset', `${arrowOffset}px`)
   }
 
   private _getCSSPx(property: string): number {

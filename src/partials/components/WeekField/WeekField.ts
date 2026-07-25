@@ -1164,9 +1164,9 @@ class WeekField {
       containerRect.width,
       popupWidth,
       window.innerWidth,
-      this._getCSSPx('--wf-site-padding') / 2,
+      this._getCSSPx('--_wf-site-padding') / 2,
     )
-    this.root.style.setProperty('--wf-popup-offset', `${offset}%`)
+    this.root.style.setProperty('--_wf-popup-offset', `${offset}%`)
 
     const popupLeft = containerRect.left + (offset / 100 * containerRect.width) - popupWidth / 2
     const arrowOffset = calculateArrowOffset(
@@ -1176,7 +1176,7 @@ class WeekField {
       this._getCSSPx('--_wf-arrow-corner-radius'),
       this._getCSSPx('--_wf-arrow-size'),
     )
-    this.root.style.setProperty('--wf-arrow-offset', `${arrowOffset}px`)
+    this.root.style.setProperty('--_wf-arrow-offset', `${arrowOffset}px`)
   }
 
   private _getCSSPx(property: string): number {

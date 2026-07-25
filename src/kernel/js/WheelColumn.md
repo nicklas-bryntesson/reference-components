@@ -62,7 +62,7 @@ destroy(): void                                        // aborts listeners, canc
 
 ## CSS / token dependency
 
-Reads `--wheel-row-height` from computed style (falls back to 38px) to size geometry — so
+Reads `--_wheel-row-height` from computed style (falls back to 38px) to size geometry — so
 [`Wheel.css`](../css/Wheel.md) (or an equivalent declaring that token) **must** be present. Without
 it the options stack as unstyled overlapping text and fail colour-contrast (the original port bug).
 

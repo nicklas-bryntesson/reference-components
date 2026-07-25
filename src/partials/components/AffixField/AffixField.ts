@@ -13,7 +13,7 @@
 // always win.
 //
 // Widths are never measured. The layout model is character counts × one
-// calibrated character unit (--af-ch-unit, CSS): the counts below are content
+// calibrated character unit (--_af-ch-unit, CSS): the counts below are content
 // facts (string lengths), the unit is typography, and the CSS formulas own the
 // math. Counts don't change with fonts, so there is no re-measure machinery of
 // any kind.
@@ -41,8 +41,8 @@ function generateId(): string {
 }
 
 const AFFIXES = [
-  ['prefix', '--af-prefix-chars'],
-  ['suffix', '--af-suffix-chars'],
+  ['prefix', '--_af-prefix-chars'],
+  ['suffix', '--_af-suffix-chars'],
 ] as const
 
 // ─── Global augmentation ─────────────────────────────────────────────────────
@@ -107,7 +107,7 @@ class AffixField {
     }
   }
 
-  // --af-prefix-chars / --af-suffix-chars: the affix string length as a plain
+  // --_af-prefix-chars / --_af-suffix-chars: the affix string length as a plain
   // number. The reference JS and a server compute the SAME thing (the length
   // of the affix string), just at different times — the end-state is fully
   // symmetric. Authored counts always win, including fractional ones (the
@@ -122,15 +122,15 @@ class AffixField {
   }
 
   // data-input-characters (width of the value area in character units) →
-  // --af-input-chars. A plain attribute → custom property mapping; the CSS
+  // --_af-input-chars. A plain attribute → custom property mapping; the CSS
   // width calc is gated on the attribute so nothing happens when it is absent.
   private _setInputChars(): void {
     const raw = this.root.dataset.inputCharacters
     if (raw === undefined) return
-    if (this._authoredInline('--af-input-chars')) return
+    if (this._authoredInline('--_af-input-chars')) return
     const chars = Number(raw)
     if (!Number.isFinite(chars) || chars <= 0) return
-    this.root.style.setProperty('--af-input-chars', String(chars))
+    this.root.style.setProperty('--_af-input-chars', String(chars))
   }
 
   // Default wiring: affixes get ids (<input-id>-prefix / <input-id>-suffix,

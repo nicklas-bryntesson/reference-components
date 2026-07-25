@@ -65,17 +65,17 @@ Override at `:root` or on the `toggle-tip` element directly.
 
 | Variable | Default | Description |
 |---|---|---|
-| `--toggletip-gap` | `0.75rem` | Space between trigger and bubble |
-| `--toggletip-content-width` | `20rem` | Bubble max width |
-| `--toggletip-padding` | `1.5rem` | Bubble inner padding |
-| `--toggletip-border-radius` | `var(--SITE--POPOVER--RADIUS)` | Bubble corner radius |
-| `--toggletip-button-width` | `1.5rem` | Trigger button size |
-| `--toggletip-button-color` | `CanvasText` | Icon colour |
-| `--toggletip-surface-color` | `Canvas` | Bubble background |
-| `--toggletip-text-color` | `CanvasText` | Bubble text colour |
-| `--toggletip-border-color` | `var(--SITE--POPOVER--BORDER--COLOR)` | Bubble border and title divider colour |
-| `--toggletip-site-max-width` | `100rem` | Site max width (caps the slide rail) |
-| `--toggletip-site-padding` | `var(--SITE--PADDING, 1rem)` | Outer site padding — bubble stays at least half this value from each viewport edge |
+| `--_toggletip-gap` | `0.75rem` | Space between trigger and bubble |
+| `--_toggletip-content-width` | `20rem` | Bubble max width |
+| `--_toggletip-padding` | `1.5rem` | Bubble inner padding |
+| `--_toggletip-border-radius` | `var(--SITE--POPOVER--RADIUS)` | Bubble corner radius |
+| `--_toggletip-button-width` | `1.5rem` | Trigger button size |
+| `--_toggletip-button-color` | `CanvasText` | Icon colour |
+| `--_toggletip-surface-color` | `Canvas` | Bubble background |
+| `--_toggletip-text-color` | `CanvasText` | Bubble text colour |
+| `--_toggletip-border-color` | `var(--SITE--POPOVER--BORDER--COLOR)` | Bubble border and title divider colour |
+| `--_toggletip-site-max-width` | `100rem` | Site max width (caps the slide rail) |
+| `--_toggletip-site-padding` | `var(--SITE--PADDING, 1rem)` | Outer site padding — bubble stays at least half this value from each viewport edge |
 
 ## Accessibility
 
@@ -139,7 +139,7 @@ Each instance exposes `destroy()`, which removes all listeners (window resize, d
 |---|---|---|
 | [`js/popup-position`](../../../kernel/js/popup-position.md) | JS | `detectDirection` + bubble/arrow offset maths |
 
-No CSS kernel dependency. The site tokens this component reads (`--SITE--PADDING`, `--SITE--POPOVER--BORDER--COLOR`, `--SITE--POPOVER--RADIUS`, `--SITE--POPOVER--SHADOW`) are surfaced through the `--toggletip-*` CSS Variable API above. Most have fallbacks, so the component largely runs standalone — with two exceptions: `box-shadow: var(--SITE--POPOVER--SHADOW)` has no fallback (no shadow without the token), and `--toggletip-border-color`'s fallback chain bottoms out in `--SITE--POPOVER--BORDER--COLOR` (the border degrades to `currentColor` without it).
+No CSS kernel dependency. The site tokens this component reads (`--SITE--PADDING`, `--SITE--POPOVER--BORDER--COLOR`, `--SITE--POPOVER--RADIUS`, `--SITE--POPOVER--SHADOW`) are surfaced through the `--_toggletip-*` CSS Variable API above. Most have fallbacks, so the component largely runs standalone — with two exceptions: `box-shadow: var(--SITE--POPOVER--SHADOW)` has no fallback (no shadow without the token), and `--_toggletip-border-color`'s fallback chain bottoms out in `--SITE--POPOVER--BORDER--COLOR` (the border degrades to `currentColor` without it).
 
 ## Non-goals
 

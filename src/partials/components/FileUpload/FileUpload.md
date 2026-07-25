@@ -134,7 +134,7 @@ Invalid entries (`data-status="invalid-type"` / `"invalid-size"`) render in the 
 
 ## Kernel dependencies
 
-None. FileUpload composes no shared primitives from [`src/kernel/`](../../../kernel/README.md) and reads no `--SITE--*` tokens — its `--fu-*` tokens are self-contained. Port the component folder on its own.
+None. FileUpload composes no shared primitives from [`src/kernel/`](../../../kernel/README.md) and reads no `--SITE--*` tokens — its `--_fu-*` tokens are self-contained. Port the component folder on its own.
 
 ## Manual accessibility testing
 

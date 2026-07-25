@@ -128,7 +128,7 @@ All observable outcomes are state changes on `data-*` attributes or DOM changes:
 | `data-state` | `"open"` while the calendar is open, `"idle"` after close |
 | `data-direction` | `"top"` or `"bottom"` — which side of the trigger the popup opens on |
 
-JS also sets two inline custom properties on the root while the calendar is open: `--df-popup-offset` (horizontal popup position, %) and `--df-arrow-offset` (arrow position, px).
+JS also sets two inline custom properties on the root while the calendar is open: `--_df-popup-offset` (horizontal popup position, %) and `--_df-arrow-offset` (arrow position, px).
 
 #### Display mode (coarse pointer / touch)
 
@@ -149,7 +149,7 @@ This component composes shared primitives from [`src/kernel/`](../../../kernel/R
 
 ## Required site tokens
 
-The `--df-*` design tokens default to host-provided site tokens. A consumer must declare these (reference values live in [`src/css/site/01-Setup/tokens.css`](../../../css/site/01-Setup/tokens.css)); porting the component without them leaves colours and spacing unset.
+The `--_df-*` design tokens default to host-provided site tokens. A consumer must declare these (reference values live in [`src/css/site/01-Setup/tokens.css`](../../../css/site/01-Setup/tokens.css)); porting the component without them leaves colours and spacing unset.
 
 - `--MAX--WIDTH--SITE`, `--SITE--PADDING`
 - `--SITE--POPOVER--BG`, `--SITE--POPOVER--COLOR`, `--SITE--POPOVER--MUTED`, `--SITE--POPOVER--BORDER--COLOR`, `--SITE--POPOVER--RADIUS`, `--SITE--POPOVER--SHADOW`, `--SITE--POPOVER--PADDING`, `--SITE--POPOVER--HOVER-BG`, `--SITE--POPOVER--ACCENT`, `--SITE--POPOVER--ACCENT-TEXT`

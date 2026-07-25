@@ -7,14 +7,14 @@
   gap: 0.5rem;
 
   /* Design tokens */
-  --fu-border-color: currentColor;
-  --fu-border-radius: 4px;
-  --fu-trigger-bg: Canvas;
-  --fu-trigger-bg-hover: #f0f0f0;
-  --fu-trigger-bg-active: #e0e0e0;
-  --fu-error-color: #c00;
-  --fu-drop-zone-border-color: #0070f3;
-  --fu-drop-zone-bg: #f0f7ff;
+  --_fu-border-color: currentColor;
+  --_fu-border-radius: 4px;
+  --_fu-trigger-bg: Canvas;
+  --_fu-trigger-bg-hover: #f0f0f0;
+  --_fu-trigger-bg-active: #e0e0e0;
+  --_fu-error-color: #c00;
+  --_fu-drop-zone-border-color: #0070f3;
+  --_fu-drop-zone-bg: #f0f7ff;
 
   /* Hidden native input — zero-sized, never display:none so input.click() works */
   & .FileUpload-input {
@@ -28,8 +28,8 @@
 
   /* Drop-zone: input spans full root, captures native drag-and-drop */
   &[data-drop-zone="true"] {
-    border: 2px dashed var(--fu-border-color);
-    border-radius: var(--fu-border-radius);
+    border: 2px dashed var(--_fu-border-color);
+    border-radius: var(--_fu-border-radius);
     padding: 1rem;
     min-height: 6rem;
     align-items: center;
@@ -67,8 +67,8 @@
   }
 
   &[data-drop-zone="true"][data-dragging-over="true"] {
-    border-color: var(--fu-drop-zone-border-color);
-    background: var(--fu-drop-zone-bg);
+    border-color: var(--_fu-drop-zone-border-color);
+    background: var(--_fu-drop-zone-bg);
   }
 
   & .FileUpload-label {
@@ -90,15 +90,15 @@
     align-items: center;
     gap: 0.5rem;
     padding: 0.375rem 0.5rem;
-    border: 1px solid var(--fu-border-color);
-    border-radius: var(--fu-border-radius);
+    border: 1px solid var(--_fu-border-color);
+    border-radius: var(--_fu-border-radius);
     font-size: 0.875rem;
   }
 
   &[data-has-errors="true"] .FileUpload-item[data-status="invalid-type"],
   &[data-has-errors="true"] .FileUpload-item[data-status="invalid-size"] {
-    border-color: var(--fu-error-color);
-    color: var(--fu-error-color);
+    border-color: var(--_fu-error-color);
+    color: var(--_fu-error-color);
   }
 
   & .FileUpload-item-name {
@@ -115,7 +115,7 @@
 
   & .FileUpload-item-error {
     font-size: 0.75rem;
-    color: var(--fu-error-color);
+    color: var(--_fu-error-color);
     white-space: nowrap;
   }
 
@@ -131,7 +131,7 @@
 
   & .FileUpload-item-remove:hover,
   &[data-test-state="hover"] .FileUpload-item-remove {
-    background: var(--fu-trigger-bg-hover);
+    background: var(--_fu-trigger-bg-hover);
   }
 
   & .FileUpload-item-remove:focus-visible,
@@ -145,9 +145,9 @@
     align-items: center;
     gap: 0.375rem;
     padding: 0.375rem 0.75rem;
-    border: 1px solid var(--fu-border-color);
-    border-radius: var(--fu-border-radius);
-    background: var(--fu-trigger-bg);
+    border: 1px solid var(--_fu-border-color);
+    border-radius: var(--_fu-border-radius);
+    background: var(--_fu-trigger-bg);
     cursor: pointer;
     font-size: 0.875rem;
     align-self: flex-start;
@@ -155,7 +155,7 @@
 
   & .FileUpload-trigger:hover,
   &[data-test-state="hover"] .FileUpload-trigger {
-    background: var(--fu-trigger-bg-hover);
+    background: var(--_fu-trigger-bg-hover);
   }
 
   & .FileUpload-trigger:focus-visible,
@@ -166,7 +166,7 @@
 
   & .FileUpload-trigger:active,
   &[data-test-state="active"] .FileUpload-trigger {
-    background: var(--fu-trigger-bg-active);
+    background: var(--_fu-trigger-bg-active);
   }
 
   &[data-disabled="true"] {
