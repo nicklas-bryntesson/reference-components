@@ -92,7 +92,7 @@ not a listbox popup).
 | `data-input-mode` | `"custom"` or `"display"` — chosen at init via `matchMedia('(pointer: coarse)')` |
 | `data-direction` | `"top"` or `"bottom"` — which side of the trigger the popup opens on |
 
-JS also sets two inline custom properties on the root while the popup is open: `--dtf-popup-offset` (horizontal popup position, %) and `--dtf-arrow-offset` (arrow position, px).
+JS also sets two inline custom properties on the root while the popup is open: `--_dtf-popup-offset` (horizontal popup position, %) and `--_dtf-arrow-offset` (arrow position, px).
 
 ## Behaviour
 
@@ -132,7 +132,7 @@ This component composes shared primitives from [`src/kernel/`](../../../kernel/R
 
 ## Required site tokens
 
-The `--dtf-*` design tokens default to host-provided site tokens. A consumer must declare these (reference values live in [`src/css/site/01-Setup/tokens.css`](../../../css/site/01-Setup/tokens.css)); porting the component without them leaves colours and spacing unset.
+The `--_dtf-*` design tokens default to host-provided site tokens. A consumer must declare these (reference values live in [`src/css/site/01-Setup/tokens.css`](../../../css/site/01-Setup/tokens.css)); porting the component without them leaves colours and spacing unset.
 
 - `--MAX--WIDTH--SITE`, `--SITE--PADDING`
 - `--SITE--POPOVER--BG`, `--SITE--POPOVER--COLOR`, `--SITE--POPOVER--MUTED`, `--SITE--POPOVER--BORDER--COLOR`, `--SITE--POPOVER--RADIUS`, `--SITE--POPOVER--SHADOW`, `--SITE--POPOVER--PADDING`, `--SITE--POPOVER--HOVER-BG`, `--SITE--POPOVER--ACCENT`, `--SITE--POPOVER--ACCENT-TEXT`

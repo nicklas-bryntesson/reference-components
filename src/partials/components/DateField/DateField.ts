@@ -712,7 +712,7 @@ class DateField {
     this.root.dataset.direction = direction
 
     const triggerCenterX = triggerRect.left + triggerRect.width / 2
-    const viewportInset = this._getCSSPx('--df-site-padding') / 2
+    const viewportInset = this._getCSSPx('--_df-site-padding') / 2
 
     const offset = calculatePopupOffset(
       triggerCenterX,
@@ -722,7 +722,7 @@ class DateField {
       window.innerWidth,
       viewportInset,
     )
-    this.root.style.setProperty('--df-popup-offset', `${offset}%`)
+    this.root.style.setProperty('--_df-popup-offset', `${offset}%`)
 
     const calendarLeft = containerRect.left + (offset / 100 * containerRect.width) - calendarWidth / 2
     const arrowOffset = calculateArrowOffset(
@@ -732,7 +732,7 @@ class DateField {
       this._getCSSPx('--_df-arrow-corner-radius'),
       this._getCSSPx('--_df-arrow-size'),
     )
-    this.root.style.setProperty('--df-arrow-offset', `${arrowOffset}px`)
+    this.root.style.setProperty('--_df-arrow-offset', `${arrowOffset}px`)
   }
 
   private _getCSSPx(property: string): number {

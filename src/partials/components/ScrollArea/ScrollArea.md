@@ -47,9 +47,9 @@ Authored:
 
 | Property | Default | Description |
 |---|---|---|
-| `--sc-offset` | `var(--content-offset)` | Inline inset the scroller breaks out to and is padded by, so content lines up with the page gutter while scrolling edge-to-edge. |
-| `--sc-fade-color` | `white` | Colour of the edge fades. **Must match the surface behind the ScrollArea** (see masking, below, to remove this coupling). |
-| `--sc-fade-size` | `--sc-offset` | Width of each edge fade. |
+| `--_sc-offset` | `var(--content-offset)` | Inline inset the scroller breaks out to and is padded by, so content lines up with the page gutter while scrolling edge-to-edge. |
+| `--_sc-fade-color` | `white` | Colour of the edge fades. **Must match the surface behind the ScrollArea** (see masking, below, to remove this coupling). |
+| `--_sc-fade-size` | `--_sc-offset` | Width of each edge fade. |
 
 ## Accessibility
 
@@ -91,7 +91,7 @@ baseline works everywhere:
 
 - **Masking instead of colour fades.** `mask-image: linear-gradient(...)` on the
   viewport fades content to *transparent* regardless of the background, removing the
-  `--sc-fade-color`-must-match-the-surface coupling. Left out of the baseline only
+  `--_sc-fade-color`-must-match-the-surface coupling. Left out of the baseline only
   because the colour fade needs no feature detection.
 - **Scroll-driven fades** (`scroll-timeline` / `animation-timeline`): show each edge
   fade only when there is actually more content to scroll in that direction.

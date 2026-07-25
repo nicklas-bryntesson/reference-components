@@ -21,12 +21,12 @@
 
 .ChoiceGroup {
   /* ── Public API ──────────────────────────────────────────────────────── */
-  --cg-gap: 0.5rem;                                   /* between fields / parts */
-  --cg-gap-horizontal: 1rem;                          /* row gap; legend→body for beside */
-  --cg-legend-gap: 0.5rem;                            /* legend → body (above) */
-  --cg-max-inline-size: 30rem;
-  --cg-legend-weight: 600;
-  --cg-hint-color: var(--SITE--POPOVER--MUTED, #6e6e6e);
+  --_cg-gap: 0.5rem;                                   /* between fields / parts */
+  --_cg-gap-horizontal: 1rem;                          /* row gap; legend→body for beside */
+  --_cg-legend-gap: 0.5rem;                            /* legend → body (above) */
+  --_cg-max-inline-size: 30rem;
+  --_cg-legend-weight: 600;
+  --_cg-hint-color: var(--SITE--POPOVER--MUTED, #6e6e6e);
 
   /* Legend hygiene — the documented cost of <fieldset> (ADR-0013).
      min-inline-size:0 kills the implicit min-content width in flex/grid hosts. */
@@ -34,38 +34,38 @@
   margin: 0;
   padding: 0;
   min-inline-size: 0;
-  max-inline-size: var(--cg-max-inline-size);
+  max-inline-size: var(--_cg-max-inline-size);
 
   & > legend {
     padding: 0;
-    font-weight: var(--cg-legend-weight);
+    font-weight: var(--_cg-legend-weight);
   }
 
   /* Body forms its own formatting context (holds hint + options + error). */
   & .Body { display: flow-root; }
 
   & .Hint {
-    margin-block: 0 var(--cg-gap);
-    color: var(--cg-hint-color);
+    margin-block: 0 var(--_cg-gap);
+    color: var(--_cg-hint-color);
   }
 
   & .Options {
     display: flex;
     flex-direction: column;
-    gap: var(--cg-gap);
+    gap: var(--_cg-gap);
   }
 
   /* Group-level error is a Notice inside a persistent live region; ChoiceGroup
      only owns the spacing (the announcer + payload are the Notice component). */
   & .NoticeRegion {
-    margin-block-start: var(--cg-gap);
+    margin-block-start: var(--_cg-gap);
   }
 
   /* ── Orientation ─────────────────────────────────────────────────────── */
   &[data-orientation="horizontal"] .Options {
     flex-direction: row;
     flex-wrap: wrap;
-    column-gap: var(--cg-gap-horizontal);
+    column-gap: var(--_cg-gap-horizontal);
   }
 
   /* ── Legend: above (default) — full-width float, Body clears below ───── */
@@ -73,7 +73,7 @@
   &:not([data-legend]) > legend {
     float: left;
     inline-size: 100%;
-    margin-block-end: var(--cg-legend-gap);
+    margin-block-end: var(--_cg-legend-gap);
   }
   &[data-legend="above"] > .Body,
   &:not([data-legend]) > .Body {
@@ -84,7 +84,7 @@
   &[data-legend="beside"] > legend {
     float: left;
     inline-size: auto;
-    margin-inline-end: var(--cg-gap-horizontal);
+    margin-inline-end: var(--_cg-gap-horizontal);
   }
   /* .Body stays flow-root (not cleared) → shrinks to the room right of the float */
 

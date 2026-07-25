@@ -4,26 +4,26 @@
   overflow: hidden;
   /* Public API */
   /* Popup sizes to its content (fit-content); month + year columns define the width. */
-  --mf-popup-gap: 1.5rem;
-  --mf-site-padding: var(--SITE--PADDING, 1rem);
+  --_mf-popup-gap: 1.5rem;
+  --_mf-site-padding: var(--SITE--PADDING, 1rem);
   /* Field-family height contract — every field's bordered box is min 2.5rem tall */
-  --mf-field-min-block-size: 2.5rem;
+  --_mf-field-min-block-size: 2.5rem;
   /* Design tokens — segments */
-  --mf-border-color: currentColor;
-  --mf-border-color-hover: CanvasText;
-  --mf-bg-hover: var(--SITE--POPOVER--HOVER-BG);
-  --mf-border-color-invalid: #c00;
-  --mf-color-muted: var(--SITE--POPOVER--MUTED);
-  --mf-trigger-bg-hover: var(--SITE--POPOVER--HOVER-BG);
-  --mf-trigger-bg-active: var(--SITE--POPOVER--HOVER-BG);
+  --_mf-border-color: currentColor;
+  --_mf-border-color-hover: CanvasText;
+  --_mf-bg-hover: var(--SITE--POPOVER--HOVER-BG);
+  --_mf-border-color-invalid: #c00;
+  --_mf-color-muted: var(--SITE--POPOVER--MUTED);
+  --_mf-trigger-bg-hover: var(--SITE--POPOVER--HOVER-BG);
+  --_mf-trigger-bg-active: var(--SITE--POPOVER--HOVER-BG);
   /* Design tokens — popup (shared popover surface) */
-  --mf-popup-bg: var(--SITE--POPOVER--BG);
-  --mf-popup-color: var(--SITE--POPOVER--COLOR);
-  --mf-popup-border-color: var(--SITE--POPOVER--BORDER--COLOR);
-  --mf-popup-radius: var(--SITE--POPOVER--RADIUS);
-  --mf-popup-shadow: var(--SITE--POPOVER--SHADOW);
-  --mf-option-bg-selected: var(--SITE--POPOVER--ACCENT);
-  --mf-option-color-selected: var(--SITE--POPOVER--ACCENT-TEXT);
+  --_mf-popup-bg: var(--SITE--POPOVER--BG);
+  --_mf-popup-color: var(--SITE--POPOVER--COLOR);
+  --_mf-popup-border-color: var(--SITE--POPOVER--BORDER--COLOR);
+  --_mf-popup-radius: var(--SITE--POPOVER--RADIUS);
+  --_mf-popup-shadow: var(--SITE--POPOVER--SHADOW);
+  --_mf-option-bg-selected: var(--SITE--POPOVER--ACCENT);
+  --_mf-option-color-selected: var(--SITE--POPOVER--ACCENT-TEXT);
   /* Wheel visuals live in the shared src/kernel/css/Wheel.css (.Wheel-*) */
   /* Internal */
   --_mf-arrow-size: 0.75rem;
@@ -57,9 +57,9 @@
       display: inline-flex;
       align-items: center;
       box-sizing: border-box;
-      min-block-size: var(--mf-field-min-block-size);
+      min-block-size: var(--_mf-field-min-block-size);
       gap: 0.125rem;
-      border: 1px solid var(--mf-border-color);
+      border: 1px solid var(--_mf-border-color);
       padding-inline: 0.5rem;
       padding-block: 0.25rem;
       border-radius: 4px;
@@ -80,9 +80,9 @@
       display: inline-flex;
       align-items: center;
       box-sizing: border-box;
-      min-block-size: var(--mf-field-min-block-size);
+      min-block-size: var(--_mf-field-min-block-size);
       gap: 0.125rem;
-      border: 1px solid var(--mf-border-color);
+      border: 1px solid var(--_mf-border-color);
       padding-inline: 0.5rem;
       padding-block: 0.25rem;
       border-radius: 4px;
@@ -114,19 +114,19 @@
     }
 
     &[data-placeholder="true"] {
-      color: var(--mf-color-muted);
+      color: var(--_mf-color-muted);
     }
   }
 
   & .MonthField-sep {
     user-select: none;
-    color: var(--mf-color-muted);
+    color: var(--_mf-color-muted);
   }
 
   &[data-input-mode="custom"] .MonthField-overlay:hover,
   &[data-test-state="hover"] .MonthField-overlay {
-    border-color: var(--mf-border-color-hover);
-    background-color: var(--mf-bg-hover);
+    border-color: var(--_mf-border-color-hover);
+    background-color: var(--_mf-bg-hover);
   }
 
   &[data-input-mode="custom"] .MonthField-overlay:focus-within,
@@ -136,7 +136,7 @@
   }
 
   &[data-invalid="true"] .MonthField-overlay {
-    border-color: var(--mf-border-color-invalid);
+    border-color: var(--_mf-border-color-invalid);
   }
 
   & .MonthField-trigger {
@@ -160,11 +160,11 @@
   }
 
   & .MonthField-trigger:hover {
-    background-color: var(--mf-trigger-bg-hover);
+    background-color: var(--_mf-trigger-bg-hover);
   }
 
   & .MonthField-trigger:active {
-    background-color: var(--mf-trigger-bg-active);
+    background-color: var(--_mf-trigger-bg-active);
   }
 
   & .MonthField-announce {
@@ -197,15 +197,15 @@
 /* ── Popup bubble ──────────────────────────────────────────────────────────── */
 .MonthField-popup {
   position: absolute;
-  left: var(--mf-popup-offset, 50%);
+  left: var(--_mf-popup-offset, 50%);
   transform: translateX(-50%);
   inline-size: fit-content;
   pointer-events: auto;
-  background: var(--mf-popup-bg);
-  color: var(--mf-popup-color);
-  border: 1px solid var(--mf-popup-border-color);
-  border-radius: var(--mf-popup-radius);
-  box-shadow: var(--mf-popup-shadow);
+  background: var(--_mf-popup-bg);
+  color: var(--_mf-popup-color);
+  border: 1px solid var(--_mf-popup-border-color);
+  border-radius: var(--_mf-popup-radius);
+  box-shadow: var(--_mf-popup-shadow);
   z-index: 100;
   padding: var(--SITE--POPOVER--PADDING);
   font-size: 1rem;
@@ -214,11 +214,11 @@
 /* ── Direction gates ───────────────────────────────────────────────────────── */
 .MonthField {
   &[data-direction="bottom"] .MonthField-popup {
-    top: var(--mf-popup-gap);
+    top: var(--_mf-popup-gap);
   }
 
   &[data-direction="top"] .MonthField-popup {
-    bottom: var(--mf-popup-gap);
+    bottom: var(--_mf-popup-gap);
   }
 }
 
@@ -257,7 +257,7 @@
     font: inherit;
 
     &:hover {
-      background-color: var(--mf-bg-hover);
+      background-color: var(--_mf-bg-hover);
     }
 
     &:focus-visible {
@@ -266,7 +266,7 @@
     }
 
     &:disabled {
-      color: var(--mf-color-muted);
+      color: var(--_mf-color-muted);
       cursor: not-allowed;
     }
   }
@@ -278,20 +278,20 @@
     position: absolute;
     width: var(--_mf-arrow-size);
     height: var(--_mf-arrow-size);
-    background-color: var(--mf-popup-bg);
+    background-color: var(--_mf-popup-bg);
     left: 50%;
     z-index: 3;
   }
 
   &[data-direction="top"] .arrow {
     bottom: calc(var(--_mf-arrow-size) * -0.5);
-    transform: translateX(calc(-50% + var(--mf-arrow-offset, 0px))) rotate(45deg);
+    transform: translateX(calc(-50% + var(--_mf-arrow-offset, 0px))) rotate(45deg);
     border-end-end-radius: var(--_mf-arrow-corner-radius);
   }
 
   &[data-direction="bottom"] .arrow {
     top: calc(var(--_mf-arrow-size) * -0.5);
-    transform: translateX(calc(-50% + var(--mf-arrow-offset, 0px))) rotate(45deg);
+    transform: translateX(calc(-50% + var(--_mf-arrow-offset, 0px))) rotate(45deg);
     border-start-start-radius: var(--_mf-arrow-corner-radius);
   }
 }

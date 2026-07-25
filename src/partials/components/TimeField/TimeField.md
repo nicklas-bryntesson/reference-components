@@ -64,23 +64,23 @@ All tokens are custom properties on `.TimeField`:
 
 | Token | Description |
 |---|---|
-| `--tf-border-color` | Segment border |
-| `--tf-border-color-hover` | Segment border on hover |
-| `--tf-border-color-invalid` | Border color when invalid |
-| `--tf-bg-hover` | Background on hover |
-| `--tf-color-muted` | Placeholder text color |
-| `--tf-trigger-bg-hover` | Trigger button hover background |
-| `--tf-trigger-bg-active` | Trigger button active background |
-| `--tf-popup-bg` | Popup background |
-| `--tf-popup-color` | Popup text color |
-| `--tf-popup-border-color` | Popup border |
-| `--tf-popup-radius` | Popup border radius |
-| `--tf-popup-shadow` | Popup box shadow |
-| `--tf-popup-width` | Popup width |
-| `--tf-popup-gap` | Gap between field and popup |
-| `--tf-site-padding` | Viewport padding read by JS for popup positioning (defaults to `--SITE--PADDING`) |
-| `--tf-option-bg-selected` | Selected option background |
-| `--tf-option-color-selected` | Selected option text color |
+| `--_tf-border-color` | Segment border |
+| `--_tf-border-color-hover` | Segment border on hover |
+| `--_tf-border-color-invalid` | Border color when invalid |
+| `--_tf-bg-hover` | Background on hover |
+| `--_tf-color-muted` | Placeholder text color |
+| `--_tf-trigger-bg-hover` | Trigger button hover background |
+| `--_tf-trigger-bg-active` | Trigger button active background |
+| `--_tf-popup-bg` | Popup background |
+| `--_tf-popup-color` | Popup text color |
+| `--_tf-popup-border-color` | Popup border |
+| `--_tf-popup-radius` | Popup border radius |
+| `--_tf-popup-shadow` | Popup box shadow |
+| `--_tf-popup-width` | Popup width |
+| `--_tf-popup-gap` | Gap between field and popup |
+| `--_tf-site-padding` | Viewport padding read by JS for popup positioning (defaults to `--SITE--PADDING`) |
+| `--_tf-option-bg-selected` | Selected option background |
+| `--_tf-option-color-selected` | Selected option text color |
 
 ## Kernel dependencies
 
@@ -98,7 +98,7 @@ This component composes shared primitives from [`src/kernel/`](../../../kernel/R
 
 ## Required site tokens
 
-The `--tf-*` tokens (see `## CSS tokens`) default to host-provided site tokens. A consumer must declare these (reference values live in [`src/css/site/01-Setup/tokens.css`](../../../css/site/01-Setup/tokens.css)):
+The `--_tf-*` tokens (see `## CSS tokens`) default to host-provided site tokens. A consumer must declare these (reference values live in [`src/css/site/01-Setup/tokens.css`](../../../css/site/01-Setup/tokens.css)):
 
 - `--SITE--PADDING`
 - `--SITE--POPOVER--BG`, `--SITE--POPOVER--COLOR`, `--SITE--POPOVER--MUTED`, `--SITE--POPOVER--BORDER--COLOR`, `--SITE--POPOVER--RADIUS`, `--SITE--POPOVER--SHADOW`, `--SITE--POPOVER--PADDING`, `--SITE--POPOVER--HOVER-BG`, `--SITE--POPOVER--ACCENT`, `--SITE--POPOVER--ACCENT-TEXT`

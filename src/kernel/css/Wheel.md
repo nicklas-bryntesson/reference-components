@@ -13,7 +13,7 @@ pair** — shipping `WheelColumn` without `Wheel.css` renders the options as ove
 | `.Wheel-ring` | injected by JS | the rotating 3D ring |
 | `.Wheel-option` | injected by JS | one row; `[aria-selected="true"]` is the centred value |
 | `.Wheel-band` | injected by JS | per-column highlight band — currently **hidden** (`display: none`); superseded by `.WheelColumns::before` |
-| `.WheelColumns` | **authored** (wrapper around the `.Wheel` columns) | draws the visible full-width centre band (`::before`) and top/bottom fade (`::after`); declares its own `--wheel-row-height: 38px` that must stay in sync with `.Wheel`'s |
+| `.WheelColumns` | **authored** (wrapper around the `.Wheel` columns) | draws the visible full-width centre band (`::before`) and top/bottom fade (`::after`); declares its own `--_wheel-row-height: 38px` that must stay in sync with `.Wheel`'s |
 
 A port that follows this table must end up with both the centre band and the fade — they live on the
 authored `.WheelColumns` wrapper (present in all four consuming components' canonical markup), not on
@@ -21,10 +21,10 @@ authored `.WheelColumns` wrapper (present in all four consuming components' cano
 
 ## Tokens
 
-- `--wheel-row-height` (default `38px`) — **read back by `WheelColumn.ts`** (`readRowHeight`) to size
+- `--_wheel-row-height` (default `38px`) — **read back by `WheelColumn.ts`** (`readRowHeight`) to size
   the geometry. Changing it in CSS changes the JS maths; keep them in sync.
-- `--wheel-rows` (default `5`) — visible row count → wheel height.
-- `--wheel-color`, `--wheel-color-selected` — derived from the site popover
+- `--_wheel-rows` (default `5`) — visible row count → wheel height.
+- `--_wheel-color`, `--_wheel-color-selected` — derived from the site popover
   tokens (`--SITE--POPOVER--COLOR`, `--SITE--POPOVER--ACCENT`). See each
   consuming component's `## Required site tokens`.
 

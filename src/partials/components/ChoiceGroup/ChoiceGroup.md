@@ -80,12 +80,12 @@ cardinality — native already carries it. (This is why the item is `ChoiceField
 
 | Variable | Default | Description |
 |---|---|---|
-| `--cg-gap` | `0.5rem` | Gap between fields (vertical) and between parts |
-| `--cg-gap-horizontal` | `1rem` | Gap between fields when horizontal; legend↔body gap for `beside` |
-| `--cg-legend-gap` | `0.5rem` | Legend → body gap (`above`) |
-| `--cg-max-inline-size` | `30rem` | Caps the group width |
-| `--cg-legend-weight` | `600` | Legend font weight |
-| `--cg-hint-color` | `var(--SITE--POPOVER--MUTED, #6e6e6e)` | Hint text colour |
+| `--_cg-gap` | `0.5rem` | Gap between fields (vertical) and between parts |
+| `--_cg-gap-horizontal` | `1rem` | Gap between fields when horizontal; legend↔body gap for `beside` |
+| `--_cg-legend-gap` | `0.5rem` | Legend → body gap (`above`) |
+| `--_cg-max-inline-size` | `30rem` | Caps the group width |
+| `--_cg-legend-weight` | `600` | Legend font weight |
+| `--_cg-hint-color` | `var(--SITE--POPOVER--MUTED, #6e6e6e)` | Hint text colour |
 
 ## Accessibility
 

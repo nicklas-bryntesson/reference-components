@@ -96,25 +96,25 @@ All tokens are custom properties on `.WeekField`:
 
 | Token | Description |
 |---|---|
-| `--wf-border-color` | Segment border |
-| `--wf-border-color-hover` | Segment border on hover |
-| `--wf-border-color-invalid` | Border color when invalid |
-| `--wf-bg-hover` | Background on hover / week-row preview |
-| `--wf-color-muted` | Placeholder / separator / week-number text color |
-| `--wf-trigger-bg-hover` | Trigger button hover background |
-| `--wf-trigger-bg-active` | Trigger button active background |
-| `--wf-popup-bg` | Popup background |
-| `--wf-popup-color` | Popup text color |
-| `--wf-popup-color-muted` | Muted popup text (weekday heads, outside-month days, week numbers) |
-| `--wf-popup-border-color` | Popup border + week-column divider |
-| `--wf-popup-radius` | Popup border radius |
-| `--wf-popup-shadow` | Popup box shadow |
-| `--wf-popup-width` | Popup width |
-| `--wf-popup-gap` | Gap between field and popup |
-| `--wf-site-padding` | Viewport padding read by JS for popup positioning (defaults to `--SITE--PADDING`) |
-| `--wf-popup-link-color` | Footer button text color |
-| `--wf-option-bg-selected` | Selected week-row background |
-| `--wf-option-color-selected` | Selected week-row text color |
+| `--_wf-border-color` | Segment border |
+| `--_wf-border-color-hover` | Segment border on hover |
+| `--_wf-border-color-invalid` | Border color when invalid |
+| `--_wf-bg-hover` | Background on hover / week-row preview |
+| `--_wf-color-muted` | Placeholder / separator / week-number text color |
+| `--_wf-trigger-bg-hover` | Trigger button hover background |
+| `--_wf-trigger-bg-active` | Trigger button active background |
+| `--_wf-popup-bg` | Popup background |
+| `--_wf-popup-color` | Popup text color |
+| `--_wf-popup-color-muted` | Muted popup text (weekday heads, outside-month days, week numbers) |
+| `--_wf-popup-border-color` | Popup border + week-column divider |
+| `--_wf-popup-radius` | Popup border radius |
+| `--_wf-popup-shadow` | Popup box shadow |
+| `--_wf-popup-width` | Popup width |
+| `--_wf-popup-gap` | Gap between field and popup |
+| `--_wf-site-padding` | Viewport padding read by JS for popup positioning (defaults to `--SITE--PADDING`) |
+| `--_wf-popup-link-color` | Footer button text color |
+| `--_wf-option-bg-selected` | Selected week-row background |
+| `--_wf-option-color-selected` | Selected week-row text color |
 
 ## Kernel dependencies
 
@@ -129,7 +129,7 @@ This component composes shared primitives from [`src/kernel/`](../../../kernel/R
 
 ## Required site tokens
 
-The `--wf-*` tokens (see `## CSS tokens`) default to host-provided site tokens. A consumer must declare these (reference values live in [`src/css/site/01-Setup/tokens.css`](../../../css/site/01-Setup/tokens.css)); porting the component without them leaves colours and spacing unset.
+The `--_wf-*` tokens (see `## CSS tokens`) default to host-provided site tokens. A consumer must declare these (reference values live in [`src/css/site/01-Setup/tokens.css`](../../../css/site/01-Setup/tokens.css)); porting the component without them leaves colours and spacing unset.
 
 - `--SITE--PADDING`
 - `--SITE--POPOVER--BG`, `--SITE--POPOVER--COLOR`, `--SITE--POPOVER--MUTED`, `--SITE--POPOVER--BORDER--COLOR`, `--SITE--POPOVER--RADIUS`, `--SITE--POPOVER--SHADOW`, `--SITE--POPOVER--PADDING`, `--SITE--POPOVER--HOVER-BG`, `--SITE--POPOVER--ACCENT`, `--SITE--POPOVER--ACCENT-TEXT`

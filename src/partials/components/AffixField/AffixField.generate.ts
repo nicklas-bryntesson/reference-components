@@ -122,7 +122,7 @@ const states: StateDefinition[] = [
   //    touches nothing; the e2e suite asserts strict equality with what is
   //    below (a JS write would re-serialize the style attribute).
   { file: '_variant-authored', id: 'af-variant-authored', rootId: 'affixfield-authored', label: 'Amount',
-    root: { style: '--af-prefix-chars: 1; --af-suffix-chars: 3' },
+    root: { style: '--_af-prefix-chars: 1; --_af-suffix-chars: 3' },
     input: { ...decimalInput, 'aria-describedby': 'af-variant-authored-prefix af-variant-authored-suffix' },
     prefix: prefix('$', { id: 'af-variant-authored-prefix' }),
     suffix: suffix('USD', { id: 'af-variant-authored-suffix' }) },

@@ -15,7 +15,7 @@ Therefore this contract specifies **the finished DOM end-state**, not where it i
 | Affixes carry ids | reference: JS at init · server stack: rendered in markup |
 | Input `aria-describedby` references the affix ids (unless opted out) | same |
 | Root carries `data-has-prefix="true"` / `data-has-suffix="true"` for the sides that exist | same — the CSS padding gates key on them |
-| Root has `--af-prefix-chars` / `--af-suffix-chars` set (the affix string lengths) | same — **fully symmetric:** reference JS and a server compute the *same thing* (the string length), just at different times |
+| Root has `--_af-prefix-chars` / `--_af-suffix-chars` set (the affix string lengths) | same — **fully symmetric:** reference JS and a server compute the *same thing* (the string length), just at different times |
 | Number spinner hidden | CSS (static, no computation) |
 
 Consequences:
@@ -42,7 +42,7 @@ End-state (after JS gap-fill *or* fully server-rendered — identical):
 <label for="af-1">Belopp</label>
 <div class="AffixField" data-component="AffixField" data-initialized="true"
      data-has-prefix="true" data-has-suffix="true"
-     style="--af-prefix-chars: 1; --af-suffix-chars: 3">
+     style="--_af-prefix-chars: 1; --_af-suffix-chars: 3">
   <span class="AffixField-prefix" id="af-1-prefix">$</span>
   <input class="AffixField-input" id="af-1" name="af-1" type="text" inputmode="decimal"
          aria-describedby="af-1-prefix af-1-suffix">
@@ -51,7 +51,7 @@ End-state (after JS gap-fill *or* fully server-rendered — identical):
 ```
 
 - Prefix and/or suffix may each be omitted; the component works with either or both.
-- The input keeps its own border/background — the native element stays the styled element. Its inline padding is gated on `data-has-prefix="true"` / `data-has-suffix="true"` and computed from the counts (`padding-inline-start: calc(var(--af-prefix-chars) * var(--af-ch-unit) + gap + inline padding)`, mirrored for the suffix); a side without an affix degrades to the plain inline padding.
+- The input keeps its own border/background — the native element stays the styled element. Its inline padding is gated on `data-has-prefix="true"` / `data-has-suffix="true"` and computed from the counts (`padding-inline-start: calc(var(--_af-prefix-chars) * var(--_af-ch-unit) + gap + inline padding)`, mirrored for the suffix); a side without an affix degrades to the plain inline padding.
 - Logical properties throughout — RTL flips for free.
 
 ## Where the logic lives (an honesty section)
@@ -63,13 +63,13 @@ The reference implementation computes the end-state with client JS at `attach()`
 The layout speaks **one unit** across the whole component: a calibrated character slot.
 
 - **`1ch`** is the width of the font's **"0" glyph** — nothing more. In a proportional font other characters vary around it ("i" is narrower, "W" is wider), so raw `ch`-math under- or over-shoots.
-- **`--af-ch-unit` (default `1.125ch`)** is the calibration factor: it maps "one character" to a practical average slot for the host's typeface. The default is the production-proven value from SVL — calibrate it against your typeface like any other design token.
-- **`--af-prefix-chars` / `--af-suffix-chars`** are plain numbers — the affix string lengths. They are **content facts**: the reference JS computes `textContent.trim().length`, a server computes `prefix.Length` — the *same computation at a different time*, which is what makes this end-state fully symmetric. Counts don't change with fonts, so there is no re-measure machinery of any kind.
+- **`--_af-ch-unit` (default `1.125ch`)** is the calibration factor: it maps "one character" to a practical average slot for the host's typeface. The default is the production-proven value from SVL — calibrate it against your typeface like any other design token.
+- **`--_af-prefix-chars` / `--_af-suffix-chars`** are plain numbers — the affix string lengths. They are **content facts**: the reference JS computes `textContent.trim().length`, a server computes `prefix.Length` — the *same computation at a different time*, which is what makes this end-state fully symmetric. Counts don't change with fonts, so there is no re-measure machinery of any kind.
 - **The CSS formulas own the math:** `count × unit + gap + padding` per affix side, gated on the presence attributes.
 
-**Per-string variance, honestly:** the calibration factor matches the *average* string, not every string. Affixes are short (`$`, `kr`, `USD`, `timmar`), and `--af-gap` absorbs normal variance. For an outlier ("WWW" runs wide, "iii" runs narrow), author a **fractional count** — `--af-prefix-chars: 3.5` — as the tuning ventil; authored counts always win over the gap-fill.
+**Per-string variance, honestly:** the calibration factor matches the *average* string, not every string. Affixes are short (`$`, `kr`, `USD`, `timmar`), and `--_af-gap` absorbs normal variance. For an outlier ("WWW" runs wide, "iii" runs narrow), author a **fractional count** — `--_af-prefix-chars: 3.5` — as the tuning ventil; authored counts always win over the gap-fill.
 
-One caveat: custom properties inherit, so a `--af-prefix-chars` set on an *ancestor* bleeds into every AffixField inside it in a zero-JS stack — author counts per instance, inline on the root, as the end-state example does. (The reference gap-fill deliberately treats only inline-on-root values as authored: a count is an instance's content fact, so an inherited value is overridden with the correct one.)
+One caveat: custom properties inherit, so a `--_af-prefix-chars` set on an *ancestor* bleeds into every AffixField inside it in a zero-JS stack — author counts per instance, inline on the root, as the end-state example does. (The reference gap-fill deliberately treats only inline-on-root values as authored: a count is an instance's content fact, so an inherited value is overridden with the correct one.)
 
 ## Attributes (on root)
 
@@ -77,7 +77,7 @@ One caveat: custom properties inherit, so a `--af-prefix-chars` set on an *ances
 |---|---|---|
 | `data-component` | `"AffixField"` | Attach hook. |
 | `data-align` | `"end"` | Opt-in end-alignment of the input text (amounts). Default: `start`. There is no `center`. |
-| `data-input-characters` | number | Width of the **value area** in character units — JS (or the server) maps it to `--af-input-chars`, and the wrapper width becomes `calc(var(--af-input-chars) * var(--af-ch-unit) + affix slots + gaps + paddings + borders)`. **When absent** (the default) no width is imposed: the field sizes via normal CSS. |
+| `data-input-characters` | number | Width of the **value area** in character units — JS (or the server) maps it to `--_af-input-chars`, and the wrapper width becomes `calc(var(--_af-input-chars) * var(--_af-ch-unit) + affix slots + gaps + paddings + borders)`. **When absent** (the default) no width is imposed: the field sizes via normal CSS. |
 | `data-has-prefix` / `data-has-suffix` | `"true"` | **End-state contract** — set to the literal string `"true"` for each affix side that exists, absent otherwise (the family-wide boolean convention — see `.claude/philosophy.md`). The padding gates match `[data-has-prefix="true"]` exactly — any other value is treated as absent (affix presence is load-bearing layout data, so it is expressed as end-state data — never inferred with `:has()`). Server-rendered, or gap-filled by JS from affix presence; authored attributes are never touched, so author `"true"` or nothing. |
 | `data-disabled` | `"true"` | Styling hook (author also sets `disabled` on the input, as the kitchensink states do). |
 | `data-invalid` | `"true"` | Styling hook (author also sets `aria-invalid="true"` on the input). |
@@ -138,8 +138,8 @@ Robustness guideline (authoring, not component logic): when the unit is critical
 What `attach()` does per instance (all of it optional in a server stack):
 
 1. Sets `data-has-prefix="true"` / `data-has-suffix="true"` for the affix sides that exist (skipped for authored attributes).
-2. Sets `--af-prefix-chars` / `--af-suffix-chars` inline on the root from each affix's `textContent.trim().length` (skipped for any count already authored inline on the root — including fractional tuning values).
-3. `data-input-characters` → sets `--af-input-chars` on the root (skipped if already authored).
+2. Sets `--_af-prefix-chars` / `--_af-suffix-chars` inline on the root from each affix's `textContent.trim().length` (skipped for any count already authored inline on the root — including fractional tuning values).
+3. `data-input-characters` → sets `--_af-input-chars` on the root (skipped if already authored).
 4. Wires affix ids + `aria-describedby` per the accessibility model (skipped where authored/overridden).
 5. Sets `data-initialized="true"`.
 
@@ -153,18 +153,18 @@ All tokens are custom properties on `.AffixField`:
 
 | Token | Description |
 |---|---|
-| `--af-ch-unit` | **Calibration** — the width of one character slot for the host's typeface (default `1.125ch`, the production-proven SVL value). Calibrate against your font like any other token |
-| `--af-gap` | Space between an affix and the value area (default `0.5ch`) |
-| `--af-inline-padding` | Inline padding inside the input (default `0.75rem`) |
-| `--af-border-width` | Input border width (also part of the sized-width calc) |
-| `--af-border-color` | Input border |
-| `--af-border-color-hover` | Input border on hover |
-| `--af-border-color-invalid` | Input border when `data-invalid` |
-| `--af-bg-hover` | Input background on hover |
-| `--af-bg-active` | Input background on active |
-| `--af-affix-color` | Affix text color |
-| `--af-prefix-chars` / `--af-suffix-chars` | **End-state contract** — the affix string lengths as plain numbers; gap-filled (JS) or authored (server); fractional values are the tuning ventil for atypical strings |
-| `--af-input-chars` | **End-state contract** — set from `data-input-characters`; only consumed under the `[data-input-characters]` gate |
+| `--_af-ch-unit` | **Calibration** — the width of one character slot for the host's typeface (default `1.125ch`, the production-proven SVL value). Calibrate against your font like any other token |
+| `--_af-gap` | Space between an affix and the value area (default `0.5ch`) |
+| `--_af-inline-padding` | Inline padding inside the input (default `0.75rem`) |
+| `--_af-border-width` | Input border width (also part of the sized-width calc) |
+| `--_af-border-color` | Input border |
+| `--_af-border-color-hover` | Input border on hover |
+| `--_af-border-color-invalid` | Input border when `data-invalid` |
+| `--_af-bg-hover` | Input background on hover |
+| `--_af-bg-active` | Input background on active |
+| `--_af-affix-color` | Affix text color |
+| `--_af-prefix-chars` / `--_af-suffix-chars` | **End-state contract** — the affix string lengths as plain numbers; gap-filled (JS) or authored (server); fractional values are the tuning ventil for atypical strings |
+| `--_af-input-chars` | **End-state contract** — set from `data-input-characters`; only consumed under the `[data-input-characters]` gate |
 
 ## Kernel dependencies
 
@@ -172,7 +172,7 @@ All tokens are custom properties on `.AffixField`:
 
 ## Required site tokens
 
-Three `--af-*` token defaults (`--af-bg-hover`, `--af-bg-active`, `--af-affix-color`) read two host-provided site tokens (reference values live in [`src/css/site/01-Setup/tokens.css`](../../../css/site/01-Setup/tokens.css)):
+Three `--_af-*` token defaults (`--_af-bg-hover`, `--_af-bg-active`, `--_af-affix-color`) read two host-provided site tokens (reference values live in [`src/css/site/01-Setup/tokens.css`](../../../css/site/01-Setup/tokens.css)):
 
 - `--SITE--POPOVER--HOVER-BG` (hover/active input background)
 - `--SITE--POPOVER--MUTED` (affix text color)

@@ -904,9 +904,9 @@ class MonthField {
       containerRect.width,
       popupWidth,
       window.innerWidth,
-      this._getCSSPx('--mf-site-padding') / 2
+      this._getCSSPx('--_mf-site-padding') / 2
     )
-    this.root.style.setProperty('--mf-popup-offset', `${offset}%`)
+    this.root.style.setProperty('--_mf-popup-offset', `${offset}%`)
 
     const popupLeft = containerRect.left + (offset / 100 * containerRect.width) - popupWidth / 2
     const arrowOffset = calculateArrowOffset(
@@ -916,11 +916,11 @@ class MonthField {
       this._getCSSPx('--_mf-arrow-corner-radius'),
       this._getCSSPx('--_mf-arrow-size'),
     )
-    this.root.style.setProperty('--mf-arrow-offset', `${arrowOffset}px`)
+    this.root.style.setProperty('--_mf-arrow-offset', `${arrowOffset}px`)
   }
 
   // Resolve a CSS custom property to px by measuring a probe inside the root,
-  // so component-scoped tokens (--mf-*) resolve rather than the var() fallback.
+  // so component-scoped tokens (--_mf-*) resolve rather than the var() fallback.
   private _getCSSPx(property: string): number {
     const probe = document.createElement('div')
     probe.style.cssText = `position:absolute;visibility:hidden;pointer-events:none;width:var(${property},0px)`

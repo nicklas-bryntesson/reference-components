@@ -79,12 +79,12 @@ test('an aria-hidden affix is skipped entirely — no id, no reference', async (
 
 // ── End-state: character-count custom properties ───────────────────────────────
 
-test('root carries --af-prefix-chars / --af-suffix-chars (the affix string lengths)', async ({ page }) => {
+test('root carries --_af-prefix-chars / --_af-suffix-chars (the affix string lengths)', async ({ page }) => {
   // Counts are content facts — the reference JS and a zero-JS server compute
   // the same numbers ("$".length, "USD".length), so exact values are the contract.
   const counts = await page.locator(AF).evaluate((root) => ({
-    prefix: root.style.getPropertyValue('--af-prefix-chars'),
-    suffix: root.style.getPropertyValue('--af-suffix-chars'),
+    prefix: root.style.getPropertyValue('--_af-prefix-chars'),
+    suffix: root.style.getPropertyValue('--_af-suffix-chars'),
   }))
   expect(counts.prefix).toBe('1') // "$"
   expect(counts.suffix).toBe('3') // "USD"
@@ -92,7 +92,7 @@ test('root carries --af-prefix-chars / --af-suffix-chars (the affix string lengt
 
 // ── Geometry: affix and value text never overlap ────────────────────────────────
 // The functional proof of the character-unit model in a real browser: if the
-// default --af-ch-unit calibration were wrong for the reference font, the
+// default --_af-ch-unit calibration were wrong for the reference font, the
 // reserved padding would fall short of the rendered affix and this would fail.
 
 test('input value area clears both affixes (bounding boxes)', async ({ page }) => {
@@ -156,7 +156,7 @@ test('the fully-authored variant is untouched — computed attributes strictly e
   const root = page.locator(AUTHORED)
   // The style attribute is byte-identical to what the generator authored: any
   // JS write would re-serialize it (spacing/semicolon normalization).
-  await expect(root).toHaveAttribute('style', '--af-prefix-chars: 1; --af-suffix-chars: 3')
+  await expect(root).toHaveAttribute('style', '--_af-prefix-chars: 1; --_af-suffix-chars: 3')
   // Presence attributes are authored (server end-state), values untouched.
   await expect(root).toHaveAttribute('data-has-prefix', 'true')
   await expect(root).toHaveAttribute('data-has-suffix', 'true')
@@ -170,10 +170,10 @@ test('the fully-authored variant is untouched — computed attributes strictly e
 
 // ── Sized variant ───────────────────────────────────────────────────────────────
 
-test('data-input-characters sets --af-input-chars and imposes a compact width', async ({ page }) => {
+test('data-input-characters sets --_af-input-chars and imposes a compact width', async ({ page }) => {
   await page.locator(`${SIZED}[data-initialized="true"]`).waitFor()
   const state = await page.locator(SIZED).evaluate((root) => ({
-    chars: root.style.getPropertyValue('--af-input-chars'),
+    chars: root.style.getPropertyValue('--_af-input-chars'),
     rootWidth: root.getBoundingClientRect().width,
     align: getComputedStyle(root.querySelector('.AffixField-input')).textAlign,
   }))

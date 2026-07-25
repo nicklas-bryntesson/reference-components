@@ -29,9 +29,9 @@ const WHEEL_MIN_DELTA = 15  // rows/event — below this we treat it as inertia 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function readRowHeight(el: HTMLElement): number {
-  let raw = getComputedStyle(el).getPropertyValue('--wheel-row-height').trim()
+  let raw = getComputedStyle(el).getPropertyValue('--_wheel-row-height').trim()
   if (!raw) {
-    raw = getComputedStyle(document.documentElement).getPropertyValue('--wheel-row-height').trim()
+    raw = getComputedStyle(document.documentElement).getPropertyValue('--_wheel-row-height').trim()
   }
   const parsed = parseFloat(raw)
   return isNaN(parsed) ? 38 : parsed

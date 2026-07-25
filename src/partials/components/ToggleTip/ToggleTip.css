@@ -5,33 +5,33 @@
 
 /* ── Public API (theme layer) ──────────────────────────────────── */
 :root {
-  --toggletip-gap: 0.75rem;
-  --toggletip-content-width: 20rem;
-  --toggletip-padding: 1.5rem;
-  --toggletip-border-radius: var(--SITE--POPOVER--RADIUS);
-  --toggletip-button-width: 1.5rem;
-  --toggletip-button-color: CanvasText;
-  --toggletip-surface-color: Canvas;
-  --toggletip-text-color: CanvasText;
-  --toggletip-border-color: var(--SITE--POPOVER--BORDER--COLOR);
-  --toggletip-site-max-width: 100rem;
-  --toggletip-site-padding: var(--SITE--PADDING, 1rem);
+  --_toggletip-gap: 0.75rem;
+  --_toggletip-content-width: 20rem;
+  --_toggletip-padding: 1.5rem;
+  --_toggletip-border-radius: var(--SITE--POPOVER--RADIUS);
+  --_toggletip-button-width: 1.5rem;
+  --_toggletip-button-color: CanvasText;
+  --_toggletip-surface-color: Canvas;
+  --_toggletip-text-color: CanvasText;
+  --_toggletip-border-color: var(--SITE--POPOVER--BORDER--COLOR);
+  --_toggletip-site-max-width: 100rem;
+  --_toggletip-site-padding: var(--SITE--PADDING, 1rem);
 }
 
 /* ── Component shell ───────────────────────────────────────────── */
 toggle-tip {
   /* Connect public → internal with fallbacks */
-  --_tt-gap: var(--toggletip-gap, 0.75rem);
-  --_tt-content-width: var(--toggletip-content-width, 20rem);
-  --_tt-padding: var(--toggletip-padding, 1.5rem);
-  --_tt-border-radius: var(--toggletip-border-radius, 1rem);
-  --_tt-button-width: var(--toggletip-button-width, 1.5rem);
-  --_tt-button-color: var(--toggletip-button-color, CanvasText);
-  --_tt-surface-color: var(--toggletip-surface-color, Canvas);
-  --_tt-text-color: var(--toggletip-text-color, CanvasText);
-  --_tt-border-color: var(--toggletip-border-color, var(--SITE--POPOVER--BORDER--COLOR));
-  --_tt-site-max-width: var(--toggletip-site-max-width, 100rem);
-  --_tt-site-padding: var(--toggletip-site-padding, 1rem);
+  --_tt-gap: var(--_toggletip-gap, 0.75rem);
+  --_tt-content-width: var(--_toggletip-content-width, 20rem);
+  --_tt-padding: var(--_toggletip-padding, 1.5rem);
+  --_tt-border-radius: var(--_toggletip-border-radius, 1rem);
+  --_tt-button-width: var(--_toggletip-button-width, 1.5rem);
+  --_tt-button-color: var(--_toggletip-button-color, CanvasText);
+  --_tt-surface-color: var(--_toggletip-surface-color, Canvas);
+  --_tt-text-color: var(--_toggletip-text-color, CanvasText);
+  --_tt-border-color: var(--_toggletip-border-color, var(--SITE--POPOVER--BORDER--COLOR));
+  --_tt-site-max-width: var(--_toggletip-site-max-width, 100rem);
+  --_tt-site-padding: var(--_toggletip-site-padding, 1rem);
 
   /* Derived */
   --_tt-rail-max-width: calc(var(--_tt-site-max-width) + var(--_tt-content-width));
@@ -39,8 +39,8 @@ toggle-tip {
   --_tt-arrow-corner-radius: calc(var(--_tt-border-radius) / 4);
 
   /* JS-set — initialized to safe defaults */
-  --tt-popup-offset: 50%;
-  --tt-arrow-offset: 0px;
+  --_tt-popup-offset: 50%;
+  --_tt-arrow-offset: 0px;
 
   /* Layout */
   display: inline-block;
@@ -118,7 +118,7 @@ toggle-tip .slideContainer {
 /* ── Bubble ────────────────────────────────────────────────────── */
 toggle-tip .ToggleTip-popup {
   position: absolute;
-  left: var(--tt-popup-offset);
+  left: var(--_tt-popup-offset);
   transform: translateX(-50%);
   inline-size: var(--_tt-content-width);
   max-inline-size: calc(100vw - var(--_tt-site-padding) * 2);
@@ -179,7 +179,7 @@ toggle-tip[data-direction="top"] .ToggleTip-popup {
 
 toggle-tip[data-direction="top"] .arrow {
   bottom: calc(var(--_tt-arrow-size) * -0.5);
-  transform: translateX(calc(-50% + var(--tt-arrow-offset))) rotate(45deg);
+  transform: translateX(calc(-50% + var(--_tt-arrow-offset))) rotate(45deg);
   border-end-end-radius: var(--_tt-arrow-corner-radius);
 }
 
@@ -190,6 +190,6 @@ toggle-tip[data-direction="bottom"] .ToggleTip-popup {
 
 toggle-tip[data-direction="bottom"] .arrow {
   top: calc(var(--_tt-arrow-size) * -0.5);
-  transform: translateX(calc(-50% + var(--tt-arrow-offset))) rotate(45deg);
+  transform: translateX(calc(-50% + var(--_tt-arrow-offset))) rotate(45deg);
   border-start-start-radius: var(--_tt-arrow-corner-radius);
 }

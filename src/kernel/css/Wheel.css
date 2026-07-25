@@ -4,14 +4,14 @@
 
 .Wheel {
   /* Geometry token read by WheelColumn (readRowHeight) */
-  --wheel-row-height: 38px;
-  --wheel-rows: 5;
-  --wheel-color: var(--SITE--POPOVER--COLOR);
-  --wheel-color-selected: var(--SITE--POPOVER--ACCENT);
+  --_wheel-row-height: 38px;
+  --_wheel-rows: 5;
+  --_wheel-color: var(--SITE--POPOVER--COLOR);
+  --_wheel-color-selected: var(--SITE--POPOVER--ACCENT);
 
   position: relative;
   width: 64px;
-  height: calc(var(--wheel-row-height) * var(--wheel-rows));
+  height: calc(var(--_wheel-row-height) * var(--_wheel-rows));
   overflow: hidden;
   perspective: 700px;
   touch-action: none;
@@ -39,8 +39,8 @@
   position: absolute;
   left: 0; right: 0;
   top: 50%;
-  height: var(--wheel-row-height);
-  margin-top: calc(var(--wheel-row-height) / -2);
+  height: var(--_wheel-row-height);
+  margin-top: calc(var(--_wheel-row-height) / -2);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -48,12 +48,12 @@
   font-variant-numeric: tabular-nums;
   backface-visibility: hidden;
   will-change: opacity, transform;
-  color: var(--wheel-color);
+  color: var(--_wheel-color);
   cursor: pointer;
 }
 
 .Wheel-option[aria-selected="true"] {
-  color: var(--wheel-color-selected);
+  color: var(--_wheel-color-selected);
   font-weight: bold;
 }
 
@@ -67,14 +67,14 @@
    that spans all columns, matching the native picker (see .Wheel). */
 .WheelColumns {
   position: relative;
-  --wheel-row-height: 38px; /* keep in sync with .Wheel */
+  --_wheel-row-height: 38px; /* keep in sync with .Wheel */
 }
 .WheelColumns::before { /* full-width selection band, behind the numbers */
   content: "";
   position: absolute;
   left: 0; right: 0;
   top: 50%;
-  height: var(--wheel-row-height);
+  height: var(--_wheel-row-height);
   transform: translateY(-50%);
   background: var(--SITE--POPOVER--HOVER-BG);
   border-radius: 9px;
@@ -89,8 +89,8 @@
   pointer-events: none;
   background: linear-gradient(
     Canvas,
-    transparent var(--wheel-row-height),
-    transparent calc(100% - var(--wheel-row-height)),
+    transparent var(--_wheel-row-height),
+    transparent calc(100% - var(--_wheel-row-height)),
     Canvas
   );
 }

@@ -3,30 +3,30 @@
   display: inline-block;
   overflow: hidden;
   /* Public API */
-  --dtf-calendar-width: 18rem;
-  --dtf-calendar-gap: 1.5rem;
-  --dtf-site-max-width: var(--MAX--WIDTH--SITE, 100rem);
-  --dtf-site-padding: var(--SITE--PADDING, 1rem);
+  --_dtf-calendar-width: 18rem;
+  --_dtf-calendar-gap: 1.5rem;
+  --_dtf-site-max-width: var(--MAX--WIDTH--SITE, 100rem);
+  --_dtf-site-padding: var(--SITE--PADDING, 1rem);
   /* Field-family height contract — every field's bordered box is min 2.5rem tall */
-  --dtf-field-min-block-size: 2.5rem;
+  --_dtf-field-min-block-size: 2.5rem;
   /* Design tokens — segments */
-  --dtf-segments-border-color: currentColor;
-  --dtf-segments-border-color-hover: CanvasText;
-  --dtf-segments-bg-hover: var(--SITE--POPOVER--HOVER-BG);
-  --dtf-segments-border-color-invalid: #c00;
-  --dtf-segments-color-muted: var(--SITE--POPOVER--MUTED);
-  --dtf-trigger-bg-hover: var(--SITE--POPOVER--HOVER-BG);
-  --dtf-trigger-bg-active: var(--SITE--POPOVER--HOVER-BG);
+  --_dtf-segments-border-color: currentColor;
+  --_dtf-segments-border-color-hover: CanvasText;
+  --_dtf-segments-bg-hover: var(--SITE--POPOVER--HOVER-BG);
+  --_dtf-segments-border-color-invalid: #c00;
+  --_dtf-segments-color-muted: var(--SITE--POPOVER--MUTED);
+  --_dtf-trigger-bg-hover: var(--SITE--POPOVER--HOVER-BG);
+  --_dtf-trigger-bg-active: var(--SITE--POPOVER--HOVER-BG);
   /* Design tokens — calendar (shared popover surface) */
-  --dtf-calendar-bg: var(--SITE--POPOVER--BG);
-  --dtf-calendar-color: var(--SITE--POPOVER--COLOR);
-  --dtf-calendar-color-muted: var(--SITE--POPOVER--MUTED);
-  --dtf-calendar-border-color: var(--SITE--POPOVER--BORDER--COLOR);
-  --dtf-calendar-radius: var(--SITE--POPOVER--RADIUS);
-  --dtf-calendar-shadow: var(--SITE--POPOVER--SHADOW);
-  --dtf-calendar-link-color: var(--SITE--POPOVER--ACCENT);
+  --_dtf-calendar-bg: var(--SITE--POPOVER--BG);
+  --_dtf-calendar-color: var(--SITE--POPOVER--COLOR);
+  --_dtf-calendar-color-muted: var(--SITE--POPOVER--MUTED);
+  --_dtf-calendar-border-color: var(--SITE--POPOVER--BORDER--COLOR);
+  --_dtf-calendar-radius: var(--SITE--POPOVER--RADIUS);
+  --_dtf-calendar-shadow: var(--SITE--POPOVER--SHADOW);
+  --_dtf-calendar-link-color: var(--SITE--POPOVER--ACCENT);
   /* Internal */
-  --_dtf-rail-max-width: calc(var(--dtf-site-max-width) + var(--dtf-calendar-width));
+  --_dtf-rail-max-width: calc(var(--_dtf-site-max-width) + var(--_dtf-calendar-width));
   --_dtf-arrow-size: 0.75rem;
   --_dtf-arrow-corner-radius: 0.25rem;
 
@@ -65,8 +65,8 @@
     display: inline-flex;
     align-items: center;
     box-sizing: border-box;
-    min-block-size: var(--dtf-field-min-block-size);
-    border: 1px solid var(--dtf-segments-border-color);
+    min-block-size: var(--_dtf-field-min-block-size);
+    border: 1px solid var(--_dtf-segments-border-color);
     padding-inline: 0.5rem;
     padding-block: 0.25rem;
     gap: 0.125rem;
@@ -106,19 +106,19 @@
     }
 
     &[data-placeholder="true"] {
-      color: var(--dtf-segments-color-muted);
+      color: var(--_dtf-segments-color-muted);
     }
   }
 
   & .Separator {
     user-select: none;
-    color: var(--dtf-segments-color-muted);
+    color: var(--_dtf-segments-color-muted);
   }
 
   & .DateTimeField-overlay:hover,
   &[data-test-state="hover"] .DateTimeField-overlay {
-    border-color: var(--dtf-segments-border-color-hover);
-    background-color: var(--dtf-segments-bg-hover);
+    border-color: var(--_dtf-segments-border-color-hover);
+    background-color: var(--_dtf-segments-bg-hover);
   }
 
   & .DateTimeField-overlay:focus-within,
@@ -128,7 +128,7 @@
   }
 
   &[data-invalid="true"] .DateTimeField-overlay {
-    border-color: var(--dtf-segments-border-color-invalid);
+    border-color: var(--_dtf-segments-border-color-invalid);
   }
 
   & .DateTimeField-trigger {
@@ -147,12 +147,12 @@
 
     &:hover,
     .DateTimeField[data-test-state="hover"] & {
-      background-color: var(--dtf-trigger-bg-hover);
+      background-color: var(--_dtf-trigger-bg-hover);
     }
 
     &:active,
     .DateTimeField[data-test-state="active"] & {
-      background-color: var(--dtf-trigger-bg-active);
+      background-color: var(--_dtf-trigger-bg-active);
     }
 
     &:focus-visible {
@@ -173,14 +173,14 @@
 
 .DateTimeField-popup {
   position: absolute;
-  background: var(--dtf-calendar-bg);
-  color: var(--dtf-calendar-color);
-  border: 1px solid var(--dtf-calendar-border-color);
+  background: var(--_dtf-calendar-bg);
+  color: var(--_dtf-calendar-color);
+  border: 1px solid var(--_dtf-calendar-border-color);
   padding: var(--SITE--POPOVER--PADDING);
   font-size: 1rem;
   z-index: 100;
-  border-radius: var(--dtf-calendar-radius);
-  box-shadow: var(--dtf-calendar-shadow);
+  border-radius: var(--_dtf-calendar-radius);
+  box-shadow: var(--_dtf-calendar-shadow);
 
   & .CalendarHeader {
     display: flex;
@@ -221,7 +221,7 @@
       padding-block-end: 0.25rem;
       text-align: center;
       font-weight: normal;
-      color: var(--dtf-calendar-color-muted);
+      color: var(--_dtf-calendar-color-muted);
       min-inline-size: 2rem;
     }
 
@@ -256,12 +256,12 @@
     }
 
     & td[data-disabled="true"] button {
-      color: var(--dtf-calendar-color-muted);
+      color: var(--_dtf-calendar-color-muted);
       cursor: not-allowed;
     }
 
     & td[data-outside-month="true"] button {
-      color: var(--dtf-calendar-color-muted);
+      color: var(--_dtf-calendar-color-muted);
     }
   }
 
@@ -269,13 +269,13 @@
     display: flex;
     justify-content: space-between;
     padding: 0.5rem;
-    border-top: 1px solid var(--dtf-calendar-border-color);
+    border-top: 1px solid var(--_dtf-calendar-border-color);
 
     & button {
       background: none;
       border: none;
       cursor: pointer;
-      color: var(--dtf-calendar-link-color);
+      color: var(--_dtf-calendar-link-color);
       font: inherit;
       padding: 0.25rem 0.5rem;
       border-radius: 2px;
@@ -286,7 +286,7 @@
       }
 
       &:disabled {
-        color: var(--dtf-calendar-color-muted);
+        color: var(--_dtf-calendar-color-muted);
         cursor: not-allowed;
       }
     }
@@ -361,19 +361,19 @@
 /* ── Calendar bubble ───────────────────────────────────────────────────── */
 .DateTimeField .DateTimeField-popup {
   position: absolute;
-  left: var(--dtf-popup-offset, 50%);
+  left: var(--_dtf-popup-offset, 50%);
   transform: translateX(-50%);
-  min-inline-size: var(--dtf-calendar-width);
+  min-inline-size: var(--_dtf-calendar-width);
   pointer-events: auto;
 }
 
 /* ── Direction gates ───────────────────────────────────────────────────── */
 .DateTimeField[data-direction="bottom"] .DateTimeField-popup {
-  top: var(--dtf-calendar-gap);
+  top: var(--_dtf-calendar-gap);
 }
 
 .DateTimeField[data-direction="top"] .DateTimeField-popup {
-  bottom: var(--dtf-calendar-gap);
+  bottom: var(--_dtf-calendar-gap);
 }
 
 /* ── Arrow ─────────────────────────────────────────────────────────────── */
@@ -381,19 +381,19 @@
   position: absolute;
   width: var(--_dtf-arrow-size);
   height: var(--_dtf-arrow-size);
-  background-color: var(--dtf-calendar-bg);
+  background-color: var(--_dtf-calendar-bg);
   left: 50%;
 }
 
 .DateTimeField[data-direction="top"] .arrow {
   bottom: calc(var(--_dtf-arrow-size) * -0.5);
-  transform: translateX(calc(-50% + var(--dtf-arrow-offset, 0px))) rotate(45deg);
+  transform: translateX(calc(-50% + var(--_dtf-arrow-offset, 0px))) rotate(45deg);
   border-end-end-radius: var(--_dtf-arrow-corner-radius);
 }
 
 .DateTimeField[data-direction="bottom"] .arrow {
   top: calc(var(--_dtf-arrow-size) * -0.5);
-  transform: translateX(calc(-50% + var(--dtf-arrow-offset, 0px))) rotate(45deg);
+  transform: translateX(calc(-50% + var(--_dtf-arrow-offset, 0px))) rotate(45deg);
   border-start-start-radius: var(--_dtf-arrow-corner-radius);
 }
 
@@ -414,7 +414,7 @@
   gap: 0.25rem;
   padding-inline-start: 0.5rem;
   margin-inline-start: 0.5rem;
-  border-left: 1px solid var(--dtf-calendar-border-color);
+  border-left: 1px solid var(--_dtf-calendar-border-color);
 }
 
 /* Wheels (hour/minute/second) get their look from the shared Wheel.css */
@@ -432,7 +432,7 @@
 
 .DateTimeField-popup .DateTimeField-ampm-option {
   background: none;
-  border: 1px solid var(--dtf-calendar-border-color);
+  border: 1px solid var(--_dtf-calendar-border-color);
   border-radius: 4px;
   padding: 0.25rem 0.5rem;
   cursor: pointer;

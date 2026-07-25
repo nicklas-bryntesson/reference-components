@@ -3,27 +3,27 @@
   display: inline-block;
   overflow: hidden;
   /* Public API */
-  --tf-popup-width: 14rem;
-  --tf-popup-gap: 1.5rem;
-  --tf-site-padding: var(--SITE--PADDING, 1rem);
+  --_tf-popup-width: 14rem;
+  --_tf-popup-gap: 1.5rem;
+  --_tf-site-padding: var(--SITE--PADDING, 1rem);
   /* Field-family height contract — every field's bordered box is min 2.5rem tall */
-  --tf-field-min-block-size: 2.5rem;
+  --_tf-field-min-block-size: 2.5rem;
   /* Design tokens — segments */
-  --tf-border-color: currentColor;
-  --tf-border-color-hover: CanvasText;
-  --tf-bg-hover: var(--SITE--POPOVER--HOVER-BG);
-  --tf-border-color-invalid: #c00;
-  --tf-color-muted: var(--SITE--POPOVER--MUTED);
-  --tf-trigger-bg-hover: var(--SITE--POPOVER--HOVER-BG);
-  --tf-trigger-bg-active: var(--SITE--POPOVER--HOVER-BG);
+  --_tf-border-color: currentColor;
+  --_tf-border-color-hover: CanvasText;
+  --_tf-bg-hover: var(--SITE--POPOVER--HOVER-BG);
+  --_tf-border-color-invalid: #c00;
+  --_tf-color-muted: var(--SITE--POPOVER--MUTED);
+  --_tf-trigger-bg-hover: var(--SITE--POPOVER--HOVER-BG);
+  --_tf-trigger-bg-active: var(--SITE--POPOVER--HOVER-BG);
   /* Design tokens — popup (shared popover surface) */
-  --tf-popup-bg: var(--SITE--POPOVER--BG);
-  --tf-popup-color: var(--SITE--POPOVER--COLOR);
-  --tf-popup-border-color: var(--SITE--POPOVER--BORDER--COLOR);
-  --tf-popup-radius: var(--SITE--POPOVER--RADIUS);
-  --tf-popup-shadow: var(--SITE--POPOVER--SHADOW);
-  --tf-option-bg-selected: var(--SITE--POPOVER--ACCENT);
-  --tf-option-color-selected: var(--SITE--POPOVER--ACCENT-TEXT);
+  --_tf-popup-bg: var(--SITE--POPOVER--BG);
+  --_tf-popup-color: var(--SITE--POPOVER--COLOR);
+  --_tf-popup-border-color: var(--SITE--POPOVER--BORDER--COLOR);
+  --_tf-popup-radius: var(--SITE--POPOVER--RADIUS);
+  --_tf-popup-shadow: var(--SITE--POPOVER--SHADOW);
+  --_tf-option-bg-selected: var(--SITE--POPOVER--ACCENT);
+  --_tf-option-color-selected: var(--SITE--POPOVER--ACCENT-TEXT);
   /* Wheel visuals live in the shared src/kernel/css/Wheel.css (.Wheel-*) */
   /* Internal */
   --_tf-arrow-size: 0.75rem;
@@ -57,9 +57,9 @@
       display: inline-flex;
       align-items: center;
       box-sizing: border-box;
-      min-block-size: var(--tf-field-min-block-size);
+      min-block-size: var(--_tf-field-min-block-size);
       gap: 0.125rem;
-      border: 1px solid var(--tf-border-color);
+      border: 1px solid var(--_tf-border-color);
       padding-inline: 0.5rem;
       padding-block: 0.25rem;
       border-radius: 4px;
@@ -80,9 +80,9 @@
       display: inline-flex;
       align-items: center;
       box-sizing: border-box;
-      min-block-size: var(--tf-field-min-block-size);
+      min-block-size: var(--_tf-field-min-block-size);
       gap: 0.125rem;
-      border: 1px solid var(--tf-border-color);
+      border: 1px solid var(--_tf-border-color);
       padding-inline: 0.5rem;
       padding-block: 0.25rem;
       border-radius: 4px;
@@ -110,19 +110,19 @@
     }
 
     &[data-placeholder="true"] {
-      color: var(--tf-color-muted);
+      color: var(--_tf-color-muted);
     }
   }
 
   & .TimeField-sep {
     user-select: none;
-    color: var(--tf-color-muted);
+    color: var(--_tf-color-muted);
   }
 
   &[data-input-mode="custom"] .TimeField-overlay:hover,
   &[data-test-state="hover"] .TimeField-overlay {
-    border-color: var(--tf-border-color-hover);
-    background-color: var(--tf-bg-hover);
+    border-color: var(--_tf-border-color-hover);
+    background-color: var(--_tf-bg-hover);
   }
 
   &[data-input-mode="custom"] .TimeField-overlay:focus-within,
@@ -132,7 +132,7 @@
   }
 
   &[data-invalid="true"] .TimeField-overlay {
-    border-color: var(--tf-border-color-invalid);
+    border-color: var(--_tf-border-color-invalid);
   }
 
   & .TimeField-trigger {
@@ -156,11 +156,11 @@
   }
 
   & .TimeField-trigger:hover {
-    background-color: var(--tf-trigger-bg-hover);
+    background-color: var(--_tf-trigger-bg-hover);
   }
 
   & .TimeField-trigger:active {
-    background-color: var(--tf-trigger-bg-active);
+    background-color: var(--_tf-trigger-bg-active);
   }
 
   & .TimeField-announce {
@@ -193,15 +193,15 @@
 /* ── Popup bubble ──────────────────────────────────────────────────────────── */
 .TimeField-popup {
   position: absolute;
-  left: var(--tf-popup-offset, 50%);
+  left: var(--_tf-popup-offset, 50%);
   transform: translateX(-50%);
-  inline-size: var(--tf-popup-width);
+  inline-size: var(--_tf-popup-width);
   pointer-events: auto;
-  background: var(--tf-popup-bg);
-  color: var(--tf-popup-color);
-  border: 1px solid var(--tf-popup-border-color);
-  border-radius: var(--tf-popup-radius);
-  box-shadow: var(--tf-popup-shadow);
+  background: var(--_tf-popup-bg);
+  color: var(--_tf-popup-color);
+  border: 1px solid var(--_tf-popup-border-color);
+  border-radius: var(--_tf-popup-radius);
+  box-shadow: var(--_tf-popup-shadow);
   z-index: 100;
   padding: var(--SITE--POPOVER--PADDING);
   font-size: 1rem;
@@ -210,11 +210,11 @@
 /* ── Direction gates ───────────────────────────────────────────────────────── */
 .TimeField {
   &[data-direction="bottom"] .TimeField-popup {
-    top: var(--tf-popup-gap);
+    top: var(--_tf-popup-gap);
   }
 
   &[data-direction="top"] .TimeField-popup {
-    bottom: var(--tf-popup-gap);
+    bottom: var(--_tf-popup-gap);
   }
 }
 
@@ -246,7 +246,7 @@
     font: inherit;
 
     &:hover {
-      background-color: var(--tf-bg-hover);
+      background-color: var(--_tf-bg-hover);
     }
 
     &:focus-visible {
@@ -255,7 +255,7 @@
     }
 
     &:disabled {
-      color: var(--tf-color-muted);
+      color: var(--_tf-color-muted);
       cursor: not-allowed;
     }
   }
@@ -267,20 +267,20 @@
     position: absolute;
     width: var(--_tf-arrow-size);
     height: var(--_tf-arrow-size);
-    background-color: var(--tf-popup-bg);
+    background-color: var(--_tf-popup-bg);
     left: 50%;
     z-index: 3;
   }
 
   &[data-direction="top"] .arrow {
     bottom: calc(var(--_tf-arrow-size) * -0.5);
-    transform: translateX(calc(-50% + var(--tf-arrow-offset, 0px))) rotate(45deg);
+    transform: translateX(calc(-50% + var(--_tf-arrow-offset, 0px))) rotate(45deg);
     border-end-end-radius: var(--_tf-arrow-corner-radius);
   }
 
   &[data-direction="bottom"] .arrow {
     top: calc(var(--_tf-arrow-size) * -0.5);
-    transform: translateX(calc(-50% + var(--tf-arrow-offset, 0px))) rotate(45deg);
+    transform: translateX(calc(-50% + var(--_tf-arrow-offset, 0px))) rotate(45deg);
     border-start-start-radius: var(--_tf-arrow-corner-radius);
   }
 }

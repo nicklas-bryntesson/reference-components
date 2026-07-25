@@ -182,11 +182,11 @@ describe('aria-hidden override', () => {
 // Fully deterministic in jsdom: counts are string lengths, not layout.
 
 describe('affix character counts', () => {
-  it('gap-fills --af-prefix-chars / --af-suffix-chars from the affix string lengths', () => {
+  it('gap-fills --_af-prefix-chars / --_af-suffix-chars from the affix string lengths', () => {
     const el = createAffixFieldEl({ inputAttrs: { id: 'af-c1' } }) // "$" / "USD"
     AffixField.attach()
-    expect(el.style.getPropertyValue('--af-prefix-chars')).toBe('1')
-    expect(el.style.getPropertyValue('--af-suffix-chars')).toBe('3')
+    expect(el.style.getPropertyValue('--_af-prefix-chars')).toBe('1')
+    expect(el.style.getPropertyValue('--_af-suffix-chars')).toBe('3')
   })
 
   it('trims surrounding whitespace before counting', () => {
@@ -196,28 +196,28 @@ describe('affix character counts', () => {
       suffix: { text: '  kr  ' },
     })
     AffixField.attach()
-    expect(el.style.getPropertyValue('--af-suffix-chars')).toBe('2')
-    expect(el.style.getPropertyValue('--af-prefix-chars')).toBe('')
+    expect(el.style.getPropertyValue('--_af-suffix-chars')).toBe('2')
+    expect(el.style.getPropertyValue('--_af-prefix-chars')).toBe('')
   })
 
   it('an authored count always wins — including a fractional tuning value', () => {
     const el = createAffixFieldEl({
-      rootAttrs: { style: '--af-prefix-chars: 3.5' }, // "WWW" runs wide
+      rootAttrs: { style: '--_af-prefix-chars: 3.5' }, // "WWW" runs wide
       inputAttrs: { id: 'af-c3' },
       prefix: { text: 'WWW' },
     })
     AffixField.attach()
-    expect(el.style.getPropertyValue('--af-prefix-chars').trim()).toBe('3.5')
+    expect(el.style.getPropertyValue('--_af-prefix-chars').trim()).toBe('3.5')
   })
 
   it('authoring is per side — an authored prefix count leaves the suffix gap-fill intact', () => {
     const el = createAffixFieldEl({
-      rootAttrs: { style: '--af-prefix-chars: 1.5' },
+      rootAttrs: { style: '--_af-prefix-chars: 1.5' },
       inputAttrs: { id: 'af-c4' },
     })
     AffixField.attach()
-    expect(el.style.getPropertyValue('--af-prefix-chars').trim()).toBe('1.5')
-    expect(el.style.getPropertyValue('--af-suffix-chars')).toBe('3') // "USD"
+    expect(el.style.getPropertyValue('--_af-prefix-chars').trim()).toBe('1.5')
+    expect(el.style.getPropertyValue('--_af-suffix-chars')).toBe('3') // "USD"
   })
 
   it('counts an aria-hidden affix too (visual, not ARIA, data)', () => {
@@ -227,29 +227,29 @@ describe('affix character counts', () => {
       suffix: { text: 'timmar', attrs: { 'aria-hidden': 'true' } },
     })
     AffixField.attach()
-    expect(el.style.getPropertyValue('--af-suffix-chars')).toBe('6')
+    expect(el.style.getPropertyValue('--_af-suffix-chars')).toBe('6')
   })
 })
 
 // ─── data-input-characters ───────────────────────────────────────────────────
 
 describe('data-input-characters', () => {
-  it('maps the attribute to --af-input-chars on the root', () => {
+  it('maps the attribute to --_af-input-chars on the root', () => {
     const el = createAffixFieldEl({
       rootAttrs: { 'data-input-characters': '4' },
       inputAttrs: { id: 'af-10' },
     })
     AffixField.attach()
-    expect(el.style.getPropertyValue('--af-input-chars')).toBe('4')
+    expect(el.style.getPropertyValue('--_af-input-chars')).toBe('4')
   })
 
-  it('never overwrites an authored --af-input-chars', () => {
+  it('never overwrites an authored --_af-input-chars', () => {
     const el = createAffixFieldEl({
-      rootAttrs: { 'data-input-characters': '4', style: '--af-input-chars: 6' },
+      rootAttrs: { 'data-input-characters': '4', style: '--_af-input-chars: 6' },
       inputAttrs: { id: 'af-11' },
     })
     AffixField.attach()
-    expect(el.style.getPropertyValue('--af-input-chars').trim()).toBe('6')
+    expect(el.style.getPropertyValue('--_af-input-chars').trim()).toBe('6')
   })
 
   it('ignores a non-numeric value', () => {
@@ -258,7 +258,7 @@ describe('data-input-characters', () => {
       inputAttrs: { id: 'af-12' },
     })
     AffixField.attach()
-    expect(el.style.getPropertyValue('--af-input-chars')).toBe('')
+    expect(el.style.getPropertyValue('--_af-input-chars')).toBe('')
   })
 })
 
@@ -308,7 +308,7 @@ describe('fully-authored fixture', () => {
       rootAttrs: {
         'data-has-prefix': 'true',
         'data-has-suffix': 'true',
-        style: '--af-prefix-chars: 1; --af-suffix-chars: 3;',
+        style: '--_af-prefix-chars: 1; --_af-suffix-chars: 3;',
       },
       inputAttrs: {
         id: 'af-authored',
@@ -331,8 +331,8 @@ describe('fully-authored fixture', () => {
   it('keeps the authored counts verbatim', () => {
     const el = createAuthoredEl()
     AffixField.attach()
-    expect(el.style.getPropertyValue('--af-prefix-chars').trim()).toBe('1')
-    expect(el.style.getPropertyValue('--af-suffix-chars').trim()).toBe('3')
+    expect(el.style.getPropertyValue('--_af-prefix-chars').trim()).toBe('1')
+    expect(el.style.getPropertyValue('--_af-suffix-chars').trim()).toBe('3')
   })
 })
 

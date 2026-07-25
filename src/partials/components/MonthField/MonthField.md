@@ -63,22 +63,22 @@ All tokens are custom properties on `.MonthField`:
 
 | Token | Description |
 |---|---|
-| `--mf-border-color` | Segment border |
-| `--mf-border-color-hover` | Segment border on hover |
-| `--mf-border-color-invalid` | Border color when invalid |
-| `--mf-bg-hover` | Background on hover |
-| `--mf-color-muted` | Placeholder / separator text color |
-| `--mf-trigger-bg-hover` | Trigger button hover background |
-| `--mf-trigger-bg-active` | Trigger button active background |
-| `--mf-popup-bg` | Popup background |
-| `--mf-popup-color` | Popup text color |
-| `--mf-popup-border-color` | Popup border |
-| `--mf-popup-radius` | Popup border radius |
-| `--mf-popup-shadow` | Popup box shadow |
-| `--mf-popup-gap` | Gap between field and popup |
-| `--mf-site-padding` | Viewport padding read by JS for popup positioning (defaults to `--SITE--PADDING`) |
-| `--mf-option-bg-selected` | Selected option background |
-| `--mf-option-color-selected` | Selected option text color |
+| `--_mf-border-color` | Segment border |
+| `--_mf-border-color-hover` | Segment border on hover |
+| `--_mf-border-color-invalid` | Border color when invalid |
+| `--_mf-bg-hover` | Background on hover |
+| `--_mf-color-muted` | Placeholder / separator text color |
+| `--_mf-trigger-bg-hover` | Trigger button hover background |
+| `--_mf-trigger-bg-active` | Trigger button active background |
+| `--_mf-popup-bg` | Popup background |
+| `--_mf-popup-color` | Popup text color |
+| `--_mf-popup-border-color` | Popup border |
+| `--_mf-popup-radius` | Popup border radius |
+| `--_mf-popup-shadow` | Popup box shadow |
+| `--_mf-popup-gap` | Gap between field and popup |
+| `--_mf-site-padding` | Viewport padding read by JS for popup positioning (defaults to `--SITE--PADDING`) |
+| `--_mf-option-bg-selected` | Selected option background |
+| `--_mf-option-color-selected` | Selected option text color |
 
 There is no popup width token — the popup sizes to `fit-content`; the month + year columns define the width.
 
@@ -97,7 +97,7 @@ This component composes shared primitives from [`src/kernel/`](../../../kernel/R
 
 ## Required site tokens
 
-The `--mf-*` tokens (see `## CSS tokens`) default to host-provided site tokens. A consumer must declare these (reference values live in [`src/css/site/01-Setup/tokens.css`](../../../css/site/01-Setup/tokens.css)); porting the component without them leaves colours and spacing unset.
+The `--_mf-*` tokens (see `## CSS tokens`) default to host-provided site tokens. A consumer must declare these (reference values live in [`src/css/site/01-Setup/tokens.css`](../../../css/site/01-Setup/tokens.css)); porting the component without them leaves colours and spacing unset.
 
 - `--SITE--PADDING`
 - `--SITE--POPOVER--BG`, `--SITE--POPOVER--COLOR`, `--SITE--POPOVER--MUTED`, `--SITE--POPOVER--BORDER--COLOR`, `--SITE--POPOVER--RADIUS`, `--SITE--POPOVER--SHADOW`, `--SITE--POPOVER--PADDING`, `--SITE--POPOVER--HOVER-BG`, `--SITE--POPOVER--ACCENT`, `--SITE--POPOVER--ACCENT-TEXT`

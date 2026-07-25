@@ -20,40 +20,40 @@
 
 .Notice {
   /* ── Public API ──────────────────────────────────────────────────────── */
-  --nt-accent: CanvasText;                                  /* per-variant below */
-  --nt-bg: color-mix(in srgb, var(--nt-accent) 8%, Canvas); /* base tint, derived from accent */
-  --nt-text-color: CanvasText;
-  --nt-title-color: currentColor;                           /* bold; accent-free by default */
-  --nt-border-width: 1px;                                   /* data-border (accent-coloured) */
-  --nt-bar-width: 0.25rem;                                  /* data-emphasis leading bar */
-  --nt-radius: 0.375rem;
-  --nt-padding: 1rem;
-  --nt-gap: 1rem;                                           /* icon → content */
-  --nt-content-gap: 0.25rem;                                /* title → body */
-  --nt-icon-size: 1.5rem;
-  --nt-max-inline-size: 50rem;
+  --_nt-accent: CanvasText;                                  /* per-variant below */
+  --_nt-bg: color-mix(in srgb, var(--_nt-accent) 8%, Canvas); /* base tint, derived from accent */
+  --_nt-text-color: CanvasText;
+  --_nt-title-color: currentColor;                           /* bold; accent-free by default */
+  --_nt-border-width: 1px;                                   /* data-border (accent-coloured) */
+  --_nt-bar-width: 0.25rem;                                  /* data-emphasis leading bar */
+  --_nt-radius: 0.375rem;
+  --_nt-padding: 1rem;
+  --_nt-gap: 1rem;                                           /* icon → content */
+  --_nt-content-gap: 0.25rem;                                /* title → body */
+  --_nt-icon-size: 1.5rem;
+  --_nt-max-inline-size: 50rem;
 
   display: grid;
   grid-template-columns: auto 1fr;
-  column-gap: var(--nt-gap);
-  max-inline-size: var(--nt-max-inline-size);
-  padding: var(--nt-padding);
-  border-radius: var(--nt-radius);
-  background-color: var(--nt-bg);   /* base: coloured */
-  color: var(--nt-text-color);
+  column-gap: var(--_nt-gap);
+  max-inline-size: var(--_nt-max-inline-size);
+  padding: var(--_nt-padding);
+  border-radius: var(--_nt-radius);
+  background-color: var(--_nt-bg);   /* base: coloured */
+  color: var(--_nt-text-color);
   /* no border by default — data-border / data-emphasis add chrome */
 
   & .Icon {
-    color: var(--nt-accent);
+    color: var(--_nt-accent);
     display: flex;
     align-items: flex-start;   /* top-align with the first line of content */
 
     & svg {
       display: block;
-      inline-size: var(--nt-icon-size);
-      block-size: var(--nt-icon-size);
+      inline-size: var(--_nt-icon-size);
+      block-size: var(--_nt-icon-size);
       fill: none;
-      stroke: currentColor;    /* inherits --nt-accent from .Icon */
+      stroke: currentColor;    /* inherits --_nt-accent from .Icon */
       stroke-width: 2;
       stroke-linecap: round;
       stroke-linejoin: round;
@@ -63,12 +63,12 @@
   & .Content {
     display: flex;
     flex-direction: column;
-    gap: var(--nt-content-gap);
+    gap: var(--_nt-content-gap);
     min-inline-size: 0;        /* let long words wrap instead of overflowing */
   }
 
   & .Title {
-    color: var(--nt-title-color);
+    color: var(--_nt-title-color);
     font-weight: 600;
   }
 
@@ -79,18 +79,18 @@
   &[data-icon="false"] .Icon { display: none; }
 
   /* Full border in the accent (icon) colour */
-  &[data-border="true"] { border: var(--nt-border-width) solid var(--nt-accent); }
+  &[data-border="true"] { border: var(--_nt-border-width) solid var(--_nt-accent); }
 
   /* The "styled" hook — a thick leading accent bar (richest look) */
-  &[data-emphasis="true"] { border-inline-start: var(--nt-bar-width) solid var(--nt-accent); }
+  &[data-emphasis="true"] { border-inline-start: var(--_nt-bar-width) solid var(--_nt-accent); }
 
   /* ── Variants: set only the accent; tint + icon + chrome derive ──────── */
-  &[data-variant="error"]   { --nt-accent: var(--SITE--NOTICE-ERROR,   #c0362c); }
-  &[data-variant="warning"] { --nt-accent: var(--SITE--NOTICE-WARNING, #a85a00); }
-  &[data-variant="success"] { --nt-accent: var(--SITE--NOTICE-SUCCESS, #1a7f37); }
-  &[data-variant="info"]    { --nt-accent: var(--SITE--NOTICE-INFO,    #0b6bcb); }
+  &[data-variant="error"]   { --_nt-accent: var(--SITE--NOTICE-ERROR,   #c0362c); }
+  &[data-variant="warning"] { --_nt-accent: var(--SITE--NOTICE-WARNING, #a85a00); }
+  &[data-variant="success"] { --_nt-accent: var(--SITE--NOTICE-SUCCESS, #1a7f37); }
+  &[data-variant="info"]    { --_nt-accent: var(--SITE--NOTICE-INFO,    #0b6bcb); }
   &[data-variant="neutral"],
-  &:not([data-variant])     { --nt-accent: CanvasText; }
+  &:not([data-variant])     { --_nt-accent: CanvasText; }
 }
 
 /* Forced colors: the tint collapses to Canvas, so give every Notice a boundary,

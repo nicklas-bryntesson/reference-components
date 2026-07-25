@@ -13,47 +13,47 @@
  *
  * NEUTRAL by default: a monochrome skeleton on system colours, like the rest of
  * the field family (AffixField, WeekField). It TAKES design from the host —
- * override --cf-selected to paint the selection in an accent; everything else
+ * override --_cf-selected to paint the selection in an accent; everything else
  * reads currentColor / Canvas / CanvasText.
  */
 
 .ChoiceField {
   /* ── Public API ──────────────────────────────────────────────────────── */
-  --cf-size: 1.5em;                               /* control box — em so it scales with the local text (≈24px at 16px) */
-  --cf-gap: 0.5rem;                               /* box → label */
-  --cf-border-width: 1px;
-  --cf-radius: 0.25rem;                           /* checkbox corner (radio is always 50%) */
-  --cf-border-color: currentColor;
-  --cf-border-color-hover: CanvasText;
-  --cf-border-color-invalid: #c00;
-  --cf-bg-hover: var(--SITE--POPOVER--HOVER-BG);
-  --cf-selected: CanvasText;                      /* checkbox fill · radio ring+dot — host overrides for accent */
-  --cf-mark-color: Canvas;                        /* checkbox tick on the filled box */
-  --cf-transition: 120ms ease;
-  /* Single tick shape; mask alpha carries the form, --cf-mark-color the colour. */
-  --cf-mark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z'/%3E%3C/svg%3E");
+  --_cf-size: 1.5em;                               /* control box — em so it scales with the local text (≈24px at 16px) */
+  --_cf-gap: 0.5rem;                               /* box → label */
+  --_cf-border-width: 1px;
+  --_cf-radius: 0.25rem;                           /* checkbox corner (radio is always 50%) */
+  --_cf-border-color: currentColor;
+  --_cf-border-color-hover: CanvasText;
+  --_cf-border-color-invalid: #c00;
+  --_cf-bg-hover: var(--SITE--POPOVER--HOVER-BG);
+  --_cf-selected: CanvasText;                      /* checkbox fill · radio ring+dot — host overrides for accent */
+  --_cf-mark-color: Canvas;                        /* checkbox tick on the filled box */
+  --_cf-transition: 120ms ease;
+  /* Single tick shape; mask alpha carries the form, --_cf-mark-color the colour. */
+  --_cf-mark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z'/%3E%3C/svg%3E");
 
   display: inline-flex;
   align-items: center;
-  gap: var(--cf-gap);
+  gap: var(--_cf-gap);
 
   /* ── Shared skeleton (both types) ────────────────────────────────────── */
   & input {
     appearance: none;
     -webkit-appearance: none;
-    /* inherit the surrounding type so --cf-size (em) tracks the label/context
+    /* inherit the surrounding type so --_cf-size (em) tracks the label/context
        font-size, not the UA input default (~13px) */
     font: inherit;
     margin: 0;
     flex-shrink: 0;
-    inline-size: var(--cf-size);
-    block-size: var(--cf-size);
+    inline-size: var(--_cf-size);
+    block-size: var(--_cf-size);
     display: grid;
     place-content: center;
-    border: var(--cf-border-width) solid var(--cf-border-color);
+    border: var(--_cf-border-width) solid var(--_cf-border-color);
     background-color: Canvas;
     cursor: pointer;
-    transition: background-color var(--cf-transition), border-color var(--cf-transition);
+    transition: background-color var(--_cf-transition), border-color var(--_cf-transition);
 
     &::after {
       content: "";
@@ -62,7 +62,7 @@
          → 0. Size the mark off the token in the type branches below. */
       opacity: 0;
       transform: scale(0.6);          /* initial: shrunk; :checked restores to full */
-      transition: opacity var(--cf-transition), transform var(--cf-transition);
+      transition: opacity var(--_cf-transition), transform var(--_cf-transition);
     }
   }
   /* :checked has higher specificity than the type branches, so it wins the
@@ -70,34 +70,34 @@
   & input:checked::after { opacity: 1; transform: none; }
 
   /* ── Checkbox branch: square box, filled + tick ──────────────────────── */
-  & input[type="checkbox"] { border-radius: var(--cf-radius); }
+  & input[type="checkbox"] { border-radius: var(--_cf-radius); }
   & input[type="checkbox"]::after {
-    inline-size: calc(var(--cf-size) * 0.82);
-    block-size: calc(var(--cf-size) * 0.82);
-    background-color: var(--cf-mark-color);
-    -webkit-mask: var(--cf-mark) center / contain no-repeat;
-            mask: var(--cf-mark) center / contain no-repeat;
+    inline-size: calc(var(--_cf-size) * 0.82);
+    block-size: calc(var(--_cf-size) * 0.82);
+    background-color: var(--_cf-mark-color);
+    -webkit-mask: var(--_cf-mark) center / contain no-repeat;
+            mask: var(--_cf-mark) center / contain no-repeat;
   }
   & input[type="checkbox"]:checked {
-    background-color: var(--cf-selected);
-    border-color: var(--cf-selected);
+    background-color: var(--_cf-selected);
+    border-color: var(--_cf-selected);
   }
 
   /* ── Radio branch: circle box, ring + dot (box stays unfilled) ───────── */
   & input[type="radio"] { border-radius: 50%; }
   & input[type="radio"]::after {
-    inline-size: calc(var(--cf-size) * 0.6);
-    block-size: calc(var(--cf-size) * 0.6);
+    inline-size: calc(var(--_cf-size) * 0.6);
+    block-size: calc(var(--_cf-size) * 0.6);
     border-radius: 50%;
-    background-color: var(--cf-selected);
+    background-color: var(--_cf-selected);
   }
-  & input[type="radio"]:checked { border-color: var(--cf-selected); }
+  & input[type="radio"]:checked { border-color: var(--_cf-selected); }
 
   /* ── Interaction states (real pseudo-class + data-test-state pairs) ──── */
   & input:hover,
-  &[data-test-state="hover"] input { border-color: var(--cf-border-color-hover); }
+  &[data-test-state="hover"] input { border-color: var(--_cf-border-color-hover); }
   & input:not(:checked):hover,
-  &[data-test-state="hover"] input:not(:checked) { background-color: var(--cf-bg-hover); }
+  &[data-test-state="hover"] input:not(:checked) { background-color: var(--_cf-bg-hover); }
 
   /* focus — matches the family: 2px solid currentColor, offset 1px */
   & input:focus-visible,
@@ -105,12 +105,12 @@
   & input:focus:not(:focus-visible) { outline: none; }
 
   & input:active,
-  &[data-test-state="active"] input { border-color: var(--cf-border-color-hover); }
+  &[data-test-state="active"] input { border-color: var(--_cf-border-color-hover); }
   & input:not(:checked):active,
-  &[data-test-state="active"] input:not(:checked) { background-color: var(--cf-bg-hover); }
+  &[data-test-state="active"] input:not(:checked) { background-color: var(--_cf-bg-hover); }
 
   /* invalid — data-* on the root is the API (ADR-0002) */
-  &[data-invalid="true"] input { border-color: var(--cf-border-color-invalid); }
+  &[data-invalid="true"] input { border-color: var(--_cf-border-color-invalid); }
 
   /* disabled — family convention: dim, don't recolour */
   & input:disabled { cursor: not-allowed; opacity: 0.5; }

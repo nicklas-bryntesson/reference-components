@@ -3,30 +3,30 @@
   display: inline-block;
   overflow: hidden;
   /* Public API */
-  --df-calendar-width: 18rem;
-  --df-calendar-gap: 1.5rem;
-  --df-site-max-width: var(--MAX--WIDTH--SITE, 100rem);
-  --df-site-padding: var(--SITE--PADDING, 1rem);
+  --_df-calendar-width: 18rem;
+  --_df-calendar-gap: 1.5rem;
+  --_df-site-max-width: var(--MAX--WIDTH--SITE, 100rem);
+  --_df-site-padding: var(--SITE--PADDING, 1rem);
   /* Field-family height contract — every field's bordered box is min 2.5rem tall */
-  --df-field-min-block-size: 2.5rem;
+  --_df-field-min-block-size: 2.5rem;
   /* Design tokens — segments */
-  --df-segments-border-color: currentColor;
-  --df-segments-border-color-hover: CanvasText;
-  --df-segments-bg-hover: var(--SITE--POPOVER--HOVER-BG);
-  --df-segments-border-color-invalid: #c00;
-  --df-segments-color-muted: var(--SITE--POPOVER--MUTED);
-  --df-trigger-bg-hover: var(--SITE--POPOVER--HOVER-BG);
-  --df-trigger-bg-active: var(--SITE--POPOVER--HOVER-BG);
+  --_df-segments-border-color: currentColor;
+  --_df-segments-border-color-hover: CanvasText;
+  --_df-segments-bg-hover: var(--SITE--POPOVER--HOVER-BG);
+  --_df-segments-border-color-invalid: #c00;
+  --_df-segments-color-muted: var(--SITE--POPOVER--MUTED);
+  --_df-trigger-bg-hover: var(--SITE--POPOVER--HOVER-BG);
+  --_df-trigger-bg-active: var(--SITE--POPOVER--HOVER-BG);
   /* Design tokens — calendar (shared popover surface) */
-  --df-calendar-bg: var(--SITE--POPOVER--BG);
-  --df-calendar-color: var(--SITE--POPOVER--COLOR);
-  --df-calendar-color-muted: var(--SITE--POPOVER--MUTED);
-  --df-calendar-border-color: var(--SITE--POPOVER--BORDER--COLOR);
-  --df-calendar-radius: var(--SITE--POPOVER--RADIUS);
-  --df-calendar-shadow: var(--SITE--POPOVER--SHADOW);
-  --df-calendar-link-color: var(--SITE--POPOVER--ACCENT);
+  --_df-calendar-bg: var(--SITE--POPOVER--BG);
+  --_df-calendar-color: var(--SITE--POPOVER--COLOR);
+  --_df-calendar-color-muted: var(--SITE--POPOVER--MUTED);
+  --_df-calendar-border-color: var(--SITE--POPOVER--BORDER--COLOR);
+  --_df-calendar-radius: var(--SITE--POPOVER--RADIUS);
+  --_df-calendar-shadow: var(--SITE--POPOVER--SHADOW);
+  --_df-calendar-link-color: var(--SITE--POPOVER--ACCENT);
   /* Internal */
-  --_df-rail-max-width: calc(var(--df-site-max-width) + var(--df-calendar-width));
+  --_df-rail-max-width: calc(var(--_df-site-max-width) + var(--_df-calendar-width));
   --_df-arrow-size: 0.75rem;
   --_df-arrow-corner-radius: 0.25rem;
 
@@ -83,8 +83,8 @@
     display: inline-flex;
     align-items: center;
     box-sizing: border-box;
-    min-block-size: var(--df-field-min-block-size);
-    border: 1px solid var(--df-segments-border-color);
+    min-block-size: var(--_df-field-min-block-size);
+    border: 1px solid var(--_df-segments-border-color);
     padding-inline: 0.5rem;
     padding-block: 0.25rem;
     gap: 0.125rem;
@@ -105,19 +105,19 @@
     }
 
     &[data-placeholder="true"] {
-      color: var(--df-segments-color-muted);
+      color: var(--_df-segments-color-muted);
     }
   }
 
   & .Separator {
     user-select: none;
-    color: var(--df-segments-color-muted);
+    color: var(--_df-segments-color-muted);
   }
 
   & .Segments:hover,
   &[data-test-state="hover"] .Segments {
-    border-color: var(--df-segments-border-color-hover);
-    background-color: var(--df-segments-bg-hover);
+    border-color: var(--_df-segments-border-color-hover);
+    background-color: var(--_df-segments-bg-hover);
   }
 
   & .Segments:focus-within,
@@ -127,7 +127,7 @@
   }
 
   &[data-invalid="true"] .Segments {
-    border-color: var(--df-segments-border-color-invalid);
+    border-color: var(--_df-segments-border-color-invalid);
   }
 
   & .DateField-trigger {
@@ -146,12 +146,12 @@
 
     &:hover,
     .DateField[data-test-state="hover"] & {
-      background-color: var(--df-trigger-bg-hover);
+      background-color: var(--_df-trigger-bg-hover);
     }
 
     &:active,
     .DateField[data-test-state="active"] & {
-      background-color: var(--df-trigger-bg-active);
+      background-color: var(--_df-trigger-bg-active);
     }
 
     &:focus-visible {
@@ -172,14 +172,14 @@
 
 .DateField-popup {
   position: absolute;
-  background: var(--df-calendar-bg);
-  color: var(--df-calendar-color);
-  border: 1px solid var(--df-calendar-border-color);
+  background: var(--_df-calendar-bg);
+  color: var(--_df-calendar-color);
+  border: 1px solid var(--_df-calendar-border-color);
   padding: var(--SITE--POPOVER--PADDING);
   font-size: 1rem;
   z-index: 100;
-  border-radius: var(--df-calendar-radius);
-  box-shadow: var(--df-calendar-shadow);
+  border-radius: var(--_df-calendar-radius);
+  box-shadow: var(--_df-calendar-shadow);
 
   & .CalendarHeader {
     display: flex;
@@ -220,7 +220,7 @@
       padding-block-end: 0.25rem;
       text-align: center;
       font-weight: normal;
-      color: var(--df-calendar-color-muted);
+      color: var(--_df-calendar-color-muted);
       min-inline-size: 2rem;
     }
 
@@ -255,12 +255,12 @@
     }
 
     & td[data-disabled="true"] button {
-      color: var(--df-calendar-color-muted);
+      color: var(--_df-calendar-color-muted);
       cursor: not-allowed;
     }
 
     & td[data-outside-month="true"] button {
-      color: var(--df-calendar-color-muted);
+      color: var(--_df-calendar-color-muted);
     }
   }
 
@@ -268,13 +268,13 @@
     display: flex;
     justify-content: space-between;
     padding: 0.5rem;
-    border-top: 1px solid var(--df-calendar-border-color);
+    border-top: 1px solid var(--_df-calendar-border-color);
 
     & button {
       background: none;
       border: none;
       cursor: pointer;
-      color: var(--df-calendar-link-color);
+      color: var(--_df-calendar-link-color);
       font: inherit;
       padding: 0.25rem 0.5rem;
       border-radius: 2px;
@@ -285,7 +285,7 @@
       }
 
       &:disabled {
-        color: var(--df-calendar-color-muted);
+        color: var(--_df-calendar-color-muted);
         cursor: not-allowed;
       }
     }
@@ -360,19 +360,19 @@
 /* ── Calendar bubble ───────────────────────────────────────────────────── */
 .DateField .DateField-popup {
   position: absolute;
-  left: var(--df-popup-offset, 50%);
+  left: var(--_df-popup-offset, 50%);
   transform: translateX(-50%);
-  inline-size: var(--df-calendar-width);
+  inline-size: var(--_df-calendar-width);
   pointer-events: auto;
 }
 
 /* ── Direction gates ───────────────────────────────────────────────────── */
 .DateField[data-direction="bottom"] .DateField-popup {
-  top: var(--df-calendar-gap);
+  top: var(--_df-calendar-gap);
 }
 
 .DateField[data-direction="top"] .DateField-popup {
-  bottom: var(--df-calendar-gap);
+  bottom: var(--_df-calendar-gap);
 }
 
 /* ── Arrow ─────────────────────────────────────────────────────────────── */
@@ -380,18 +380,18 @@
   position: absolute;
   width: var(--_df-arrow-size);
   height: var(--_df-arrow-size);
-  background-color: var(--df-calendar-bg);
+  background-color: var(--_df-calendar-bg);
   left: 50%;
 }
 
 .DateField[data-direction="top"] .arrow {
   bottom: calc(var(--_df-arrow-size) * -0.5);
-  transform: translateX(calc(-50% + var(--df-arrow-offset, 0px))) rotate(45deg);
+  transform: translateX(calc(-50% + var(--_df-arrow-offset, 0px))) rotate(45deg);
   border-end-end-radius: var(--_df-arrow-corner-radius);
 }
 
 .DateField[data-direction="bottom"] .arrow {
   top: calc(var(--_df-arrow-size) * -0.5);
-  transform: translateX(calc(-50% + var(--df-arrow-offset, 0px))) rotate(45deg);
+  transform: translateX(calc(-50% + var(--_df-arrow-offset, 0px))) rotate(45deg);
   border-start-start-radius: var(--_df-arrow-corner-radius);
 }

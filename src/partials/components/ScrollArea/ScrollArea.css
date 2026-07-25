@@ -4,17 +4,17 @@
    space. See ScrollArea.md for the contract.
 
    Public API (author-settable custom properties):
-     --sc-offset      inline inset the scroller breaks out to / is padded by.
+     --_sc-offset      inline inset the scroller breaks out to / is padded by.
                       Defaults to the host --content-offset so content lines up
                       with the page gutter while scrolling edge-to-edge.
-     --sc-fade-color  colour of the edge fades — MUST match the surface behind
+     --_sc-fade-color  colour of the edge fades — MUST match the surface behind
                       the ScrollArea (default: white, the page surface).
-     --sc-fade-size   width of each fade (default: --sc-offset). */
+     --_sc-fade-size   width of each fade (default: --_sc-offset). */
 
 .ScrollArea {
-  --sc-offset: var(--content-offset, 1rem);
-  --sc-fade-color: white;
-  --sc-fade-size: var(--sc-offset);
+  --_sc-offset: var(--content-offset, 1rem);
+  --_sc-fade-color: white;
+  --_sc-fade-size: var(--_sc-offset);
 
   --_sb-height: 4px;
   --_sb-gap: 0.5rem;
@@ -28,7 +28,7 @@
   grid-template-areas: "stack";
   grid-template-columns: minmax(0, 1fr);
   /* break out to the page edges so the fades sit over the gutter */
-  margin-inline: calc(var(--sc-offset) * -1);
+  margin-inline: calc(var(--_sc-offset) * -1);
 }
 
 .ScrollArea-viewport {
@@ -36,7 +36,7 @@
   /* flex makes the trailing padding-inline-end survive the scroll end; in plain
      block layout the end padding is eaten by overflowing content. */
   display: flex;
-  padding-inline: var(--sc-offset);
+  padding-inline: var(--_sc-offset);
   overflow-x: auto;
   /* horizontal only — no forced vertical bar. NOTE: overflow-x:auto forces
      overflow-y to a non-visible value, so popovers opened inside are clipped. */
@@ -57,7 +57,7 @@
 .ScrollArea-scrollbar {
   position: absolute;
   inset-block-start: calc(100% + var(--_sb-gap));
-  inset-inline: var(--sc-offset);
+  inset-inline: var(--_sc-offset);
   block-size: var(--_sb-height);
   border-radius: 999px;
   background: var(--_sb-track);
@@ -107,15 +107,15 @@
   content: "";
   position: absolute;
   inset-block: 0;
-  inline-size: var(--sc-fade-size);
+  inline-size: var(--_sc-fade-size);
 }
 .ScrollArea-fades::before {
   inset-inline-start: 0;
-  background: linear-gradient(to right, var(--sc-fade-color), transparent);
+  background: linear-gradient(to right, var(--_sc-fade-color), transparent);
 }
 .ScrollArea-fades::after {
   inset-inline-end: 0;
-  background: linear-gradient(to left, var(--sc-fade-color), transparent);
+  background: linear-gradient(to left, var(--_sc-fade-color), transparent);
 }
 
 @media (prefers-reduced-motion: reduce) {

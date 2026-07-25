@@ -70,3 +70,4 @@ holds the *why-we-built-it*; the `.md` holds the *how-it-works*.
 | [0014](0014-picklist-toggle-buttongroup-selection-vs-action.md) | Picklist, Toggle and ButtonGroup are distinct components; selection-vs-action draws the line | Architecture | Proposed |
 | [0015](0015-choicefield-one-component-keyed-on-native-type.md) | ChoiceField — one component keyed on native `type` (supersedes the 0013 radio/checkbox split) | Component | Accepted |
 | [0016](0016-notice-message-and-separate-live-region.md) | Notice is a presentational message; the live region is a separate persistent container | Component | Accepted |
+| [0017](0017-component-css-vars-are-private-underscore.md) | Component-local CSS custom properties are private (`--_` prefix); public seam is `--SITE--*` + `data-*` | Convention | Accepted |

@@ -59,28 +59,28 @@ Contract rules (enforced by the unit test against this file's kitchensink):
 ## CSS Variable API
 
 Override on the `.ChoiceField` element (or any rule that targets it — e.g.
-`.my-theme .ChoiceField { --cf-selected: … }`). An ancestor or `:root` override is
+`.my-theme .ChoiceField { --_cf-selected: … }`). An ancestor or `:root` override is
 **shadowed** by the component's own defaults on the root, so it must target `.ChoiceField`
 itself. Neutral, monochrome defaults on system colours — the component **takes** design;
-override `--cf-selected` to push an accent.
+override `--_cf-selected` to push an accent.
 
 | Variable | Default | Description |
 |---|---|---|
-| `--cf-size` | `1.5em` | Control box size — `em` so the control scales with its local text (≈24px at 16px); the tick (0.82×) and dot (0.6×) follow proportionally |
-| `--cf-gap` | `0.5rem` | Space between box and label |
-| `--cf-border-width` | `1px` | Box border |
-| `--cf-radius` | `0.25rem` | Checkbox corner (radio is always `50%`) |
-| `--cf-border-color` | `currentColor` | Unselected border |
-| `--cf-border-color-hover` | `CanvasText` | Hover / active border |
-| `--cf-border-color-invalid` | `#c00` | Invalid border |
-| `--cf-bg-hover` | `var(--SITE--POPOVER--HOVER-BG)` | Hover / active fill (unselected) |
-| `--cf-selected` | `CanvasText` | Checkbox fill · radio ring + dot — **override for accent** |
-| `--cf-mark-color` | `Canvas` | Checkbox tick colour on the filled box |
-| `--cf-mark` | inline check SVG | Tick shape (a `mask`; fill colour is irrelevant) |
+| `--_cf-size` | `1.5em` | Control box size — `em` so the control scales with its local text (≈24px at 16px); the tick (0.82×) and dot (0.6×) follow proportionally |
+| `--_cf-gap` | `0.5rem` | Space between box and label |
+| `--_cf-border-width` | `1px` | Box border |
+| `--_cf-radius` | `0.25rem` | Checkbox corner (radio is always `50%`) |
+| `--_cf-border-color` | `currentColor` | Unselected border |
+| `--_cf-border-color-hover` | `CanvasText` | Hover / active border |
+| `--_cf-border-color-invalid` | `#c00` | Invalid border |
+| `--_cf-bg-hover` | `var(--SITE--POPOVER--HOVER-BG)` | Hover / active fill (unselected) |
+| `--_cf-selected` | `CanvasText` | Checkbox fill · radio ring + dot — **override for accent** |
+| `--_cf-mark-color` | `Canvas` | Checkbox tick colour on the filled box |
+| `--_cf-mark` | inline check SVG | Tick shape (a `mask`; fill colour is irrelevant) |
 
 ### Why one icon, and why neutral
 
-The tick is a single `mask-image` tinted by `--cf-mark-color`, so one shape serves both
+The tick is a single `mask-image` tinted by `--_cf-mark-color`, so one shape serves both
 checked and disabled-checked — the colour is a token swap, not a second SVG. Defaults are
 monochrome (system colours) to match the rest of the field family (AffixField, WeekField):
 a reference skeleton should look like every other field until the host paints it.
