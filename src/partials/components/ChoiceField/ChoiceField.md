@@ -73,7 +73,7 @@ override `--_cf-selected` to push an accent.
 | `--_cf-border-color` | `currentColor` | Unselected border |
 | `--_cf-border-color-hover` | `CanvasText` | Hover / active border |
 | `--_cf-border-color-invalid` | `#c00` | Invalid border |
-| `--_cf-bg-hover` | `var(--SITE--POPOVER--HOVER-BG)` | Hover / active fill (unselected) |
+| `--_cf-bg-hover` | `var(--ui-hover)` | Hover / active fill (unselected) |
 | `--_cf-selected` | `CanvasText` | Checkbox fill · radio ring + dot — **override for accent** |
 | `--_cf-mark-color` | `Canvas` | Checkbox tick colour on the filled box |
 | `--_cf-mark` | inline check SVG | Tick shape (a `mask`; fill colour is irrelevant) |

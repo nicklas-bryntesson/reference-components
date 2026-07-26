@@ -77,9 +77,21 @@ A property that only applies in some states must not appear in the base rule. Gr
 
 If a property applies to every instance with no variation — it belongs in the base. If it varies by attribute at all — it belongs behind a gate.
 
-### Private props (`--_*`) carry no value in the base
+### Component-local props are private (`--_`)
 
-Use `--_` prefix for internal variables. **Gate-consumed** props have no value in the base — they get one only when a variant/gate sets it, and the gate consumes it (the `box-shadow`/`--_shadow` example above). A `--_*` used as a plain **internal constant** (a fixed rail width, an arrow size) is the exception: it legitimately holds its value in the base, because it never varies by state — it is a named constant, not a gated variable.
+**Every** component-local custom property is prefixed `--_<component>-*` (`--_dtf-calendar-bg`, `--_nt-accent`) — not just internal/gated ones. A var set on a component is only overridable by selecting that component, so it is inherently component-scoped; the `--_` marks that (a convention marker, not enforced privacy). See ADR-0017.
+
+Within that: a **gate-consumed** prop carries no value in the base — it gets one only when a variant/gate sets it, and the gate consumes it (the `box-shadow`/`--_shadow` example above). A `--_*` used as a plain **internal constant** (a fixed rail width, an arrow size) is the exception: it legitimately holds its value in the base, because it never varies by state — it is a named constant, not a gated variable.
+
+### Design comes from the `--ui-*` seam
+
+Components take design through **one** host-facing namespace: `--ui-*` (in `01-Setup/ui-tokens.css`) — surface, colour, radius, shadow, and state roles, with neutral standalone defaults. A themable component prop reads a `--ui-*` with a literal fallback, so it still renders with nothing wired:
+
+```css
+--_nt-accent: var(--ui-destructive, #c0362c);
+```
+
+Never read design from `--SITE--*` — that namespace is *site layout scaffolding* (padding / max-width / grid), not the component seam — and never invent a new host token. If a role is missing, add it to `ui-tokens.css`, don't reach past the seam. See ADR-0018.
 
 ### Interaction states are paired selectors
 

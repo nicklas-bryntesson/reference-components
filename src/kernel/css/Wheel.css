@@ -6,8 +6,8 @@
   /* Geometry token read by WheelColumn (readRowHeight) */
   --_wheel-row-height: 38px;
   --_wheel-rows: 5;
-  --_wheel-color: var(--SITE--POPOVER--COLOR);
-  --_wheel-color-selected: var(--SITE--POPOVER--ACCENT);
+  --_wheel-color: var(--ui-surface-foreground);
+  --_wheel-color-selected: var(--ui-primary);
 
   position: relative;
   width: 64px;
@@ -23,7 +23,7 @@
   &:active { cursor: grabbing; }
 
   &:focus-visible {
-    outline: 2px solid var(--SITE--POPOVER--ACCENT);
+    outline: 2px solid var(--ui-primary);
     outline-offset: -2px;
   }
 }
@@ -76,7 +76,7 @@
   top: 50%;
   height: var(--_wheel-row-height);
   transform: translateY(-50%);
-  background: var(--SITE--POPOVER--HOVER-BG);
+  background: var(--ui-hover);
   border-radius: 9px;
   z-index: 0;
   pointer-events: none;

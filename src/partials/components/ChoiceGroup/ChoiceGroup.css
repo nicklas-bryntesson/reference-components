@@ -26,7 +26,7 @@
   --_cg-legend-gap: 0.5rem;                            /* legend → body (above) */
   --_cg-max-inline-size: 30rem;
   --_cg-legend-weight: 600;
-  --_cg-hint-color: var(--SITE--POPOVER--MUTED, #6e6e6e);
+  --_cg-hint-color: var(--ui-muted-foreground, #6e6e6e);
 
   /* Legend hygiene — the documented cost of <fieldset> (ADR-0013).
      min-inline-size:0 kills the implicit min-content width in flex/grid hosts. */

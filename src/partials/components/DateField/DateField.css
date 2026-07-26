@@ -12,19 +12,19 @@
   /* Design tokens — segments */
   --_df-segments-border-color: currentColor;
   --_df-segments-border-color-hover: CanvasText;
-  --_df-segments-bg-hover: var(--SITE--POPOVER--HOVER-BG);
-  --_df-segments-border-color-invalid: #c00;
-  --_df-segments-color-muted: var(--SITE--POPOVER--MUTED);
-  --_df-trigger-bg-hover: var(--SITE--POPOVER--HOVER-BG);
-  --_df-trigger-bg-active: var(--SITE--POPOVER--HOVER-BG);
+  --_df-segments-bg-hover: var(--ui-hover);
+  --_df-segments-border-color-invalid: var(--ui-destructive, #c00);
+  --_df-segments-color-muted: var(--ui-muted-foreground);
+  --_df-trigger-bg-hover: var(--ui-hover);
+  --_df-trigger-bg-active: var(--ui-hover);
   /* Design tokens — calendar (shared popover surface) */
-  --_df-calendar-bg: var(--SITE--POPOVER--BG);
-  --_df-calendar-color: var(--SITE--POPOVER--COLOR);
-  --_df-calendar-color-muted: var(--SITE--POPOVER--MUTED);
-  --_df-calendar-border-color: var(--SITE--POPOVER--BORDER--COLOR);
-  --_df-calendar-radius: var(--SITE--POPOVER--RADIUS);
-  --_df-calendar-shadow: var(--SITE--POPOVER--SHADOW);
-  --_df-calendar-link-color: var(--SITE--POPOVER--ACCENT);
+  --_df-calendar-bg: var(--ui-surface);
+  --_df-calendar-color: var(--ui-surface-foreground);
+  --_df-calendar-color-muted: var(--ui-muted-foreground);
+  --_df-calendar-border-color: var(--ui-border);
+  --_df-calendar-radius: var(--ui-radius);
+  --_df-calendar-shadow: var(--ui-shadow);
+  --_df-calendar-link-color: var(--ui-primary);
   /* Internal */
   --_df-rail-max-width: calc(var(--_df-site-max-width) + var(--_df-calendar-width));
   --_df-arrow-size: 0.75rem;
@@ -100,8 +100,8 @@
     cursor: default;
 
     &[data-focused="true"] {
-      background-color: var(--SITE--POPOVER--ACCENT);
-      color: var(--SITE--POPOVER--ACCENT-TEXT);
+      background-color: var(--ui-primary);
+      color: var(--ui-primary-foreground);
     }
 
     &[data-placeholder="true"] {
@@ -175,7 +175,7 @@
   background: var(--_df-calendar-bg);
   color: var(--_df-calendar-color);
   border: 1px solid var(--_df-calendar-border-color);
-  padding: var(--SITE--POPOVER--PADDING);
+  padding: var(--ui-surface-padding);
   font-size: 1rem;
   z-index: 100;
   border-radius: var(--_df-calendar-radius);
@@ -250,8 +250,8 @@
     }
 
     & td[data-selected="true"] button {
-      background-color: var(--SITE--POPOVER--ACCENT);
-      color: var(--SITE--POPOVER--ACCENT-TEXT);
+      background-color: var(--ui-primary);
+      color: var(--ui-primary-foreground);
     }
 
     & td[data-disabled="true"] button {
@@ -325,14 +325,14 @@
 }
 
 .DateField-popup .MonthYearTrigger:hover {
-  background-color: var(--SITE--POPOVER--HOVER-BG);
+  background-color: var(--ui-hover);
 }
 
 .DateField-popup .MonthYearTrigger::after {
   content: '›';
   display: inline-block;
   margin-inline-start: 0.3rem;
-  color: var(--SITE--POPOVER--ACCENT);
+  color: var(--ui-primary);
   transform: rotate(90deg);
 }
 

@@ -170,14 +170,14 @@ All tokens are custom properties on `.AffixField`:
 
 **None.** AffixField composes no shared primitives from [`src/kernel/`](../../../kernel/README.md) — together with FileUpload it is the simplest porting target in the repo: the component folder ports on its own.
 
-## Required site tokens
+## Required tokens
 
-Three `--_af-*` token defaults (`--_af-bg-hover`, `--_af-bg-active`, `--_af-affix-color`) read two host-provided site tokens (reference values live in [`src/css/site/01-Setup/tokens.css`](../../../css/site/01-Setup/tokens.css)):
+Three `--_af-*` token defaults (`--_af-bg-hover`, `--_af-bg-active`, `--_af-affix-color`) read two host-provided site tokens (reference values live in [`src/css/site/01-Setup/ui-tokens.css`](../../../css/site/01-Setup/ui-tokens.css)):
 
-- `--SITE--POPOVER--HOVER-BG` (hover/active input background)
-- `--SITE--POPOVER--MUTED` (affix text color)
+- `--ui-hover` (hover/active input background)
+- `--ui-muted-foreground` (affix text color)
 
-Map onto your design system from the **values** in `tokens.css`, not from the names alone. `--SITE--POPOVER--HOVER-BG` uses CSS system-color math (`color-mix(in srgb, CanvasText 3%, transparent)`), which gives free dark-mode support; `--SITE--POPOVER--MUTED` is a fixed hex (`#6e6e6e`), chosen to pass AA contrast on a light canvas. Substituting your own values is valid — but you then own dark-mode and contrast yourself.
+Map onto your design system from the **values** in `ui-tokens.css` (design) / `tokens.css` (layout), not from the names alone. `--ui-hover` uses CSS system-color math (`color-mix(in srgb, CanvasText 3%, transparent)`), which gives free dark-mode support; `--ui-muted-foreground` is a fixed hex (`#6e6e6e`), chosen to pass AA contrast on a light canvas. Substituting your own values is valid — but you then own dark-mode and contrast yourself.
 
 ## Non-goals
 

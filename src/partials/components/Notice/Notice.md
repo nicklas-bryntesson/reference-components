@@ -45,7 +45,7 @@ and the tint derives from it; adjust the rest globally.
 
 | Variable | Default | Description |
 |---|---|---|
-| `--_nt-accent` | per variant (`error #c0362c`, `warning #a85a00`, `success #1a7f37`, `info #0b6bcb`, `neutral CanvasText`) | Drives the tint, the icon, and the `data-border` / `data-emphasis` chrome; each variant reads `var(--SITE--NOTICE-*, <fallback>)` |
+| `--_nt-accent` | per variant (`error #c0362c`, `warning #a85a00`, `success #1a7f37`, `info #0b6bcb`, `neutral CanvasText`) | Drives the tint, the icon, and the `data-border` / `data-emphasis` chrome; each variant reads `var(--ui-<state>, <fallback>)` (destructive/warning/success/info) |
 | `--_nt-bg` | `color-mix(in srgb, var(--_nt-accent) 8%, Canvas)` | Base surface tint (always on) — derived from the accent so it adapts to light/dark |
 | `--_nt-text-color` | `CanvasText` | Body text |
 | `--_nt-title-color` | `currentColor` | Title colour (bold regardless) |

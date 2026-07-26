@@ -28,10 +28,10 @@
   /* Design tokens */
   --_af-border-color: currentColor;
   --_af-border-color-hover: CanvasText;
-  --_af-border-color-invalid: #c00;
-  --_af-bg-hover: var(--SITE--POPOVER--HOVER-BG);
-  --_af-bg-active: var(--SITE--POPOVER--HOVER-BG);
-  --_af-affix-color: var(--SITE--POPOVER--MUTED);
+  --_af-border-color-invalid: var(--ui-destructive, #c00);
+  --_af-bg-hover: var(--ui-hover);
+  --_af-bg-active: var(--ui-hover);
+  --_af-affix-color: var(--ui-muted-foreground);
   /* Set by JS at init (or authored server-side) — never given base values here:
      --_af-prefix-chars, --_af-suffix-chars  (affix string length, plain number)
      --_af-input-chars                      (number, from data-input-characters) */

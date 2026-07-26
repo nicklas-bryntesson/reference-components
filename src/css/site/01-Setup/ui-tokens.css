@@ -1,0 +1,51 @@
+/* src/css/site/01-Setup/ui-tokens.css */
+/*
+ * --ui-* — the component theming seam (ADR-0018).
+ *
+ * This is the ONE public surface a consuming site feeds design into. Every token
+ * is `--ui-<role>`, lowercase and single-dash, so a consumer can find-replace the
+ * whole namespace against their own system (Tailwind / shadcn / bespoke) in one
+ * pass — e.g. `--ui-primary: var(--primary)`. Roles are shadcn-flavoured
+ * (`-foreground` = "on" colour) but named for clarity, not slavish parity.
+ *
+ * The values below are neutral, standalone DEFAULTS — the reference looks right
+ * with nothing wired. Components read these (with a literal fallback); they never
+ * reach past this file for design. Component-internal plumbing stays `--_*`.
+ *
+ * NOT the theming seam (site scaffolding, separate concern): the layout constants
+ * in tokens.css (--SITE--PADDING, --MAX--WIDTH--*, --GRID--*) and the grid-*.css.
+ */
+
+:root {
+  /* Surface — panels / popovers */
+  --ui-surface: Canvas;
+  --ui-surface-foreground: CanvasText;
+  --ui-surface-padding: 0.75rem;
+  --ui-radius: 0.75rem;
+  --ui-shadow:
+    0px 0px 1px rgba(3, 7, 18, 0.01),
+    0px 1px 4px rgba(3, 7, 18, 0.01),
+    0px 2px 9px rgba(3, 7, 18, 0.02),
+    0px 4px 17px rgba(3, 7, 18, 0.02),
+    0px 7px 26px rgba(3, 7, 18, 0.03),
+    0px 10px 37px rgba(3, 7, 18, 0.03),
+    0px 13px 51px rgba(3, 7, 18, 0.04),
+    0px 17px 66px rgba(3, 7, 18, 0.04),
+    0px 22px 84px rgba(3, 7, 18, 0.05);
+
+  /* Lines & focus */
+  --ui-border: color-mix(in srgb, CanvasText 12%, transparent);  /* borders + dividers/hairlines */
+  --ui-ring: var(--ui-primary);                                  /* focus ring */
+
+  /* Roles */
+  --ui-primary: #0066cc;              /* links, selection, active accent */
+  --ui-primary-foreground: #ffffff;   /* text / tick on a primary fill */
+  --ui-muted-foreground: #6e6e6e;     /* placeholder / secondary text */
+  --ui-hover: color-mix(in srgb, CanvasText 3%, transparent);    /* hover surface (shadcn: --accent) */
+
+  /* State — shared by field-invalid and Notice */
+  --ui-destructive: #c0362c;
+  --ui-warning: #a85a00;
+  --ui-success: #1a7f37;
+  --ui-info: #0b6bcb;
+}
