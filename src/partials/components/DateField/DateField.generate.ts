@@ -52,13 +52,13 @@ function canonical(id: string, label: string, rootAttrs: string, inputAttrs: str
             <button type="button" class="month-year-trigger" aria-expanded="false"></button>
             <button type="button" class="next-month">&#8250;</button>
           </div>
-          <div class="panel" data-panel="calendar" data-active="true">
+          <div data-panel="calendar" data-active="true">
             <table class="grid" role="grid">
               <thead><tr role="row"><th scope="col"></th><th scope="col"></th><th scope="col"></th><th scope="col"></th><th scope="col"></th><th scope="col"></th><th scope="col"></th></tr></thead>
               <tbody></tbody>
             </table>
           </div>
-          <div class="panel year-month-picker WheelColumns" role="group" data-panel="picker" data-active="false">
+          <div class="year-month-picker WheelColumns" role="group" data-panel="picker" data-active="false">
             <div class="Wheel" data-picker="month" tabindex="0"></div>
             <div class="Wheel" data-picker="year" tabindex="0"></div>
           </div>

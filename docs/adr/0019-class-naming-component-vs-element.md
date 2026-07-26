@@ -31,17 +31,23 @@ Case carries meaning: **capital = a component, lowercase = an internal element.*
   `.options`). No `Component-` prefix — the prefix is redundant once nested under the root,
   and it bloats the footprint. An element is any presentational part with **no** standalone
   contract.
-- **Nesting** — children are selected nested under the root, `&` explicit:
+- **Every rule is fully qualified from the root** — `.Component .element`, never a bare
+  `.element` and never `&`-nested. The `.Component { }` block holds only tokens + the
+  properties applied to the root itself; every part is its own flat, rooted rule:
   ```css
-  .DateField {          /* component — own .md */
-    & .calendar-header {}   /* element — no contract */
-    & .Wheel {}             /* sub-component — kernel contract */
-  }
+  .DateField { /* tokens + root props only */ }
+  .DateField .segments {}
+  .DateField[data-invalid="true"] .segments {}
+  .DateField .popup [data-panel="picker"][data-active="true"] {}
+  .DateField .Wheel {}   /* sub-component — still PascalCase */
   ```
-- **Detached parts** — a part rendered *outside* the root (can't be a nested descendant) is
-  the one exception: it gets a root-scoped `.Component-part` name because it can't rely on
-  descendant scoping. This is rare and must be *genuinely* detached (portaled / top-layer);
-  a JS-built descendant of the root is **not** detached and nests normally (`.popup`).
+  **Why flat, not nested:** a fully-qualified selector is deterministic to read — no `&` to
+  resolve, no depth to track — which is the point for a consuming AI. A bare `.element {}` at
+  column 0 is a scoping bug: generic names (`.popup`, `.grid`, `.panel`) leak across
+  components; the `.Component` prefix is what makes bare element names safe.
+- **Detached parts** — a part rendered *outside* the root (can't be a descendant) is the one
+  exception: it gets a root-scoped `.Component-part` name. Rare; must be *genuinely* detached
+  (portaled / top-layer). A JS-built descendant of the root is **not** detached.
 
 ### Shared lexicon (same kind of part → same word, across all components)
 

@@ -112,16 +112,17 @@ Case carries meaning:
 - **A component is `PascalCase`, no dash** (`.DateField`, `.Wheel`, `.ChoiceField`) — the root *and* any nested/composed sub-component. Litmus: *it has its own `.md` contract* (or is a kernel primitive with one).
 - **An internal element is `lowercase-kebab`** (`.calendar-header`, `.content`, `.options`, `.arrow`) — a presentational part with no standalone contract. **No `Component-` prefix** — it's redundant once nested under the root, and it bloats the footprint.
 
-Children are selected nested under the root, `&` explicit:
+**Every rule is fully qualified from the root** — `.Component .element`, never a bare `.element` and never `&`-nested. The `.Component { }` block holds only the tokens and the properties applied to the root itself; every part is its own flat, rooted rule:
 
 ```css
-.DateField {
-  & .calendar-header {}   /* element — no contract */
-  & .Wheel {}             /* sub-component — kernel contract */
-}
+.DateField { /* tokens + root-level props only */ }
+.DateField .segments {}
+.DateField[data-invalid="true"] .segments {}
+.DateField .popup [data-panel="picker"][data-active="true"] {}
+.DateField .Wheel {}   /* sub-component — still PascalCase */
 ```
 
-The one exception: a part rendered *outside* the root (genuinely portaled / top-layer) can't be a descendant, so it takes a root-scoped `.Component-part` name. A JS-*built* descendant is not detached — it nests (`.popup`, not `.DateField-popup`).
+**Why flat, not nested:** a fully-qualified selector is deterministic to read — no `&` to resolve, no nesting depth to track, every rule says exactly what it targets. A bare `.element {}` at column 0 is a scoping bug (generic names like `.popup`/`.grid` would leak across components); the `.Component` prefix is what makes bare element names safe. The one exception: a part rendered *outside* the root (genuinely portaled / top-layer) can't be a descendant, so it takes a root-scoped `.Component-part` name.
 
 Variants and states are `data-*`, never class modifiers: no `.DateField--disabled`, no `.text-sm` utilities.
 
