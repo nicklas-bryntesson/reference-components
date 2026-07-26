@@ -43,7 +43,8 @@ src/kernel/                       # shared primitives — ported once, composed 
   <module>.md  + README.md                   # one contract per primitive
   js/tests/, utils/tests/                    # kernel conformance tests
 src/js/script.js                  # entry point, imports all active components
-src/css/site/01-Setup/tokens.css  # host --SITE--* token contract (components read these)
+src/css/site/01-Setup/ui-tokens.css # --ui-* component theming seam — the ONE surface components read design from (ADR-0018)
+src/css/site/01-Setup/tokens.css  # --SITE--* site layout scaffolding only (padding/max-width/grid) — not the component seam
 docs/adr/                         # Architecture Decision Records — tracked; the "why" behind every direction
 tasks/                            # current specs & implementation plans (gitignored, local)
 docs/superpowers/                 # historical specs/plans archive — no longer the active workflow
