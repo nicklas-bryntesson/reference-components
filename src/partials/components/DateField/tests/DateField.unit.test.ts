@@ -28,13 +28,13 @@ describe('DateField locale resolution', () => {
     el.dataset.id = 't1'
     el.dataset.locale = 'fr'
     el.innerHTML = `
-      <input class="Native" type="date" />
-      <div class="Custom" aria-hidden="true">
-        <div class="Segments" role="group"></div>
-        <button class="DateField-trigger" type="button"></button>
+      <input class="native" type="date" />
+      <div class="custom" aria-hidden="true">
+        <div class="segments" role="group"></div>
+        <button class="trigger" type="button"></button>
         <template data-template="datefield-calendar"></template>
       </div>
-      <div class="Announce" aria-live="polite" aria-atomic="true"></div>
+      <div class="announce" aria-live="polite" aria-atomic="true"></div>
     `
     document.body.appendChild(el)
     const instance = new DateField(el)
@@ -48,13 +48,13 @@ describe('DateField locale resolution', () => {
     el.dataset.id = 't2'
     el.dataset.locale = 'sv-SE'
     el.innerHTML = `
-      <input class="Native" type="date" />
-      <div class="Custom" aria-hidden="true">
-        <div class="Segments" role="group"></div>
-        <button class="DateField-trigger" type="button"></button>
+      <input class="native" type="date" />
+      <div class="custom" aria-hidden="true">
+        <div class="segments" role="group"></div>
+        <button class="trigger" type="button"></button>
         <template data-template="datefield-calendar"></template>
       </div>
-      <div class="Announce" aria-live="polite" aria-atomic="true"></div>
+      <div class="announce" aria-live="polite" aria-atomic="true"></div>
     `
     DateField.registerLocale('sv-SE', { day: 'Dag', month: 'Månad', year: 'År', openCalendar: 'Öppna kalender', closeCalendar: 'Stäng kalender', prevMonth: 'Föregående månad', nextMonth: 'Nästa månad', today: 'idag', selected: 'valt', notAvailable: 'ej tillgängligt', announceSelected: 'Valt datum:' })
     document.body.appendChild(el)
@@ -70,13 +70,13 @@ describe('DateField locale resolution', () => {
     el.dataset.component = 'DateField'
     el.dataset.id = 't3'
     el.innerHTML = `
-      <input class="Native" type="date" />
-      <div class="Custom" aria-hidden="true">
-        <div class="Segments" role="group"></div>
-        <button class="DateField-trigger" type="button"></button>
+      <input class="native" type="date" />
+      <div class="custom" aria-hidden="true">
+        <div class="segments" role="group"></div>
+        <button class="trigger" type="button"></button>
         <template data-template="datefield-calendar"></template>
       </div>
-      <div class="Announce" aria-live="polite" aria-atomic="true"></div>
+      <div class="announce" aria-live="polite" aria-atomic="true"></div>
     `
     document.body.appendChild(el)
     const instance = new DateField(el)
@@ -93,13 +93,13 @@ describe('registerLocale fallback', () => {
     el.dataset.id = 't4'
     el.dataset.locale = 'de'
     el.innerHTML = `
-      <input class="Native" type="date" />
-      <div class="Custom" aria-hidden="true">
-        <div class="Segments" role="group"></div>
-        <button class="DateField-trigger" type="button"></button>
+      <input class="native" type="date" />
+      <div class="custom" aria-hidden="true">
+        <div class="segments" role="group"></div>
+        <button class="trigger" type="button"></button>
         <template data-template="datefield-calendar"></template>
       </div>
-      <div class="Announce" aria-live="polite" aria-atomic="true"></div>
+      <div class="announce" aria-live="polite" aria-atomic="true"></div>
     `
     document.body.appendChild(el)
     const instance = new DateField(el)
@@ -130,25 +130,25 @@ function makeField({ disabled = false, value = '', min = '', max = '', locale = 
   if (min) el.dataset.min = min
   if (max) el.dataset.max = max
   el.innerHTML = `
-    <input class="Native" type="date"
+    <input class="native" type="date"
       ${value    ? `value="${value}"` : ''}
       ${disabled ? 'disabled'         : ''}
     />
     <label for="${fieldId}">Test label</label>
-    <div class="Custom" aria-hidden="true">
-      <div class="Segments" role="group">
-        <button class="DateField-trigger" type="button" aria-label="Öppna kalender"
+    <div class="custom" aria-hidden="true">
+      <div class="segments" role="group">
+        <button class="trigger" type="button" aria-label="Öppna kalender"
           aria-expanded="false" aria-haspopup="dialog"></button>
       </div>
-      <div class="slideContainer">
+      <div class="rail">
       <template data-template="datefield-calendar">
-        <div class="DateField-popup" role="dialog" aria-modal="true">
-          <div class="CalendarHeader">
-            <button type="button" class="PrevMonth">&#8249;</button>
-            <button type="button" class="MonthYearTrigger" aria-live="polite" aria-atomic="true"></button>
-            <button type="button" class="NextMonth">&#8250;</button>
+        <div class="popup" role="dialog" aria-modal="true">
+          <div class="calendar-header">
+            <button type="button" class="prev-month">&#8249;</button>
+            <button type="button" class="month-year-trigger" aria-live="polite" aria-atomic="true"></button>
+            <button type="button" class="next-month">&#8250;</button>
           </div>
-          <table class="Grid" role="grid">
+          <table class="grid" role="grid">
             <thead><tr role="row">
               <th scope="col"></th><th scope="col"></th><th scope="col"></th>
               <th scope="col"></th><th scope="col"></th><th scope="col"></th>
@@ -156,16 +156,16 @@ function makeField({ disabled = false, value = '', min = '', max = '', locale = 
             </tr></thead>
             <tbody></tbody>
           </table>
-          <div class="CalendarFooter">
-            <button type="button" class="CalendarFooterClear"></button>
-            <button type="button" class="CalendarFooterToday"></button>
+          <div class="calendar-footer">
+            <button type="button" class="calendar-footer-clear"></button>
+            <button type="button" class="calendar-footer-today"></button>
           </div>
           <div class="arrow"></div>
         </div>
       </template>
       </div>
     </div>
-    <div class="Announce" aria-live="polite" aria-atomic="true"></div>
+    <div class="announce" aria-live="polite" aria-atomic="true"></div>
   `
   document.body.appendChild(el)
   const instance = new DateField(el)
@@ -207,7 +207,7 @@ describe('DateField — initial value sync', () => {
 describe('DateField — disabled state', () => {
   it('sets all segments to tabindex="-1" when native is disabled', () => {
     const { el } = makeField({ disabled: true })
-    el.querySelectorAll('.Segment').forEach(seg => {
+    el.querySelectorAll('.segment').forEach(seg => {
       expect(seg.getAttribute('tabindex')).toBe('-1')
     })
     el.remove()
@@ -284,7 +284,7 @@ describe('DateField — year limits from data-min/max', () => {
 describe('DateField — min/max enforcement on segment sync', () => {
   it('does not write to native input when complete date is before data-min', () => {
     const { el, instance } = makeField({ min: '2026-03-26', max: '2027-12-31' })
-    const native = el.querySelector('.Native') as HTMLInputElement
+    const native = el.querySelector('.native') as HTMLInputElement
     instance._setSegmentValue(instance._getSegmentEl('day')!, 1)
     instance._setSegmentValue(instance._getSegmentEl('month')!, 1)
     instance._setSegmentValue(instance._getSegmentEl('year')!, 2025)
@@ -294,7 +294,7 @@ describe('DateField — min/max enforcement on segment sync', () => {
 
   it('does not write to native input when complete date is after data-max', () => {
     const { el, instance } = makeField({ min: '2026-03-26', max: '2027-12-31' })
-    const native = el.querySelector('.Native') as HTMLInputElement
+    const native = el.querySelector('.native') as HTMLInputElement
     instance._setSegmentValue(instance._getSegmentEl('day')!, 1)
     instance._setSegmentValue(instance._getSegmentEl('month')!, 1)
     instance._setSegmentValue(instance._getSegmentEl('year')!, 2028)
@@ -304,7 +304,7 @@ describe('DateField — min/max enforcement on segment sync', () => {
 
   it('writes to native input when complete date is within data-min/max', () => {
     const { el, instance } = makeField({ min: '2026-03-26', max: '2027-12-31' })
-    const native = el.querySelector('.Native') as HTMLInputElement
+    const native = el.querySelector('.native') as HTMLInputElement
     instance._setSegmentValue(instance._getSegmentEl('day')!, 1)
     instance._setSegmentValue(instance._getSegmentEl('month')!, 4)
     instance._setSegmentValue(instance._getSegmentEl('year')!, 2026)
@@ -314,7 +314,7 @@ describe('DateField — min/max enforcement on segment sync', () => {
 
   it('always writes when no data-min/max set', () => {
     const { el, instance } = makeField()
-    const native = el.querySelector('.Native') as HTMLInputElement
+    const native = el.querySelector('.native') as HTMLInputElement
     instance._setSegmentValue(instance._getSegmentEl('day')!, 1)
     instance._setSegmentValue(instance._getSegmentEl('month')!, 1)
     instance._setSegmentValue(instance._getSegmentEl('year')!, 1900)
@@ -345,7 +345,7 @@ describe('DateField — locale-derived segment order', () => {
   it('sv-SE separators use "-"', () => {
     DateField.registerLocale('sv-SE', svSEStrings)
     const { el } = makeField({ locale: 'sv-SE' })
-    const separators = [...el.querySelectorAll('.Separator')]
+    const separators = [...el.querySelectorAll('.separator')]
     expect(separators).toHaveLength(2)
     separators.forEach(sep => expect(sep.textContent).toBe('-'))
     el.remove()
@@ -371,7 +371,7 @@ describe('DateField — locale-derived segment order', () => {
   it('generates exactly 3 segments and 2 separators', () => {
     const { el } = makeField({ locale: 'en' })
     expect(el.querySelectorAll('[data-segment]')).toHaveLength(3)
-    expect(el.querySelectorAll('.Separator')).toHaveLength(2)
+    expect(el.querySelectorAll('.separator')).toHaveLength(2)
     el.remove()
   })
 
@@ -413,9 +413,9 @@ describe('DateField — display mode (pointer: coarse)', () => {
     el.remove()
   })
 
-  it('keeps aria-hidden="true" on .Custom — it is a decorative display layer', () => {
+  it('keeps aria-hidden="true" on .custom — it is a decorative display layer', () => {
     const { el } = makeDisplayField()
-    expect(el.querySelector('.Custom')!.getAttribute('aria-hidden')).toBe('true')
+    expect(el.querySelector('.custom')!.getAttribute('aria-hidden')).toBe('true')
     el.remove()
   })
 
@@ -451,7 +451,7 @@ describe('DateField — display mode (pointer: coarse)', () => {
 
   it('updates segments when native value changes externally', () => {
     const { el } = makeDisplayField()
-    const native = el.querySelector('.Native') as HTMLInputElement
+    const native = el.querySelector('.native') as HTMLInputElement
     native.value = '2026-12-31'
     native.dispatchEvent(new Event('change', { bubbles: true }))
     expect(el.querySelector('[data-segment="day"]')!.getAttribute('aria-valuenow')).toBe('31')
@@ -476,14 +476,14 @@ describe('DateField — display mode (pointer: coarse)', () => {
     el.dataset.id = inputId
     el.dataset.locale = 'sv-SE'
     el.innerHTML = `
-      <input class="Native" type="date" value="2026-03-26" />
-      <div class="Custom" aria-hidden="true">
-        <div class="Segments" role="group">
-          <button class="DateField-trigger" type="button"></button>
+      <input class="native" type="date" value="2026-03-26" />
+      <div class="custom" aria-hidden="true">
+        <div class="segments" role="group">
+          <button class="trigger" type="button"></button>
         </div>
         <template data-template="datefield-calendar"></template>
       </div>
-      <div class="Announce" aria-live="polite" aria-atomic="true"></div>
+      <div class="announce" aria-live="polite" aria-atomic="true"></div>
     `
     form.appendChild(el)
     new DateField(el)
@@ -520,19 +520,19 @@ describe('DateField — prop application from wrapper data attributes', () => {
     el.dataset.name = 'mydate'
     el.dataset.locale = 'sv-SE'
     el.innerHTML = `
-      <input class="Native" type="date" />
-      <div class="Custom" aria-hidden="true">
-        <div class="Segments" role="group">
-          <button class="DateField-trigger" type="button" aria-expanded="false" aria-haspopup="dialog"></button>
+      <input class="native" type="date" />
+      <div class="custom" aria-hidden="true">
+        <div class="segments" role="group">
+          <button class="trigger" type="button" aria-expanded="false" aria-haspopup="dialog"></button>
         </div>
         <template data-template="datefield-calendar">
-          <div class="DateField-popup" role="dialog" aria-modal="true">
-            <div class="CalendarHeader">
-              <button type="button" class="PrevMonth">&#8249;</button>
-              <button type="button" class="MonthYearTrigger" aria-live="polite" aria-atomic="true"></button>
-              <button type="button" class="NextMonth">&#8250;</button>
+          <div class="popup" role="dialog" aria-modal="true">
+            <div class="calendar-header">
+              <button type="button" class="prev-month">&#8249;</button>
+              <button type="button" class="month-year-trigger" aria-live="polite" aria-atomic="true"></button>
+              <button type="button" class="next-month">&#8250;</button>
             </div>
-            <table class="Grid" role="grid">
+            <table class="grid" role="grid">
               <thead><tr role="row">
                 <th scope="col"></th><th scope="col"></th><th scope="col"></th>
                 <th scope="col"></th><th scope="col"></th><th scope="col"></th>
@@ -543,7 +543,7 @@ describe('DateField — prop application from wrapper data attributes', () => {
           </div>
         </template>
       </div>
-      <div class="Announce" aria-live="polite" aria-atomic="true"></div>
+      <div class="announce" aria-live="polite" aria-atomic="true"></div>
     `
     document.body.appendChild(el)
     const instance = new DateField(el)
@@ -558,19 +558,19 @@ describe('DateField — prop application from wrapper data attributes', () => {
     el.dataset.name = 'mydate'
     el.dataset.locale = 'sv-SE'
     el.innerHTML = `
-      <input class="Native" type="date" />
-      <div class="Custom" aria-hidden="true">
-        <div class="Segments" role="group">
-          <button class="DateField-trigger" type="button" aria-expanded="false" aria-haspopup="dialog"></button>
+      <input class="native" type="date" />
+      <div class="custom" aria-hidden="true">
+        <div class="segments" role="group">
+          <button class="trigger" type="button" aria-expanded="false" aria-haspopup="dialog"></button>
         </div>
         <template data-template="datefield-calendar">
-          <div class="DateField-popup" role="dialog" aria-modal="true">
-            <div class="CalendarHeader">
-              <button type="button" class="PrevMonth">&#8249;</button>
-              <button type="button" class="MonthYearTrigger" aria-live="polite" aria-atomic="true"></button>
-              <button type="button" class="NextMonth">&#8250;</button>
+          <div class="popup" role="dialog" aria-modal="true">
+            <div class="calendar-header">
+              <button type="button" class="prev-month">&#8249;</button>
+              <button type="button" class="month-year-trigger" aria-live="polite" aria-atomic="true"></button>
+              <button type="button" class="next-month">&#8250;</button>
             </div>
-            <table class="Grid" role="grid">
+            <table class="grid" role="grid">
               <thead><tr role="row">
                 <th scope="col"></th><th scope="col"></th><th scope="col"></th>
                 <th scope="col"></th><th scope="col"></th><th scope="col"></th>
@@ -581,7 +581,7 @@ describe('DateField — prop application from wrapper data attributes', () => {
           </div>
         </template>
       </div>
-      <div class="Announce" aria-live="polite" aria-atomic="true"></div>
+      <div class="announce" aria-live="polite" aria-atomic="true"></div>
     `
     document.body.appendChild(el)
     const instance = new DateField(el)
@@ -598,19 +598,19 @@ describe('DateField — prop application from wrapper data attributes', () => {
     el.dataset.max = '2099-12-31'
     el.dataset.locale = 'sv-SE'
     el.innerHTML = `
-      <input class="Native" type="date" />
-      <div class="Custom" aria-hidden="true">
-        <div class="Segments" role="group">
-          <button class="DateField-trigger" type="button" aria-expanded="false" aria-haspopup="dialog"></button>
+      <input class="native" type="date" />
+      <div class="custom" aria-hidden="true">
+        <div class="segments" role="group">
+          <button class="trigger" type="button" aria-expanded="false" aria-haspopup="dialog"></button>
         </div>
         <template data-template="datefield-calendar">
-          <div class="DateField-popup" role="dialog" aria-modal="true">
-            <div class="CalendarHeader">
-              <button type="button" class="PrevMonth">&#8249;</button>
-              <button type="button" class="MonthYearTrigger" aria-live="polite" aria-atomic="true"></button>
-              <button type="button" class="NextMonth">&#8250;</button>
+          <div class="popup" role="dialog" aria-modal="true">
+            <div class="calendar-header">
+              <button type="button" class="prev-month">&#8249;</button>
+              <button type="button" class="month-year-trigger" aria-live="polite" aria-atomic="true"></button>
+              <button type="button" class="next-month">&#8250;</button>
             </div>
-            <table class="Grid" role="grid">
+            <table class="grid" role="grid">
               <thead><tr role="row">
                 <th scope="col"></th><th scope="col"></th><th scope="col"></th>
                 <th scope="col"></th><th scope="col"></th><th scope="col"></th>
@@ -621,7 +621,7 @@ describe('DateField — prop application from wrapper data attributes', () => {
           </div>
         </template>
       </div>
-      <div class="Announce" aria-live="polite" aria-atomic="true"></div>
+      <div class="announce" aria-live="polite" aria-atomic="true"></div>
     `
     document.body.appendChild(el)
     const instance = new DateField(el)
@@ -636,19 +636,19 @@ describe('DateField — prop application from wrapper data attributes', () => {
     el.dataset.name = 'mydate'
     el.dataset.locale = 'sv-SE'
     el.innerHTML = `
-      <input class="Native" type="date" />
-      <div class="Custom" aria-hidden="true">
-        <div class="Segments" role="group">
-          <button class="DateField-trigger" type="button" aria-expanded="false" aria-haspopup="dialog"></button>
+      <input class="native" type="date" />
+      <div class="custom" aria-hidden="true">
+        <div class="segments" role="group">
+          <button class="trigger" type="button" aria-expanded="false" aria-haspopup="dialog"></button>
         </div>
         <template data-template="datefield-calendar">
-          <div class="DateField-popup" role="dialog" aria-modal="true">
-            <div class="CalendarHeader">
-              <button type="button" class="PrevMonth">&#8249;</button>
-              <button type="button" class="MonthYearTrigger" aria-live="polite" aria-atomic="true"></button>
-              <button type="button" class="NextMonth">&#8250;</button>
+          <div class="popup" role="dialog" aria-modal="true">
+            <div class="calendar-header">
+              <button type="button" class="prev-month">&#8249;</button>
+              <button type="button" class="month-year-trigger" aria-live="polite" aria-atomic="true"></button>
+              <button type="button" class="next-month">&#8250;</button>
             </div>
-            <table class="Grid" role="grid">
+            <table class="grid" role="grid">
               <thead><tr role="row">
                 <th scope="col"></th><th scope="col"></th><th scope="col"></th>
                 <th scope="col"></th><th scope="col"></th><th scope="col"></th>
@@ -659,7 +659,7 @@ describe('DateField — prop application from wrapper data attributes', () => {
           </div>
         </template>
       </div>
-      <div class="Announce" aria-live="polite" aria-atomic="true"></div>
+      <div class="announce" aria-live="polite" aria-atomic="true"></div>
     `
     document.body.appendChild(el)
     const instance = new DateField(el)
@@ -674,19 +674,19 @@ describe('DateField — prop application from wrapper data attributes', () => {
     el.dataset.name = 'mydate'
     el.dataset.locale = 'sv-SE'
     el.innerHTML = `
-      <input class="Native" type="date" />
-      <div class="Custom" aria-hidden="true">
-        <div class="Segments" role="group">
-          <button class="DateField-trigger" type="button" aria-expanded="false" aria-haspopup="dialog"></button>
+      <input class="native" type="date" />
+      <div class="custom" aria-hidden="true">
+        <div class="segments" role="group">
+          <button class="trigger" type="button" aria-expanded="false" aria-haspopup="dialog"></button>
         </div>
         <template data-template="datefield-calendar">
-          <div class="DateField-popup" role="dialog" aria-modal="true">
-            <div class="CalendarHeader">
-              <button type="button" class="PrevMonth">&#8249;</button>
-              <button type="button" class="MonthYearTrigger" aria-live="polite" aria-atomic="true"></button>
-              <button type="button" class="NextMonth">&#8250;</button>
+          <div class="popup" role="dialog" aria-modal="true">
+            <div class="calendar-header">
+              <button type="button" class="prev-month">&#8249;</button>
+              <button type="button" class="month-year-trigger" aria-live="polite" aria-atomic="true"></button>
+              <button type="button" class="next-month">&#8250;</button>
             </div>
-            <table class="Grid" role="grid">
+            <table class="grid" role="grid">
               <thead><tr role="row">
                 <th scope="col"></th><th scope="col"></th><th scope="col"></th>
                 <th scope="col"></th><th scope="col"></th><th scope="col"></th>
@@ -697,7 +697,7 @@ describe('DateField — prop application from wrapper data attributes', () => {
           </div>
         </template>
       </div>
-      <div class="Announce" aria-live="polite" aria-atomic="true"></div>
+      <div class="announce" aria-live="polite" aria-atomic="true"></div>
     `
     document.body.appendChild(el)
     const instance = new DateField(el)
@@ -883,7 +883,7 @@ describe('DateField — calendar footer (Clear + Today)', () => {
   it('Clear button is disabled when no date is selected', () => {
     const { instance, el } = makeField()
     instance._openCalendar()
-    const clearBtn = instance.calendarEl!.querySelector<HTMLButtonElement>('.CalendarFooterClear')!
+    const clearBtn = instance.calendarEl!.querySelector<HTMLButtonElement>('.calendar-footer-clear')!
     expect(clearBtn.disabled).toBe(true)
     instance._closeCalendar()
     el.remove()
@@ -892,7 +892,7 @@ describe('DateField — calendar footer (Clear + Today)', () => {
   it('Clear button is enabled when a date is selected', () => {
     const { instance, el } = makeField({ value: '2026-03-31' })
     instance._openCalendar()
-    const clearBtn = instance.calendarEl!.querySelector<HTMLButtonElement>('.CalendarFooterClear')!
+    const clearBtn = instance.calendarEl!.querySelector<HTMLButtonElement>('.calendar-footer-clear')!
     expect(clearBtn.disabled).toBe(false)
     instance._closeCalendar()
     el.remove()
@@ -901,7 +901,7 @@ describe('DateField — calendar footer (Clear + Today)', () => {
   it('Clear button clears the date and closes the calendar', () => {
     const { instance, el } = makeField({ value: '2026-03-31' })
     instance._openCalendar()
-    const clearBtn = instance.calendarEl!.querySelector<HTMLButtonElement>('.CalendarFooterClear')!
+    const clearBtn = instance.calendarEl!.querySelector<HTMLButtonElement>('.calendar-footer-clear')!
     clearBtn.click()
     expect(instance.selectedDate).toBeNull()
     expect(instance.calendarEl).toBeNull()
@@ -915,7 +915,7 @@ describe('DateField — calendar footer (Clear + Today)', () => {
     const changeEvents: Event[] = []
     instance.native.addEventListener('change', e => changeEvents.push(e))
     instance._openCalendar()
-    const clearBtn = instance.calendarEl!.querySelector<HTMLButtonElement>('.CalendarFooterClear')!
+    const clearBtn = instance.calendarEl!.querySelector<HTMLButtonElement>('.calendar-footer-clear')!
     clearBtn.click()
     expect(changeEvents).toHaveLength(1)
     el.remove()
@@ -924,7 +924,7 @@ describe('DateField — calendar footer (Clear + Today)', () => {
   it('Today button is enabled when today is within the default range', () => {
     const { instance, el } = makeField()
     instance._openCalendar()
-    const todayBtn = instance.calendarEl!.querySelector<HTMLButtonElement>('.CalendarFooterToday')!
+    const todayBtn = instance.calendarEl!.querySelector<HTMLButtonElement>('.calendar-footer-today')!
     expect(todayBtn.disabled).toBe(false)
     instance._closeCalendar()
     el.remove()
@@ -933,7 +933,7 @@ describe('DateField — calendar footer (Clear + Today)', () => {
   it('Today button is disabled when today is outside the max date', () => {
     const { instance, el } = makeField({ max: '2000-01-01' })
     instance._openCalendar()
-    const todayBtn = instance.calendarEl!.querySelector<HTMLButtonElement>('.CalendarFooterToday')!
+    const todayBtn = instance.calendarEl!.querySelector<HTMLButtonElement>('.calendar-footer-today')!
     expect(todayBtn.disabled).toBe(true)
     instance._closeCalendar()
     el.remove()
@@ -942,7 +942,7 @@ describe('DateField — calendar footer (Clear + Today)', () => {
   it('Today button selects today and closes the calendar', () => {
     const { instance, el } = makeField()
     instance._openCalendar()
-    const todayBtn = instance.calendarEl!.querySelector<HTMLButtonElement>('.CalendarFooterToday')!
+    const todayBtn = instance.calendarEl!.querySelector<HTMLButtonElement>('.calendar-footer-today')!
     todayBtn.click()
     const today = new Date()
     expect(instance.selectedDate!.getFullYear()).toBe(today.getFullYear())
@@ -962,7 +962,7 @@ describe('DateField — _updateLayout direction', () => {
       x: 200, y: 50, toJSON: () => {},
     } as DOMRect)
 
-    vi.spyOn((instance as any).slideContainer, 'getBoundingClientRect').mockReturnValue({
+    vi.spyOn((instance as any).rail, 'getBoundingClientRect').mockReturnValue({
       top: 0, bottom: 0, left: 0, right: 1000, width: 1000, height: 0,
       x: 0, y: 0, toJSON: () => {},
     } as DOMRect)
@@ -991,7 +991,7 @@ describe('DateField — _updateLayout direction', () => {
       x: 200, y: 800, toJSON: () => {},
     } as DOMRect)
 
-    vi.spyOn((instance as any).slideContainer, 'getBoundingClientRect').mockReturnValue({
+    vi.spyOn((instance as any).rail, 'getBoundingClientRect').mockReturnValue({
       top: 0, bottom: 0, left: 0, right: 1000, width: 1000, height: 0,
       x: 0, y: 0, toJSON: () => {},
     } as DOMRect)

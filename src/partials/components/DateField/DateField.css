@@ -30,11 +30,11 @@
   --_df-arrow-size: 0.75rem;
   --_df-arrow-corner-radius: 0.25rem;
 
-  & .Native {
+  & .native {
     display: block;
   }
 
-  & .Custom {
+  & .custom {
     display: none;
   }
 
@@ -48,7 +48,7 @@
   }
 
   &[data-input-mode="custom"] {
-    & .Native {
+    & .native {
       position: absolute;
       opacity: 0;
       visibility: hidden;
@@ -58,13 +58,13 @@
       overflow: hidden;
     }
 
-    & .Custom {
+    & .custom {
       display: block;
     }
   }
 
   &[data-input-mode="display"] {
-    & .Native {
+    & .native {
       position: absolute;
       inset: 0;
       width: 100%;
@@ -73,13 +73,13 @@
       cursor: pointer;
     }
 
-    & .Custom {
+    & .custom {
       display: block;
       pointer-events: none;
     }
   }
 
-  & .Segments {
+  & .segments {
     display: inline-flex;
     align-items: center;
     box-sizing: border-box;
@@ -91,7 +91,7 @@
     border-radius: 4px;
   }
 
-  & .Segment {
+  & .segment {
     font-variant-numeric: tabular-nums;
     min-inline-size: 2ch;
     text-align: center;
@@ -109,28 +109,28 @@
     }
   }
 
-  & .Separator {
+  & .separator {
     user-select: none;
     color: var(--_df-segments-color-muted);
   }
 
-  & .Segments:hover,
-  &[data-test-state="hover"] .Segments {
+  & .segments:hover,
+  &[data-test-state="hover"] .segments {
     border-color: var(--_df-segments-border-color-hover);
     background-color: var(--_df-segments-bg-hover);
   }
 
-  & .Segments:focus-within,
-  &[data-test-state="focus"] .Segments {
+  & .segments:focus-within,
+  &[data-test-state="focus"] .segments {
     outline: 2px solid;
     outline-offset: 1px;
   }
 
-  &[data-invalid="true"] .Segments {
+  &[data-invalid="true"] .segments {
     border-color: var(--_df-segments-border-color-invalid);
   }
 
-  & .DateField-trigger {
+  & .trigger {
     margin-inline-start: 0.25rem;
     background: none;
     border: none;
@@ -160,7 +160,7 @@
     }
   }
 
-  & .Announce {
+  & .announce {
     position: absolute;
     inline-size: 1px;
     block-size: 1px;
@@ -170,7 +170,7 @@
   }
 }
 
-.DateField-popup {
+.popup {
   position: absolute;
   background: var(--_df-calendar-bg);
   color: var(--_df-calendar-color);
@@ -181,7 +181,7 @@
   border-radius: var(--_df-calendar-radius);
   box-shadow: var(--_df-calendar-shadow);
 
-  & .CalendarHeader {
+  & .calendar-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -210,7 +210,7 @@
     }
   }
 
-  & .Grid {
+  & .grid {
     width: 100%;
     border-collapse: collapse;
 
@@ -264,7 +264,7 @@
     }
   }
 
-  & .CalendarFooter {
+  & .calendar-footer {
     display: flex;
     justify-content: space-between;
     padding: 0.5rem;
@@ -295,16 +295,16 @@
 /* ── Panels (deterministic boolean switch) ──────────────────────────────────── */
 /* Exactly one [data-panel] sibling carries data-active="true"; header + footer
    are always-visible chrome. */
-.DateField-popup [data-panel][data-active="false"] {
+.popup [data-panel][data-active="false"] {
   display: none;
 }
 
-.DateField-popup [data-panel="calendar"][data-active="true"] {
+.popup [data-panel="calendar"][data-active="true"] {
   display: block;
 }
 
 /* Month/year picker — two wheels (look from shared Wheel.css) */
-.DateField-popup [data-panel="picker"][data-active="true"] {
+.popup [data-panel="picker"][data-active="true"] {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -314,21 +314,21 @@
 }
 
 /* Wider hosts than the time digits so locale month names fit */
-.DateField-popup .YearMonthPicker .Wheel[data-picker="month"] { width: 8rem; }
-.DateField-popup .YearMonthPicker .Wheel[data-picker="year"] { width: 5rem; }
+.popup .year-month-picker .Wheel[data-picker="month"] { width: 8rem; }
+.popup .year-month-picker .Wheel[data-picker="year"] { width: 5rem; }
 
 /* Month/year picker trigger — padded + hover to read as interactive.
    The label stays default text colour; only the chevron is accent-coloured. */
-.DateField-popup .MonthYearTrigger {
+.popup .month-year-trigger {
   padding-inline: 0.5rem;
   border-radius: 4px;
 }
 
-.DateField-popup .MonthYearTrigger:hover {
+.popup .month-year-trigger:hover {
   background-color: var(--ui-hover);
 }
 
-.DateField-popup .MonthYearTrigger::after {
+.popup .month-year-trigger::after {
   content: '›';
   display: inline-block;
   margin-inline-start: 0.3rem;
@@ -336,7 +336,7 @@
   transform: rotate(90deg);
 }
 
-.DateField-popup .MonthYearTrigger[aria-expanded="true"]::after {
+.popup .month-year-trigger[aria-expanded="true"]::after {
   transform: rotate(-90deg);
 }
 
@@ -346,7 +346,7 @@
 }
 
 /* ── Slide rail ────────────────────────────────────────────────────────── */
-.DateField .slideContainer {
+.DateField .rail {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -358,7 +358,7 @@
 }
 
 /* ── Calendar bubble ───────────────────────────────────────────────────── */
-.DateField .DateField-popup {
+.DateField .popup {
   position: absolute;
   left: var(--_df-popup-offset, 50%);
   transform: translateX(-50%);
@@ -367,11 +367,11 @@
 }
 
 /* ── Direction gates ───────────────────────────────────────────────────── */
-.DateField[data-direction="bottom"] .DateField-popup {
+.DateField[data-direction="bottom"] .popup {
   top: var(--_df-calendar-gap);
 }
 
-.DateField[data-direction="top"] .DateField-popup {
+.DateField[data-direction="top"] .popup {
   bottom: var(--_df-calendar-gap);
 }
 
