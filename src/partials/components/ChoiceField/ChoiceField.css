@@ -25,8 +25,8 @@
   --_cf-radius: 0.25rem;                           /* checkbox corner (radio is always 50%) */
   --_cf-border-color: currentColor;
   --_cf-border-color-hover: CanvasText;
-  --_cf-border-color-invalid: #c00;
-  --_cf-bg-hover: var(--SITE--POPOVER--HOVER-BG);
+  --_cf-border-color-invalid: var(--ui-destructive, #c00);
+  --_cf-bg-hover: var(--ui-hover);
   --_cf-selected: CanvasText;                      /* checkbox fill · radio ring+dot — host overrides for accent */
   --_cf-mark-color: Canvas;                        /* checkbox tick on the filled box */
   --_cf-transition: 120ms ease;

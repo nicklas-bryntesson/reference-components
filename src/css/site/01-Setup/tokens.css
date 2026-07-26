@@ -25,29 +25,8 @@
   --GRID--COLUMNS--TABLET: 8;
   --GRID--COLUMNS--DESKTOP: 12;
 
-  /* Popover surface — shared by DateField / DateTimeField / TimeField / MonthField / WeekField / ToggleTip */
-  --SITE--POPOVER--SHADOW:
-    0px 0px 1px rgba(3, 7, 18, 0.01),
-    0px 1px 4px rgba(3, 7, 18, 0.01),
-    0px 2px 9px rgba(3, 7, 18, 0.02),
-    0px 4px 17px rgba(3, 7, 18, 0.02),
-    0px 7px 26px rgba(3, 7, 18, 0.03),
-    0px 10px 37px rgba(3, 7, 18, 0.03),
-    0px 13px 51px rgba(3, 7, 18, 0.04),
-    0px 17px 66px rgba(3, 7, 18, 0.04),
-    0px 22px 84px rgba(3, 7, 18, 0.05);
-  --SITE--POPOVER--RADIUS: 0.75rem;
-  --SITE--POPOVER--BORDER--COLOR: color-mix(in srgb, CanvasText 12%, transparent);
-  --SITE--POPOVER--BG: Canvas;
-  --SITE--POPOVER--COLOR: CanvasText;
-  --SITE--POPOVER--PADDING: 0.75rem;
-
-  /* One blue, one grey, neutral hovers/dividers from a single source */
-  --SITE--POPOVER--ACCENT: #0066cc;        /* links, focus ring, selection */
-  --SITE--POPOVER--ACCENT-TEXT: #ffffff;   /* text on an accent fill */
-  --SITE--POPOVER--MUTED: #6e6e6e;         /* secondary / weekday / placeholder text */
-  --SITE--POPOVER--HOVER-BG: color-mix(in srgb, CanvasText 3%, transparent);
-  /* --SITE--POPOVER--BORDER--COLOR doubles as the divider/hairline grey */
+  /* Component theming (surface / colour / state) moved to the --ui-* seam in
+     ui-tokens.css (ADR-0018). What remains here is site layout scaffolding only. */
 
   /* Mobile 0 - 399px */
   @media (max-width: 24.99rem) {

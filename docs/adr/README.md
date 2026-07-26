@@ -71,3 +71,4 @@ holds the *why-we-built-it*; the `.md` holds the *how-it-works*.
 | [0015](0015-choicefield-one-component-keyed-on-native-type.md) | ChoiceField — one component keyed on native `type` (supersedes the 0013 radio/checkbox split) | Component | Accepted |
 | [0016](0016-notice-message-and-separate-live-region.md) | Notice is a presentational message; the live region is a separate persistent container | Component | Accepted |
 | [0017](0017-component-css-vars-are-private-underscore.md) | Component-local CSS custom properties are private (`--_` prefix); public seam is `--SITE--*` + `data-*` | Convention | Accepted |
+| [0018](0018-ui-token-theming-seam.md) | The component theming seam is a flat `--ui-*` token namespace, decoupled from any design system | Convention | Accepted |

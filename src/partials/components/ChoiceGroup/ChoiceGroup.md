@@ -85,7 +85,7 @@ cardinality — native already carries it. (This is why the item is `ChoiceField
 | `--_cg-legend-gap` | `0.5rem` | Legend → body gap (`above`) |
 | `--_cg-max-inline-size` | `30rem` | Caps the group width |
 | `--_cg-legend-weight` | `600` | Legend font weight |
-| `--_cg-hint-color` | `var(--SITE--POPOVER--MUTED, #6e6e6e)` | Hint text colour |
+| `--_cg-hint-color` | `var(--ui-muted-foreground, #6e6e6e)` | Hint text colour |
 
 ## Accessibility
 

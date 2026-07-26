@@ -11,21 +11,21 @@
   /* Design tokens — segments */
   --_wf-border-color: currentColor;
   --_wf-border-color-hover: CanvasText;
-  --_wf-bg-hover: var(--SITE--POPOVER--HOVER-BG);
-  --_wf-border-color-invalid: #c00;
-  --_wf-color-muted: var(--SITE--POPOVER--MUTED);
-  --_wf-trigger-bg-hover: var(--SITE--POPOVER--HOVER-BG);
-  --_wf-trigger-bg-active: var(--SITE--POPOVER--HOVER-BG);
+  --_wf-bg-hover: var(--ui-hover);
+  --_wf-border-color-invalid: var(--ui-destructive, #c00);
+  --_wf-color-muted: var(--ui-muted-foreground);
+  --_wf-trigger-bg-hover: var(--ui-hover);
+  --_wf-trigger-bg-active: var(--ui-hover);
   /* Design tokens — popup (shared popover surface) */
-  --_wf-popup-bg: var(--SITE--POPOVER--BG);
-  --_wf-popup-color: var(--SITE--POPOVER--COLOR);
-  --_wf-popup-color-muted: var(--SITE--POPOVER--MUTED);
-  --_wf-popup-border-color: var(--SITE--POPOVER--BORDER--COLOR);
-  --_wf-popup-radius: var(--SITE--POPOVER--RADIUS);
-  --_wf-popup-shadow: var(--SITE--POPOVER--SHADOW);
-  --_wf-popup-link-color: var(--SITE--POPOVER--ACCENT);
-  --_wf-option-bg-selected: var(--SITE--POPOVER--ACCENT);
-  --_wf-option-color-selected: var(--SITE--POPOVER--ACCENT-TEXT);
+  --_wf-popup-bg: var(--ui-surface);
+  --_wf-popup-color: var(--ui-surface-foreground);
+  --_wf-popup-color-muted: var(--ui-muted-foreground);
+  --_wf-popup-border-color: var(--ui-border);
+  --_wf-popup-radius: var(--ui-radius);
+  --_wf-popup-shadow: var(--ui-shadow);
+  --_wf-popup-link-color: var(--ui-primary);
+  --_wf-option-bg-selected: var(--ui-primary);
+  --_wf-option-color-selected: var(--ui-primary-foreground);
   /* Internal */
   --_wf-arrow-size: 0.75rem;
   --_wf-arrow-corner-radius: 0.25rem;
@@ -116,8 +116,8 @@
     }
 
     &[data-focused="true"] {
-      background-color: var(--SITE--POPOVER--ACCENT);
-      color: var(--SITE--POPOVER--ACCENT-TEXT);
+      background-color: var(--ui-primary);
+      color: var(--ui-primary-foreground);
     }
 
     &[data-placeholder="true"] {
@@ -214,7 +214,7 @@
   border-radius: var(--_wf-popup-radius);
   box-shadow: var(--_wf-popup-shadow);
   z-index: 100;
-  padding: var(--SITE--POPOVER--PADDING);
+  padding: var(--ui-surface-padding);
   font-size: 1rem;
 
   & .CalendarHeader {

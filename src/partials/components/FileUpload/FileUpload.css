@@ -12,7 +12,7 @@
   --_fu-trigger-bg: Canvas;
   --_fu-trigger-bg-hover: #f0f0f0;
   --_fu-trigger-bg-active: #e0e0e0;
-  --_fu-error-color: #c00;
+  --_fu-error-color: var(--ui-destructive, #c00);
   --_fu-drop-zone-border-color: #0070f3;
   --_fu-drop-zone-bg: #f0f7ff;
 

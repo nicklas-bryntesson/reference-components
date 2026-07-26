@@ -25,7 +25,7 @@ authored `.WheelColumns` wrapper (present in all four consuming components' cano
   the geometry. Changing it in CSS changes the JS maths; keep them in sync.
 - `--_wheel-rows` (default `5`) — visible row count → wheel height.
 - `--_wheel-color`, `--_wheel-color-selected` — derived from the site popover
-  tokens (`--SITE--POPOVER--COLOR`, `--SITE--POPOVER--ACCENT`). See each
+  tokens (`--ui-surface-foreground`, `--ui-primary`). See each
   consuming component's `## Required site tokens`.
 
 ## Conformance

@@ -85,10 +85,10 @@
   &[data-emphasis="true"] { border-inline-start: var(--_nt-bar-width) solid var(--_nt-accent); }
 
   /* ── Variants: set only the accent; tint + icon + chrome derive ──────── */
-  &[data-variant="error"]   { --_nt-accent: var(--SITE--NOTICE-ERROR,   #c0362c); }
-  &[data-variant="warning"] { --_nt-accent: var(--SITE--NOTICE-WARNING, #a85a00); }
-  &[data-variant="success"] { --_nt-accent: var(--SITE--NOTICE-SUCCESS, #1a7f37); }
-  &[data-variant="info"]    { --_nt-accent: var(--SITE--NOTICE-INFO,    #0b6bcb); }
+  &[data-variant="error"]   { --_nt-accent: var(--ui-destructive,   #c0362c); }
+  &[data-variant="warning"] { --_nt-accent: var(--ui-warning, #a85a00); }
+  &[data-variant="success"] { --_nt-accent: var(--ui-success, #1a7f37); }
+  &[data-variant="info"]    { --_nt-accent: var(--ui-info,    #0b6bcb); }
   &[data-variant="neutral"],
   &:not([data-variant])     { --_nt-accent: CanvasText; }
 }
