@@ -12,57 +12,57 @@ Custom accessible datetime input wrapping a hidden `input[type="datetime-local"]
   data-name="INPUT_NAME"
   data-locale="sv-SE"
 >
-  <input type="datetime-local" class="DateTimeField-native" tabindex="-1" aria-hidden="true">
-  <div class="DateTimeField-overlay">
-    <div class="Segments" role="group"></div>
-    <button class="DateTimeField-trigger" type="button"><!-- calendar icon SVG --></button>
+  <input type="datetime-local" class="native" tabindex="-1" aria-hidden="true">
+  <div class="overlay">
+    <div class="segments" role="group"></div>
+    <button class="trigger" type="button"><!-- calendar icon SVG --></button>
   </div>
-  <template class="DateTimeField-calendarTemplate">
-    <div class="DateTimeField-popup" role="dialog" aria-modal="true">
-      <div class="CalendarInner">
-        <div class="CalendarLeft">
-          <div class="CalendarHeader">
-            <button class="CalendarPrev" type="button">&#8249;</button>
-            <button class="MonthYearTrigger" type="button" aria-expanded="false"><span class="CalendarMonthYear"></span></button>
-            <button class="CalendarNext" type="button">&#8250;</button>
+  <template class="calendar-template">
+    <div class="popup" role="dialog" aria-modal="true">
+      <div class="calendar-inner">
+        <div class="calendar-left">
+          <div class="calendar-header">
+            <button class="prev-month" type="button">&#8249;</button>
+            <button class="month-year-trigger" type="button" aria-expanded="false"><span class="calendar-month-year"></span></button>
+            <button class="next-month" type="button">&#8250;</button>
           </div>
           <div class="Panel" data-panel="calendar" data-active="true">
-            <table class="CalendarGrid" role="grid"></table>
+            <table class="calendar-grid" role="grid"></table>
           </div>
-          <div class="Panel YearMonthPicker WheelColumns" role="group" data-panel="picker" data-active="false">
+          <div class="Panel year-month-picker WheelColumns" role="group" data-panel="picker" data-active="false">
             <div class="Wheel" data-picker="month" tabindex="0"></div>
             <div class="Wheel" data-picker="year" tabindex="0"></div>
           </div>
         </div>
-        <div class="TimeColumns WheelColumns">
+        <div class="time-columns WheelColumns">
           <div class="Wheel" data-segment="hour" tabindex="0"></div>
           <div class="Wheel" data-segment="minute" tabindex="0"></div>
           <div class="Wheel" data-segment="second" tabindex="0" style="display:none"></div>
-          <div class="DateTimeField-ampm" role="group" hidden></div>
+          <div class="ampm" role="group" hidden></div>
         </div>
       </div>
-      <div class="CalendarFooter">
-        <button type="button" class="CalendarFooterClear"></button>
-        <button type="button" class="CalendarFooterToday"></button>
-        <button type="button" class="CalendarFooterNow"></button>
+      <div class="calendar-footer">
+        <button type="button" class="calendar-footer-clear"></button>
+        <button type="button" class="calendar-footer-today"></button>
+        <button type="button" class="calendar-footer-now"></button>
       </div>
       <div class="arrow"></div>
     </div>
   </template>
-  <div class="slideContainer"></div>
-  <div class="Announce" aria-live="polite" aria-atomic="true"></div>
+  <div class="rail"></div>
+  <div class="announce" aria-live="polite" aria-atomic="true"></div>
 </div>
 ```
 
-JS injects the segment spinbuttons into `.Segments` and the day cells into `.CalendarGrid`, and clones
-the `<template>` into `.slideContainer` on open — do not author those. The five `.Wheel` elements
+JS injects the segment spinbuttons into `.segments` and the day cells into `.calendar-grid`, and clones
+the `<template>` into `.rail` on open — do not author those. The five `.Wheel` elements
 (two `data-picker` for month/year, three `data-segment` for hour/minute/second) are upgraded by the
 `WheelColumn` kernel primitive to `role="spinbutton"`; see
 [`src/kernel/js/WheelColumn.md`](../../../kernel/js/WheelColumn.md). The `WheelColumns` class on the
-picker panel and `.TimeColumns` is required — the kernel `Wheel.css` styles the wheel band and fade
+picker panel and `.time-columns` is required — the kernel `Wheel.css` styles the wheel band and fade
 on it. The `data-panel="calendar"` and
-`data-panel="picker"` panels swap via `data-active`; the second segment and `.DateTimeField-ampm` stay
-hidden unless `data-step < 60` / a 12-hour locale applies. JS gives `.MonthYearTrigger` an
+`data-panel="picker"` panels swap via `data-active`; the second segment and `.ampm` stay
+hidden unless `data-step < 60` / a 12-hour locale applies. JS gives `.month-year-trigger` an
 `aria-controls` pointing at the picker panel and toggles its `aria-expanded` on picker open/close; it
 deliberately carries no `aria-haspopup` (the trigger swaps an in-dialog panel of spinbutton wheels,
 not a listbox popup).
@@ -96,7 +96,7 @@ JS also sets two inline custom properties on the root while the popup is open: `
 
 ## Behaviour
 
-- Segment spinbuttons for day/month/year/hour/minute (and second when `step < 60`, AM/PM when locale is 12h)
+- segment spinbuttons for day/month/year/hour/minute (and second when `step < 60`, AM/PM when locale is 12h)
 - Popup: calendar grid on the left, scrollable time columns on the right
 - "Nu" footer button sets current datetime
 - All segments must be filled before native input is written
@@ -105,17 +105,17 @@ JS also sets two inline custom properties on the root while the popup is open: `
 ## Events
 
 - `change` — dispatched on the native input as `new Event('change', { bubbles: true })`, exactly once per actual value change. An equality gate against the native input's current value collapses cascading segment writes (e.g. a calendar selection touches up to seven segments) into a single event. Popup **Clear** also dispatches `change` (value set to `""`).
-- Each value change also writes "Selected date and time: <localized label>" (localised) to the `.Announce` live region.
+- Each value change also writes "Selected date and time: <localized label>" (localised) to the `.announce` live region.
 
 ## Accessibility notes
 
 - Native input is `aria-hidden="true"` and `tabindex="-1"`
-- `.Segments` has `role="group"` with `aria-roledescription`
+- `.segments` has `role="group"` with `aria-roledescription`
 - Each spinbutton has `aria-valuemin`, `aria-valuemax`, `aria-valuenow`, `aria-valuetext` — except the AM/PM segment, which gets only `aria-valuenow`/`aria-valuetext` (a 2-state toggle, not a range)
 - Popup is `role="dialog"` with `aria-modal="true"`
 - Time columns are `.Wheel` spinbuttons — the `WheelColumn` primitive sets `role="spinbutton"` with `aria-valuemin`/`aria-valuemax`/`aria-valuenow`/`aria-valuetext` (not `listbox`)
 - `aria-disabled="true"` on all segments when disabled
-- `.Announce` (`aria-live="polite"`, `aria-atomic="true"`, last child of the root) announces the selected date and time on each value change
+- `.announce` (`aria-live="polite"`, `aria-atomic="true"`, last child of the root) announces the selected date and time on each value change
 
 ## Kernel dependencies
 
@@ -145,7 +145,7 @@ Test with a real screenreader before shipping.
 
 ### Desktop screenreader (NVDA, JAWS, VoiceOver)
 
-**Segment group**
+**segment group**
 - [ ] When tabbing into the component, the group label is announced
 - [ ] First segment announces its type and current value
 

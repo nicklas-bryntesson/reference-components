@@ -4,13 +4,13 @@ import { JSDOM } from 'jsdom'
 function makeRoot(attrs = '') {
   const dom = new JSDOM(`
     <div data-component="DateTimeField" data-id="test" data-name="test" data-locale="en" ${attrs}>
-      <input type="datetime-local" class="DateTimeField-native" tabindex="-1" aria-hidden="true">
-      <div class="DateTimeField-overlay">
-        <div class="Segments" role="group"></div>
-        <button class="DateTimeField-trigger" type="button"></button>
+      <input type="datetime-local" class="native" tabindex="-1" aria-hidden="true">
+      <div class="overlay">
+        <div class="segments" role="group"></div>
+        <button class="trigger" type="button"></button>
       </div>
-      <template class="DateTimeField-calendarTemplate"></template>
-      <div class="Announce" aria-live="polite" aria-atomic="true"></div>
+      <template class="calendar-template"></template>
+      <div class="announce" aria-live="polite" aria-atomic="true"></div>
     </div>
   `)
   return dom.window.document.querySelector('[data-component="DateTimeField"]')
@@ -33,7 +33,7 @@ describe('_buildSegments() — date segments', () => {
     const root = makeRoot()
     document.body.appendChild(root)
     DateTimeField.attach(document.body)
-    const segs = root.querySelectorAll('.Segment[role="spinbutton"]')
+    const segs = root.querySelectorAll('.segment[role="spinbutton"]')
     const types = Array.from(segs).map(s => s.dataset.segment)
     expect(types).toContain('day')
     expect(types).toContain('month')
@@ -46,7 +46,7 @@ describe('_buildSegments() — date segments', () => {
     const root = makeRoot()
     document.body.appendChild(root)
     DateTimeField.attach(document.body)
-    const types = Array.from(root.querySelectorAll('.Segment[role="spinbutton"]'))
+    const types = Array.from(root.querySelectorAll('.segment[role="spinbutton"]'))
       .map(s => s.dataset.segment)
     expect(types).toContain('hour')
     expect(types).toContain('minute')
@@ -58,7 +58,7 @@ describe('_buildSegments() — date segments', () => {
     const root = makeRoot()
     document.body.appendChild(root)
     DateTimeField.attach(document.body)
-    const types = Array.from(root.querySelectorAll('.Segment[role="spinbutton"]'))
+    const types = Array.from(root.querySelectorAll('.segment[role="spinbutton"]'))
       .map(s => s.dataset.segment)
     expect(types).not.toContain('second')
     root.remove()
@@ -69,7 +69,7 @@ describe('_buildSegments() — date segments', () => {
     const root = makeRoot('data-step="30"')
     document.body.appendChild(root)
     DateTimeField.attach(document.body)
-    const types = Array.from(root.querySelectorAll('.Segment[role="spinbutton"]'))
+    const types = Array.from(root.querySelectorAll('.segment[role="spinbutton"]'))
       .map(s => s.dataset.segment)
     expect(types).toContain('second')
     root.remove()
@@ -133,7 +133,7 @@ describe('_trySyncToNative()', () => {
     // must collapse them to a single change event.
     instance._syncSegmentsFromDatetime(new Date(2026, 4, 27, 14, 35))
     expect(changeCount).toBe(1)
-    expect(root.querySelector('.Announce').textContent).toContain('Selected date and time:')
+    expect(root.querySelector('.announce').textContent).toContain('Selected date and time:')
 
     // Re-syncing the same value is silent.
     instance._syncSegmentsFromDatetime(new Date(2026, 4, 27, 14, 35))
