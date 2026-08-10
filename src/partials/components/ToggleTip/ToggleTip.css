@@ -1,6 +1,9 @@
 /* ================================================================
    ToggleTip — fully self-contained
    No Tailwind, no framework reset, no external dependencies
+
+   The component root is the custom element `toggle-tip`, so every part is a
+   flat, fully-qualified `toggle-tip .element` rule (ADR-0019).
    ================================================================ */
 
 /* ── Public API (theme layer) ──────────────────────────────────── */
@@ -49,18 +52,18 @@ toggle-tip {
   height: var(--_tt-button-width);
   overflow: hidden;
   vertical-align: middle;
+}
 
-  & > * {
-    opacity: 0; /* hide raw content before JS builds DOM */
-  }
+/* Hide raw content before JS builds the DOM */
+toggle-tip > * {
+  opacity: 0;
 }
 
 toggle-tip[initialized] {
   overflow: visible;
-
-  & > * {
-    opacity: 1;
-  }
+}
+toggle-tip[initialized] > * {
+  opacity: 1;
 }
 
 /* ── Button ────────────────────────────────────────────────────── */
@@ -74,23 +77,23 @@ toggle-tip button {
   height: var(--_tt-button-width);
   cursor: pointer;
   color: var(--_tt-button-color);
+}
 
-  /* Enlarged hit area */
-  &::after {
-    --_click-area: 2rem;
-    --_offset: calc((var(--_tt-button-width) - var(--_click-area)) / 2);
-    position: absolute;
-    content: "";
-    width: var(--_click-area);
-    height: var(--_click-area);
-    inset: var(--_offset);
-  }
+/* Enlarged hit area */
+toggle-tip button::after {
+  --_click-area: 2rem;
+  --_offset: calc((var(--_tt-button-width) - var(--_click-area)) / 2);
+  position: absolute;
+  content: "";
+  width: var(--_click-area);
+  height: var(--_click-area);
+  inset: var(--_offset);
+}
 
-  & .toggleTipIcon {
-    display: block;
-    width: var(--_tt-button-width);
-    height: var(--_tt-button-width);
-  }
+toggle-tip button .icon {
+  display: block;
+  width: var(--_tt-button-width);
+  height: var(--_tt-button-width);
 }
 
 /* ── Slide rail ────────────────────────────────────────────────── */
@@ -104,7 +107,7 @@ toggle-tip button {
  * Note: physical properties (left, top, bottom) are used intentionally here.
  * The slider-rail model is left-to-right by design; RTL is not in scope.
  */
-toggle-tip .slideContainer {
+toggle-tip .rail {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -116,7 +119,7 @@ toggle-tip .slideContainer {
 }
 
 /* ── Bubble ────────────────────────────────────────────────────── */
-toggle-tip .ToggleTip-popup {
+toggle-tip .popup {
   position: absolute;
   left: var(--_tt-popup-offset);
   transform: translateX(-50%);
@@ -134,23 +137,23 @@ toggle-tip .ToggleTip-popup {
   font: inherit;
   font-size: 1rem;
   box-shadow: var(--ui-shadow);
+}
 
-  /* Force all descendant text to use the bubble's colour, not the page default */
-  & * {
-    color: inherit;
-  }
+/* Force all descendant text to use the bubble's colour, not the page default */
+toggle-tip .popup * {
+  color: inherit;
+}
 
-  &[aria-hidden="true"] {
-    display: none;
-  }
+toggle-tip .popup[aria-hidden="true"] {
+  display: none;
+}
 
-  &[aria-hidden="false"] {
-    display: block;
-    transition: opacity 0.15s;
+toggle-tip .popup[aria-hidden="false"] {
+  display: block;
+  transition: opacity 0.15s;
 
-    @starting-style {
-      opacity: 0;
-    }
+  @starting-style {
+    opacity: 0;
   }
 }
 
@@ -173,7 +176,7 @@ toggle-tip .arrow {
 }
 
 /* ── Direction: top (bubble above trigger) ─────────────────────── */
-toggle-tip[data-direction="top"] .ToggleTip-popup {
+toggle-tip[data-direction="top"] .popup {
   bottom: var(--_tt-gap);
 }
 
@@ -184,7 +187,7 @@ toggle-tip[data-direction="top"] .arrow {
 }
 
 /* ── Direction: bottom (bubble below trigger) ──────────────────── */
-toggle-tip[data-direction="bottom"] .ToggleTip-popup {
+toggle-tip[data-direction="bottom"] .popup {
   top: var(--_tt-gap);
 }
 

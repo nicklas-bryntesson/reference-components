@@ -11,7 +11,7 @@ test('opens on button click', async ({ page }) => {
   const tip = page.locator('toggle-tip[data-id="inline"]')
   await tip.scrollIntoViewIfNeeded()
   const button = tip.locator('button')
-  const popup = tip.locator('.ToggleTip-popup')
+  const popup = tip.locator('.popup')
 
   await expect(popup).not.toBeVisible()
   await button.click()
@@ -27,7 +27,7 @@ test('closes on second click', async ({ page }) => {
 
   await button.click()
   await button.click()
-  await expect(tip.locator('.ToggleTip-popup')).not.toBeVisible()
+  await expect(tip.locator('.popup')).not.toBeVisible()
   await expect(button).toHaveAttribute('aria-expanded', 'false')
 })
 
@@ -35,10 +35,10 @@ test('closes on click outside', async ({ page }) => {
   const tip = page.locator('toggle-tip[data-id="inline"]')
   await tip.scrollIntoViewIfNeeded()
   await tip.locator('button').click()
-  await expect(tip.locator('.ToggleTip-popup')).toBeVisible()
+  await expect(tip.locator('.popup')).toBeVisible()
 
   await page.mouse.click(5, 5)
-  await expect(tip.locator('.ToggleTip-popup')).not.toBeVisible()
+  await expect(tip.locator('.popup')).not.toBeVisible()
 })
 
 // ── Keyboard ────────────────────────────────────────────────────────────────
@@ -48,18 +48,18 @@ test('button is keyboard-activatable with Enter', async ({ page }) => {
   await tip.scrollIntoViewIfNeeded()
   await tip.locator('button').focus()
   await page.keyboard.press('Enter')
-  await expect(tip.locator('.ToggleTip-popup')).toBeVisible()
+  await expect(tip.locator('.popup')).toBeVisible()
 })
 
 test('focusout closes the tip', async ({ page }) => {
   const tip = page.locator('toggle-tip[data-id="inline"]')
   await tip.scrollIntoViewIfNeeded()
   await tip.locator('button').click()
-  await expect(tip.locator('.ToggleTip-popup')).toBeVisible()
+  await expect(tip.locator('.popup')).toBeVisible()
 
   // Move focus to body programmatically — no mousedown, no tab-order dependency
   await page.evaluate(() => { document.body.setAttribute('tabindex', '-1'); document.body.focus() })
-  await expect(tip.locator('.ToggleTip-popup')).not.toBeVisible()
+  await expect(tip.locator('.popup')).not.toBeVisible()
 })
 
 // ── Positioning ─────────────────────────────────────────────────────────────
@@ -79,7 +79,7 @@ test('bubble is positioned above trigger by default', async ({ page }) => {
   await expect(tip).toHaveAttribute('data-direction', 'top')
 
   const tipBox = await tip.boundingBox()
-  const bubbleBox = await tip.locator('.ToggleTip-popup').boundingBox()
+  const bubbleBox = await tip.locator('.popup').boundingBox()
   // bubble bottom edge must be above trigger bottom edge
   expect(bubbleBox.y + bubbleBox.height).toBeLessThan(tipBox.y + tipBox.height)
 })
@@ -101,7 +101,7 @@ test('bubble flips below trigger when near top of viewport', async ({ page }) =>
   await expect(tip).toHaveAttribute('data-direction', 'bottom')
 
   const tipBox = await tip.boundingBox()
-  const bubbleBox = await tip.locator('.ToggleTip-popup').boundingBox()
+  const bubbleBox = await tip.locator('.popup').boundingBox()
 
   // Restore viewport before assertions so subsequent tests start clean
   await page.setViewportSize({ width: 1280, height: 720 })
@@ -115,7 +115,7 @@ test('bubble does not overflow viewport left edge', async ({ page }) => {
   await tip.scrollIntoViewIfNeeded()
   await tip.locator('button').click()
 
-  const bubbleBox = await tip.locator('.ToggleTip-popup').boundingBox()
+  const bubbleBox = await tip.locator('.popup').boundingBox()
   expect(bubbleBox.x).toBeGreaterThanOrEqual(0)
 })
 
@@ -125,7 +125,7 @@ test('bubble does not overflow viewport right edge', async ({ page }) => {
   await tip.scrollIntoViewIfNeeded()
   await tip.locator('button').click()
 
-  const bubbleBox = await tip.locator('.ToggleTip-popup').boundingBox()
+  const bubbleBox = await tip.locator('.popup').boundingBox()
   const viewport = page.viewportSize()
   expect(Math.round(bubbleBox.x + bubbleBox.width)).toBeLessThanOrEqual(viewport.width)
 })

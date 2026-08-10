@@ -21,8 +21,8 @@ All attributes are optional — `icon` defaults to `"info"` (see `## Attributes`
   <button aria-label="More information" aria-expanded="false" aria-controls="tt-ID">
     <!-- icon SVG -->
   </button>
-  <div class="slideContainer">
-    <div class="ToggleTip-popup" id="tt-ID" role="tooltip" aria-hidden="true">
+  <div class="rail">
+    <div class="popup" id="tt-ID" role="tooltip" aria-hidden="true">
       <span class="title" role="heading" aria-level="3">Optional heading</span> <!-- only when title is set -->
       Content shown inside the bubble.
       <div class="arrow"></div>
