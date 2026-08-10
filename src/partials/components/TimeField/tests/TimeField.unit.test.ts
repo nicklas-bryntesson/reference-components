@@ -46,31 +46,31 @@ function createTimeFieldEl(options: {
       ${options.disabled ? 'data-disabled="true"' : ''}
       ${options.step != null ? `data-step="${options.step}"` : ''}
     >
-      <input class="TimeField-native" type="time" aria-hidden="true" tabindex="-1"
+      <input class="native" type="time" aria-hidden="true" tabindex="-1"
         ${options.value ? `value="${options.value}"` : ''}
         ${options.disabled ? 'disabled' : ''}
       />
-      <div class="TimeField-overlay" aria-hidden="true">
-        <div class="TimeField-segments" role="group"></div>
-        <button type="button" class="TimeField-trigger" aria-label="Öppna tidsväljare" aria-expanded="false" aria-haspopup="dialog"></button>
-        <div class="slideContainer">
+      <div class="overlay" aria-hidden="true">
+        <div class="segments" role="group"></div>
+        <button type="button" class="trigger" aria-label="Öppna tidsväljare" aria-expanded="false" aria-haspopup="dialog"></button>
+        <div class="rail">
           <template data-template="timefield-popup">
-            <div class="TimeField-popup" role="dialog" aria-modal="true" aria-label="Välj tid">
-              <div class="TimeField-popup-columns">
+            <div class="popup" role="dialog" aria-modal="true" aria-label="Välj tid">
+              <div class="time-columns">
                 <ul class="Wheel" data-segment="hour" role="listbox" aria-label="Timmar" tabindex="0"></ul>
                 <ul class="Wheel" data-segment="minute" role="listbox" aria-label="Minuter" tabindex="-1"></ul>
                 <ul class="Wheel" data-segment="second" role="listbox" aria-label="Sekunder" tabindex="-1"></ul>
               </div>
-              <div class="TimeField-popup-footer">
-                <button type="button" class="TimeField-popup-clear">Rensa</button>
-                <button type="button" class="TimeField-popup-now">Nu</button>
+              <div class="footer">
+                <button type="button" class="footer-clear">Rensa</button>
+                <button type="button" class="footer-now">Nu</button>
               </div>
               <div class="arrow"></div>
             </div>
           </template>
         </div>
       </div>
-      <div class="TimeField-announce" aria-live="polite" aria-atomic="true"></div>
+      <div class="announce" aria-live="polite" aria-atomic="true"></div>
     </div>
   `
   document.body.appendChild(div)
@@ -224,7 +224,7 @@ describe('segment construction (sv-SE, no seconds)', () => {
   it('separators have aria-hidden="true" and text ":"', () => {
     const el = createTimeFieldEl()
     new TimeField(el)
-    const seps = el.querySelectorAll('.TimeField-sep')
+    const seps = el.querySelectorAll('.separator')
     expect(seps).toHaveLength(1)
     expect(seps[0].getAttribute('aria-hidden')).toBe('true')
     expect(seps[0].textContent).toBe(':')
@@ -252,7 +252,7 @@ describe('segment construction (step=1, with seconds)', () => {
   it('renders two ":" separators', () => {
     const el = createTimeFieldEl({ step: 1 })
     new TimeField(el)
-    const seps = el.querySelectorAll('.TimeField-sep')
+    const seps = el.querySelectorAll('.separator')
     const colonSeps = [...seps].filter(s => s.textContent === ':')
     expect(colonSeps).toHaveLength(2)
   })
