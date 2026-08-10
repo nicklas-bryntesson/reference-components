@@ -107,7 +107,7 @@ class MonthField {
   private _suppressEvents = false
   private popupEl: HTMLElement | null = null
   private _wheels: Map<string, WheelColumn> = new Map()
-  private _slideContainer!: HTMLElement
+  private _rail!: HTMLElement
   private _outsideClickHandler: ((e: MouseEvent) => void) | null = null
   private _rafHandle: number | null = null
   private _popupTemplate: HTMLTemplateElement | null = null
@@ -126,11 +126,11 @@ class MonthField {
     this.root = el
     this.instanceId = ++MonthField.instanceCount
 
-    this.native = el.querySelector<HTMLInputElement>('.MonthField-native')!
-    this.overlay = el.querySelector<HTMLElement>('.MonthField-overlay')!
-    this.segments = el.querySelector<HTMLElement>('.MonthField-segments')!
-    this.trigger = el.querySelector<HTMLButtonElement>('.MonthField-trigger')!
-    this.announce = el.querySelector<HTMLElement>('.MonthField-announce')!
+    this.native = el.querySelector<HTMLInputElement>('.native')!
+    this.overlay = el.querySelector<HTMLElement>('.overlay')!
+    this.segments = el.querySelector<HTMLElement>('.segments')!
+    this.trigger = el.querySelector<HTMLButtonElement>('.trigger')!
+    this.announce = el.querySelector<HTMLElement>('.announce')!
 
     this.fieldId = el.dataset.id ?? `monthfield-${this.instanceId}`
     this.locale = resolveLocale(readLocale(el), MonthField.translations)
@@ -149,7 +149,7 @@ class MonthField {
     this.minYear = parsedMin ? parsedMin.year : currentYear - MonthField.YEAR_SPAN
     this.maxYear = parsedMax ? parsedMax.year : currentYear + MonthField.YEAR_SPAN
 
-    this._slideContainer = el.querySelector<HTMLElement>('.slideContainer')!
+    this._rail = el.querySelector<HTMLElement>('.rail')!
     this._popupTemplate = el.querySelector<HTMLTemplateElement>('[data-template="monthfield-popup"]')
 
     this._init()
@@ -243,7 +243,7 @@ class MonthField {
   // ─── Segment construction ─────────────────────────────────────────────────
 
   _buildSegments(): void {
-    this.segments.querySelectorAll('.MonthField-segment, .MonthField-sep').forEach(el => el.remove())
+    this.segments.querySelectorAll('.segment, .separator').forEach(el => el.remove())
 
     const segmentTypes: MonthSegmentType[] = ['month', 'year']
 
@@ -271,7 +271,7 @@ class MonthField {
 
   _createSep(text: string): HTMLSpanElement {
     const sep = document.createElement('span')
-    sep.className = 'MonthField-sep'
+    sep.className = 'separator'
     sep.setAttribute('aria-hidden', 'true')
     sep.textContent = text
     return sep
@@ -279,7 +279,7 @@ class MonthField {
 
   _createSegmentEl(type: MonthSegmentType): HTMLSpanElement {
     const span = document.createElement('span')
-    span.className = 'MonthField-segment'
+    span.className = 'segment'
     span.setAttribute('role', 'spinbutton')
     span.setAttribute('data-segment', type)
     span.setAttribute('tabindex', '-1')
@@ -694,7 +694,7 @@ class MonthField {
   private _openPopup(): void {
     if (!this._popupTemplate) return
     const clone = this._popupTemplate.content.cloneNode(true) as DocumentFragment
-    this.popupEl = clone.querySelector<HTMLElement>('.MonthField-popup')!
+    this.popupEl = clone.querySelector<HTMLElement>('.popup')!
 
     // Localised labels
     this.popupEl.setAttribute('aria-label', this.t.popupLabel)
@@ -704,8 +704,8 @@ class MonthField {
     yearHost.setAttribute('aria-label', this.t.year)
 
     // Footer button labels
-    const clearBtn = this.popupEl.querySelector<HTMLButtonElement>('.MonthField-popup-clear')!
-    const nowBtn = this.popupEl.querySelector<HTMLButtonElement>('.MonthField-popup-now')!
+    const clearBtn = this.popupEl.querySelector<HTMLButtonElement>('.footer-clear')!
+    const nowBtn = this.popupEl.querySelector<HTMLButtonElement>('.footer-now')!
     clearBtn.textContent = this.t.clearButton
     nowBtn.textContent = this.t.thisMonthButton
     clearBtn.addEventListener('click', () => this._handleClear())
@@ -714,7 +714,7 @@ class MonthField {
     // Keyboard
     this.popupEl.addEventListener('keydown', (e) => this._handlePopupKeydown(e))
 
-    this._slideContainer.appendChild(this.popupEl)
+    this._rail.appendChild(this.popupEl)
     this.root.setAttribute('data-open', 'true')
     this.trigger.setAttribute('aria-expanded', 'true')
 
@@ -770,8 +770,8 @@ class MonthField {
   private _popupTabStops(): HTMLElement[] {
     if (!this.popupEl) return []
     const wheels = [...this.popupEl.querySelectorAll<HTMLElement>('.Wheel[role="spinbutton"]')]
-    const clearBtn = this.popupEl.querySelector<HTMLButtonElement>('.MonthField-popup-clear')
-    const nowBtn = this.popupEl.querySelector<HTMLButtonElement>('.MonthField-popup-now')
+    const clearBtn = this.popupEl.querySelector<HTMLButtonElement>('.footer-clear')
+    const nowBtn = this.popupEl.querySelector<HTMLButtonElement>('.footer-now')
     const buttons = [clearBtn, nowBtn].filter(
       (b): b is HTMLButtonElement => Boolean(b) && !b!.disabled,
     )
@@ -821,7 +821,7 @@ class MonthField {
 
   private _updateClearButton(): void {
     if (!this.popupEl) return
-    const clearBtn = this.popupEl.querySelector<HTMLButtonElement>('.MonthField-popup-clear')
+    const clearBtn = this.popupEl.querySelector<HTMLButtonElement>('.footer-clear')
     if (clearBtn) {
       clearBtn.disabled = this.native.value === ''
     }
@@ -891,7 +891,7 @@ class MonthField {
   private _updateLayout(): void {
     if (!this.popupEl) return
     const triggerRect = this.trigger.getBoundingClientRect()
-    const containerRect = this._slideContainer.getBoundingClientRect()
+    const containerRect = this._rail.getBoundingClientRect()
     const popupWidth = this.popupEl.getBoundingClientRect().width
     if (!containerRect.width || !popupWidth) return
 
