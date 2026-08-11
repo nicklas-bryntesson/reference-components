@@ -35,31 +35,31 @@ function canonical(id: string, label: string, rootAttrs: string, inputAttrs: str
   data-name="${id}"
   data-locale="${locale}"${rootExtra}
 >
-  <input class="TimeField-native" type="time" aria-hidden="true" tabindex="-1"${inputAttrs} />
-  <div class="TimeField-overlay" aria-hidden="true">
-    <div class="TimeField-segments" role="group">
+  <input class="native" type="time" aria-hidden="true" tabindex="-1"${inputAttrs} />
+  <div class="overlay" aria-hidden="true">
+    <div class="segments" role="group">
     </div>
-    <button type="button" class="TimeField-trigger" aria-label="Open time picker" aria-expanded="false" aria-haspopup="dialog"${triggerAttrs}>
+    <button type="button" class="trigger" aria-label="Open time picker" aria-expanded="false" aria-haspopup="dialog"${triggerAttrs}>
       <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clock-icon lucide-clock"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
     </button>
-    <div class="slideContainer">
+    <div class="rail">
       <template data-template="timefield-popup">
-        <div class="TimeField-popup" role="dialog" aria-modal="true">
-          <div class="TimeField-popup-columns WheelColumns">
+        <div class="popup" role="dialog" aria-modal="true">
+          <div class="time-columns WheelColumns">
             <div class="Wheel" data-segment="hour" role="spinbutton" tabindex="0"></div>
             <div class="Wheel" data-segment="minute" role="spinbutton" tabindex="-1"></div>
             <div class="Wheel" data-segment="second" role="spinbutton" tabindex="-1"></div>
           </div>
-          <div class="TimeField-popup-footer">
-            <button type="button" class="TimeField-popup-clear"></button>
-            <button type="button" class="TimeField-popup-now"></button>
+          <div class="footer">
+            <button type="button" class="footer-clear"></button>
+            <button type="button" class="footer-now"></button>
           </div>
           <div class="arrow"></div>
         </div>
       </template>
     </div>
   </div>
-  <div class="TimeField-announce" aria-live="polite" aria-atomic="true"></div>
+  <div class="announce" aria-live="polite" aria-atomic="true"></div>
 </div>
 `
 }

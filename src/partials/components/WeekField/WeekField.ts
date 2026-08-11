@@ -150,7 +150,7 @@ class WeekField {
 
   private _suppressEvents = false
   private popupEl: HTMLElement | null = null
-  private _slideContainer!: HTMLElement
+  private _rail!: HTMLElement
   private _outsideClickHandler: ((e: MouseEvent) => void) | null = null
   private _rafHandle: number | null = null
   private _popupTemplate: HTMLTemplateElement | null = null
@@ -168,11 +168,11 @@ class WeekField {
     this.root = el
     this.instanceId = ++WeekField.instanceCount
 
-    this.native = el.querySelector<HTMLInputElement>('.WeekField-native')!
-    this.overlay = el.querySelector<HTMLElement>('.WeekField-overlay')!
-    this.segments = el.querySelector<HTMLElement>('.WeekField-segments')!
-    this.trigger = el.querySelector<HTMLButtonElement>('.WeekField-trigger')!
-    this.announce = el.querySelector<HTMLElement>('.WeekField-announce')!
+    this.native = el.querySelector<HTMLInputElement>('.native')!
+    this.overlay = el.querySelector<HTMLElement>('.overlay')!
+    this.segments = el.querySelector<HTMLElement>('.segments')!
+    this.trigger = el.querySelector<HTMLButtonElement>('.trigger')!
+    this.announce = el.querySelector<HTMLElement>('.announce')!
 
     this.fieldId = el.dataset.id ?? `weekfield-${this.instanceId}`
     this.locale = resolveLocale(readLocale(el), WeekField.translations)
@@ -195,7 +195,7 @@ class WeekField {
     this.viewYear = today.getFullYear()
     this.viewMonth = today.getMonth()
 
-    this._slideContainer = el.querySelector<HTMLElement>('.slideContainer')!
+    this._rail = el.querySelector<HTMLElement>('.rail')!
     this._popupTemplate = el.querySelector<HTMLTemplateElement>('[data-template="weekfield-popup"]')
 
     this._init()
@@ -295,13 +295,13 @@ class WeekField {
   // ─── Segment construction ─────────────────────────────────────────────────
 
   _buildSegments(): void {
-    this.segments.querySelectorAll('.WeekField-segment, .WeekField-sep').forEach(el => el.remove())
+    this.segments.querySelectorAll('.segment, .separator').forEach(el => el.remove())
 
     const segmentTypes: WeekSegmentType[] = ['week', 'year']
 
     // Prefix "v." / "Wk" so the field reads as a week, not a date.
     const prefix = document.createElement('span')
-    prefix.className = 'WeekField-prefix'
+    prefix.className = 'prefix'
     prefix.setAttribute('aria-hidden', 'true')
     prefix.textContent = this.t.weekAbbrev
     this.segments.appendChild(prefix)
@@ -330,7 +330,7 @@ class WeekField {
 
   _createSep(text: string): HTMLSpanElement {
     const sep = document.createElement('span')
-    sep.className = 'WeekField-sep'
+    sep.className = 'separator'
     sep.setAttribute('aria-hidden', 'true')
     sep.textContent = text
     return sep
@@ -338,7 +338,7 @@ class WeekField {
 
   _createSegmentEl(type: WeekSegmentType): HTMLSpanElement {
     const span = document.createElement('span')
-    span.className = 'WeekField-segment'
+    span.className = 'segment'
     span.setAttribute('role', 'spinbutton')
     span.setAttribute('data-segment', type)
     span.setAttribute('tabindex', '-1')
@@ -747,25 +747,25 @@ class WeekField {
   private _openPopup(): void {
     if (!this._popupTemplate) return
     const clone = this._popupTemplate.content.cloneNode(true) as DocumentFragment
-    this.popupEl = clone.querySelector<HTMLElement>('.WeekField-popup')!
+    this.popupEl = clone.querySelector<HTMLElement>('.popup')!
 
     const popupId = `${this.fieldId}-popup`
     const labelId = `${this.fieldId}-monthlabel`
     this.popupEl.id = popupId
     this.popupEl.setAttribute('aria-label', this.t.popupLabel)
 
-    const label = this.popupEl.querySelector<HTMLElement>('.MonthYearLabel')!
+    const label = this.popupEl.querySelector<HTMLElement>('.calendar-month-year')!
     label.id = labelId
 
-    const prevBtn = this.popupEl.querySelector<HTMLButtonElement>('.PrevMonth')!
-    const nextBtn = this.popupEl.querySelector<HTMLButtonElement>('.NextMonth')!
+    const prevBtn = this.popupEl.querySelector<HTMLButtonElement>('.prev-month')!
+    const nextBtn = this.popupEl.querySelector<HTMLButtonElement>('.next-month')!
     prevBtn.setAttribute('aria-label', this.t.prevMonth)
     nextBtn.setAttribute('aria-label', this.t.nextMonth)
     prevBtn.addEventListener('click', () => this._navigateMonth(-1))
     nextBtn.addEventListener('click', () => this._navigateMonth(1))
 
-    const clearBtn = this.popupEl.querySelector<HTMLButtonElement>('.WeekField-popup-clear')!
-    const nowBtn = this.popupEl.querySelector<HTMLButtonElement>('.WeekField-popup-now')!
+    const clearBtn = this.popupEl.querySelector<HTMLButtonElement>('.calendar-footer-clear')!
+    const nowBtn = this.popupEl.querySelector<HTMLButtonElement>('.calendar-footer-now')!
     clearBtn.textContent = this.t.clearButton
     nowBtn.textContent = this.t.thisWeekButton
     clearBtn.addEventListener('click', () => this._handleClear())
@@ -787,7 +787,7 @@ class WeekField {
     this._renderWeekdays()
     this._renderMonth()
 
-    this._slideContainer.appendChild(this.popupEl)
+    this._rail.appendChild(this.popupEl)
     this.root.setAttribute('data-open', 'true')
     this.trigger.setAttribute('aria-expanded', 'true')
 
@@ -819,13 +819,13 @@ class WeekField {
   // internally so it is exactly one tab stop (WAI-ARIA grid pattern).
   private _popupTabStops(): HTMLElement[] {
     if (!this.popupEl) return []
-    const prevBtn = this.popupEl.querySelector<HTMLButtonElement>('.PrevMonth')
-    const nextBtn = this.popupEl.querySelector<HTMLButtonElement>('.NextMonth')
+    const prevBtn = this.popupEl.querySelector<HTMLButtonElement>('.prev-month')
+    const nextBtn = this.popupEl.querySelector<HTMLButtonElement>('.next-month')
     const gridStop =
-      this.popupEl.querySelector<HTMLButtonElement>('.WeekGrid tbody tr[tabindex="0"]') ??
-      this.popupEl.querySelector<HTMLButtonElement>('.WeekGrid tbody tr:not([data-disabled])')
-    const clearBtn = this.popupEl.querySelector<HTMLButtonElement>('.WeekField-popup-clear')
-    const nowBtn = this.popupEl.querySelector<HTMLButtonElement>('.WeekField-popup-now')
+      this.popupEl.querySelector<HTMLButtonElement>('.calendar-grid tbody tr[tabindex="0"]') ??
+      this.popupEl.querySelector<HTMLButtonElement>('.calendar-grid tbody tr:not([data-disabled])')
+    const clearBtn = this.popupEl.querySelector<HTMLButtonElement>('.calendar-footer-clear')
+    const nowBtn = this.popupEl.querySelector<HTMLButtonElement>('.calendar-footer-now')
 
     const stops: Array<HTMLElement | null> = [
       prevBtn,
@@ -871,7 +871,7 @@ class WeekField {
   _renderWeekdays(): void {
     if (!this.popupEl) return
     const names = getWeekdayNames(this.locale)
-    const ths = this.popupEl.querySelectorAll('.WeekGrid thead th')
+    const ths = this.popupEl.querySelectorAll('.calendar-grid thead th')
     // ths[0] is the week-number column head; days start at index 1.
     const weekHead = ths[0]
     if (weekHead) {
@@ -890,10 +890,10 @@ class WeekField {
 
   _renderMonth(): void {
     if (!this.popupEl) return
-    const label = this.popupEl.querySelector<HTMLElement>('.MonthYearLabel')!
+    const label = this.popupEl.querySelector<HTMLElement>('.calendar-month-year')!
     label.textContent = `${getMonthName(this.viewYear, this.viewMonth, this.locale)} ${this.viewYear}`
 
-    const tbody = this.popupEl.querySelector<HTMLTableSectionElement>('.WeekGrid tbody')!
+    const tbody = this.popupEl.querySelector<HTMLTableSectionElement>('.calendar-grid tbody')!
     tbody.innerHTML = ''
 
     const today = new Date()
@@ -947,7 +947,7 @@ class WeekField {
     // Week-number cell (leading column). Clicking it selects the week too.
     const weekCell = document.createElement('td')
     weekCell.setAttribute('role', 'rowheader')
-    weekCell.className = 'WeekNumCell'
+    weekCell.className = 'week-number-cell'
     weekCell.textContent = String(week)
     weekCell.dataset.weeknum = String(week)
     tr.appendChild(weekCell)
@@ -983,7 +983,7 @@ class WeekField {
   // rest -1. Prefer the selected row, else today's row, else the first enabled.
   _updateRovingTabindex(): void {
     if (!this.popupEl) return
-    const tbody = this.popupEl.querySelector<HTMLTableSectionElement>('.WeekGrid tbody')!
+    const tbody = this.popupEl.querySelector<HTMLTableSectionElement>('.calendar-grid tbody')!
     tbody.querySelectorAll('tr').forEach(tr => tr.setAttribute('tabindex', '-1'))
 
     const todayISO = this._todayWeekISO()
@@ -1001,7 +1001,7 @@ class WeekField {
 
   _moveFocusIntoGrid(): void {
     if (!this.popupEl) return
-    const tbody = this.popupEl.querySelector<HTMLTableSectionElement>('.WeekGrid tbody')!
+    const tbody = this.popupEl.querySelector<HTMLTableSectionElement>('.calendar-grid tbody')!
     const target = tbody.querySelector<HTMLTableRowElement>('tr[tabindex="0"]')
     target?.focus()
   }
@@ -1013,16 +1013,16 @@ class WeekField {
     const week = getISOWeek(date)
     const iso = formatWeekISO(weekYear, week)
 
-    let row = this.popupEl!.querySelector<HTMLTableRowElement>(`.WeekGrid tbody tr[data-week="${iso}"]`)
+    let row = this.popupEl!.querySelector<HTMLTableRowElement>(`.calendar-grid tbody tr[data-week="${iso}"]`)
     if (!row) {
       const monday = getDateOfISOWeek(weekYear, week)
       this.viewYear = monday.getFullYear()
       this.viewMonth = monday.getMonth()
       this._renderMonth()
-      row = this.popupEl!.querySelector<HTMLTableRowElement>(`.WeekGrid tbody tr[data-week="${iso}"]`)
+      row = this.popupEl!.querySelector<HTMLTableRowElement>(`.calendar-grid tbody tr[data-week="${iso}"]`)
     }
     if (row) {
-      const tbody = this.popupEl!.querySelector<HTMLTableSectionElement>('.WeekGrid tbody')!
+      const tbody = this.popupEl!.querySelector<HTMLTableSectionElement>('.calendar-grid tbody')!
       tbody.querySelectorAll('tr').forEach(tr => tr.setAttribute('tabindex', '-1'))
       row.setAttribute('tabindex', '0')
       row.focus()
@@ -1038,7 +1038,7 @@ class WeekField {
       return
     }
 
-    const focusedRow = this.popupEl.querySelector<HTMLTableRowElement>('.WeekGrid tbody tr:focus')
+    const focusedRow = this.popupEl.querySelector<HTMLTableRowElement>('.calendar-grid tbody tr:focus')
     if (!focusedRow) return
     const iso = focusedRow.dataset.week
     if (!iso) return
@@ -1142,7 +1142,7 @@ class WeekField {
 
   private _updateClearButton(): void {
     if (!this.popupEl) return
-    const clearBtn = this.popupEl.querySelector<HTMLButtonElement>('.WeekField-popup-clear')
+    const clearBtn = this.popupEl.querySelector<HTMLButtonElement>('.calendar-footer-clear')
     if (clearBtn) clearBtn.disabled = this.native.value === ''
   }
 
@@ -1151,7 +1151,7 @@ class WeekField {
   private _updateLayout(): void {
     if (!this.popupEl) return
     const triggerRect = this.trigger.getBoundingClientRect()
-    const containerRect = this._slideContainer.getBoundingClientRect()
+    const containerRect = this._rail.getBoundingClientRect()
     const popupWidth = this.popupEl.getBoundingClientRect().width
     if (!containerRect.width || !popupWidth) return
 

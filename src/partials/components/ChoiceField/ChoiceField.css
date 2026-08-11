@@ -15,6 +15,9 @@
  * the field family (AffixField, WeekField). It TAKES design from the host —
  * override --_cf-selected to paint the selection in an accent; everything else
  * reads currentColor / Canvas / CanvasText.
+ *
+ * Root carries tokens + root props only; every part is a flat, fully-qualified
+ * `.ChoiceField <part>` rule below (ADR-0019).
  */
 
 .ChoiceField {
@@ -36,88 +39,87 @@
   display: inline-flex;
   align-items: center;
   gap: var(--_cf-gap);
-
-  /* ── Shared skeleton (both types) ────────────────────────────────────── */
-  & input {
-    appearance: none;
-    -webkit-appearance: none;
-    /* inherit the surrounding type so --_cf-size (em) tracks the label/context
-       font-size, not the UA input default (~13px) */
-    font: inherit;
-    margin: 0;
-    flex-shrink: 0;
-    inline-size: var(--_cf-size);
-    block-size: var(--_cf-size);
-    display: grid;
-    place-content: center;
-    border: var(--_cf-border-width) solid var(--_cf-border-color);
-    background-color: Canvas;
-    cursor: pointer;
-    transition: background-color var(--_cf-transition), border-color var(--_cf-transition);
-
-    &::after {
-      content: "";
-      /* Fixed size, not %: the box is a place-content:center grid, so a
-         percentage resolves against an auto track sized by this very element
-         → 0. Size the mark off the token in the type branches below. */
-      opacity: 0;
-      transform: scale(0.6);          /* initial: shrunk; :checked restores to full */
-      transition: opacity var(--_cf-transition), transform var(--_cf-transition);
-    }
-  }
-  /* :checked has higher specificity than the type branches, so it wins the
-     final size regardless of source order — the mark reaches its full size. */
-  & input:checked::after { opacity: 1; transform: none; }
-
-  /* ── Checkbox branch: square box, filled + tick ──────────────────────── */
-  & input[type="checkbox"] { border-radius: var(--_cf-radius); }
-  & input[type="checkbox"]::after {
-    inline-size: calc(var(--_cf-size) * 0.82);
-    block-size: calc(var(--_cf-size) * 0.82);
-    background-color: var(--_cf-mark-color);
-    -webkit-mask: var(--_cf-mark) center / contain no-repeat;
-            mask: var(--_cf-mark) center / contain no-repeat;
-  }
-  & input[type="checkbox"]:checked {
-    background-color: var(--_cf-selected);
-    border-color: var(--_cf-selected);
-  }
-
-  /* ── Radio branch: circle box, ring + dot (box stays unfilled) ───────── */
-  & input[type="radio"] { border-radius: 50%; }
-  & input[type="radio"]::after {
-    inline-size: calc(var(--_cf-size) * 0.6);
-    block-size: calc(var(--_cf-size) * 0.6);
-    border-radius: 50%;
-    background-color: var(--_cf-selected);
-  }
-  & input[type="radio"]:checked { border-color: var(--_cf-selected); }
-
-  /* ── Interaction states (real pseudo-class + data-test-state pairs) ──── */
-  & input:hover,
-  &[data-test-state="hover"] input { border-color: var(--_cf-border-color-hover); }
-  & input:not(:checked):hover,
-  &[data-test-state="hover"] input:not(:checked) { background-color: var(--_cf-bg-hover); }
-
-  /* focus — matches the family: 2px solid currentColor, offset 1px */
-  & input:focus-visible,
-  &[data-test-state="focus"] input { outline: 2px solid; outline-offset: 1px; }
-  & input:focus:not(:focus-visible) { outline: none; }
-
-  & input:active,
-  &[data-test-state="active"] input { border-color: var(--_cf-border-color-hover); }
-  & input:not(:checked):active,
-  &[data-test-state="active"] input:not(:checked) { background-color: var(--_cf-bg-hover); }
-
-  /* invalid — data-* on the root is the API (ADR-0002) */
-  &[data-invalid="true"] input { border-color: var(--_cf-border-color-invalid); }
-
-  /* disabled — family convention: dim, don't recolour */
-  & input:disabled { cursor: not-allowed; opacity: 0.5; }
-  & input:disabled ~ label { cursor: not-allowed; opacity: 0.5; }
-
-  & label { cursor: pointer; }
 }
+
+/* ── Shared skeleton (both types) ────────────────────────────────────── */
+.ChoiceField input {
+  appearance: none;
+  -webkit-appearance: none;
+  /* inherit the surrounding type so --_cf-size (em) tracks the label/context
+     font-size, not the UA input default (~13px) */
+  font: inherit;
+  margin: 0;
+  flex-shrink: 0;
+  inline-size: var(--_cf-size);
+  block-size: var(--_cf-size);
+  display: grid;
+  place-content: center;
+  border: var(--_cf-border-width) solid var(--_cf-border-color);
+  background-color: Canvas;
+  cursor: pointer;
+  transition: background-color var(--_cf-transition), border-color var(--_cf-transition);
+}
+.ChoiceField input::after {
+  content: "";
+  /* Fixed size, not %: the box is a place-content:center grid, so a
+     percentage resolves against an auto track sized by this very element
+     → 0. Size the mark off the token in the type branches below. */
+  opacity: 0;
+  transform: scale(0.6);          /* initial: shrunk; :checked restores to full */
+  transition: opacity var(--_cf-transition), transform var(--_cf-transition);
+}
+/* :checked has higher specificity than the type branches, so it wins the
+   final size regardless of source order — the mark reaches its full size. */
+.ChoiceField input:checked::after { opacity: 1; transform: none; }
+
+/* ── Checkbox branch: square box, filled + tick ──────────────────────── */
+.ChoiceField input[type="checkbox"] { border-radius: var(--_cf-radius); }
+.ChoiceField input[type="checkbox"]::after {
+  inline-size: calc(var(--_cf-size) * 0.82);
+  block-size: calc(var(--_cf-size) * 0.82);
+  background-color: var(--_cf-mark-color);
+  -webkit-mask: var(--_cf-mark) center / contain no-repeat;
+          mask: var(--_cf-mark) center / contain no-repeat;
+}
+.ChoiceField input[type="checkbox"]:checked {
+  background-color: var(--_cf-selected);
+  border-color: var(--_cf-selected);
+}
+
+/* ── Radio branch: circle box, ring + dot (box stays unfilled) ───────── */
+.ChoiceField input[type="radio"] { border-radius: 50%; }
+.ChoiceField input[type="radio"]::after {
+  inline-size: calc(var(--_cf-size) * 0.6);
+  block-size: calc(var(--_cf-size) * 0.6);
+  border-radius: 50%;
+  background-color: var(--_cf-selected);
+}
+.ChoiceField input[type="radio"]:checked { border-color: var(--_cf-selected); }
+
+/* ── Interaction states (real pseudo-class + data-test-state pairs) ──── */
+.ChoiceField input:hover,
+.ChoiceField[data-test-state="hover"] input { border-color: var(--_cf-border-color-hover); }
+.ChoiceField input:not(:checked):hover,
+.ChoiceField[data-test-state="hover"] input:not(:checked) { background-color: var(--_cf-bg-hover); }
+
+/* focus — matches the family: 2px solid currentColor, offset 1px */
+.ChoiceField input:focus-visible,
+.ChoiceField[data-test-state="focus"] input { outline: 2px solid; outline-offset: 1px; }
+.ChoiceField input:focus:not(:focus-visible) { outline: none; }
+
+.ChoiceField input:active,
+.ChoiceField[data-test-state="active"] input { border-color: var(--_cf-border-color-hover); }
+.ChoiceField input:not(:checked):active,
+.ChoiceField[data-test-state="active"] input:not(:checked) { background-color: var(--_cf-bg-hover); }
+
+/* invalid — data-* on the root is the API (ADR-0002) */
+.ChoiceField[data-invalid="true"] input { border-color: var(--_cf-border-color-invalid); }
+
+/* disabled — family convention: dim, don't recolour */
+.ChoiceField input:disabled { cursor: not-allowed; opacity: 0.5; }
+.ChoiceField input:disabled ~ label { cursor: not-allowed; opacity: 0.5; }
+
+.ChoiceField label { cursor: pointer; }
 
 /* Windows High Contrast / forced-colors: appearance:none loses the selection —
    redraw the selected state from system colours (unchecked already uses

@@ -50,12 +50,12 @@ test('a side without an affix gets no presence attribute', async ({ page }) => {
 })
 
 test('affixes carry ids derived from the input id', async ({ page }) => {
-  await expect(page.locator(`${AF} .AffixField-prefix`)).toHaveAttribute('id', 'af-live-prefix')
-  await expect(page.locator(`${AF} .AffixField-suffix`)).toHaveAttribute('id', 'af-live-suffix')
+  await expect(page.locator(`${AF} .prefix`)).toHaveAttribute('id', 'af-live-prefix')
+  await expect(page.locator(`${AF} .suffix`)).toHaveAttribute('id', 'af-live-suffix')
 })
 
 test('input aria-describedby references prefix then suffix', async ({ page }) => {
-  await expect(page.locator(`${AF} .AffixField-input`)).toHaveAttribute(
+  await expect(page.locator(`${AF} .input`)).toHaveAttribute(
     'aria-describedby',
     'af-live-prefix af-live-suffix',
   )
@@ -63,7 +63,7 @@ test('input aria-describedby references prefix then suffix', async ({ page }) =>
 
 test('affix ids append AFTER an existing hint id (describedby merge)', async ({ page }) => {
   await page.locator(`${DESCRIBEDBY}[data-initialized="true"]`).waitFor()
-  await expect(page.locator(`${DESCRIBEDBY} .AffixField-input`)).toHaveAttribute(
+  await expect(page.locator(`${DESCRIBEDBY} .input`)).toHaveAttribute(
     'aria-describedby',
     'af-variant-describedby-hint af-variant-describedby-suffix',
   )
@@ -71,10 +71,10 @@ test('affix ids append AFTER an existing hint id (describedby merge)', async ({ 
 
 test('an aria-hidden affix is skipped entirely — no id, no reference', async ({ page }) => {
   await page.locator(`${UNIT_IN_LABEL}[data-initialized="true"]`).waitFor()
-  const suffix = page.locator(`${UNIT_IN_LABEL} .AffixField-suffix`)
+  const suffix = page.locator(`${UNIT_IN_LABEL} .suffix`)
   await expect(suffix).toHaveAttribute('aria-hidden', 'true')
   expect(await suffix.getAttribute('id')).toBeNull()
-  expect(await page.locator(`${UNIT_IN_LABEL} .AffixField-input`).getAttribute('aria-describedby')).toBeNull()
+  expect(await page.locator(`${UNIT_IN_LABEL} .input`).getAttribute('aria-describedby')).toBeNull()
 })
 
 // ── End-state: character-count custom properties ───────────────────────────────
@@ -97,17 +97,17 @@ test('root carries --_af-prefix-chars / --_af-suffix-chars (the affix string len
 
 test('input value area clears both affixes (bounding boxes)', async ({ page }) => {
   // Fill a value so the geometry claim is about real text, not an empty field.
-  await page.locator(`${AF} .AffixField-input`).fill('100')
+  await page.locator(`${AF} .input`).fill('100')
   const geo = await page.locator(AF).evaluate((root) => {
-    const input = root.querySelector('.AffixField-input')
+    const input = root.querySelector('.input')
     const cs = getComputedStyle(input)
     const box = input.getBoundingClientRect()
     return {
       // The value text renders inside the input's content box.
       contentStart: box.left + parseFloat(cs.borderLeftWidth) + parseFloat(cs.paddingLeft),
       contentEnd: box.right - parseFloat(cs.borderRightWidth) - parseFloat(cs.paddingRight),
-      prefixEnd: root.querySelector('.AffixField-prefix').getBoundingClientRect().right,
-      suffixStart: root.querySelector('.AffixField-suffix').getBoundingClientRect().left,
+      prefixEnd: root.querySelector('.prefix').getBoundingClientRect().right,
+      suffixStart: root.querySelector('.suffix').getBoundingClientRect().left,
     }
   })
   expect(geo.prefixEnd).toBeLessThanOrEqual(geo.contentStart + 0.5)
@@ -122,7 +122,7 @@ test('number input spinner is hidden (it would collide with the suffix)', async 
   // it cannot observe them. The observable end-state is the input's computed
   // appearance: 'textfield' (or 'none') removes the spinner; the native
   // reference stays 'auto' and shows it.
-  const custom = await page.locator(`${NUMBER} .AffixField-input`).evaluate(
+  const custom = await page.locator(`${NUMBER} .input`).evaluate(
     (input) => getComputedStyle(input).appearance,
   )
   const native = await page.locator('#af-native-number').evaluate(
@@ -133,7 +133,7 @@ test('number input spinner is hidden (it would collide with the suffix)', async 
 })
 
 test('arrow-key stepping still works despite the hidden spinner', async ({ page }) => {
-  const input = page.locator(`${NUMBER} .AffixField-input`)
+  const input = page.locator(`${NUMBER} .input`)
   await input.focus()
   await input.press('ArrowUp')
   await expect(input).toHaveValue('101')
@@ -144,9 +144,9 @@ test('arrow-key stepping still works despite the hidden spinner', async ({ page 
 test('clicking an affix focuses the input (pointer-events pass-through)', async ({ page }) => {
   // The affix has pointer-events: none, so click raw coordinates at its center —
   // the input underneath must receive the click.
-  const box = await page.locator(`${AF} .AffixField-suffix`).boundingBox()
+  const box = await page.locator(`${AF} .suffix`).boundingBox()
   await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2)
-  await expect(page.locator(`${AF} .AffixField-input`)).toBeFocused()
+  await expect(page.locator(`${AF} .input`)).toBeFocused()
 })
 
 // ── Fully-authored variant: JS verifiably touches nothing ──────────────────────
@@ -160,9 +160,9 @@ test('the fully-authored variant is untouched — computed attributes strictly e
   // Presence attributes are authored (server end-state), values untouched.
   await expect(root).toHaveAttribute('data-has-prefix', 'true')
   await expect(root).toHaveAttribute('data-has-suffix', 'true')
-  await expect(root.locator('.AffixField-prefix')).toHaveAttribute('id', 'af-variant-authored-prefix')
-  await expect(root.locator('.AffixField-suffix')).toHaveAttribute('id', 'af-variant-authored-suffix')
-  await expect(root.locator('.AffixField-input')).toHaveAttribute(
+  await expect(root.locator('.prefix')).toHaveAttribute('id', 'af-variant-authored-prefix')
+  await expect(root.locator('.suffix')).toHaveAttribute('id', 'af-variant-authored-suffix')
+  await expect(root.locator('.input')).toHaveAttribute(
     'aria-describedby',
     'af-variant-authored-prefix af-variant-authored-suffix',
   )
@@ -175,7 +175,7 @@ test('data-input-characters sets --_af-input-chars and imposes a compact width',
   const state = await page.locator(SIZED).evaluate((root) => ({
     chars: root.style.getPropertyValue('--_af-input-chars'),
     rootWidth: root.getBoundingClientRect().width,
-    align: getComputedStyle(root.querySelector('.AffixField-input')).textAlign,
+    align: getComputedStyle(root.querySelector('.input')).textAlign,
   }))
   expect(state.chars).toBe('4')
   // 4ch value area + suffix + gaps + paddings — far below the input's natural width.

@@ -17,12 +17,12 @@ On construction, WheelColumn:
 - sets `role="spinbutton"`, `aria-valuemin`, `aria-valuemax` on the host;
 - per render, sets `aria-valuenow`, `aria-valuetext` (the formatted display, or `--` when empty) and
   `aria-activedescendant` pointing at the centred option;
-- injects a `.Wheel-ring` containing nine `.Wheel-option` slots (`aria-hidden`, the centred one gets
-  `aria-selected="true"` + an id), plus one `.Wheel-band` appended to the host as a **sibling** of
+- injects a `.ring` containing nine `.option` slots (`aria-hidden`, the centred one gets
+  `aria-selected="true"` + an id), plus one `.band` appended to the host as a **sibling** of
   the ring. Per [`Wheel.css`](../css/Wheel.md) the band is currently hidden — the visible centre
   band and fade are drawn by the component-authored `.WheelColumns` wrapper.
 
-Do not author `.Wheel-ring` / `.Wheel-option` / `.Wheel-band` — they are generated.
+Do not author `.ring` / `.option` / `.band` — they are generated.
 
 ## Public API
 

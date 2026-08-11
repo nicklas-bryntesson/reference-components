@@ -16,13 +16,13 @@ Authored:
 
 ```html
 <div class="ScrollArea" data-component="ScrollArea">
-  <div class="ScrollArea-viewport" data-scroll-viewport
+  <div class="viewport" data-scroll-viewport
        role="region" aria-label="Members table">
-    <div class="ScrollArea-content">
+    <div class="content">
       <!-- the overflowing content, e.g. a wide table -->
     </div>
   </div>
-  <div class="ScrollArea-fades" aria-hidden="true"></div>
+  <div class="fades" aria-hidden="true"></div>
 </div>
 ```
 
@@ -31,9 +31,9 @@ Authored:
   **region**. Author `role="region"` + a meaningful accessible name (`aria-label`); if
   omitted, the component gap-fills `role="region"` and a generic label. JS makes it
   focusable (`tabindex="0"`) only while it overflows.
-- `.ScrollArea-fades` **must come after** the viewport in the DOM (stacking) and is
+- `.fades` **must come after** the viewport in the DOM (stacking) and is
   decorative (`aria-hidden`).
-- The custom bar (`.ScrollArea-scrollbar` > `.ScrollArea-thumb`) is **created by JS**,
+- The custom bar (`.scrollbar` > `.thumb`) is **created by JS**,
   `aria-hidden`, and a pointer/visual affordance only — do not author it.
 
 ## Progressive enhancement

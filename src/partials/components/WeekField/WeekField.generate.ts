@@ -35,40 +35,40 @@ function canonical(id: string, label: string, rootAttrs: string, inputAttrs: str
   data-name="${id}"
   data-locale="${locale}"${rootExtra}
 >
-  <input class="WeekField-native" type="week" aria-hidden="true" tabindex="-1"${inputAttrs} />
-  <div class="WeekField-overlay" aria-hidden="true">
-    <div class="WeekField-segments" role="group">
+  <input class="native" type="week" aria-hidden="true" tabindex="-1"${inputAttrs} />
+  <div class="overlay" aria-hidden="true">
+    <div class="segments" role="group">
     </div>
-    <button type="button" class="WeekField-trigger" aria-label="Open week picker" aria-expanded="false" aria-haspopup="dialog"${triggerAttrs}>
+    <button type="button" class="trigger" aria-label="Open week picker" aria-expanded="false" aria-haspopup="dialog"${triggerAttrs}>
       <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar-icon lucide-calendar"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>
     </button>
-    <div class="slideContainer">
+    <div class="rail">
       <template data-template="weekfield-popup">
-        <div class="WeekField-popup" role="dialog" aria-modal="true">
-          <div class="CalendarHeader">
-            <button type="button" class="PrevMonth">&#8249;</button>
-            <span class="MonthYearLabel"></span>
-            <button type="button" class="NextMonth">&#8250;</button>
+        <div class="popup" role="dialog" aria-modal="true">
+          <div class="calendar-header">
+            <button type="button" class="prev-month">&#8249;</button>
+            <span class="calendar-month-year"></span>
+            <button type="button" class="next-month">&#8250;</button>
           </div>
-          <table class="CalendarGrid WeekGrid" role="grid">
+          <table class="calendar-grid" role="grid">
             <thead>
               <tr role="row">
-                <th scope="col" class="WeekNumHead"></th>
+                <th scope="col" class="week-number-head"></th>
                 <th scope="col"></th><th scope="col"></th><th scope="col"></th><th scope="col"></th><th scope="col"></th><th scope="col"></th><th scope="col"></th>
               </tr>
             </thead>
             <tbody></tbody>
           </table>
-          <div class="WeekField-popup-footer">
-            <button type="button" class="WeekField-popup-clear"></button>
-            <button type="button" class="WeekField-popup-now"></button>
+          <div class="calendar-footer">
+            <button type="button" class="calendar-footer-clear"></button>
+            <button type="button" class="calendar-footer-now"></button>
           </div>
           <div class="arrow"></div>
         </div>
       </template>
     </div>
   </div>
-  <div class="WeekField-announce" aria-live="polite" aria-atomic="true"></div>
+  <div class="announce" aria-live="polite" aria-atomic="true"></div>
 </div>
 `
 }

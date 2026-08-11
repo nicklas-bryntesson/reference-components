@@ -35,30 +35,30 @@ function canonical(id: string, label: string, rootAttrs: string, inputAttrs: str
   data-name="${id}"
   data-locale="${locale}"${rootExtra}
 >
-  <input class="MonthField-native" type="month" aria-hidden="true" tabindex="-1"${inputAttrs} />
-  <div class="MonthField-overlay" aria-hidden="true">
-    <div class="MonthField-segments" role="group">
+  <input class="native" type="month" aria-hidden="true" tabindex="-1"${inputAttrs} />
+  <div class="overlay" aria-hidden="true">
+    <div class="segments" role="group">
     </div>
-    <button type="button" class="MonthField-trigger" aria-label="Open month picker" aria-expanded="false" aria-haspopup="dialog"${triggerAttrs}>
+    <button type="button" class="trigger" aria-label="Open month picker" aria-expanded="false" aria-haspopup="dialog"${triggerAttrs}>
       <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar-icon lucide-calendar"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>
     </button>
-    <div class="slideContainer">
+    <div class="rail">
       <template data-template="monthfield-popup">
-        <div class="MonthField-popup" role="dialog" aria-modal="true">
-          <div class="MonthField-popup-columns WheelColumns">
+        <div class="popup" role="dialog" aria-modal="true">
+          <div class="year-month-picker WheelColumns">
             <div class="Wheel" data-picker="month" role="spinbutton" tabindex="0"></div>
             <div class="Wheel" data-picker="year" role="spinbutton" tabindex="-1"></div>
           </div>
-          <div class="MonthField-popup-footer">
-            <button type="button" class="MonthField-popup-clear"></button>
-            <button type="button" class="MonthField-popup-now"></button>
+          <div class="footer">
+            <button type="button" class="footer-clear"></button>
+            <button type="button" class="footer-now"></button>
           </div>
           <div class="arrow"></div>
         </div>
       </template>
     </div>
   </div>
-  <div class="MonthField-announce" aria-live="polite" aria-atomic="true"></div>
+  <div class="announce" aria-live="polite" aria-atomic="true"></div>
 </div>
 `
 }

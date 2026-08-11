@@ -72,3 +72,4 @@ holds the *why-we-built-it*; the `.md` holds the *how-it-works*.
 | [0016](0016-notice-message-and-separate-live-region.md) | Notice is a presentational message; the live region is a separate persistent container | Component | Accepted |
 | [0017](0017-component-css-vars-are-private-underscore.md) | Component-local CSS custom properties are private (`--_` prefix); public seam is `--SITE--*` + `data-*` | Convention | Accepted |
 | [0018](0018-ui-token-theming-seam.md) | The component theming seam is a flat `--ui-*` token namespace, decoupled from any design system | Convention | Accepted |
+| [0019](0019-class-naming-component-vs-element.md) | Class naming — PascalCase = component (has a contract), lowercase-kebab = internal element; one shared lexicon | Convention | Accepted |

@@ -1,6 +1,7 @@
 /* Shared 3D wheel / spinner — driven by src/kernel/js/WheelColumn.ts.
    Used by DateField, DateTimeField, TimeField and MonthField. The host element
-   carries .Wheel; WheelColumn injects .Wheel-ring / .Wheel-option / .Wheel-band. */
+   carries .Wheel; WheelColumn injects .ring / .option / .band. Every part is a
+   flat, fully-qualified `.Wheel .element` rule (ADR-0019). */
 
 .Wheel {
   /* Geometry token read by WheelColumn (readRowHeight) */
@@ -19,23 +20,23 @@
   user-select: none;
   flex-shrink: 0;
   outline: none;
-
-  &:active { cursor: grabbing; }
-
-  &:focus-visible {
-    outline: 2px solid var(--ui-primary);
-    outline-offset: -2px;
-  }
 }
 
-.Wheel-ring {
+.Wheel:active { cursor: grabbing; }
+
+.Wheel:focus-visible {
+  outline: 2px solid var(--ui-primary);
+  outline-offset: -2px;
+}
+
+.Wheel .ring {
   position: absolute;
   inset: 0;
   transform-style: preserve-3d;
   will-change: transform;
 }
 
-.Wheel-option {
+.Wheel .option {
   position: absolute;
   left: 0; right: 0;
   top: 50%;
@@ -52,14 +53,14 @@
   cursor: pointer;
 }
 
-.Wheel-option[aria-selected="true"] {
+.Wheel .option[aria-selected="true"] {
   color: var(--_wheel-color-selected);
   font-weight: bold;
 }
 
 /* Center band — moved to the full-width .WheelColumns container below.
    WheelColumn still injects this element; hide the per-column version. */
-.Wheel-band {
+.Wheel .band {
   display: none;
 }
 

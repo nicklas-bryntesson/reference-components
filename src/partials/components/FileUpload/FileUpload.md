@@ -11,20 +11,20 @@ Custom accessible file upload component wrapping a hidden native `input[type=fil
   role="group"
   aria-labelledby="LABEL_ID"
 >
-  <span id="LABEL_ID" class="FileUpload-label">Label text</span>
+  <span id="LABEL_ID" class="label">Label text</span>
   <input
-    class="FileUpload-input"
+    class="input"
     type="file"
     aria-hidden="true"
     tabindex="-1"
   >
   <ul
-    class="FileUpload-list"
+    class="list"
     aria-live="polite"
     aria-relevant="additions removals"
     aria-label="Selected files"
   ></ul>
-  <button type="button" class="FileUpload-trigger">Add file</button>
+  <button type="button" class="trigger">Add file</button>
 </div>
 ```
 
@@ -32,17 +32,17 @@ Custom accessible file upload component wrapping a hidden native `input[type=fil
 
 The file container has two forms, chosen by whether the native input has `multiple`:
 
-- **multiple:** `<ul class="FileUpload-list" aria-live="polite" aria-relevant="additions removals" aria-label="Selected files">` — each file is an `<li class="FileUpload-item">` (shown empty above).
-- **single:** `<div class="FileUpload-selected" aria-live="polite" aria-atomic="true">` — the file's spans and button render inline, with no `<li>` wrapper.
+- **multiple:** `<ul class="list" aria-live="polite" aria-relevant="additions removals" aria-label="Selected files">` — each file is an `<li class="item">` (shown empty above).
+- **single:** `<div class="selected" aria-live="polite" aria-atomic="true">` — the file's spans and button render inline, with no `<li>` wrapper.
 
-JS renders the entries — do not author them. In multiple mode each `<li>` carries `data-status` (`valid` / `invalid-type` / `invalid-size`), a `data-entry-id`, and `data-source="server"` for server-seeded files. In single mode the `.FileUpload-selected` container carries only `data-status` — no `data-entry-id` or `data-source` (the hidden `uploaded-ref` input is still emitted for server files):
+JS renders the entries — do not author them. In multiple mode each `<li>` carries `data-status` (`valid` / `invalid-type` / `invalid-size`), a `data-entry-id`, and `data-source="server"` for server-seeded files. In single mode the `.selected` container carries only `data-status` — no `data-entry-id` or `data-source` (the hidden `uploaded-ref` input is still emitted for server files):
 
 ```html
-<li class="FileUpload-item" data-status="valid" data-entry-id="...">
-  <span class="FileUpload-item-name">report.pdf</span>
-  <span class="FileUpload-item-size">200 KB</span>
-  <span class="FileUpload-item-error" role="alert">File type not allowed</span> <!-- only when data-status is an error -->
-  <button type="button" class="FileUpload-item-remove" aria-label="Remove report.pdf">&#215;</button>
+<li class="item" data-status="valid" data-entry-id="...">
+  <span class="item-name">report.pdf</span>
+  <span class="item-size">200 KB</span>
+  <span class="item-error" role="alert">File type not allowed</span> <!-- only when data-status is an error -->
+  <button type="button" class="item-remove" aria-label="Remove report.pdf">&#215;</button>
   <input type="hidden" name="uploaded-ref" value="..."> <!-- only when data-source="server" -->
 </li>
 ```
@@ -51,10 +51,10 @@ JS renders the entries — do not author them. In multiple mode each `<li>` carr
 
 ```html
 <div class="FileUpload" data-component="FileUpload" role="group" aria-labelledby="cv-label">
-  <span id="cv-label" class="FileUpload-label">CV</span>
-  <input class="FileUpload-input" type="file" accept=".pdf,.docx" aria-hidden="true" tabindex="-1">
-  <ul class="FileUpload-list" aria-live="polite" aria-relevant="additions removals" aria-label="Selected files"></ul>
-  <button type="button" class="FileUpload-trigger">Add file</button>
+  <span id="cv-label" class="label">CV</span>
+  <input class="input" type="file" accept=".pdf,.docx" aria-hidden="true" tabindex="-1">
+  <ul class="list" aria-live="polite" aria-relevant="additions removals" aria-label="Selected files"></ul>
+  <button type="button" class="trigger">Add file</button>
 </div>
 ```
 
@@ -75,7 +75,7 @@ FileUpload.attach()
 |---|---|---|
 | `data-max-size` | `"5mb"` / `"500kb"` / bytes | Frontend max file size validation |
 | `data-drop-zone` | `"true"` | Opt-in native drag-and-drop |
-| `data-label-drop-zone` | string | Visible drop-zone hint text (default: "Drop files here"). JS injects it as an `aria-hidden` `.FileUpload-dropLabel` span — the trigger button remains the accessible action |
+| `data-label-drop-zone` | string | Visible drop-zone hint text (default: "Drop files here"). JS injects it as an `aria-hidden` `.drop-label` span — the trigger button remains the accessible action |
 | `data-initial-files` | JSON string | Server-provided files (persistent state) |
 | `data-label-trigger` | string | Trigger button text (default: "Add file") |
 | `data-label-trigger-multiple` | string | Trigger text with `multiple` (default: "Add files") |

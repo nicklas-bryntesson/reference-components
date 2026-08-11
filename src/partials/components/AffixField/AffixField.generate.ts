@@ -19,8 +19,8 @@ interface StateDefinition {
   label: string
   root?: Attrs
   input?: Attrs
-  prefix?: string       // pre-rendered .AffixField-prefix span (see helpers)
-  suffix?: string       // pre-rendered .AffixField-suffix span
+  prefix?: string       // pre-rendered .prefix span (see helpers)
+  suffix?: string       // pre-rendered .suffix span
   hint?: { id: string; text: string } // external hint referenced by aria-describedby
   bare?: boolean        // omit the authored data-has-* presence attributes —
                         // the bare variant demonstrates the JS gap-fill path
@@ -29,10 +29,10 @@ interface StateDefinition {
 // ─── Affix helpers ────────────────────────────────────────────────────────────
 
 const prefix = (text: string, extra: Attrs = {}) =>
-  `<span class="AffixField-prefix"${attrs(extra)}>${text}</span>`
+  `<span class="prefix"${attrs(extra)}>${text}</span>`
 
 const suffix = (text: string, extra: Attrs = {}) =>
-  `<span class="AffixField-suffix"${attrs(extra)}>${text}</span>`
+  `<span class="suffix"${attrs(extra)}>${text}</span>`
 
 // ─── Attribute serializers ────────────────────────────────────────────────────
 
@@ -79,7 +79,7 @@ function canonical(state: StateDefinition): string {
   class="AffixField"
   data-component="AffixField"${rootIdAttr}${rootExtra}
 >${prefixLine}
-  <input class="AffixField-input" id="${state.id}" name="${state.id}"${inputAttrs} />${suffixLine}
+  <input class="input" id="${state.id}" name="${state.id}"${inputAttrs} />${suffixLine}
 </div>${hintLine}
 `
 }

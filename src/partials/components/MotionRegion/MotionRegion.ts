@@ -107,7 +107,7 @@ export default class MotionRegion {
   setupControl(): void {
     const control = document.createElement('button')
     control.type = 'button'
-    control.className = 'MotionRegion-control'
+    control.className = 'control'
     if (this.video?.id) control.setAttribute('aria-controls', this.video.id)
 
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')

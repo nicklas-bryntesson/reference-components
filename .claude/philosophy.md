@@ -105,9 +105,30 @@ Every real pseudo-class has a `data-test-state` counterpart on the component roo
 &[data-test-state="focus"] .Segments { outline: 2px solid; }
 ```
 
-### No BEM modifiers, no utility classes
+### Class naming — case marks component vs element
 
-Variants and states are expressed through `data-*` attributes. CSS class is always PascalCase matching the component name (`.DateField`, `.ToggleTip`). No `.DateField--disabled`, no `.text-sm`.
+Case carries meaning:
+
+- **A component is `PascalCase`, no dash** (`.DateField`, `.Wheel`, `.ChoiceField`) — the root *and* any nested/composed sub-component. Litmus: *it has its own `.md` contract* (or is a kernel primitive with one).
+- **An internal element is `lowercase-kebab`** (`.calendar-header`, `.content`, `.options`, `.arrow`) — a presentational part with no standalone contract. **No `Component-` prefix** — it's redundant once nested under the root, and it bloats the footprint.
+
+**Every rule is fully qualified from the root** — `.Component .element`, never a bare `.element` and never `&`-nested. The `.Component { }` block holds only the tokens and the properties applied to the root itself; every part is its own flat, rooted rule:
+
+```css
+.DateField { /* tokens + root-level props only */ }
+.DateField .segments {}
+.DateField[data-invalid="true"] .segments {}
+.DateField .popup [data-panel="picker"][data-active="true"] {}
+.DateField .Wheel {}   /* sub-component — still PascalCase */
+```
+
+**Why flat, not nested:** a fully-qualified selector is deterministic to read — no `&` to resolve, no nesting depth to track, every rule says exactly what it targets. A bare `.element {}` at column 0 is a scoping bug (generic names like `.popup`/`.grid` would leak across components); the `.Component` prefix is what makes bare element names safe. The one exception: a part rendered *outside* the root (genuinely portaled / top-layer) can't be a descendant, so it takes a root-scoped `.Component-part` name.
+
+Variants and states are `data-*`, never class modifiers: no `.DateField--disabled`, no `.text-sm` utilities.
+
+**Shared lexicon** — same kind of part, same word, everywhere: `.content` · `.options` · `.popup` · `.trigger` · `.rail` · `.arrow` · `.icon` · `.title` · `.hint` · `.notice-region`. `.container` is reserved for a genuinely role-less box (a part *with* a role gets the role's name, so `.container` never becomes the new catch-all "wrapper"). See ADR-0019.
+
+**Why — the swap map.** A consumer decoding this library reads three seams by case + namespace: `PascalCase` = component boundaries (map to your components), `lowercase-kebab` = our internal element styling (swap for your utilities on the same DOM), `--ui-*` = design values (ADR-0018). Case itself tells you where to go in.
 
 ---
 

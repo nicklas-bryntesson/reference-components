@@ -85,7 +85,7 @@ class DateField {
   trigger: HTMLButtonElement
   announce: HTMLElement
   calendarTemplate: HTMLTemplateElement | null
-  private slideContainer!: HTMLElement
+  private rail!: HTMLElement
   private _pickerWheels: Map<'month' | 'year', WheelColumn> = new Map()
 
   // State
@@ -131,11 +131,11 @@ class DateField {
   constructor(el: HTMLElement) {
     this.root = el
     this.instanceId = ++DateField.instanceCount
-    this.native = el.querySelector<HTMLInputElement>('.Native')!
-    this.custom = el.querySelector<HTMLElement>('.Custom')!
-    this.segments = el.querySelector<HTMLElement>('.Segments')!
-    this.trigger = el.querySelector<HTMLButtonElement>('.DateField-trigger')!
-    this.announce = el.querySelector<HTMLElement>('.Announce')!
+    this.native = el.querySelector<HTMLInputElement>('.native')!
+    this.custom = el.querySelector<HTMLElement>('.custom')!
+    this.segments = el.querySelector<HTMLElement>('.segments')!
+    this.trigger = el.querySelector<HTMLButtonElement>('.trigger')!
+    this.announce = el.querySelector<HTMLElement>('.announce')!
     this.calendarTemplate = el.querySelector<HTMLTemplateElement>('[data-template="datefield-calendar"]')
 
     this.calendarEl = null
@@ -194,7 +194,7 @@ class DateField {
     if (this.root.dataset.max) this.native.max = this.root.dataset.max
     this.announce.id = `${this.fieldId}-announce`
 
-    this.slideContainer = this.root.querySelector<HTMLElement>('.slideContainer')!
+    this.rail = this.root.querySelector<HTMLElement>('.rail')!
 
     const coarse = (typeof window.matchMedia === 'function')
       ? window.matchMedia('(pointer: coarse)').matches
@@ -264,11 +264,11 @@ class DateField {
     delete this.root.__dateFieldInstance
   }
 
-  // ─── Segments ───────────────────────────────────────────────────────────────
+  // ─── segments ───────────────────────────────────────────────────────────────
 
   _createSegmentEl(type: DateSegmentType): HTMLSpanElement {
     const span = document.createElement('span')
-    span.className = 'Segment'
+    span.className = 'segment'
     span.setAttribute('role', 'spinbutton')
     span.setAttribute('aria-label', this.t[type] || type)
     span.setAttribute('data-segment', type)
@@ -287,7 +287,7 @@ class DateField {
   }
 
   _buildSegments(): void {
-    this.segments.querySelectorAll('.Segment, .Separator').forEach(el => el.remove())
+    this.segments.querySelectorAll('.segment, .separator').forEach(el => el.remove())
 
     const { order, separator } = getSegmentOrder(this.localeTag)
 
@@ -295,7 +295,7 @@ class DateField {
       this.trigger.before(this._createSegmentEl(type))
       if (i < order.length - 1) {
         const sep = document.createElement('span')
-        sep.className = 'Separator'
+        sep.className = 'separator'
         sep.setAttribute('aria-hidden', 'true')
         sep.textContent = separator
         this.trigger.before(sep)
@@ -602,11 +602,11 @@ class DateField {
     if (!this.calendarTemplate) return
 
     const clone = this.calendarTemplate.content.cloneNode(true) as DocumentFragment
-    this.calendarEl = clone.querySelector<HTMLElement>('.DateField-popup')!
+    this.calendarEl = clone.querySelector<HTMLElement>('.popup')!
 
-    const monthYearTrigger = this.calendarEl.querySelector<HTMLButtonElement>('.MonthYearTrigger')!
-    const prevBtn = this.calendarEl.querySelector<HTMLButtonElement>('.PrevMonth')!
-    const nextBtn = this.calendarEl.querySelector<HTMLButtonElement>('.NextMonth')!
+    const monthYearTrigger = this.calendarEl.querySelector<HTMLButtonElement>('.month-year-trigger')!
+    const prevBtn = this.calendarEl.querySelector<HTMLButtonElement>('.prev-month')!
+    const nextBtn = this.calendarEl.querySelector<HTMLButtonElement>('.next-month')!
 
     const calId = `${this.fieldId}-calendar`
     const monthId = `${this.fieldId}-month`
@@ -632,7 +632,7 @@ class DateField {
 
     // One-time picker setup: ArrowUp/Down steps the focused month/year wheel.
     // (The wheels themselves are (re)instantiated in _openPicker.)
-    this.calendarEl.querySelectorAll<HTMLElement>('.YearMonthPicker .Wheel').forEach(host => {
+    this.calendarEl.querySelectorAll<HTMLElement>('.year-month-picker .Wheel').forEach(host => {
       host.addEventListener('keydown', (e) => {
         if (e.key !== 'ArrowUp' && e.key !== 'ArrowDown') return
         e.preventDefault()
@@ -646,8 +646,8 @@ class DateField {
     prevBtn.addEventListener('click', () => this._navigateMonth(-1))
     nextBtn.addEventListener('click', () => this._navigateMonth(1))
 
-    const clearBtn = this.calendarEl.querySelector<HTMLButtonElement>('.CalendarFooterClear')!
-    const todayBtn = this.calendarEl.querySelector<HTMLButtonElement>('.CalendarFooterToday')!
+    const clearBtn = this.calendarEl.querySelector<HTMLButtonElement>('.calendar-footer-clear')!
+    const todayBtn = this.calendarEl.querySelector<HTMLButtonElement>('.calendar-footer-today')!
     clearBtn.textContent = this.t.clearButton
     todayBtn.textContent = this.t.todayButton
     clearBtn.disabled = this.selectedDate === null
@@ -667,7 +667,7 @@ class DateField {
     this._renderWeekdays()
     this._renderMonth()
 
-    this.slideContainer.appendChild(this.calendarEl)
+    this.rail.appendChild(this.calendarEl)
     this._updateLayout()
 
     this.root.dataset.state = 'open'
@@ -704,7 +704,7 @@ class DateField {
     if (!this.calendarEl) return
 
     const triggerRect = this.trigger.getBoundingClientRect()
-    const containerRect = this.slideContainer.getBoundingClientRect()
+    const containerRect = this.rail.getBoundingClientRect()
     const calendarWidth = this.calendarEl.getBoundingClientRect().width
     if (!containerRect.width || !calendarWidth) return
 
@@ -785,9 +785,9 @@ class DateField {
     if (!this.calendarEl) return
     this._pickerEntryYear = this.currentYear
     this._pickerEntryMonth = this.currentMonth
-    const pickerGroup = this.calendarEl.querySelector<HTMLElement>('.YearMonthPicker')!
+    const pickerGroup = this.calendarEl.querySelector<HTMLElement>('.year-month-picker')!
     pickerGroup.setAttribute('aria-label', this.t.openPicker)
-    const monthYearTrigger = this.calendarEl.querySelector<HTMLButtonElement>('.MonthYearTrigger')!
+    const monthYearTrigger = this.calendarEl.querySelector<HTMLButtonElement>('.month-year-trigger')!
     const monthHost = this.calendarEl.querySelector<HTMLElement>('.Wheel[data-picker="month"]')!
     const yearHost = this.calendarEl.querySelector<HTMLElement>('.Wheel[data-picker="year"]')!
 
@@ -838,7 +838,7 @@ class DateField {
     if (!this.calendarEl) return
     this._pickerWheels.forEach(w => w.destroy())
     this._pickerWheels.clear()
-    const monthYearTrigger = this.calendarEl.querySelector<HTMLButtonElement>('.MonthYearTrigger')!
+    const monthYearTrigger = this.calendarEl.querySelector<HTMLButtonElement>('.month-year-trigger')!
     this._setPanel('calendar')
     monthYearTrigger.setAttribute('aria-expanded', 'false')
     monthYearTrigger.setAttribute('aria-label', this.t.openPicker)
@@ -863,7 +863,7 @@ class DateField {
 
   _renderWeekdays(): void {
     const names = getWeekdayNames(this.locale)
-    const ths = this.calendarEl!.querySelectorAll('.Grid thead th')
+    const ths = this.calendarEl!.querySelectorAll('.grid thead th')
     ths.forEach((th, i) => {
       if (!names[i]) return
       th.textContent = names[i]
@@ -874,11 +874,11 @@ class DateField {
   }
 
   _renderMonth(): void {
-    const monthYearTrigger = this.calendarEl!.querySelector<HTMLButtonElement>('.MonthYearTrigger')
+    const monthYearTrigger = this.calendarEl!.querySelector<HTMLButtonElement>('.month-year-trigger')
     const monthName = getMonthName(this.currentYear, this.currentMonth, this.locale)
     if (monthYearTrigger) monthYearTrigger.textContent = `${monthName} ${this.currentYear}`
 
-    const tbody = this.calendarEl!.querySelector<HTMLTableSectionElement>('.Grid tbody')!
+    const tbody = this.calendarEl!.querySelector<HTMLTableSectionElement>('.grid tbody')!
     tbody.innerHTML = ''
 
     const today = new Date()
@@ -970,7 +970,7 @@ class DateField {
   }
 
   _updateRovingTabindex(): void {
-    const grid = this.calendarEl!.querySelector<HTMLElement>('.Grid')!
+    const grid = this.calendarEl!.querySelector<HTMLElement>('.grid')!
     grid.querySelectorAll('td button').forEach(b => b.setAttribute('tabindex', '-1'))
 
     const todayISO = formatISO(new Date())
@@ -984,7 +984,7 @@ class DateField {
   }
 
   _moveFocusIntoCalendar(): void {
-    const grid = this.calendarEl!.querySelector<HTMLElement>('.Grid')!
+    const grid = this.calendarEl!.querySelector<HTMLElement>('.grid')!
     const todayISO = formatISO(new Date())
     const todayBtn = grid.querySelector<HTMLButtonElement>(`button[data-date="${todayISO}"]`)
     const todayEnabled = todayBtn && !todayBtn.closest('[aria-disabled="true"]') ? todayBtn : null
@@ -1006,7 +1006,7 @@ class DateField {
     this._setSegmentValue(this._getSegmentEl('year')!, date.getFullYear())
     const label = date.toLocaleDateString(this.locale, { dateStyle: 'long' })
     this.announce.textContent = `${this.t.announceSelected} ${label}`
-    const clearBtn = this.calendarEl?.querySelector<HTMLButtonElement>('.CalendarFooterClear')
+    const clearBtn = this.calendarEl?.querySelector<HTMLButtonElement>('.calendar-footer-clear')
     if (clearBtn) clearBtn.disabled = false
   }
 
@@ -1033,7 +1033,7 @@ class DateField {
       return
     }
 
-    const grid = this.calendarEl!.querySelector<HTMLElement>('.Grid')!
+    const grid = this.calendarEl!.querySelector<HTMLElement>('.grid')!
     const focusedBtn = grid.querySelector<HTMLButtonElement>('button:focus')
 
     if (e.key === 'Escape') {
@@ -1127,12 +1127,12 @@ class DateField {
       ].filter((el): el is HTMLElement => Boolean(el))
     }
 
-    const grid = this.calendarEl.querySelector<HTMLElement>('.Grid')!
-    const prevBtn = this.calendarEl.querySelector<HTMLButtonElement>('.PrevMonth')
-    const monthYearTrigger = this.calendarEl.querySelector<HTMLButtonElement>('.MonthYearTrigger')
-    const nextBtn = this.calendarEl.querySelector<HTMLButtonElement>('.NextMonth')
-    const clearBtn = this.calendarEl.querySelector<HTMLButtonElement>('.CalendarFooterClear')
-    const todayBtn = this.calendarEl.querySelector<HTMLButtonElement>('.CalendarFooterToday')
+    const grid = this.calendarEl.querySelector<HTMLElement>('.grid')!
+    const prevBtn = this.calendarEl.querySelector<HTMLButtonElement>('.prev-month')
+    const monthYearTrigger = this.calendarEl.querySelector<HTMLButtonElement>('.month-year-trigger')
+    const nextBtn = this.calendarEl.querySelector<HTMLButtonElement>('.next-month')
+    const clearBtn = this.calendarEl.querySelector<HTMLButtonElement>('.calendar-footer-clear')
+    const todayBtn = this.calendarEl.querySelector<HTMLButtonElement>('.calendar-footer-today')
 
     // The grid's single stop is its current roving cell (falling back to the
     // first in-month, enabled cell — mirrors _updateRovingTabindex, which never
@@ -1168,7 +1168,7 @@ class DateField {
     }
 
     if (btn) {
-      const grid = this.calendarEl!.querySelector<HTMLElement>('.Grid')!
+      const grid = this.calendarEl!.querySelector<HTMLElement>('.grid')!
       grid.querySelectorAll('td button').forEach(b => b.setAttribute('tabindex', '-1'))
       btn.setAttribute('tabindex', '0')
       btn.focus()

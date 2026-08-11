@@ -49,30 +49,30 @@ function createMonthFieldEl(options: {
       ${options.min ? `data-min="${options.min}"` : ''}
       ${options.max ? `data-max="${options.max}"` : ''}
     >
-      <input class="MonthField-native" type="month" aria-hidden="true" tabindex="-1"
+      <input class="native" type="month" aria-hidden="true" tabindex="-1"
         ${options.value ? `value="${options.value}"` : ''}
         ${options.disabled ? 'disabled' : ''}
       />
-      <div class="MonthField-overlay" aria-hidden="true">
-        <div class="MonthField-segments" role="group"></div>
-        <button type="button" class="MonthField-trigger" aria-label="Öppna månadsväljare" aria-expanded="false" aria-haspopup="dialog"></button>
-        <div class="slideContainer">
+      <div class="overlay" aria-hidden="true">
+        <div class="segments" role="group"></div>
+        <button type="button" class="trigger" aria-label="Öppna månadsväljare" aria-expanded="false" aria-haspopup="dialog"></button>
+        <div class="rail">
           <template data-template="monthfield-popup">
-            <div class="MonthField-popup" role="dialog" aria-modal="true" aria-label="Välj månad">
-              <div class="MonthField-popup-columns">
+            <div class="popup" role="dialog" aria-modal="true" aria-label="Välj månad">
+              <div class="year-month-picker">
                 <div class="Wheel" data-picker="month" role="spinbutton" tabindex="0"></div>
                 <div class="Wheel" data-picker="year" role="spinbutton" tabindex="-1"></div>
               </div>
-              <div class="MonthField-popup-footer">
-                <button type="button" class="MonthField-popup-clear">Rensa</button>
-                <button type="button" class="MonthField-popup-now">Denna månad</button>
+              <div class="footer">
+                <button type="button" class="footer-clear">Rensa</button>
+                <button type="button" class="footer-now">Denna månad</button>
               </div>
               <div class="arrow"></div>
             </div>
           </template>
         </div>
       </div>
-      <div class="MonthField-announce" aria-live="polite" aria-atomic="true"></div>
+      <div class="announce" aria-live="polite" aria-atomic="true"></div>
     </div>
   `
   document.body.appendChild(div)
@@ -162,7 +162,7 @@ describe('segment construction', () => {
   it('separator is aria-hidden with "/"', () => {
     const el = createMonthFieldEl()
     new MonthField(el)
-    const seps = el.querySelectorAll('.MonthField-sep')
+    const seps = el.querySelectorAll('.separator')
     expect(seps).toHaveLength(1)
     expect(seps[0].getAttribute('aria-hidden')).toBe('true')
     expect(seps[0].textContent).toBe('/')

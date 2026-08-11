@@ -15,18 +15,18 @@ a thick leading accent bar, the richest look). Severity is always carried by the
 
 ```html
 <div class="Notice" data-variant="error">
-  <div class="Icon" aria-hidden="true">
+  <div class="icon" aria-hidden="true">
     <svg viewBox="0 0 24 24"><!-- variant icon, stroke=currentColor --></svg>
   </div>
-  <div class="Content">
-    <strong class="Title">Optional title</strong>   <!-- omit for a title-less message -->
+  <div class="content">
+    <strong class="title">Optional title</strong>   <!-- omit for a title-less message -->
     <p>Message body. May contain inline markup like a <a href="#">link</a>.</p>
   </div>
 </div>
 ```
 
 - The **icon is decorative** (`aria-hidden="true"`) — the text carries the meaning.
-- `.Content` holds an optional `.Title` (`<strong>`) and the body.
+- `.content` holds an optional `.title` (`<strong>`) and the body.
 - Notice has **no margin** — spacing is the layout context's job.
 
 ## HTML Authoring API (`data-*`)
@@ -60,7 +60,7 @@ and the tint derives from it; adjust the rest globally.
 
 ### Icons: inline SVG + currentColor
 
-Icons are authored inline as stroke SVGs; the CSS points `.Icon { color: var(--_nt-accent) }`
+Icons are authored inline as stroke SVGs; the CSS points `.icon { color: var(--_nt-accent) }`
 and the SVG uses `stroke: currentColor`, so the mark re-tints with the variant and needs no
 sprite sheet. Deliberately **not** a CSS `mask`/`background` icon — this keeps the icon
 colour bound to the accent via `currentColor` and the component fully self-contained.
@@ -74,7 +74,7 @@ empty from load — and you swap Notice content into it:
 
 ```html
 <!-- present and empty at load; the announcer -->
-<div class="NoticeRegion" role="alert" aria-live="assertive"></div>
+<div class="notice-region" role="alert" aria-live="assertive"></div>
 ```
 
 ```js
@@ -111,8 +111,8 @@ region.
 
 ## Testing strategy
 
-- **Unit (jsdom):** contract invariants — Notice never carries a live role, `.NoticeRegion`
-  always does; every Notice has a known `data-variant` and a `.Content`; icons are
+- **Unit (jsdom):** contract invariants — Notice never carries a live role, `.notice-region`
+  always does; every Notice has a known `data-variant` and a `.content`; icons are
   `aria-hidden` and omitted when `data-icon="false"`.
 - **E2E (Playwright + axe):** Notice has no `role` while the region has `role="alert"` +
   `aria-live`; variants paint distinct accent borders; `data-icon="false"` renders no icon and

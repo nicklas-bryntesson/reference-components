@@ -35,10 +35,10 @@ test('root has data-initialized', async ({ page }) => {
   await expect(page.locator(ROOT)).toBeAttached()
 })
 
-// ─── Segments ────────────────────────────────────────────────────────────────
+// ─── segments ────────────────────────────────────────────────────────────────
 
 test('date and time segments are rendered as spinbuttons', async ({ page }) => {
-  const segs = page.locator(`${ROOT} .Segment[role="spinbutton"]`)
+  const segs = page.locator(`${ROOT} .segment[role="spinbutton"]`)
   const types = await segs.evaluateAll(els => els.map(e => e.dataset.segment))
   expect(types).toContain('day')
   expect(types).toContain('month')
@@ -48,14 +48,14 @@ test('date and time segments are rendered as spinbuttons', async ({ page }) => {
 })
 
 test('segments have aria-valuemin, aria-valuemax, aria-valuetext', async ({ page }) => {
-  const hourSeg = page.locator(`${ROOT} .Segment[data-segment="hour"]`)
+  const hourSeg = page.locator(`${ROOT} .segment[data-segment="hour"]`)
   await expect(hourSeg).toHaveAttribute('aria-valuemin')
   await expect(hourSeg).toHaveAttribute('aria-valuemax')
   await expect(hourSeg).toHaveAttribute('aria-valuetext')
 })
 
 test('ArrowUp increments hour segment', async ({ page }) => {
-  const hourSeg = page.locator(`${ROOT} .Segment[data-segment="hour"]`)
+  const hourSeg = page.locator(`${ROOT} .segment[data-segment="hour"]`)
   await hourSeg.focus()
   const before = await hourSeg.getAttribute('aria-valuenow')
   await page.keyboard.press('ArrowUp')
@@ -71,15 +71,15 @@ test('ArrowUp increments hour segment', async ({ page }) => {
 })
 
 test('Tab moves focus to next segment', async ({ page }) => {
-  const firstSeg = page.locator(`${ROOT} .Segment[role="spinbutton"]`).first()
-  const secondSeg = page.locator(`${ROOT} .Segment[role="spinbutton"]`).nth(1)
+  const firstSeg = page.locator(`${ROOT} .segment[role="spinbutton"]`).first()
+  const secondSeg = page.locator(`${ROOT} .segment[role="spinbutton"]`).nth(1)
   await firstSeg.focus()
   await page.keyboard.press('ArrowRight')
   await expect(secondSeg).toBeFocused()
 })
 
 test('native input is aria-hidden and tabindex -1', async ({ page }) => {
-  const native = page.locator(`${ROOT} .DateTimeField-native`)
+  const native = page.locator(`${ROOT} .native`)
   await expect(native).toHaveAttribute('aria-hidden', 'true')
   await expect(native).toHaveAttribute('tabindex', '-1')
 })
@@ -87,33 +87,33 @@ test('native input is aria-hidden and tabindex -1', async ({ page }) => {
 // ─── Calendar popup ───────────────────────────────────────────────────────────
 
 test('trigger button opens the calendar popup', async ({ page }) => {
-  const trigger = page.locator(`${ROOT} .DateTimeField-trigger`)
+  const trigger = page.locator(`${ROOT} .trigger`)
   await trigger.click()
-  await expect(page.locator(`${ROOT} .DateTimeField-popup`)).toBeVisible()
+  await expect(page.locator(`${ROOT} .popup`)).toBeVisible()
 })
 
 test('popup has role=dialog and aria-modal=true', async ({ page }) => {
-  await page.locator(`${ROOT} .DateTimeField-trigger`).click()
-  const dialog = page.locator(`${ROOT} .DateTimeField-popup`)
+  await page.locator(`${ROOT} .trigger`).click()
+  const dialog = page.locator(`${ROOT} .popup`)
   await expect(dialog).toHaveAttribute('role', 'dialog')
   await expect(dialog).toHaveAttribute('aria-modal', 'true')
 })
 
 test('Escape closes the calendar and restores focus to trigger', async ({ page }) => {
-  const trigger = page.locator(`${ROOT} .DateTimeField-trigger`)
+  const trigger = page.locator(`${ROOT} .trigger`)
   await trigger.click()
-  await expect(page.locator(`${ROOT} .DateTimeField-popup`)).toBeVisible()
+  await expect(page.locator(`${ROOT} .popup`)).toBeVisible()
   await page.keyboard.press('Escape')
-  await expect(page.locator(`${ROOT} .DateTimeField-popup`)).not.toBeAttached()
+  await expect(page.locator(`${ROOT} .popup`)).not.toBeAttached()
   await expect(trigger).toBeFocused()
 })
 
 test('clicking a date closes the popup and updates segments', async ({ page }) => {
-  await page.locator(`${ROOT} .DateTimeField-trigger`).click()
-  const dateBtn = page.locator(`${ROOT} .DateTimeField-popup td:not([data-outside-month="true"]):not([aria-disabled]) button`).first()
+  await page.locator(`${ROOT} .trigger`).click()
+  const dateBtn = page.locator(`${ROOT} .popup td:not([data-outside-month="true"]):not([aria-disabled]) button`).first()
   await dateBtn.click({ force: true })
   // Date segments should now be filled
-  const daySeg = page.locator(`${ROOT} .Segment[data-segment="day"]`)
+  const daySeg = page.locator(`${ROOT} .segment[data-segment="day"]`)
   const val = await daySeg.getAttribute('aria-valuenow')
   expect(val).not.toBeNull()
 })
@@ -121,13 +121,13 @@ test('clicking a date closes the popup and updates segments', async ({ page }) =
 // ─── Time wheels (shared spinner with TimeField) ───────────────────────────────
 
 test('hour and minute wheels are visible in the popup', async ({ page }) => {
-  await page.locator(`${ROOT} .DateTimeField-trigger`).click()
+  await page.locator(`${ROOT} .trigger`).click()
   await expect(page.locator(`${ROOT} .Wheel[data-segment="hour"]`)).toBeVisible()
   await expect(page.locator(`${ROOT} .Wheel[data-segment="minute"]`)).toBeVisible()
 })
 
 test('hour wheel is a spinbutton with aria-label', async ({ page }) => {
-  await page.locator(`${ROOT} .DateTimeField-trigger`).click()
+  await page.locator(`${ROOT} .trigger`).click()
   const hourWheel = page.locator(`${ROOT} .Wheel[data-segment="hour"]`)
   await expect(hourWheel).toHaveAttribute('role', 'spinbutton')
   const label = await hourWheel.getAttribute('aria-label')
@@ -135,12 +135,12 @@ test('hour wheel is a spinbutton with aria-label', async ({ page }) => {
 })
 
 test('ArrowDown on the hour wheel sets the hour segment', async ({ page }) => {
-  await page.locator(`${ROOT} .DateTimeField-trigger`).click()
+  await page.locator(`${ROOT} .trigger`).click()
   const hourWheel = page.locator(`${ROOT} .Wheel[data-segment="hour"]`)
   await hourWheel.focus()
   await page.keyboard.press('ArrowDown')
   await page.waitForTimeout(500) // snap animation
-  const hourSeg = page.locator(`${ROOT} .Segment[data-segment="hour"]`)
+  const hourSeg = page.locator(`${ROOT} .segment[data-segment="hour"]`)
   await expect(hourSeg).not.toHaveAttribute('data-placeholder')
   expect(await hourSeg.getAttribute('aria-valuenow')).not.toBeNull()
 })
@@ -148,33 +148,33 @@ test('ArrowDown on the hour wheel sets the hour segment', async ({ page }) => {
 // ─── AM/PM toggle ───────────────────────────────────────────────────────────────
 
 test('AM/PM toggle is hidden in the 24h (en-GB) locale', async ({ page }) => {
-  await page.locator(`${ROOT} .DateTimeField-trigger`).click()
-  await expect(page.locator(`${ROOT} .DateTimeField-ampm`)).toBeHidden()
+  await page.locator(`${ROOT} .trigger`).click()
+  await expect(page.locator(`${ROOT} .ampm`)).toBeHidden()
 })
 
 test('AM/PM toggle is shown and drives the hour in a 12h locale', async ({ page }) => {
   const TWELVE = '[data-component="DateTimeField"][data-id="dtf-12h"]'
   await page.locator(`${TWELVE}`).scrollIntoViewIfNeeded()
-  await page.locator(`${TWELVE} .DateTimeField-trigger`).click()
+  await page.locator(`${TWELVE} .trigger`).click()
 
-  const toggle = page.locator(`${TWELVE} .DateTimeField-ampm`)
+  const toggle = page.locator(`${TWELVE} .ampm`)
   await expect(toggle).toBeVisible()
-  const native = page.locator(`${TWELVE} .DateTimeField-native`)
+  const native = page.locator(`${TWELVE} .native`)
 
   // Seeded value 14:35 → PM active. Switch to AM → hour drops by 12 (02:35).
   await expect(native).toHaveValue('2026-05-27T14:35')
-  await page.locator(`${TWELVE} .DateTimeField-ampm-option[data-ampm="0"]`).click()
+  await page.locator(`${TWELVE} .ampm-option[data-ampm="0"]`).click()
   await expect(native).toHaveValue('2026-05-27T02:35')
-  await expect(page.locator(`${TWELVE} .DateTimeField-ampm-option[data-ampm="0"]`)).toHaveAttribute('aria-pressed', 'true')
+  await expect(page.locator(`${TWELVE} .ampm-option[data-ampm="0"]`)).toHaveAttribute('aria-pressed', 'true')
 })
 
 // ─── "Nu" button ──────────────────────────────────────────────────────────────
 
 test('"Nu" button sets current datetime and closes popup', async ({ page }) => {
-  await page.locator(`${ROOT} .DateTimeField-trigger`).click()
-  await page.locator(`${ROOT} .CalendarFooterNow`).click()
-  await expect(page.locator(`${ROOT} .DateTimeField-popup`)).not.toBeAttached()
-  const hourSeg = page.locator(`${ROOT} .Segment[data-segment="hour"]`)
+  await page.locator(`${ROOT} .trigger`).click()
+  await page.locator(`${ROOT} .calendar-footer-now`).click()
+  await expect(page.locator(`${ROOT} .popup`)).not.toBeAttached()
+  const hourSeg = page.locator(`${ROOT} .segment[data-segment="hour"]`)
   const val = await hourSeg.getAttribute('aria-valuenow')
   expect(val).not.toBeNull()
 })
@@ -182,19 +182,19 @@ test('"Nu" button sets current datetime and closes popup', async ({ page }) => {
 // ─── Clear ────────────────────────────────────────────────────────────────────
 
 test('clear button empties all segments', async ({ page }) => {
-  await page.locator(`${ROOT} .DateTimeField-trigger`).click()
-  await page.locator(`${ROOT} .CalendarFooterNow`).click()
-  await page.locator(`${ROOT} .DateTimeField-trigger`).click()
-  await page.locator(`${ROOT} .CalendarFooterClear`).click()
-  const hourSeg = page.locator(`${ROOT} .Segment[data-segment="hour"]`)
+  await page.locator(`${ROOT} .trigger`).click()
+  await page.locator(`${ROOT} .calendar-footer-now`).click()
+  await page.locator(`${ROOT} .trigger`).click()
+  await page.locator(`${ROOT} .calendar-footer-clear`).click()
+  const hourSeg = page.locator(`${ROOT} .segment[data-segment="hour"]`)
   await expect(hourSeg).toHaveAttribute('data-placeholder')
 })
 
 // ─── Calendar navigation ─────────────────────────────────────────────────────
 
 test('ArrowRight moves focus to next day', async ({ page }) => {
-  await page.locator(`${ROOT} .DateTimeField-trigger`).click()
-  const firstBtn = page.locator(`${ROOT} .DateTimeField-popup td:not([data-outside-month="true"]):not([aria-disabled]) button`).first()
+  await page.locator(`${ROOT} .trigger`).click()
+  const firstBtn = page.locator(`${ROOT} .popup td:not([data-outside-month="true"]):not([aria-disabled]) button`).first()
   await firstBtn.focus()
   const firstDate = await firstBtn.getAttribute('data-date')
   await page.keyboard.press('ArrowRight')
@@ -203,27 +203,27 @@ test('ArrowRight moves focus to next day', async ({ page }) => {
 })
 
 test('PageDown navigates to next month', async ({ page }) => {
-  await page.locator(`${ROOT} .DateTimeField-trigger`).click()
-  const firstBtn = page.locator(`${ROOT} .DateTimeField-popup td:not([data-outside-month="true"]):not([aria-disabled]) button`).first()
+  await page.locator(`${ROOT} .trigger`).click()
+  const firstBtn = page.locator(`${ROOT} .popup td:not([data-outside-month="true"]):not([aria-disabled]) button`).first()
   await firstBtn.focus()
-  const before = await page.locator(`${ROOT} .CalendarMonthYear`).textContent()
+  const before = await page.locator(`${ROOT} .calendar-month-year`).textContent()
   await page.keyboard.press('PageDown')
-  const after = await page.locator(`${ROOT} .CalendarMonthYear`).textContent()
+  const after = await page.locator(`${ROOT} .calendar-month-year`).textContent()
   expect(after).not.toBe(before)
 })
 
 // ─── Month/Year picker wheels ───────────────────────────────────────────────
 
 test('month/year picker opens as wheels', async ({ page }) => {
-  await page.locator(`${ROOT} .DateTimeField-trigger`).click()
-  await page.locator(`${ROOT} .MonthYearTrigger`).click()
+  await page.locator(`${ROOT} .trigger`).click()
+  await page.locator(`${ROOT} .month-year-trigger`).click()
   await expect(page.locator(`${ROOT} .Wheel[data-picker="month"]`)).toHaveAttribute('role', 'spinbutton')
   await expect(page.locator(`${ROOT} .Wheel[data-picker="year"]`)).toHaveAttribute('role', 'spinbutton')
 })
 
-test('MonthYearTrigger uses aria-controls (not aria-haspopup) for the picker', async ({ page }) => {
-  await page.locator(`${ROOT} .DateTimeField-trigger`).click()
-  const trigger = page.locator(`${ROOT} .MonthYearTrigger`)
+test('month-year-trigger uses aria-controls (not aria-haspopup) for the picker', async ({ page }) => {
+  await page.locator(`${ROOT} .trigger`).click()
+  const trigger = page.locator(`${ROOT} .month-year-trigger`)
   expect(await trigger.getAttribute('aria-haspopup')).toBeNull()
   const controls = await trigger.getAttribute('aria-controls')
   expect(controls).toBeTruthy()
@@ -231,9 +231,9 @@ test('MonthYearTrigger uses aria-controls (not aria-haspopup) for the picker', a
 })
 
 test('ArrowDown on the year wheel navigates the calendar', async ({ page }) => {
-  await page.locator(`${ROOT} .DateTimeField-trigger`).click()
-  await page.locator(`${ROOT} .MonthYearTrigger`).click()
-  const header = page.locator(`${ROOT} .CalendarMonthYear`)
+  await page.locator(`${ROOT} .trigger`).click()
+  await page.locator(`${ROOT} .month-year-trigger`).click()
+  const header = page.locator(`${ROOT} .calendar-month-year`)
   const before = await header.textContent()
   await page.locator(`${ROOT} .Wheel[data-picker="year"]`).focus()
   await page.keyboard.press('ArrowDown')
@@ -242,18 +242,18 @@ test('ArrowDown on the year wheel navigates the calendar', async ({ page }) => {
 })
 
 test('Escape from the picker returns to the calendar (keeps popup open)', async ({ page }) => {
-  await page.locator(`${ROOT} .DateTimeField-trigger`).click()
-  await page.locator(`${ROOT} .MonthYearTrigger`).click()
+  await page.locator(`${ROOT} .trigger`).click()
+  await page.locator(`${ROOT} .month-year-trigger`).click()
   await page.locator(`${ROOT} .Wheel[data-picker="month"]`).focus()
   await page.keyboard.press('Escape')
   await expect(page.locator(`${ROOT} [data-panel="picker"]`)).toHaveAttribute('data-active', 'false')
-  await expect(page.locator(`${ROOT} .DateTimeField-popup`)).toBeVisible()
+  await expect(page.locator(`${ROOT} .popup`)).toBeVisible()
 })
 
 test('spinning the year wheel updates the underlying field', async ({ page }) => {
-  await page.locator(`${ROOT} .DateTimeField-trigger`).click()
-  await page.locator(`${ROOT} .MonthYearTrigger`).click()
-  const native = page.locator(`${ROOT} .DateTimeField-native`)
+  await page.locator(`${ROOT} .trigger`).click()
+  await page.locator(`${ROOT} .month-year-trigger`).click()
+  const native = page.locator(`${ROOT} .native`)
   await expect(native).toHaveValue('') // meeting-time starts empty
   await page.locator(`${ROOT} .Wheel[data-picker="year"]`).focus()
   await page.keyboard.press('ArrowDown')
@@ -262,8 +262,8 @@ test('spinning the year wheel updates the underlying field', async ({ page }) =>
 })
 
 test('month wheel loops past the year boundary (Jan ↔ Dec)', async ({ page }) => {
-  await page.locator(`${ROOT} .DateTimeField-trigger`).click()
-  await page.locator(`${ROOT} .MonthYearTrigger`).click()
+  await page.locator(`${ROOT} .trigger`).click()
+  await page.locator(`${ROOT} .month-year-trigger`).click()
   const month = page.locator(`${ROOT} .Wheel[data-picker="month"]`)
   await month.focus()
   const v0 = Number(await month.getAttribute('aria-valuenow'))
@@ -275,53 +275,53 @@ test('month wheel loops past the year boundary (Jan ↔ Dec)', async ({ page }) 
 // ── Kernel: popup-interaction (focus trap + scroll containment) ─────────────────
 
 test('Tab past the last footer button keeps focus inside the calendar', async ({ page }) => {
-  await page.locator(`${ROOT} .DateTimeField-trigger`).click()
-  await expect(page.locator(`${ROOT} .DateTimeField-popup`)).toBeVisible()
+  await page.locator(`${ROOT} .trigger`).click()
+  await expect(page.locator(`${ROOT} .popup`)).toBeVisible()
   // "Now" is the last tab stop. Tab must wrap back into the calendar, not
   // escape the aria-modal dialog (this calendar previously had no Tab trap).
-  await page.locator(`${ROOT} .DateTimeField-popup .CalendarFooterNow`).focus()
+  await page.locator(`${ROOT} .popup .calendar-footer-now`).focus()
   await page.keyboard.press('Tab')
   const inside = await page.evaluate((rootSel) => {
-    const popup = document.querySelector(`${rootSel} .DateTimeField-popup`)
+    const popup = document.querySelector(`${rootSel} .popup`)
     return popup?.contains(document.activeElement) ?? false
   }, ROOT)
   expect(inside).toBe(true)
 })
 
 test('Shift+Tab from the first tab stop keeps focus inside the calendar', async ({ page }) => {
-  await page.locator(`${ROOT} .DateTimeField-trigger`).click()
-  await expect(page.locator(`${ROOT} .DateTimeField-popup`)).toBeVisible()
-  await page.locator(`${ROOT} .DateTimeField-popup .CalendarPrev`).focus()
+  await page.locator(`${ROOT} .trigger`).click()
+  await expect(page.locator(`${ROOT} .popup`)).toBeVisible()
+  await page.locator(`${ROOT} .popup .prev-month`).focus()
   await page.keyboard.press('Shift+Tab')
-  await expect(page.locator(`${ROOT} .DateTimeField-popup`)).toBeVisible()
+  await expect(page.locator(`${ROOT} .popup`)).toBeVisible()
   const inside = await page.evaluate((rootSel) => {
-    const popup = document.querySelector(`${rootSel} .DateTimeField-popup`)
+    const popup = document.querySelector(`${rootSel} .popup`)
     return popup?.contains(document.activeElement) ?? false
   }, ROOT)
   expect(inside).toBe(true)
 })
 
 test('Tab from a focused grid day exits the grid as one composite stop (→ time wheel)', async ({ page }) => {
-  await page.locator(`${ROOT} .DateTimeField-trigger`).click()
-  await expect(page.locator(`${ROOT} .DateTimeField-popup`)).toBeVisible()
+  await page.locator(`${ROOT} .trigger`).click()
+  await expect(page.locator(`${ROOT} .popup`)).toBeVisible()
   // Focus the grid's roving day cell. Tab must leave the grid (WAI-ARIA grid is
   // ONE tab stop) and land on the first time wheel, not the adjacent day.
-  const day = page.locator(`${ROOT} .DateTimeField-popup .CalendarGrid td:not([data-outside-month="true"]):not([aria-disabled]) button[tabindex="0"]`)
+  const day = page.locator(`${ROOT} .popup .calendar-grid td:not([data-outside-month="true"]):not([aria-disabled]) button[tabindex="0"]`)
   await day.focus()
   await page.keyboard.press('Tab')
   const landedOnDay = await page.evaluate((rootSel) => {
     const active = document.activeElement
-    return Boolean(active?.closest(`${rootSel} .CalendarGrid td button`))
+    return Boolean(active?.closest(`${rootSel} .calendar-grid td button`))
   }, ROOT)
   expect(landedOnDay).toBe(false)
   await expect(page.locator(`${ROOT} .Wheel[data-segment="hour"]`)).toBeFocused()
 })
 
 test('wheel event on the calendar surface (off a wheel) is defaultPrevented', async ({ page }) => {
-  await page.locator(`${ROOT} .DateTimeField-trigger`).click()
-  await expect(page.locator(`${ROOT} .DateTimeField-popup`)).toBeVisible()
+  await page.locator(`${ROOT} .trigger`).click()
+  await expect(page.locator(`${ROOT} .popup`)).toBeVisible()
   const prevented = await page.evaluate((rootSel) => {
-    const popup = document.querySelector(`${rootSel} .DateTimeField-popup`)
+    const popup = document.querySelector(`${rootSel} .popup`)
     const ev = new WheelEvent('wheel', { deltaY: 120, bubbles: true, cancelable: true })
     popup.dispatchEvent(ev)
     return ev.defaultPrevented

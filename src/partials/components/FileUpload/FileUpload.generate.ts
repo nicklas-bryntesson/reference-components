@@ -24,46 +24,46 @@ interface StateDefinition {
 // ─── Item HTML helpers — multiple mode (<li>) ─────────────────────────────────
 
 const validItem = (name: string, size: string, id = 'static-1') =>
-  `\n    <li class="FileUpload-item" data-status="valid" data-entry-id="${id}">
-      <span class="FileUpload-item-name">${name}</span>
-      <span class="FileUpload-item-size">${size}</span>
-      <button type="button" class="FileUpload-item-remove" aria-label="Remove ${name}">&#215;</button>
+  `\n    <li class="item" data-status="valid" data-entry-id="${id}">
+      <span class="item-name">${name}</span>
+      <span class="item-size">${size}</span>
+      <button type="button" class="item-remove" aria-label="Remove ${name}">&#215;</button>
     </li>`
 
 const invalidTypeItem = (name: string, size: string) =>
-  `\n    <li class="FileUpload-item" data-status="invalid-type" data-entry-id="static-2">
-      <span class="FileUpload-item-name">${name}</span>
-      <span class="FileUpload-item-size">${size}</span>
-      <span class="FileUpload-item-error" role="alert">File type not allowed</span>
-      <button type="button" class="FileUpload-item-remove" aria-label="Remove ${name}">&#215;</button>
+  `\n    <li class="item" data-status="invalid-type" data-entry-id="static-2">
+      <span class="item-name">${name}</span>
+      <span class="item-size">${size}</span>
+      <span class="item-error" role="alert">File type not allowed</span>
+      <button type="button" class="item-remove" aria-label="Remove ${name}">&#215;</button>
     </li>`
 
 const serverItem = (name: string, size: string, ref: string) =>
-  `\n    <li class="FileUpload-item" data-status="valid" data-source="server" data-entry-id="static-server">
-      <span class="FileUpload-item-name">${name}</span>
-      <span class="FileUpload-item-size">${size}</span>
-      <button type="button" class="FileUpload-item-remove" aria-label="Remove ${name}">&#215;</button>
+  `\n    <li class="item" data-status="valid" data-source="server" data-entry-id="static-server">
+      <span class="item-name">${name}</span>
+      <span class="item-size">${size}</span>
+      <button type="button" class="item-remove" aria-label="Remove ${name}">&#215;</button>
       <input type="hidden" name="uploaded-ref" value="${ref}">
     </li>`
 
-// ─── Item HTML helpers — single mode (inline spans in FileUpload-selected) ───
+// ─── Item HTML helpers — single mode (inline spans in selected) ───
 
 const validSingleFile = (name: string, size: string) =>
-  `\n    <span class="FileUpload-item-name">${name}</span>
-    <span class="FileUpload-item-size">${size}</span>
-    <button type="button" class="FileUpload-item-remove" aria-label="Remove ${name}">&#215;</button>`
+  `\n    <span class="item-name">${name}</span>
+    <span class="item-size">${size}</span>
+    <button type="button" class="item-remove" aria-label="Remove ${name}">&#215;</button>`
 
 const invalidTypeSingleFile = (name: string, size: string) =>
-  `\n    <span class="FileUpload-item-name">${name}</span>
-    <span class="FileUpload-item-size">${size}</span>
-    <span class="FileUpload-item-error" role="alert">File type not allowed</span>
-    <button type="button" class="FileUpload-item-remove" aria-label="Remove ${name}">&#215;</button>`
+  `\n    <span class="item-name">${name}</span>
+    <span class="item-size">${size}</span>
+    <span class="item-error" role="alert">File type not allowed</span>
+    <button type="button" class="item-remove" aria-label="Remove ${name}">&#215;</button>`
 
 const invalidSizeSingleFile = (name: string, size: string) =>
-  `\n    <span class="FileUpload-item-name">${name}</span>
-    <span class="FileUpload-item-size">${size}</span>
-    <span class="FileUpload-item-error" role="alert">File exceeds maximum size</span>
-    <button type="button" class="FileUpload-item-remove" aria-label="Remove ${name}">&#215;</button>`
+  `\n    <span class="item-name">${name}</span>
+    <span class="item-size">${size}</span>
+    <span class="item-error" role="alert">File exceeds maximum size</span>
+    <button type="button" class="item-remove" aria-label="Remove ${name}">&#215;</button>`
 
 // ─── Canonical markup ─────────────────────────────────────────────────────────
 
@@ -81,14 +81,14 @@ function canonical(
   const triggerDisabledAttr = triggerDisabled ? ' disabled' : ''
   const fileContainer = isMultiple
     ? `<ul
-    class="FileUpload-list"
+    class="list"
     aria-live="polite"
     aria-relevant="additions removals"
     aria-label="Selected files"
   >${items}
   </ul>`
     : `<div
-    class="FileUpload-selected"
+    class="selected"
     aria-live="polite"
     aria-atomic="true"
   >${items}
@@ -99,15 +99,15 @@ function canonical(
   role="group"
   aria-labelledby="${id}-label"${rootAttrs}${initialFilesAttr}
 >
-  <span id="${id}-label" class="FileUpload-label">${label}</span>
+  <span id="${id}-label" class="label">${label}</span>
   <input
-    class="FileUpload-input"
+    class="input"
     type="file"
     aria-hidden="true"
     tabindex="-1"${inputAttrs}
   >
   ${fileContainer}
-  <button type="button" class="FileUpload-trigger"${triggerDisabledAttr}>${triggerText}</button>
+  <button type="button" class="trigger"${triggerDisabledAttr}>${triggerText}</button>
 </div>
 `
 }
@@ -139,7 +139,7 @@ const states: StateDefinition[] = [
   { file: '_empty-focus',  label: 'File', root: { 'data-test-state': 'focus'  }, input: {}, items: '' },
   { file: '_empty-active', label: 'File', root: { 'data-test-state': 'active' }, input: {}, items: '' },
 
-  // Interaction states — with files (single mode → FileUpload-selected).
+  // Interaction states — with files (single mode → selected).
   // Seeded via data-initial-files so the rendered chip is entry-backed and its
   // remove button works (static markup alone is display-only and not removable).
   { file: '_with-files',        label: 'File', root: { 'data-has-files': 'true'                            }, input: {}, items: validSingleFile('report.pdf', '200 KB'), initialFiles: seedReport },

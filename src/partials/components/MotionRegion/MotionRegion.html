@@ -12,14 +12,14 @@
   <style>
     /* Demo backend: an authored CSS animation that obeys the region's data-motion.
        This gate is the ENTIRE integration for a CSS backend — no JavaScript. */
-    .MotionRegion-demo {
+    .demo-animation {
       block-size: 12rem;
       background: linear-gradient(120deg, #6a5acd, #ff6b6b, #4ecdc4, #6a5acd);
       background-size: 300% 300%;
       animation: motionRegionDemo 6s ease infinite;
     }
 
-    .MotionRegion[data-motion="paused"] .MotionRegion-demo {
+    .MotionRegion[data-motion="paused"] .demo-animation {
       animation-play-state: paused;
     }
 
@@ -46,7 +46,7 @@
     data-autoplay="policy"
     data-play-text="Play background animation"
     data-pause-text="Pause background animation">
-    <div class="MotionRegion-demo" role="presentation"></div>
+    <div class="demo-animation" role="presentation"></div>
   </div>
 
   <!-- ─── Autoplay off — waits for the user ─────────────────────────────── -->
@@ -58,7 +58,7 @@
     data-autoplay="off"
     data-play-text="Play background animation"
     data-pause-text="Pause background animation">
-    <div class="MotionRegion-demo" role="presentation"></div>
+    <div class="demo-animation" role="presentation"></div>
   </div>
 
   <!-- ─── Video backend ─────────────────────────────────────────────────── -->

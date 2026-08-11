@@ -12,10 +12,10 @@ function canonical(id: string, attrs: Record<string, string> = {}, locale = 'en-
     .join(' ')
 
   return `<div class="DateTimeField" data-component="DateTimeField" data-id="${id}" data-name="${id}" data-locale="${locale}" ${attrStr}>
-  <input type="datetime-local" class="DateTimeField-native" tabindex="-1" aria-hidden="true">
-  <div class="DateTimeField-overlay">
-    <div class="Segments" role="group"></div>
-    <button class="DateTimeField-trigger" type="button">
+  <input type="datetime-local" class="native" tabindex="-1" aria-hidden="true">
+  <div class="overlay">
+    <div class="segments" role="group"></div>
+    <button class="trigger" type="button">
       <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
         <line x1="16" y1="2" x2="16" y2="6"></line>
@@ -24,40 +24,40 @@ function canonical(id: string, attrs: Record<string, string> = {}, locale = 'en-
       </svg>
     </button>
   </div>
-  <template class="DateTimeField-calendarTemplate">
-    <div class="DateTimeField-popup" role="dialog" aria-modal="true">
-      <div class="CalendarInner">
-        <div class="CalendarLeft">
-          <div class="CalendarHeader">
-            <button class="CalendarPrev" type="button">&#8249;</button>
-            <button class="MonthYearTrigger" type="button" aria-expanded="false"><span class="CalendarMonthYear"></span></button>
-            <button class="CalendarNext" type="button">&#8250;</button>
+  <template class="calendar-template">
+    <div class="popup" role="dialog" aria-modal="true">
+      <div class="calendar-inner">
+        <div class="calendar-left">
+          <div class="calendar-header">
+            <button class="prev-month" type="button">&#8249;</button>
+            <button class="month-year-trigger" type="button" aria-expanded="false"><span class="calendar-month-year"></span></button>
+            <button class="next-month" type="button">&#8250;</button>
           </div>
-          <div class="Panel" data-panel="calendar" data-active="true">
-            <table class="CalendarGrid" role="grid"></table>
+          <div data-panel="calendar" data-active="true">
+            <table class="calendar-grid" role="grid"></table>
           </div>
-          <div class="Panel YearMonthPicker WheelColumns" role="group" data-panel="picker" data-active="false">
+          <div class="year-month-picker WheelColumns" role="group" data-panel="picker" data-active="false">
             <div class="Wheel" data-picker="month" tabindex="0"></div>
             <div class="Wheel" data-picker="year" tabindex="0"></div>
           </div>
         </div>
-        <div class="TimeColumns WheelColumns">
+        <div class="time-columns WheelColumns">
           <div class="Wheel" data-segment="hour" tabindex="0"></div>
           <div class="Wheel" data-segment="minute" tabindex="0"></div>
           <div class="Wheel" data-segment="second" tabindex="0" style="display:none"></div>
-          <div class="DateTimeField-ampm" role="group" hidden></div>
+          <div class="ampm" role="group" hidden></div>
         </div>
       </div>
-      <div class="CalendarFooter">
-        <button type="button" class="CalendarFooterClear"></button>
-        <button type="button" class="CalendarFooterToday"></button>
-        <button type="button" class="CalendarFooterNow"></button>
+      <div class="calendar-footer">
+        <button type="button" class="calendar-footer-clear"></button>
+        <button type="button" class="calendar-footer-today"></button>
+        <button type="button" class="calendar-footer-now"></button>
       </div>
       <div class="arrow"></div>
     </div>
   </template>
-  <div class="slideContainer"></div>
-  <div class="Announce" aria-live="polite" aria-atomic="true"></div>
+  <div class="rail"></div>
+  <div class="announce" aria-live="polite" aria-atomic="true"></div>
 </div>`
 }
 
