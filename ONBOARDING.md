@@ -48,12 +48,15 @@ Arrow size / corner-radius / site-padding are CSS custom properties (e.g. `--_tf
 
 | Thing | Convention | Notes |
 |---|---|---|
-| Popup container class | `.<Component>-popup` | e.g. `.DateField-popup`, `.TimeField-popup` (and its BEM children `.TimeField-popup-*`) |
-| Rail class | `.slideContainer` | generic, scoped by nesting under the component root |
-| Arrow class | `.arrow` | generic; **must be nested under the component root in CSS** or it leaks globally |
-| Trigger class | `.<Component>-trigger` | ToggleTip is a bare `<button>` (fine for a tooltip) |
+| Popup container class | `.popup` | the same word in every component; the CSS rule is always fully qualified — `.DateField .popup`, `.TimeField .popup` |
+| Rail class | `.rail` | same word everywhere; the JS property is `_rail` |
+| Arrow class | `.arrow` | same word everywhere |
+| Trigger class | `.trigger` | ToggleTip is a bare `<button>` (fine for a tooltip) |
+| Every element rule | `.Component .element` | **never a bare `.element` at column 0** — generic names are only safe because the root qualifies them. See the class-naming section in [`.claude/philosophy.md`](.claude/philosophy.md) |
 | Direction | `data-direction="top\|bottom"` | not a bare `direction` attribute |
 | Offset vars | `--<prefix>-popup-offset`, `--<prefix>-arrow-offset` | set from JS |
+
+> **Gotcha (already bit us):** the same rule applies to **e2e locators**. `page.locator('.popup')` matches every component's popup on the shared kitchensink page — always scope to the suite's root constant: `page.locator(\`${TF} .popup\`)`. The only page-wide locators should be ones qualified by a component class on purpose (e.g. targeting the disabled kitchensink row).
 
 ### Dismiss & focus
 
