@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url'
 
 // Notice is markup + CSS, no JS. The unit layer guards the contract invariants —
 // above all the ADR-0016 separation: Notice is a presentational payload and must
-// NOT carry a live role; the announcer role lives on the persistent .NoticeRegion.
+// NOT carry a live role; the announcer role lives on the persistent .notice-region.
 const html = readFileSync(
   resolve(dirname(fileURLToPath(import.meta.url)), '../Notice.html'),
   'utf-8',
@@ -27,8 +27,8 @@ describe('Notice reference markup contract', () => {
     }
   })
 
-  it('the announcer (.NoticeRegion) carries the live role + aria-live', () => {
-    const regions = [...document.querySelectorAll('.NoticeRegion')]
+  it('the announcer (.notice-region) carries the live role + aria-live', () => {
+    const regions = [...document.querySelectorAll('.notice-region')]
     expect(regions.length).toBeGreaterThan(0)
     for (const r of regions) {
       expect(['alert', 'status']).toContain(r.getAttribute('role'))
@@ -47,7 +47,7 @@ describe('Notice reference markup contract', () => {
       if (n.getAttribute('data-icon') === 'false') {
         expect(n.querySelector('svg'), 'no-icon Notice should render no svg').toBeNull()
       } else {
-        const svg = n.querySelector('.Icon svg')
+        const svg = n.querySelector('.icon svg')
         if (svg) expect(svg.getAttribute('aria-hidden')).toBe('true')
       }
     }
@@ -55,7 +55,7 @@ describe('Notice reference markup contract', () => {
 
   it('every Notice has a content region', () => {
     for (const n of notices()) {
-      expect(n.querySelector('.Content')).not.toBeNull()
+      expect(n.querySelector('.content')).not.toBeNull()
     }
   })
 })

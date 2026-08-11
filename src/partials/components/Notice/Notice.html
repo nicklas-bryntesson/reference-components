@@ -7,51 +7,51 @@
   <div style="display:flex; flex-direction:column; gap:1.5rem; max-inline-size:50rem;">
 
     <div class="Notice" data-variant="error">
-      <div class="Icon">
+      <div class="icon">
         <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
       </div>
-      <div class="Content">
-        <strong class="Title">Validation error</strong>
+      <div class="content">
+        <strong class="title">Validation error</strong>
         <p>Please fill in all required fields before continuing.</p>
       </div>
     </div>
 
     <div class="Notice" data-variant="warning">
-      <div class="Icon">
+      <div class="icon">
         <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
       </div>
-      <div class="Content">
-        <strong class="Title">Almost out of space</strong>
+      <div class="content">
+        <strong class="title">Almost out of space</strong>
         <p>You have used 90% of your storage quota.</p>
       </div>
     </div>
 
     <div class="Notice" data-variant="success">
-      <div class="Icon">
+      <div class="icon">
         <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
       </div>
-      <div class="Content">
-        <strong class="Title">Saved</strong>
+      <div class="content">
+        <strong class="title">Saved</strong>
         <p>Your changes have been saved.</p>
       </div>
     </div>
 
     <div class="Notice" data-variant="info">
-      <div class="Icon">
+      <div class="icon">
         <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
       </div>
-      <div class="Content">
-        <strong class="Title">Heads up</strong>
+      <div class="content">
+        <strong class="title">Heads up</strong>
         <p>Maintenance is scheduled for Sunday at 02:00 UTC.</p>
       </div>
     </div>
 
     <div class="Notice" data-variant="neutral">
-      <div class="Icon">
+      <div class="icon">
         <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
       </div>
-      <div class="Content">
-        <strong class="Title">Reminder</strong>
+      <div class="content">
+        <strong class="title">Reminder</strong>
         <p>Your trial ends in three days.</p>
       </div>
     </div>
@@ -61,11 +61,11 @@
   <!-- data-border — adds a full border in the accent (icon) colour -->
   <h3>Border (data-border="true")</h3>
   <div class="Notice" data-variant="error" data-border="true">
-    <div class="Icon">
+    <div class="icon">
       <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
     </div>
-    <div class="Content">
-      <strong class="Title">Validation error</strong>
+    <div class="content">
+      <strong class="title">Validation error</strong>
       <p>A full border in the accent colour.</p>
     </div>
   </div>
@@ -73,11 +73,11 @@
   <!-- data-emphasis — the "styled" hook: a thick leading accent bar -->
   <h3>Styled (data-emphasis="true")</h3>
   <div class="Notice" data-variant="info" data-emphasis="true" style="margin-block-start:1rem;">
-    <div class="Icon">
+    <div class="icon">
       <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
     </div>
-    <div class="Content">
-      <strong class="Title">Heads up</strong>
+    <div class="content">
+      <strong class="title">Heads up</strong>
       <p>A thick leading accent bar — the richest look.</p>
     </div>
   </div>
@@ -85,11 +85,11 @@
   <!-- Enriched — both toggles on -->
   <h3>Enriched (border + emphasis)</h3>
   <div class="Notice" data-variant="success" data-border="true" data-emphasis="true" style="margin-block-start:1rem;">
-    <div class="Icon">
+    <div class="icon">
       <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
     </div>
-    <div class="Content">
-      <strong class="Title">Saved</strong>
+    <div class="content">
+      <strong class="title">Saved</strong>
       <p>Border and leading bar together — the most decorated Notice.</p>
     </div>
   </div>
@@ -97,8 +97,8 @@
   <!-- No icon — data-icon="false" collapses the icon column -->
   <h3>No icon</h3>
   <div class="Notice" data-variant="info" data-icon="false">
-    <div class="Content">
-      <strong class="Title">Text only</strong>
+    <div class="content">
+      <strong class="title">Text only</strong>
       <p>The icon column collapses when <code>data-icon="false"</code>.</p>
     </div>
   </div>
@@ -106,10 +106,10 @@
   <!-- No title — body only -->
   <h3>No title</h3>
   <div class="Notice" data-variant="success" style="margin-block-start:1rem;">
-    <div class="Icon">
+    <div class="icon">
       <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
     </div>
-    <div class="Content">
+    <div class="content">
       <p>A single-line confirmation with no heading.</p>
     </div>
   </div>
@@ -117,10 +117,10 @@
   <!-- Single line — no title, icon centred with the one line of text -->
   <h3>Single line</h3>
   <div class="Notice" data-variant="error">
-    <div class="Icon">
+    <div class="icon">
       <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
     </div>
-    <div class="Content">
+    <div class="content">
       <p>Please fill in all required fields before continuing.</p>
     </div>
   </div>
@@ -128,11 +128,11 @@
   <!-- Long content — wraps inside the content column -->
   <h3>Long content</h3>
   <div class="Notice" data-variant="warning" style="margin-block-start:1rem;">
-    <div class="Icon">
+    <div class="icon">
       <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
     </div>
-    <div class="Content">
-      <strong class="Title">Long message</strong>
+    <div class="content">
+      <strong class="title">Long message</strong>
       <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco.</p>
     </div>
   </div>
@@ -141,13 +141,13 @@
        EMPTY at load; the consumer swaps a Notice into it (clear → next frame → set).
        Shown here already populated to illustrate the structure. -->
   <h3>Live-region pattern (announcer)</h3>
-  <div class="NoticeRegion" role="alert" aria-live="assertive" data-id="region" style="max-inline-size:50rem;">
+  <div class="notice-region" role="alert" aria-live="assertive" data-id="region" style="max-inline-size:50rem;">
     <div class="Notice" data-variant="error">
-      <div class="Icon">
+      <div class="icon">
         <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
       </div>
-      <div class="Content">
-        <strong class="Title">Validation error</strong>
+      <div class="content">
+        <strong class="title">Validation error</strong>
         <p>Please fill in all required fields.</p>
       </div>
     </div>
