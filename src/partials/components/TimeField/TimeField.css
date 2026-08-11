@@ -26,7 +26,7 @@
   --_tf-popup-shadow: var(--ui-shadow);
   --_tf-option-bg-selected: var(--ui-primary);
   --_tf-option-color-selected: var(--ui-primary-foreground);
-  /* Wheel visuals live in the shared src/kernel/css/Wheel.css (.Wheel-*) */
+  /* Wheel visuals live in the shared src/kernel/css/Wheel.css (.Wheel .ring / .option) */
   /* Internal */
   --_tf-arrow-size: 0.75rem;
   --_tf-arrow-corner-radius: 0.25rem;

@@ -26,7 +26,7 @@
   --_mf-popup-shadow: var(--ui-shadow);
   --_mf-option-bg-selected: var(--ui-primary);
   --_mf-option-color-selected: var(--ui-primary-foreground);
-  /* Wheel visuals live in the shared src/kernel/css/Wheel.css (.Wheel-*) */
+  /* Wheel visuals live in the shared src/kernel/css/Wheel.css (.Wheel .ring / .option) */
   /* Internal */
   --_mf-arrow-size: 0.75rem;
   --_mf-arrow-corner-radius: 0.25rem;

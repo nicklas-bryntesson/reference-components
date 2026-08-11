@@ -48,7 +48,7 @@ test('no aria-controls on trigger at any time', async ({ page }) => {
 })
 
 test('calendar does not exist in DOM when closed', async ({ page }) => {
-  await expect(page.locator('.popup')).toHaveCount(0)
+  await expect(page.locator(`${TARGET} .popup`)).toHaveCount(0)
 })
 
 test('calendar is visible inside rail when open', async ({ page }) => {
@@ -60,7 +60,7 @@ test('calendar is visible inside rail when open', async ({ page }) => {
 test('calendar is removed on Escape', async ({ page }) => {
   await page.locator('[data-id="birthdate"] .trigger').click()
   await page.keyboard.press('Escape')
-  await expect(page.locator('.popup')).toHaveCount(0)
+  await expect(page.locator(`${TARGET} .popup`)).toHaveCount(0)
 })
 
 test('focus returns to trigger after Escape', async ({ page }) => {
@@ -71,17 +71,17 @@ test('focus returns to trigger after Escape', async ({ page }) => {
 
 test('calendar is removed on outside click', async ({ page }) => {
   await page.locator('[data-id="birthdate"] .trigger').click()
-  await expect(page.locator('.popup')).toBeVisible()
+  await expect(page.locator(`${TARGET} .popup`)).toBeVisible()
   await page.evaluate(() => document.body.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true })))
-  await expect(page.locator('.popup')).toHaveCount(0)
+  await expect(page.locator(`${TARGET} .popup`)).toHaveCount(0)
 })
 
 test('date selection closes calendar and syncs native input', async ({ page }) => {
   await page.locator('[data-id="birthdate"] .trigger').click()
-  const firstDay = page.locator('.popup td:not([data-outside-month="true"]):not([aria-disabled="true"]) button').first()
+  const firstDay = page.locator(`${TARGET} .popup td:not([data-outside-month="true"]):not([aria-disabled="true"]) button`).first()
   const dateLabel = await firstDay.getAttribute('data-date')
   await firstDay.click({ force: true })
-  await expect(page.locator('.popup')).toHaveCount(0)
+  await expect(page.locator(`${TARGET} .popup`)).toHaveCount(0)
   const nativeValue = await page.locator('[data-id="birthdate"] .native').inputValue()
   expect(nativeValue).toBe(dateLabel)
 })
@@ -89,16 +89,16 @@ test('date selection closes calendar and syncs native input', async ({ page }) =
 test('aria-selected is on td not button', async ({ page }) => {
   await page.locator('[data-id="birthdate"] .trigger').click()
   // All td elements in grid should have aria-selected
-  const tdsWithAriaSelected = page.locator('.grid td[aria-selected]')
+  const tdsWithAriaSelected = page.locator(`${TARGET} .grid td[aria-selected]`)
   const count = await tdsWithAriaSelected.count()
   expect(count).toBeGreaterThan(0)
   // No buttons should have aria-selected
-  await expect(page.locator('.grid button[aria-selected]')).toHaveCount(0)
+  await expect(page.locator(`${TARGET} .grid button[aria-selected]`)).toHaveCount(0)
 })
 
 test('aria-disabled is on td not button for disabled cells', async ({ page }) => {
   await page.locator('[data-id="birthdate"] .trigger').click()
-  const disabledButtons = page.locator('.grid button[aria-disabled="true"]')
+  const disabledButtons = page.locator(`${TARGET} .grid button[aria-disabled="true"]`)
   expect(await disabledButtons.count()).toBe(0) // aria-disabled never on button — only on td
   await page.keyboard.press('Escape')
 })
@@ -106,11 +106,11 @@ test('aria-disabled is on td not button for disabled cells', async ({ page }) =>
 test('Tab wraps from last to first focusable element in calendar', async ({ page }) => {
   await page.locator('[data-id="birthdate"] .trigger').click()
   // Last tabbable element is the Today button in the footer
-  const todayBtn = page.locator('.calendar-footer-today')
+  const todayBtn = page.locator(`${TARGET} .calendar-footer-today`)
   await todayBtn.focus()
   await page.keyboard.press('Tab')
   // Should wrap to first (prev-month button)
-  const prevMonthBtn = page.locator('.calendar-header button').first()
+  const prevMonthBtn = page.locator(`${TARGET} .calendar-header button`).first()
   await expect(prevMonthBtn).toBeFocused()
   await page.keyboard.press('Escape')
 })
@@ -130,7 +130,7 @@ test('axe: zero violations on initial render', async ({ page }) => {
 
 test('axe: zero violations with calendar open', async ({ page }) => {
   await page.locator('[data-id="birthdate"] .trigger').click()
-  await expect(page.locator('.popup')).toBeVisible()
+  await expect(page.locator(`${TARGET} .popup`)).toBeVisible()
   await scopedCheckA11y(page, TARGET, {
     axeOptions: { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa'] } }
   })
@@ -150,14 +150,14 @@ test('data-direction is set on root when calendar opens', async ({ page }) => {
 test('month-year-trigger opens picker on click', async ({ page }) => {
   await page.locator('[data-id="birthdate"] .trigger').click()
   await page.locator('[data-id="birthdate"] .month-year-trigger').click()
-  const picker = page.locator('.popup [data-panel="picker"]')
+  const picker = page.locator(`${TARGET} .popup [data-panel="picker"]`)
   await expect(picker).toHaveAttribute('data-active', 'true')
 })
 
 test('month-year-trigger has aria-expanded true when picker open', async ({ page }) => {
   await page.locator('[data-id="birthdate"] .trigger').click()
   await page.locator('[data-id="birthdate"] .month-year-trigger').click()
-  const trigger = page.locator('.month-year-trigger')
+  const trigger = page.locator(`${TARGET} .month-year-trigger`)
   await expect(trigger).toHaveAttribute('aria-expanded', 'true')
 })
 
@@ -173,14 +173,14 @@ test('month-year-trigger uses aria-controls (not aria-haspopup) for the picker',
 test('month and year wheels are spinbuttons when picker opens', async ({ page }) => {
   await page.locator('[data-id="birthdate"] .trigger').click()
   await page.locator('[data-id="birthdate"] .month-year-trigger').click()
-  await expect(page.locator('.popup .Wheel[data-picker="month"]')).toHaveAttribute('role', 'spinbutton')
-  await expect(page.locator('.popup .Wheel[data-picker="year"]')).toHaveAttribute('role', 'spinbutton')
+  await expect(page.locator(`${TARGET} .popup .Wheel[data-picker="month"]`)).toHaveAttribute('role', 'spinbutton')
+  await expect(page.locator(`${TARGET} .popup .Wheel[data-picker="year"]`)).toHaveAttribute('role', 'spinbutton')
 })
 
 test('month wheel receives focus when picker opens', async ({ page }) => {
   await page.locator('[data-id="birthdate"] .trigger').click()
   await page.locator('[data-id="birthdate"] .month-year-trigger').click()
-  await expect(page.locator('.popup .Wheel[data-picker="month"]')).toBeFocused()
+  await expect(page.locator(`${TARGET} .popup .Wheel[data-picker="month"]`)).toBeFocused()
 })
 
 test('ArrowDown on the year wheel navigates the calendar', async ({ page }) => {
@@ -188,7 +188,7 @@ test('ArrowDown on the year wheel navigates the calendar', async ({ page }) => {
   const header = page.locator('[data-id="birthdate"] .month-year-trigger')
   await header.click()
   const before = await header.textContent()
-  await page.locator('.popup .Wheel[data-picker="year"]').focus()
+  await page.locator(`${TARGET} .popup .Wheel[data-picker="year"]`).focus()
   await page.keyboard.press('ArrowDown')
   await page.waitForTimeout(500) // snap animation
   expect(await header.textContent()).not.toBe(before)
@@ -198,14 +198,14 @@ test('Tab moves focus from month wheel to year wheel', async ({ page }) => {
   await page.locator('[data-id="birthdate"] .trigger').click()
   await page.locator('[data-id="birthdate"] .month-year-trigger').click()
   await page.keyboard.press('Tab')
-  await expect(page.locator('.popup .Wheel[data-picker="year"]')).toBeFocused()
+  await expect(page.locator(`${TARGET} .popup .Wheel[data-picker="year"]`)).toBeFocused()
 })
 
 test('clicking the header again returns to the calendar view', async ({ page }) => {
   await page.locator('[data-id="birthdate"] .trigger').click()
   await page.locator('[data-id="birthdate"] .month-year-trigger').click()
   await page.locator('[data-id="birthdate"] .month-year-trigger').click()
-  const picker = page.locator('.popup [data-panel="picker"]')
+  const picker = page.locator(`${TARGET} .popup [data-panel="picker"]`)
   await expect(picker).toHaveAttribute('data-active', 'false')
 })
 
@@ -213,7 +213,7 @@ test('Escape from picker returns to calendar view', async ({ page }) => {
   await page.locator('[data-id="birthdate"] .trigger').click()
   await page.locator('[data-id="birthdate"] .month-year-trigger').click()
   await page.keyboard.press('Escape')
-  const picker = page.locator('.popup [data-panel="picker"]')
+  const picker = page.locator(`${TARGET} .popup [data-panel="picker"]`)
   await expect(picker).toHaveAttribute('data-active', 'false')
 })
 
@@ -221,7 +221,7 @@ test('Escape from picker does not close calendar', async ({ page }) => {
   await page.locator('[data-id="birthdate"] .trigger').click()
   await page.locator('[data-id="birthdate"] .month-year-trigger').click()
   await page.keyboard.press('Escape')
-  await expect(page.locator('.popup')).toBeVisible()
+  await expect(page.locator(`${TARGET} .popup`)).toBeVisible()
 })
 
 test('spinning the year wheel updates the underlying field', async ({ page }) => {
@@ -229,7 +229,7 @@ test('spinning the year wheel updates the underlying field', async ({ page }) =>
   await page.locator('[data-id="birthdate"] .month-year-trigger').click()
   const native = page.locator('[data-id="birthdate"] .native')
   await expect(native).toHaveValue('') // birthdate starts empty
-  await page.locator('.popup .Wheel[data-picker="year"]').focus()
+  await page.locator(`${TARGET} .popup .Wheel[data-picker="year"]`).focus()
   await page.keyboard.press('ArrowDown')
   await page.waitForTimeout(500) // snap
   await expect(native).not.toHaveValue('') // the wheel applied a date to the field
@@ -238,7 +238,7 @@ test('spinning the year wheel updates the underlying field', async ({ page }) =>
 test('month wheel loops past the year boundary (Jan ↔ Dec)', async ({ page }) => {
   await page.locator('[data-id="birthdate"] .trigger').click()
   await page.locator('[data-id="birthdate"] .month-year-trigger').click()
-  const month = page.locator('.popup .Wheel[data-picker="month"]')
+  const month = page.locator(`${TARGET} .popup .Wheel[data-picker="month"]`)
   await month.focus()
   const v0 = Number(await month.getAttribute('aria-valuenow'))
   // Step up to 0, then once more — a looping wheel wraps to 11, a capped one stays at 0
@@ -259,7 +259,7 @@ test('Space opens calendar from trigger', async ({ page }) => {
   const trigger = page.locator('[data-id="birthdate"] .trigger')
   await trigger.focus()
   await page.keyboard.press('Space')
-  await expect(page.locator('.popup')).toBeVisible()
+  await expect(page.locator(`${TARGET} .popup`)).toBeVisible()
   await page.keyboard.press('Escape')
 })
 
@@ -267,17 +267,17 @@ test('Enter opens calendar from trigger', async ({ page }) => {
   const trigger = page.locator('[data-id="birthdate"] .trigger')
   await trigger.focus()
   await page.keyboard.press('Enter')
-  await expect(page.locator('.popup')).toBeVisible()
+  await expect(page.locator(`${TARGET} .popup`)).toBeVisible()
   await page.keyboard.press('Escape')
 })
 
 test('ArrowRight moves focus to next day in calendar grid', async ({ page }) => {
   await page.locator('[data-id="birthdate"] .trigger').click()
-  const firstDay = page.locator('.popup td:not([data-outside-month="true"]):not([aria-disabled="true"]) button').first()
+  const firstDay = page.locator(`${TARGET} .popup td:not([data-outside-month="true"]):not([aria-disabled="true"]) button`).first()
   await firstDay.focus()
   const initialDate = await firstDay.getAttribute('data-date')
   await page.keyboard.press('ArrowRight')
-  const focused = page.locator('.grid button:focus')
+  const focused = page.locator(`${TARGET} .grid button:focus`)
   const nextDate = await focused.getAttribute('data-date')
   expect(nextDate).not.toBe(initialDate)
   await page.keyboard.press('Escape')
@@ -285,12 +285,12 @@ test('ArrowRight moves focus to next day in calendar grid', async ({ page }) => 
 
 test('ArrowLeft moves focus to previous day in calendar grid', async ({ page }) => {
   await page.locator('[data-id="birthdate"] .trigger').click()
-  const days = page.locator('.popup td:not([data-outside-month="true"]):not([aria-disabled="true"]) button')
+  const days = page.locator(`${TARGET} .popup td:not([data-outside-month="true"]):not([aria-disabled="true"]) button`)
   const secondDay = days.nth(1)
   await secondDay.focus()
   const initialDate = await secondDay.getAttribute('data-date')
   await page.keyboard.press('ArrowLeft')
-  const focused = page.locator('.grid button:focus')
+  const focused = page.locator(`${TARGET} .grid button:focus`)
   const prevDate = await focused.getAttribute('data-date')
   expect(prevDate).not.toBe(initialDate)
   await page.keyboard.press('Escape')
@@ -298,11 +298,11 @@ test('ArrowLeft moves focus to previous day in calendar grid', async ({ page }) 
 
 test('ArrowDown moves focus one week forward in calendar grid', async ({ page }) => {
   await page.locator('[data-id="birthdate"] .trigger').click()
-  const firstDay = page.locator('.popup td:not([data-outside-month="true"]):not([aria-disabled="true"]) button').first()
+  const firstDay = page.locator(`${TARGET} .popup td:not([data-outside-month="true"]):not([aria-disabled="true"]) button`).first()
   await firstDay.focus()
   const initialDate = await firstDay.getAttribute('data-date')
   await page.keyboard.press('ArrowDown')
-  const focused = page.locator('.grid button:focus')
+  const focused = page.locator(`${TARGET} .grid button:focus`)
   const nextDate = await focused.getAttribute('data-date')
   expect(nextDate).not.toBe(initialDate)
   await page.keyboard.press('Escape')
@@ -310,9 +310,9 @@ test('ArrowDown moves focus one week forward in calendar grid', async ({ page })
 
 test('PageDown moves calendar to next month', async ({ page }) => {
   await page.locator('[data-id="birthdate"] .trigger').click()
-  const monthLabel = page.locator('.month-year-trigger')
+  const monthLabel = page.locator(`${TARGET} .month-year-trigger`)
   const initialLabel = await monthLabel.textContent()
-  await page.locator('.grid').focus()
+  await page.locator(`${TARGET} .grid`).focus()
   await page.keyboard.press('PageDown')
   const nextLabel = await monthLabel.textContent()
   expect(nextLabel).not.toBe(initialLabel)
@@ -321,9 +321,9 @@ test('PageDown moves calendar to next month', async ({ page }) => {
 
 test('PageUp moves calendar to previous month', async ({ page }) => {
   await page.locator('[data-id="birthdate"] .trigger').click()
-  const monthLabel = page.locator('.month-year-trigger')
+  const monthLabel = page.locator(`${TARGET} .month-year-trigger`)
   const initialLabel = await monthLabel.textContent()
-  await page.locator('.grid').focus()
+  await page.locator(`${TARGET} .grid`).focus()
   await page.keyboard.press('PageUp')
   const nextLabel = await monthLabel.textContent()
   expect(nextLabel).not.toBe(initialLabel)
@@ -334,10 +334,10 @@ test('PageUp moves calendar to previous month', async ({ page }) => {
 
 test('Tab past the last footer button keeps focus inside the calendar', async ({ page }) => {
   await page.locator('[data-id="birthdate"] .trigger').click()
-  await expect(page.locator('.popup')).toBeVisible()
+  await expect(page.locator(`${TARGET} .popup`)).toBeVisible()
   // "Today" is the last tab stop (Clear is disabled while empty). Tab must wrap
   // back into the calendar, not escape the aria-modal dialog.
-  await page.locator('.popup .calendar-footer-today').focus()
+  await page.locator(`${TARGET} .popup .calendar-footer-today`).focus()
   await page.keyboard.press('Tab')
   const inside = await page.evaluate(() =>
     document.querySelector('.popup')?.contains(document.activeElement) ?? false,
@@ -347,10 +347,10 @@ test('Tab past the last footer button keeps focus inside the calendar', async ({
 
 test('Shift+Tab from the first tab stop keeps focus inside the calendar', async ({ page }) => {
   await page.locator('[data-id="birthdate"] .trigger').click()
-  await expect(page.locator('.popup')).toBeVisible()
-  await page.locator('.popup .prev-month').focus()
+  await expect(page.locator(`${TARGET} .popup`)).toBeVisible()
+  await page.locator(`${TARGET} .popup .prev-month`).focus()
   await page.keyboard.press('Shift+Tab')
-  await expect(page.locator('.popup')).toBeVisible()
+  await expect(page.locator(`${TARGET} .popup`)).toBeVisible()
   const inside = await page.evaluate(() =>
     document.querySelector('.popup')?.contains(document.activeElement) ?? false,
   )
@@ -359,31 +359,31 @@ test('Shift+Tab from the first tab stop keeps focus inside the calendar', async 
 
 test('Tab from a focused grid day exits the grid as one composite stop (→ next-month)', async ({ page }) => {
   await page.locator('[data-id="birthdate"] .trigger').click()
-  await expect(page.locator('.popup')).toBeVisible()
+  await expect(page.locator(`${TARGET} .popup`)).toBeVisible()
   // Focus the grid's roving day cell. Tab must leave the grid (WAI-ARIA grid is
   // ONE tab stop), not step to the adjacent day.
-  const day = page.locator('.popup td:not([data-outside-month="true"]):not([aria-disabled="true"]) button[tabindex="0"]')
+  const day = page.locator(`${TARGET} .popup td:not([data-outside-month="true"]):not([aria-disabled="true"]) button[tabindex="0"]`)
   await day.focus()
   await page.keyboard.press('Tab')
   const landedOnDay = await page.evaluate(() =>
     Boolean(document.activeElement?.closest('.grid td button')),
   )
   expect(landedOnDay).toBe(false)
-  await expect(page.locator('.popup .next-month')).toBeFocused()
+  await expect(page.locator(`${TARGET} .popup .next-month`)).toBeFocused()
 })
 
 test('Escape closes the calendar and returns focus to the trigger', async ({ page }) => {
   await page.locator('[data-id="birthdate"] .trigger').click()
-  await expect(page.locator('.popup')).toBeVisible()
-  await page.locator('.grid').focus()
+  await expect(page.locator(`${TARGET} .popup`)).toBeVisible()
+  await page.locator(`${TARGET} .grid`).focus()
   await page.keyboard.press('Escape')
-  await expect(page.locator('.popup')).toHaveCount(0)
+  await expect(page.locator(`${TARGET} .popup`)).toHaveCount(0)
   await expect(page.locator('[data-id="birthdate"] .trigger')).toBeFocused()
 })
 
 test('wheel event on the calendar surface (off a wheel) is defaultPrevented', async ({ page }) => {
   await page.locator('[data-id="birthdate"] .trigger').click()
-  await expect(page.locator('.popup')).toBeVisible()
+  await expect(page.locator(`${TARGET} .popup`)).toBeVisible()
   const prevented = await page.evaluate(() => {
     const popup = document.querySelector('.popup')
     const ev = new WheelEvent('wheel', { deltaY: 120, bubbles: true, cancelable: true })

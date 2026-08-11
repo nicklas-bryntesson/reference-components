@@ -117,20 +117,20 @@ class WheelColumn {
     }
 
     this.ring = document.createElement('div')
-    this.ring.className = 'Wheel-ring'
+    this.ring.className = 'ring'
     this.ring.style.transformStyle = 'preserve-3d'
     this.ring.style.transform = `translateZ(${-this.radius}px)`
 
     for (let o = -HALF; o <= HALF; o++) {
       const slotEl = document.createElement('div')
-      slotEl.className = 'Wheel-option'
+      slotEl.className = 'option'
       slotEl.setAttribute('aria-hidden', 'true')
       this.ring.appendChild(slotEl)
       this.slots.push({ el: slotEl, o })
     }
 
     const band = document.createElement('div')
-    band.className = 'Wheel-band'
+    band.className = 'band'
 
     this.el.appendChild(this.ring)
     this.el.appendChild(band)
@@ -244,7 +244,7 @@ class WheelColumn {
 
   private _onClick = (e: MouseEvent): void => {
     if (this._destroyed) return
-    const option = (e.target as HTMLElement).closest<HTMLElement>('.Wheel-option')
+    const option = (e.target as HTMLElement).closest<HTMLElement>('.option')
     if (!option) return
 
     const raw = option.dataset.value

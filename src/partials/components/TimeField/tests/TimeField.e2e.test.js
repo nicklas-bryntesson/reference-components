@@ -58,12 +58,12 @@ test('trigger has aria-expanded=false and aria-haspopup=dialog when closed', asy
 // ── Popup open / close ─────────────────────────────────────────────────────────
 
 test('popup does not exist in DOM when closed', async ({ page }) => {
-  await expect(page.locator('.popup')).toHaveCount(0)
+  await expect(page.locator(`${TF} .popup`)).toHaveCount(0)
 })
 
 test('popup is visible after trigger click', async ({ page }) => {
   await page.locator(`${TF} .trigger`).click()
-  await expect(page.locator('.popup')).toBeVisible()
+  await expect(page.locator(`${TF} .popup`)).toBeVisible()
 })
 
 test('trigger aria-expanded=true when popup open', async ({ page }) => {
@@ -74,46 +74,46 @@ test('trigger aria-expanded=true when popup open', async ({ page }) => {
 test('popup closes on Escape', async ({ page }) => {
   await page.locator(`${TF} .trigger`).click()
   // Focus inside the popup so the popup's keydown handler receives the event
-  await page.locator('.Wheel[data-segment="hour"]').focus()
+  await page.locator(`${TF} .Wheel[data-segment="hour"]`).focus()
   await page.keyboard.press('Escape')
-  await expect(page.locator('.popup')).toHaveCount(0)
+  await expect(page.locator(`${TF} .popup`)).toHaveCount(0)
 })
 
 test('focus returns to trigger after Escape', async ({ page }) => {
   await page.locator(`${TF} .trigger`).click()
   // Focus inside the popup so the popup's keydown handler receives the event
-  await page.locator('.Wheel[data-segment="hour"]').focus()
+  await page.locator(`${TF} .Wheel[data-segment="hour"]`).focus()
   await page.keyboard.press('Escape')
   await expect(page.locator(`${TF} .trigger`)).toBeFocused()
 })
 
 test('popup closes on outside click', async ({ page }) => {
   await page.locator(`${TF} .trigger`).click()
-  await expect(page.locator('.popup')).toBeVisible()
+  await expect(page.locator(`${TF} .popup`)).toBeVisible()
   // Wait for the setTimeout(0) outside-click handler to register before clicking outside
   await page.waitForTimeout(50)
   await page.evaluate(() => document.body.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true })))
-  await expect(page.locator('.popup')).toHaveCount(0)
+  await expect(page.locator(`${TF} .popup`)).toHaveCount(0)
 })
 
 // ── Popup ARIA structure ───────────────────────────────────────────────────────
 
 test('popup has role=dialog and aria-modal=true', async ({ page }) => {
   await page.locator(`${TF} .trigger`).click()
-  const popup = page.locator('.popup')
+  const popup = page.locator(`${TF} .popup`)
   await expect(popup).toHaveAttribute('role', 'dialog')
   await expect(popup).toHaveAttribute('aria-modal', 'true')
 })
 
 test('popup has aria-label', async ({ page }) => {
   await page.locator(`${TF} .trigger`).click()
-  const popup = page.locator('.popup')
+  const popup = page.locator(`${TF} .popup`)
   await expect(popup).toHaveAttribute('aria-label', 'Choose time')
 })
 
 test('popup hour column has role=spinbutton', async ({ page }) => {
   await page.locator(`${TF} .trigger`).click()
-  const hourCol = page.locator('.Wheel[data-segment="hour"]')
+  const hourCol = page.locator(`${TF} .Wheel[data-segment="hour"]`)
   await expect(hourCol).toHaveAttribute('role', 'spinbutton')
   await expect(hourCol).toHaveAttribute('aria-valuemin', '0')
   await expect(hourCol).toHaveAttribute('aria-valuemax', '23')
@@ -121,7 +121,7 @@ test('popup hour column has role=spinbutton', async ({ page }) => {
 
 test('popup minute column has role=spinbutton', async ({ page }) => {
   await page.locator(`${TF} .trigger`).click()
-  const minuteCol = page.locator('.Wheel[data-segment="minute"]')
+  const minuteCol = page.locator(`${TF} .Wheel[data-segment="minute"]`)
   await expect(minuteCol).toHaveAttribute('role', 'spinbutton')
   await expect(minuteCol).toHaveAttribute('aria-valuemin', '0')
   await expect(minuteCol).toHaveAttribute('aria-valuemax', '59')
@@ -129,7 +129,7 @@ test('popup minute column has role=spinbutton', async ({ page }) => {
 
 test('popup column contains 9 aria-hidden option elements', async ({ page }) => {
   await page.locator(`${TF} .trigger`).click()
-  const options = page.locator('.Wheel[data-segment="hour"] .Wheel-option')
+  const options = page.locator(`${TF} .Wheel[data-segment="hour"] .option`)
   await expect(options).toHaveCount(9)
   for (let i = 0; i < 9; i++) {
     await expect(options.nth(i)).toHaveAttribute('aria-hidden', 'true')
@@ -168,7 +168,7 @@ test('Tab from last segment moves focus to trigger', async ({ page }) => {
 
 test('disabled field trigger is disabled', async ({ page }) => {
   // The kitchensink has disabled TimeField instances — find the first one
-  const disabledTrigger = page.locator('.TimeField[data-disabled="true"] .trigger').first()
+  const disabledTrigger = page.locator(`.TimeField[data-disabled="true"] .trigger`).first()
   if (await disabledTrigger.count() > 0) {
     await expect(disabledTrigger).toBeDisabled()
   }
@@ -184,14 +184,14 @@ test('passes axe on the kitchensink page', async ({ page }) => {
 
 test('passes axe with popup open', async ({ page }) => {
   await page.locator(`${TF} .trigger`).click()
-  await expect(page.locator('.popup')).toBeVisible()
+  await expect(page.locator(`${TF} .popup`)).toBeVisible()
   await scopedCheckA11y(page, TF, {
     detailedReport: false,
     axeOptions: {
       runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa'] },
     },
   })
-  await page.locator('.Wheel[data-segment="hour"]').focus()
+  await page.locator(`${TF} .Wheel[data-segment="hour"]`).focus()
   await page.keyboard.press('Escape')
 })
 
@@ -207,7 +207,7 @@ test('wheel column ArrowDown increases value in segment', async ({ page }) => {
 
   // Open popup and focus hour column
   await page.locator(`${TF} .trigger`).click()
-  const hourCol = page.locator('.Wheel[data-segment="hour"]')
+  const hourCol = page.locator(`${TF} .Wheel[data-segment="hour"]`)
   await hourCol.focus()
 
   // ArrowDown = stepBy(+1) = raises the value
@@ -227,7 +227,7 @@ test('wheel column ArrowUp decreases value in segment', async ({ page }) => {
   await page.waitForTimeout(350)
 
   await page.locator(`${TF} .trigger`).click()
-  const hourCol = page.locator('.Wheel[data-segment="hour"]')
+  const hourCol = page.locator(`${TF} .Wheel[data-segment="hour"]`)
   await hourCol.focus()
 
   // ArrowUp = stepBy(-1) = lowers the value
@@ -239,11 +239,11 @@ test('wheel column ArrowUp decreases value in segment', async ({ page }) => {
 
 test('"Now" button syncs the wheel with the current time', async ({ page }) => {
   await page.locator(`${TF} .trigger`).click()
-  const nowBtn = page.locator('.footer-now')
+  const nowBtn = page.locator(`${TF} .footer-now`)
   await nowBtn.click()
   // Wheel columns should now have aria-valuenow set
-  const hourCol = page.locator('.Wheel[data-segment="hour"]')
-  const minuteCol = page.locator('.Wheel[data-segment="minute"]')
+  const hourCol = page.locator(`${TF} .Wheel[data-segment="hour"]`)
+  const minuteCol = page.locator(`${TF} .Wheel[data-segment="minute"]`)
   const hourVal = await hourCol.getAttribute('aria-valuenow')
   const minVal = await minuteCol.getAttribute('aria-valuenow')
   expect(Number(hourVal)).toBeGreaterThanOrEqual(0)
@@ -255,9 +255,9 @@ test('"Now" button syncs the wheel with the current time', async ({ page }) => {
 test('"Clear" button resets the wheel to an empty state', async ({ page }) => {
   // First set a value via Nu
   await page.locator(`${TF} .trigger`).click()
-  await page.locator('.footer-now').click()
+  await page.locator(`${TF} .footer-now`).click()
   // Then clear
-  await page.locator('.footer-clear').click()
+  await page.locator(`${TF} .footer-clear`).click()
   // Native value should be empty
   const nativeVal = await page.locator(`${TF} .native`).inputValue()
   expect(nativeVal).toBe('')
@@ -271,18 +271,18 @@ test('"Now" and "Clear" dispatch input + change on the native input', async ({ p
     native.addEventListener('input', () => window.__events.push('input'))
     native.addEventListener('change', () => window.__events.push('change'))
   }, TF)
-  await page.locator('.footer-now').click()
+  await page.locator(`${TF} .footer-now`).click()
   expect(await page.evaluate(() => window.__events)).toEqual(['input', 'change'])
-  await page.locator('.footer-clear').click()
+  await page.locator(`${TF} .footer-clear`).click()
   expect(await page.evaluate(() => window.__events)).toEqual(['input', 'change', 'input', 'change'])
 })
 
 test('popup wheel column has aria-valuemin and aria-valuemax', async ({ page }) => {
   await page.locator(`${TF} .trigger`).click()
-  const hourCol = page.locator('.Wheel[data-segment="hour"]')
+  const hourCol = page.locator(`${TF} .Wheel[data-segment="hour"]`)
   await expect(hourCol).toHaveAttribute('aria-valuemin', '0')
   await expect(hourCol).toHaveAttribute('aria-valuemax', '23')
-  const minuteCol = page.locator('.Wheel[data-segment="minute"]')
+  const minuteCol = page.locator(`${TF} .Wheel[data-segment="minute"]`)
   await expect(minuteCol).toHaveAttribute('aria-valuemin', '0')
   await expect(minuteCol).toHaveAttribute('aria-valuemax', '59')
 })
@@ -291,10 +291,10 @@ test('popup wheel column has aria-valuemin and aria-valuemax', async ({ page }) 
 
 test('Tab past the last footer button keeps focus inside the popup', async ({ page }) => {
   await page.locator(`${TF} .trigger`).click()
-  await expect(page.locator('.popup')).toBeVisible()
+  await expect(page.locator(`${TF} .popup`)).toBeVisible()
   // "Now" is the last tab stop (Clear is disabled while empty). Tab must wrap
   // back into the popup, not escape to the page behind the aria-modal dialog.
-  await page.locator('.footer-now').focus()
+  await page.locator(`${TF} .footer-now`).focus()
   await page.keyboard.press('Tab')
   const inside = await page.evaluate(() =>
     document.querySelector('.popup')?.contains(document.activeElement) ?? false,
@@ -304,11 +304,11 @@ test('Tab past the last footer button keeps focus inside the popup', async ({ pa
 
 test('Shift+Tab from the first wheel keeps focus inside the popup (wraps, does not close)', async ({ page }) => {
   await page.locator(`${TF} .trigger`).click()
-  await expect(page.locator('.popup')).toBeVisible()
-  await page.locator('.Wheel[data-segment="hour"]').focus()
+  await expect(page.locator(`${TF} .popup`)).toBeVisible()
+  await page.locator(`${TF} .Wheel[data-segment="hour"]`).focus()
   await page.keyboard.press('Shift+Tab')
   // Popup stays open and focus is still within it (wraps to the last footer button).
-  await expect(page.locator('.popup')).toBeVisible()
+  await expect(page.locator(`${TF} .popup`)).toBeVisible()
   const inside = await page.evaluate(() =>
     document.querySelector('.popup')?.contains(document.activeElement) ?? false,
   )
@@ -317,7 +317,7 @@ test('Shift+Tab from the first wheel keeps focus inside the popup (wraps, does n
 
 test('wheel event on the popup surface (off a column) is defaultPrevented', async ({ page }) => {
   await page.locator(`${TF} .trigger`).click()
-  await expect(page.locator('.popup')).toBeVisible()
+  await expect(page.locator(`${TF} .popup`)).toBeVisible()
   const prevented = await page.evaluate(() => {
     const popup = document.querySelector('.popup')
     const ev = new WheelEvent('wheel', { deltaY: 120, bubbles: true, cancelable: true })

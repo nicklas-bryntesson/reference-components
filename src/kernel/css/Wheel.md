@@ -10,14 +10,14 @@ pair** — shipping `WheelColumn` without `Wheel.css` renders the options as ove
 | Class | Authored / injected | Role |
 |-------|--------------------|------|
 | `.Wheel` | **authored** (host) | sizing, perspective, overflow clip, focus ring |
-| `.Wheel-ring` | injected by JS | the rotating 3D ring |
-| `.Wheel-option` | injected by JS | one row; `[aria-selected="true"]` is the centred value |
-| `.Wheel-band` | injected by JS | per-column highlight band — currently **hidden** (`display: none`); superseded by `.WheelColumns::before` |
+| `.ring` | injected by JS | the rotating 3D ring |
+| `.option` | injected by JS | one row; `[aria-selected="true"]` is the centred value |
+| `.band` | injected by JS | per-column highlight band — currently **hidden** (`display: none`); superseded by `.WheelColumns::before` |
 | `.WheelColumns` | **authored** (wrapper around the `.Wheel` columns) | draws the visible full-width centre band (`::before`) and top/bottom fade (`::after`); declares its own `--_wheel-row-height: 38px` that must stay in sync with `.Wheel`'s |
 
 A port that follows this table must end up with both the centre band and the fade — they live on the
 authored `.WheelColumns` wrapper (present in all four consuming components' canonical markup), not on
-`.Wheel` or the injected `.Wheel-band`.
+`.Wheel` or the injected `.band`.
 
 ## Tokens
 
