@@ -30,7 +30,7 @@ function video(el: HTMLElement): HTMLVideoElement {
 }
 
 function control(el: HTMLElement): HTMLButtonElement | null {
-  return el.querySelector<HTMLButtonElement>('button.MotionRegion-control')
+  return el.querySelector<HTMLButtonElement>('button.control')
 }
 
 afterEach(() => {
@@ -75,7 +75,7 @@ describe('MotionRegion.attach — init', () => {
     createRegion()
     MotionRegion.attach(document.body)
     MotionRegion.attach(document.body)
-    expect(document.querySelectorAll('button.MotionRegion-control').length).toBe(1)
+    expect(document.querySelectorAll('button.control').length).toBe(1)
   })
 })
 
@@ -149,7 +149,7 @@ describe('MotionRegion — video adapter', () => {
   it('pauses the video when the user pauses', () => {
     const el = createRegion({ 'data-autoplay': 'policy' }, true)
     MotionRegion.attach(document.body)
-    el.querySelector<HTMLButtonElement>('button.MotionRegion-control')!.click()
+    el.querySelector<HTMLButtonElement>('button.control')!.click()
     expect(pauseSpy).toHaveBeenCalled()
   })
 
@@ -165,7 +165,7 @@ describe('MotionRegion — video adapter', () => {
     MotionRegion.attach(document.body)
     const v = video(el)
     expect(v.id).toBeTruthy()
-    expect(el.querySelector('button.MotionRegion-control')!.getAttribute('aria-controls')).toBe(v.id)
+    expect(el.querySelector('button.control')!.getAttribute('aria-controls')).toBe(v.id)
   })
 })
 

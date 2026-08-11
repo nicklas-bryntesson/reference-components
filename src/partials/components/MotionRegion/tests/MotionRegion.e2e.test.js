@@ -20,21 +20,21 @@ test.beforeEach(async ({ page }) => {
 test('autostarts under a clean policy and the CSS backend runs', async ({ page }) => {
   const region = page.locator(MR)
   await expect(region).toHaveAttribute('data-motion', 'running')
-  await expect(region.locator('.MotionRegion-demo')).toHaveCSS('animation-play-state', 'running')
+  await expect(region.locator('.demo-animation')).toHaveCSS('animation-play-state', 'running')
 })
 
 test('injects an accessible pause control (WCAG 2.2.2)', async ({ page }) => {
-  const control = page.locator(`${MR} .MotionRegion-control`)
+  const control = page.locator(`${MR} .control`)
   await expect(control).toBeVisible()
   await expect(control).toHaveAttribute('aria-label', /pause/i)
 })
 
 test('the control pauses motion and the CSS gate stops the animation', async ({ page }) => {
   const region = page.locator(MR)
-  await region.locator('.MotionRegion-control').click()
+  await region.locator('.control').click()
   await expect(region).toHaveAttribute('data-motion', 'paused')
-  await expect(region.locator('.MotionRegion-demo')).toHaveCSS('animation-play-state', 'paused')
-  await expect(region.locator('.MotionRegion-control')).toHaveAttribute('aria-label', /play/i)
+  await expect(region.locator('.demo-animation')).toHaveCSS('animation-play-state', 'paused')
+  await expect(region.locator('.control')).toHaveAttribute('aria-label', /play/i)
 })
 
 test('passes an axe audit', async ({ page }) => {
@@ -52,5 +52,5 @@ test('does not autostart under reduced motion; the CSS animation stays paused', 
   await region.scrollIntoViewIfNeeded()
   await page.locator(`${MR}[data-initialized="true"]`).waitFor()
   await expect(region).toHaveAttribute('data-motion', 'paused')
-  await expect(region.locator('.MotionRegion-demo')).toHaveCSS('animation-play-state', 'paused')
+  await expect(region.locator('.demo-animation')).toHaveCSS('animation-play-state', 'paused')
 })
