@@ -23,6 +23,17 @@ Do **not** port:
 - **`*.generate.ts` and `states/`** — repo-internal tooling that regenerates the kitchensink's `.hbs` state partials. You author your demo states directly in your own stack.
 - **`*.unit.test.*`** — these are white-box tests of the *reference implementation* (they call private methods and import the TS class directly). They are **not** the portable contract and carry a TS-adaptation tax for no benefit. The portable contract is the **conformance suite** — the e2e + axe tests, which assert observable behaviour and ARIA structure against your own DOM.
 
+## Restyle to your own convention — after the suite is green, never during
+
+Copying the `.css` verbatim is the point of the step above, so if your project writes nested CSS, CSS Modules, scoped styles or utility classes, that translation is a **separate step on a verified baseline**. Doing both at once leaves you two variables and nothing to bisect: when the field misbehaves you cannot tell which half broke it.
+
+Translate in **your own tree**, not inside the submodule — the submodule is meant to stay pristine and disposable, and rewriting it costs you both upstream updates and the unmodified reference to compare against when something looks wrong.
+
+Two things worth knowing before you start:
+
+- **The suite will not catch a botched translation.** It asserts behaviour and ARIA, not appearance — green afterwards means "I did not break the interaction", not "it looks right". Cheap net: snapshot `getComputedStyle` for a handful of parts (the popup, its footer, the segments, the trigger) with the popup **open**, translate, snapshot again, diff. That catches exactly what the suite cannot.
+- **Keep every rule qualified from the root.** The element class names are deliberately generic words — `.popup`, `.footer`, `.rail`, `.content`, `.trigger`, the same word in every component — so a bare `.popup {}` at column 0 leaks across components and the last stylesheet imported wins. Nesting is fine; a nested rule is qualified too. The one trap: `&` takes the specificity of the **most specific** selector in its parent list, so `#id, .cls { & .x {} }` silently gives `.x` id-level weight, which a later class-level rule can no longer override. Flat descendant selectors cannot express that ambiguity.
+
 ## Run the test suite against your dev server
 
 The test suite is driven by `BASE_URL`. When set, Playwright skips the built-in dev server and points all tests at your server instead.
