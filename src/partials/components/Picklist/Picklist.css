@@ -1,0 +1,251 @@
+/* src/partials/components/Picklist/Picklist.css */
+/*
+ * Picklist — a wrapping set of CHIPS the user picks from (ADR-0014).
+ *
+ * It composes ChoiceGroup's semantic core — <fieldset> + <legend> + native
+ * <input type="radio|checkbox"> + <label> — and diverges only in item
+ * rendering: the input's box disappears and the LABEL becomes the chip.
+ *
+ * Own component, not a ChoiceGroup skin: "pick chips from a set" is a distinct
+ * usage context (ADR-0014 condition 3). The legend recipe is COPIED here rather
+ * than imported, so a consumer can port Picklist without porting ChoiceGroup
+ * (clarity over DRY, ADR-0004).
+ *
+ * No JS. Native owns selection, arrow-roving, Space, form participation and
+ * label association. Cardinality is implicit in the children's `type`
+ * (ADR-0015): radios sharing a `name` are single-select, checkboxes multi.
+ *
+ * THE CHIP MECHANISM: the input is sr-clipped (1px, still focusable) and the
+ * adjacent label is the chip surface, so selected and focus states are plain
+ * sibling selectors — `input:checked + label`, `input:focus-visible + label`.
+ * No :has() anywhere: a focus ring is load-bearing, and :has() is progressive
+ * enhancement only (ADR-0005).
+ *
+ * Root carries tokens + root props only; every part is a flat, fully-qualified
+ * `.Picklist <part>` rule below (ADR-0019).
+ */
+
+.Picklist {
+  /* ── Public API ──────────────────────────────────────────────────────── */
+  --_pl-gap: 0.5rem;                                   /* between chips, both axes */
+  --_pl-legend-gap: 0.5rem;                            /* legend → body (above) */
+  --_pl-legend-gap-inline: 1rem;                       /* legend → body (beside) */
+  --_pl-legend-weight: 600;
+  --_pl-max-inline-size: 30rem;
+  --_pl-hint-color: var(--ui-muted-foreground, #6e6e6e);
+
+  --_pl-chip-min-block-size: 2.5rem;                   /* the family field-height contract (ADR-0008) */
+  --_pl-chip-padding-inline: 0.75rem;
+  --_pl-chip-radius: 999px;                            /* pill */
+  --_pl-chip-border-width: 1px;
+  --_pl-chip-border-color: currentColor;
+  --_pl-chip-border-color-hover: CanvasText;
+  --_pl-chip-border-color-invalid: var(--ui-destructive, #c00);
+  --_pl-chip-bg: Canvas;
+  --_pl-chip-bg-hover: var(--ui-hover);
+  --_pl-chip-selected-bg: CanvasText;                  /* host overrides for accent */
+  --_pl-chip-selected-fg: Canvas;
+  --_pl-deselect-size: 0.75em;                         /* the × glyph — em, tracks chip text */
+  --_pl-deselect-gap: 0.375rem;                        /* text → × */
+  --_pl-deselect-opacity: 0.7;
+  --_pl-transition: 120ms ease;
+
+  /* Legend hygiene — the documented cost of <fieldset> (ADR-0013).
+     min-inline-size:0 kills the implicit min-content width in flex/grid hosts. */
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-inline-size: 0;
+  max-inline-size: var(--_pl-max-inline-size);
+}
+
+.Picklist > legend {
+  padding: 0;
+  font-weight: var(--_pl-legend-weight);
+}
+
+/* Body forms its own formatting context (holds hint + options + error). */
+.Picklist .content { display: flow-root; }
+
+.Picklist .hint {
+  margin-block: 0 var(--_pl-gap);
+  color: var(--_pl-hint-color);
+}
+
+/* Chips wrap — that is the shape of a picklist (ADR-0014). */
+.Picklist .options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--_pl-gap);
+}
+
+/* Group-level error is a Notice inside a persistent live region; Picklist only
+   owns the spacing (announcer + payload are the Notice component, ADR-0016). */
+.Picklist .notice-region {
+  margin-block-start: var(--_pl-gap);
+}
+
+/* ── The chip ────────────────────────────────────────────────────────────
+   .option positions the clipped input; the label is the visible surface. */
+.Picklist .option {
+  position: relative;
+  display: inline-flex;
+}
+
+/* sr-clipped but STILL FOCUSABLE — never display:none / visibility:hidden. */
+.Picklist .option input {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.Picklist .option input + label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--_pl-deselect-gap);
+  /* border-box so the border counts INSIDE the height: the rest of the field
+     family lands on exactly 40px, and content-box would make the chip 42px
+     (ADR-0008 is a total-height contract, not a content-height one). */
+  box-sizing: border-box;
+  min-block-size: var(--_pl-chip-min-block-size);
+  padding-inline: var(--_pl-chip-padding-inline);
+  border: var(--_pl-chip-border-width) solid var(--_pl-chip-border-color);
+  border-radius: var(--_pl-chip-radius);
+  background-color: var(--_pl-chip-bg);
+  cursor: pointer;
+  user-select: none;
+  transition: background-color var(--_pl-transition), border-color var(--_pl-transition),
+              color var(--_pl-transition);
+}
+
+/* Selected — a plain adjacent-sibling selector, no :has(). */
+.Picklist .option input:checked + label {
+  border-color: var(--_pl-chip-selected-bg);
+  background-color: var(--_pl-chip-selected-bg);
+  color: var(--_pl-chip-selected-fg);
+}
+
+/* The × glyph: decorative, lives INSIDE the label, so clicking it activates the
+   label and toggles the input — deselection with no JS and no second label. */
+.Picklist .option .deselect {
+  flex-shrink: 0;
+  inline-size: var(--_pl-deselect-size);
+  block-size: var(--_pl-deselect-size);
+  opacity: var(--_pl-deselect-opacity);
+}
+
+/* An × on an UNSELECTED chip is meaningless — there is nothing to remove. Hide
+   it with visibility, not display, so the slot keeps its width: toggling must
+   not resize the chip and reflow the wrapped rows around it. Still a plain
+   sibling selector — no :has(). */
+.Picklist .option input:not(:checked) + label .deselect {
+  visibility: hidden;
+}
+
+/* ── Interaction states (real pseudo-class + data-test-state pairs) ────── */
+.Picklist .option input:not(:checked):hover + label,
+.Picklist[data-test-state="hover"] .option input:not(:checked) + label {
+  border-color: var(--_pl-chip-border-color-hover);
+  background-color: var(--_pl-chip-bg-hover);
+}
+.Picklist .option input:checked:hover + label,
+.Picklist[data-test-state="hover"] .option input:checked + label {
+  border-color: var(--_pl-chip-border-color-hover);
+}
+
+/* focus — matches the family: 2px solid currentColor, offset 1px. The ring is
+   drawn on the LABEL, which is the chip, not on the 1px clipped input. */
+.Picklist .option input:focus-visible + label,
+.Picklist[data-test-state="focus"] .option input + label {
+  outline: 2px solid;
+  outline-offset: 1px;
+}
+
+.Picklist .option input:not(:checked):active + label,
+.Picklist[data-test-state="active"] .option input:not(:checked) + label {
+  border-color: var(--_pl-chip-border-color-hover);
+  background-color: var(--_pl-chip-bg-hover);
+}
+.Picklist .option input:checked:active + label,
+.Picklist[data-test-state="active"] .option input:checked + label {
+  border-color: var(--_pl-chip-border-color-hover);
+}
+
+/* invalid — group-level; data-* on the root is the API (ADR-0002) */
+.Picklist[data-invalid="true"] .option input:not(:checked) + label {
+  border-color: var(--_pl-chip-border-color-invalid);
+}
+
+/* disabled — family convention: dim, don't recolour. Covers both a single
+   disabled input and the <fieldset disabled> cascade. */
+.Picklist .option input:disabled + label {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* ── Orientation: chips wrap in a row by default. A vertical picklist is a
+   list, i.e. a ChoiceGroup — so there is no data-orientation here. ───── */
+
+/* ── Legend: above (default) — full-width float, content clears below ─── */
+.Picklist[data-legend="above"] > legend,
+.Picklist:not([data-legend]) > legend {
+  float: left;
+  inline-size: 100%;
+  margin-block-end: var(--_pl-legend-gap);
+}
+.Picklist[data-legend="above"] > .content,
+.Picklist:not([data-legend]) > .content {
+  clear: both;                 /* drop the whole body below the full-width legend */
+}
+
+/* ── Legend: beside — auto-width float, content fills the space beside it ─ */
+.Picklist[data-legend="beside"] > legend {
+  float: left;
+  inline-size: auto;
+  margin-inline-end: var(--_pl-legend-gap-inline);
+}
+/* .content stays flow-root (not cleared) → shrinks to the room right of the float */
+
+/* ── Legend: hidden — removed visually, kept as the SR group name ────── */
+.Picklist[data-legend="hidden"] > legend {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Windows High Contrast / forced-colors: the chip is an author-painted <label>,
+   so the platform draws neither the selection nor the ring — redraw both from
+   system colours. Do not delete this block when porting. */
+@media (forced-colors: active) {
+  .Picklist .option input:checked + label {
+    border-color: Highlight;
+    background-color: Highlight;
+    color: HighlightText;
+  }
+  .Picklist .option input:focus-visible + label {
+    outline: 2px solid CanvasText;
+    outline-offset: 1px;
+  }
+  .Picklist .option input:disabled + label {
+    color: GrayText;
+    border-color: GrayText;
+    opacity: 1;                /* opacity is not a forced-colors signal */
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .Picklist .option input + label { transition: none; }
+}
