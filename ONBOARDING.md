@@ -54,7 +54,10 @@ Arrow size / corner-radius / site-padding are CSS custom properties (e.g. `--_tf
 | Trigger class | `.trigger` | ToggleTip is a bare `<button>` (fine for a tooltip) |
 | Every element rule | `.Component .element` | **never a bare `.element` at column 0** — generic names are only safe because the root qualifies them. See the class-naming section in [`.claude/philosophy.md`](.claude/philosophy.md) |
 | Direction | `data-direction="top\|bottom"` | not a bare `direction` attribute |
+| Orientation | `data-orientation="horizontal\|vertical"` | same word and values in every component that has a direction of flow (ChoiceGroup, Picklist) |
 | Offset vars | `--<prefix>-popup-offset`, `--<prefix>-arrow-offset` | set from JS |
+| Boolean vs enum `data-*` | run the orthogonality test | **boolean** if the axis is independent and stacks (`data-invalid`, `data-emphasis`, `data-segmented`); **enum** if the values are mutually exclusive on one axis (`data-legend`, `data-orientation`, `data-variant`). See the `data-*` section in [`.claude/philosophy.md`](.claude/philosophy.md) |
+| Naming a `data-*` | after what it **is**, not how it works | `data-emphasis` not `elevated`; `data-segmented` not `data-flush`/`data-joined`. A design *value* (radius, colour) is a `--_*`/`--ui-*` token, not an attribute |
 
 > **Gotcha (already bit us):** the same rule applies to **e2e locators**. `page.locator('.popup')` matches every component's popup on the shared kitchensink page — always scope to the suite's root constant: `page.locator(\`${TF} .popup\`)`. The only page-wide locators should be ones qualified by a component class on purpose (e.g. targeting the disabled kitchensink row).
 
