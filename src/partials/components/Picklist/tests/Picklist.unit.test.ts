@@ -101,6 +101,34 @@ describe('Picklist reference markup contract', () => {
     }
   })
 
+  // ── The two axes ──────────────────────────────────────────────────────
+
+  it('a data-orientation value is always one of the known directions', () => {
+    for (const l of lists()) {
+      const v = l.getAttribute('data-orientation')
+      expect(['horizontal', 'vertical', null]).toContain(v)
+    }
+  })
+
+  it('data-segmented is the literal "true" when present', () => {
+    // Boolean-ish data attributes carry an explicit ="true" family-wide, so the
+    // CSS attribute selectors and the HTML read the same way.
+    for (const l of lists()) {
+      if (!l.hasAttribute('data-segmented')) continue
+      expect(l.getAttribute('data-segmented')).toBe('true')
+    }
+  })
+
+  it('the kitchensink exercises both axes and their combination', () => {
+    const q = (sel: string) => document.querySelectorAll(sel).length
+    expect(q('.Picklist[data-segmented="true"]'), 'no segmented example').toBeGreaterThan(0)
+    expect(q('.Picklist[data-orientation="vertical"]'), 'no vertical example').toBeGreaterThan(0)
+    expect(
+      q('.Picklist[data-orientation="vertical"][data-segmented="true"]'),
+      'the axes must be shown composed, not only separately',
+    ).toBeGreaterThan(0)
+  })
+
   // ── Removable chips ───────────────────────────────────────────────────
   // The × deselects by living inside the label: clicking it activates the
   // label, which toggles the input. That only works if it is INSIDE the

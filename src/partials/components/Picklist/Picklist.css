@@ -190,8 +190,76 @@
   opacity: 0.5;
 }
 
-/* ── Orientation: chips wrap in a row by default. A vertical picklist is a
-   list, i.e. a ChoiceGroup — so there is no data-orientation here. ───── */
+/* ── Orientation ──────────────────────────────────────────────────────────
+   Horizontal (default) wraps; vertical stacks. Vertical is NOT the same as a
+   ChoiceGroup: what separates the two is the item SKIN — a pill vs a box with
+   a mark — not the direction the items run in. */
+.Picklist[data-orientation="vertical"] .options {
+  flex-direction: column;
+  /* A flex column stretches its children by default; chips should hug their
+     own text instead, so each pill is as wide as its label. Segmented mode
+     overrides this below — there the segments must line up as one bar. */
+  align-items: start;
+}
+
+/* ── Segmented — one control with N positions, not N independent chips ─────
+   Gaps collapse, borders join, and the outer radius moves to the two ends.
+   The radius is derived from the SAME token as the chip shape, via logical
+   properties, so a host that sets --_pl-chip-radius: 0.25rem gets a rounded
+   rectangle in either orientation (and RTL) for free. */
+.Picklist[data-segmented="true"] .options {
+  flex-wrap: nowrap;
+  gap: 0;
+}
+.Picklist[data-segmented="true"] .option input + label {
+  border-radius: 0;
+}
+
+/* Segmented · horizontal — one border per seam, radius on the inline ends. */
+.Picklist[data-segmented="true"]:not([data-orientation="vertical"]) .option + .option input + label {
+  border-inline-start: 0;
+}
+.Picklist[data-segmented="true"]:not([data-orientation="vertical"]) .option:first-child input + label {
+  border-start-start-radius: var(--_pl-chip-radius);
+  border-end-start-radius: var(--_pl-chip-radius);
+}
+.Picklist[data-segmented="true"]:not([data-orientation="vertical"]) .option:last-child input + label {
+  border-start-end-radius: var(--_pl-chip-radius);
+  border-end-end-radius: var(--_pl-chip-radius);
+}
+
+/* Segmented · vertical — seams and radii move to the block axis, and the
+   segments line up as one bar.
+   GOTCHA: `align-items: stretch` stretches the .option wrapper but NOT the
+   label, which is a flex item in the wrapper's own row context — and the label
+   is what the user sees as the chip. Without `flex: 1` the bar renders ragged
+   (measured: 54/75/64/74px labels inside 480px wrappers). */
+.Picklist[data-orientation="vertical"][data-segmented="true"] .options {
+  align-items: stretch;
+}
+.Picklist[data-orientation="vertical"][data-segmented="true"] .option input + label {
+  flex: 1;
+}
+.Picklist[data-orientation="vertical"][data-segmented="true"] .option + .option input + label {
+  border-block-start: 0;
+}
+.Picklist[data-orientation="vertical"][data-segmented="true"] .option:first-child input + label {
+  border-start-start-radius: var(--_pl-chip-radius);
+  border-start-end-radius: var(--_pl-chip-radius);
+}
+.Picklist[data-orientation="vertical"][data-segmented="true"] .option:last-child input + label {
+  border-end-start-radius: var(--_pl-chip-radius);
+  border-end-end-radius: var(--_pl-chip-radius);
+}
+
+/* Segmented segments touch, so the focus ring of one is painted over by the
+   next unless it is raised. Verified in the browser: without this the ring's
+   trailing edge is missing. */
+.Picklist[data-segmented="true"] .option input:focus-visible + label,
+.Picklist[data-segmented="true"][data-test-state="focus"] .option input + label {
+  position: relative;
+  z-index: 1;
+}
 
 /* ── Legend: above (default) — full-width float, content clears below ─── */
 .Picklist[data-legend="above"] > legend,

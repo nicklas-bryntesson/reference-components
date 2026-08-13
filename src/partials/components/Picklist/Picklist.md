@@ -65,15 +65,34 @@ carries it.
 
 | Attribute | Values | Default | Effect |
 |---|---|---|---|
+| `data-orientation` | `horizontal` · `vertical` | `horizontal` | Chips run in a wrapping row, or stack in a column |
+| `data-segmented` | `"true"` | — | The set becomes **one control with N positions**: gaps collapse, borders join, the outer radius moves to the two ends, and the row no longer wraps |
 | `data-legend` | `above` · `beside` · `hidden` | `above` | Legend placement recipe (see below) |
 | `data-invalid` | `"true"` | — | Group-level invalid; tints unselected chip borders. Pair with an error Notice in a live region + `aria-describedby` |
 | `aria-describedby` | id ref list | — | Points at the `.hint` and/or the error Notice's text id so SRs read them after the group name |
 | `data-test-state` | `hover` · `focus` · `active` on the root | — | **Kitchensink only** — simulated pseudo-class, projected down to the chips |
 
-There is **no `data-orientation`**: chips wrap in a row, and a *vertically stacked* list of
-options is a ChoiceGroup, not a Picklist. There is also no `data-removable` — a chip is
-removable exactly when its label contains a `.deselect` glyph, so a second source of truth would
-only be a way to disagree with the markup.
+### The two axes
+
+`data-orientation` and `data-segmented` are independent, and all four combinations are useful:
+
+| | gapped (default) | `data-segmented="true"` |
+|---|---|---|
+| **horizontal** (default) | a wrapping row of chips — filters, tags | a segmented control — alignment, density |
+| **vertical** | a stacked list of pills, each hugging its own text | one vertical bar of joined segments |
+
+Two consequences worth knowing when porting:
+
+- **Wrap and equal-width are not separate settings.** They follow from `data-segmented`: a joined
+  row that wrapped would break mid-row with stray radii, so segmented never wraps.
+- **Pill vs rectangle is not an attribute.** It is the `--_pl-chip-radius` token, and the same
+  token that rounds a chip also rounds the two ends of a segmented bar, in either orientation.
+
+A vertical Picklist is **not** a ChoiceGroup. What separates them is the item **skin** — a pill
+versus a box with a mark — not the direction the items run in.
+
+There is no `data-removable` — a chip is removable exactly when its label contains a `.deselect`
+glyph, so a second source of truth would only be a way to disagree with the markup.
 
 ### Legend placement recipes
 
@@ -103,6 +122,15 @@ Two consequences worth keeping when porting:
 
 The chip's total height is **2.5rem / 40px**, matching every other control in the library. The
 label is `box-sizing: border-box` so the border counts inside that height.
+
+Two details the segmented mode adds, both of which are easy to get wrong:
+
+- **The focus ring must be raised.** Segments touch, so without `position: relative; z-index: 1`
+  on the focused label the *next* segment paints over the ring's trailing edge — verified in a
+  browser, not a precaution.
+- **Vertical segments need `flex: 1` on the label.** `align-items: stretch` stretches the
+  `.option` wrapper, but the label is a flex item inside that wrapper's own row context and stays
+  at content width — and the label is what the user sees as the segment.
 
 ## Removable chips (the `×`)
 
@@ -229,7 +257,10 @@ Because behaviour is native, the centre of gravity sits in e2e:
   counter. The moment a click handler appears, the component has left the native family.
 - **No combobox/autocomplete** feeding the chips — that is the token-input pattern, a different
   component.
-- **No vertical orientation** — a stacked list of options is a ChoiceGroup.
+- **No sliding indicator.** A segmented Picklist paints the selected segment directly. An
+  indicator that *animates* between segments would need either one CSS rule per segment index
+  (capping how many segments a group may have) or JavaScript — neither is worth it for a
+  decoration, and the selection is already unambiguous without it.
 - **No horizontal-scroll variant** — scrolling a selection group hides options from sighted users
   while keeping them Tab-reachable; that needs its own accessibility round.
 - **Does not restyle or import ChoiceGroup** — the two are siblings that share a recipe, not a
