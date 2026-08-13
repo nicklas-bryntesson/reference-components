@@ -146,6 +146,36 @@ Boolean state always carries the explicit literal value `"true"` — never a bar
 <div class="DateField" data-component="DateField" data-disabled="true">
 ```
 
+### Boolean or enum — decided by the orthogonality test
+
+Before adding a `data-*`, ask whether each axis is meaningful **on its own**:
+
+- **Boolean** when the axis is independent and *stacks* with the others — `data-invalid`,
+  `data-icon`, `data-border`, `data-emphasis`, `data-segmented`. Notice is the proof: three
+  independent toggles, and all eight combinations are meaningful.
+- **Enum** when the values are mutually exclusive positions on **one** axis — `data-legend`
+  (`above`/`beside`/`hidden`), `data-orientation`, `data-variant`, `data-direction`. A legend
+  cannot be above *and* hidden.
+
+The failure mode runs in both directions. Splitting one axis into N booleans promises 2^N
+combinations of which only a couple are coherent — a segmented Picklist was nearly shipped as
+`data-joined` + `data-wrap` + `data-equal`, eight combinations with two meaningful, when wrap and
+equal-width are simply *derived* from being segmented. Bundling two independent axes into one enum
+is the mirror image: `data-shape="chips|segmented"` would have made direction and tightness
+inexpressible together.
+
+### Name a `data-*` after what the thing *is*
+
+Name the attribute for the intent or the result, never the mechanism and never "this is about
+looks". `data-emphasis` beat `elevated` (a mechanism: shadow) and `styled` (vague).
+`data-segmented` beat `data-flush` (context-dependent jargon — flush left, flush a cache — and
+silent about the result), `data-joined`/`data-connected` (mechanism: the borders merge),
+`data-compact`/`data-dense` (both conventionally mean *less padding*, so an author would expect a
+shorter control), and `data-look`/`data-shape` (names the category, not the thing).
+
+A design *value* is not an attribute at all — pill versus rounded rectangle is
+`--_pl-chip-radius`, i.e. the `--_`/`--ui-*` seam.
+
 ### No impossible states in markup
 
 The component's source of truth (JS logic + `generate.ts` for state partials) defines which attribute combinations are valid. CSS never needs to guard against states that can't exist — they can't be authored.
