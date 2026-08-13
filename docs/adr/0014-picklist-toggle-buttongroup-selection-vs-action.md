@@ -1,8 +1,22 @@
 # ADR 0014: Picklist, Toggle and ButtonGroup are distinct components; *selection-vs-action* draws the line
 
-**Status:** Proposed
+**Status:** Accepted 2026-08-12 · Picklist built; condition 3 held up in the building (see note below)
 **Date:** 2026-07-21
 **Decider:** Nicklas Bryntesson
+
+> **2026-08-12 — the "Reconsider when" check, on building Picklist.** Condition 3 still reads as
+> the honest reason: Picklist's own `.md` ended up with a *different contract*, not a different
+> stylesheet — no `data-orientation` (a stacked list of options **is** a ChoiceGroup), a chip
+> mechanism ChoiceGroup has no use for (sr-clipped input, label-as-surface), and a removable-chip
+> rule that only makes sense for chips. A skin could not have carried those. Picklist does **not**
+> import ChoiceGroup's CSS; it copies the legend recipe, so a consumer can port one without the
+> other.
+>
+> One refinement the building produced: the **removable chip** is *not* the action-inside-selection
+> problem this ADR feared. Its `×` is a decorative `aria-hidden` glyph inside the chip's own
+> `<label>`, so activating it activates the label and **deselects the value** — no JS, no second
+> label, no submitted-value violation. A focusable `<button>` `×` that deletes the chip from the
+> DOM *would* cross the line, and is recorded as a non-goal. Toggle and ButtonGroup remain unbuilt.
 
 ## Context
 

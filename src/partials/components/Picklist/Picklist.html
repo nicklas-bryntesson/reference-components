@@ -1,0 +1,231 @@
+<section class="kitchensink-section" id="Picklist">
+
+  <h2>Picklist</h2>
+
+  <!-- ── 1. Interaction states ──────────────────────────────────────────
+       data-test-state on the ROOT; CSS projects it down to the chips with
+       descendant selectors, mirroring the real pseudo-class pairs. Each cell
+       is its own Picklist root so the simulated state is scoped to it. -->
+  <h3>Interaction states</h3>
+
+  <h4>Default</h4>
+  <fieldset class="Picklist" data-id="state-default" data-legend="hidden">
+    <legend>Interaction state: default</legend>
+    <div class="content">
+      <div class="options">
+        <span class="option"><input type="checkbox" id="pl-sd-1" name="pl-sd-1"><label for="pl-sd-1">Unselected</label></span>
+        <span class="option"><input type="checkbox" id="pl-sd-2" name="pl-sd-2" checked><label for="pl-sd-2">Selected</label></span>
+      </div>
+    </div>
+  </fieldset>
+
+  <h4>Hover</h4>
+  <fieldset class="Picklist" data-id="state-hover" data-legend="hidden" data-test-state="hover">
+    <legend>Interaction state: hover</legend>
+    <div class="content">
+      <div class="options">
+        <span class="option"><input type="checkbox" id="pl-sh-1" name="pl-sh-1"><label for="pl-sh-1">Unselected</label></span>
+        <span class="option"><input type="checkbox" id="pl-sh-2" name="pl-sh-2" checked><label for="pl-sh-2">Selected</label></span>
+      </div>
+    </div>
+  </fieldset>
+
+  <h4>Focus</h4>
+  <fieldset class="Picklist" data-id="state-focus" data-legend="hidden" data-test-state="focus">
+    <legend>Interaction state: focus</legend>
+    <div class="content">
+      <div class="options">
+        <span class="option"><input type="checkbox" id="pl-sf-1" name="pl-sf-1"><label for="pl-sf-1">Unselected</label></span>
+        <span class="option"><input type="checkbox" id="pl-sf-2" name="pl-sf-2" checked><label for="pl-sf-2">Selected</label></span>
+      </div>
+    </div>
+  </fieldset>
+
+  <h4>Active</h4>
+  <fieldset class="Picklist" data-id="state-active" data-legend="hidden" data-test-state="active">
+    <legend>Interaction state: active</legend>
+    <div class="content">
+      <div class="options">
+        <span class="option"><input type="checkbox" id="pl-sa-1" name="pl-sa-1"><label for="pl-sa-1">Unselected</label></span>
+        <span class="option"><input type="checkbox" id="pl-sa-2" name="pl-sa-2" checked><label for="pl-sa-2">Selected</label></span>
+      </div>
+    </div>
+  </fieldset>
+
+  <!-- ── 2. Disabled — single column: pointer-events are gone, so there is
+       no hover/focus to simulate. Both a single disabled chip and the
+       <fieldset disabled> cascade. -->
+  <h3>Disabled</h3>
+  <fieldset class="Picklist" data-id="disabled-single" data-legend="above">
+    <legend>One chip disabled</legend>
+    <div class="content">
+      <div class="options">
+        <span class="option"><input type="checkbox" id="pl-d-1" name="pl-d-1" checked><label for="pl-d-1">Available</label></span>
+        <span class="option"><input type="checkbox" id="pl-d-2" name="pl-d-2" disabled><label for="pl-d-2">Sold out</label></span>
+        <span class="option"><input type="checkbox" id="pl-d-3" name="pl-d-3" checked disabled><label for="pl-d-3">Locked in</label></span>
+      </div>
+    </div>
+  </fieldset>
+
+  <fieldset class="Picklist" data-id="disabled-group" data-legend="above" disabled>
+    <legend>Whole group disabled (fieldset cascade)</legend>
+    <div class="content">
+      <div class="options">
+        <span class="option"><input type="radio" id="pl-dg-1" name="pl-dg" checked><label for="pl-dg-1">Thai</label></span>
+        <span class="option"><input type="radio" id="pl-dg-2" name="pl-dg"><label for="pl-dg-2">Italian</label></span>
+      </div>
+    </div>
+  </fieldset>
+
+  <!-- ── 3. Invalid — group-level, with the error as a Notice inside a
+       persistent live region. The fieldset's aria-describedby points at the
+       Notice text id, so it also describes the group on focus. -->
+  <h3>Invalid (group error)</h3>
+  <fieldset class="Picklist" data-id="invalid" data-legend="above" data-invalid="true" aria-describedby="pl-err-text">
+    <legend>Dietary needs</legend>
+    <div class="content">
+      <div class="options">
+        <span class="option"><input type="checkbox" id="pl-e-1" name="pl-e-1" required aria-invalid="true"><label for="pl-e-1">Vegetarian</label></span>
+        <span class="option"><input type="checkbox" id="pl-e-2" name="pl-e-2" required aria-invalid="true"><label for="pl-e-2">Vegan</label></span>
+        <span class="option"><input type="checkbox" id="pl-e-3" name="pl-e-3" required aria-invalid="true"><label for="pl-e-3">Gluten free</label></span>
+      </div>
+      <div class="notice-region" role="alert" aria-live="assertive">
+        <div class="Notice" data-variant="error">
+          <div class="icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          </div>
+          <div class="content">
+            <p id="pl-err-text">Pick at least one option to continue.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </fieldset>
+
+  <!-- ── 4. Variants ──────────────────────────────────────────────────── -->
+  <h3>Variants</h3>
+
+  <!-- Single-select: radios sharing one name. Cardinality is implicit in the
+       children's `type` — never an attribute on the group. -->
+  <h4>Single-select (radio core)</h4>
+  <fieldset class="Picklist" data-id="single" data-legend="above">
+    <legend>Cuisine</legend>
+    <div class="content">
+      <div class="options">
+        <span class="option"><input type="radio" id="pl-s-1" name="pl-cuisine" checked><label for="pl-s-1">Thai</label></span>
+        <span class="option"><input type="radio" id="pl-s-2" name="pl-cuisine"><label for="pl-s-2">Italian</label></span>
+        <span class="option"><input type="radio" id="pl-s-3" name="pl-cuisine"><label for="pl-s-3">Japanese</label></span>
+        <span class="option"><input type="radio" id="pl-s-4" name="pl-cuisine"><label for="pl-s-4">Mexican</label></span>
+      </div>
+    </div>
+  </fieldset>
+
+  <!-- Multi-select: independent checkboxes, no shared name. -->
+  <h4>Multi-select (checkbox core)</h4>
+  <fieldset class="Picklist" data-id="multi" data-legend="above">
+    <legend>Amenities</legend>
+    <div class="content">
+      <div class="options">
+        <span class="option"><input type="checkbox" id="pl-m-1" name="pl-m-1" checked><label for="pl-m-1">Wi-Fi</label></span>
+        <span class="option"><input type="checkbox" id="pl-m-2" name="pl-m-2"><label for="pl-m-2">Parking</label></span>
+        <span class="option"><input type="checkbox" id="pl-m-3" name="pl-m-3" checked><label for="pl-m-3">Breakfast</label></span>
+        <span class="option"><input type="checkbox" id="pl-m-4" name="pl-m-4"><label for="pl-m-4">Pool</label></span>
+      </div>
+    </div>
+  </fieldset>
+
+  <!-- Removable: the × is a DECORATIVE aria-hidden glyph inside the chip's own
+       label. Clicking it activates the label, which toggles the input — so it
+       deselects with no JS and no second label. Checkbox core only: a native
+       radio cannot be unchecked by the user, so an × there would be a lie.
+       Note the markup has NO whitespace before the <svg> — a text node
+       "Wi-Fi " would leave a trailing space in the accessible name. -->
+  <h4>Removable (checkbox core only)</h4>
+  <fieldset class="Picklist" data-id="removable" data-legend="above" aria-describedby="pl-r-hint">
+    <legend>Applied filters</legend>
+    <div class="content">
+      <p class="hint" id="pl-r-hint">Selected chips show a × — activating it removes the selection.</p>
+      <div class="options">
+        <span class="option"><input type="checkbox" id="pl-r-1" name="pl-r-1" checked><label for="pl-r-1">Under 500 kr<svg class="deselect" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M2 2 L10 10 M10 2 L2 10" stroke="currentColor" stroke-width="2" fill="none"/></svg></label></span>
+        <span class="option"><input type="checkbox" id="pl-r-2" name="pl-r-2" checked><label for="pl-r-2">In stock<svg class="deselect" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M2 2 L10 10 M10 2 L2 10" stroke="currentColor" stroke-width="2" fill="none"/></svg></label></span>
+        <span class="option"><input type="checkbox" id="pl-r-3" name="pl-r-3"><label for="pl-r-3">Free delivery<svg class="deselect" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M2 2 L10 10 M10 2 L2 10" stroke="currentColor" stroke-width="2" fill="none"/></svg></label></span>
+      </div>
+    </div>
+  </fieldset>
+
+  <!-- Legend beside — auto-width float, chips fill the space next to it. -->
+  <h4>Legend beside</h4>
+  <fieldset class="Picklist" data-id="beside" data-legend="beside">
+    <legend>Size</legend>
+    <div class="content">
+      <div class="options">
+        <span class="option"><input type="radio" id="pl-b-1" name="pl-size"><label for="pl-b-1">S</label></span>
+        <span class="option"><input type="radio" id="pl-b-2" name="pl-size" checked><label for="pl-b-2">M</label></span>
+        <span class="option"><input type="radio" id="pl-b-3" name="pl-size"><label for="pl-b-3">L</label></span>
+        <span class="option"><input type="radio" id="pl-b-4" name="pl-size"><label for="pl-b-4">XL</label></span>
+      </div>
+    </div>
+  </fieldset>
+
+  <!-- Legend hidden — visually gone, still the group's accessible name. -->
+  <h4>Legend hidden (SR-only name)</h4>
+  <fieldset class="Picklist" data-id="hidden" data-legend="hidden">
+    <legend>Sort order</legend>
+    <div class="content">
+      <div class="options">
+        <span class="option"><input type="radio" id="pl-h-1" name="pl-sort" checked><label for="pl-h-1">Newest</label></span>
+        <span class="option"><input type="radio" id="pl-h-2" name="pl-sort"><label for="pl-h-2">Price</label></span>
+        <span class="option"><input type="radio" id="pl-h-3" name="pl-sort"><label for="pl-h-3">Rating</label></span>
+      </div>
+    </div>
+  </fieldset>
+
+  <!-- A long set — proves chips wrap to multiple rows. -->
+  <h4>Long set (wraps to multiple rows)</h4>
+  <fieldset class="Picklist" data-id="wrap" data-legend="above">
+    <legend>Tags</legend>
+    <div class="content">
+      <div class="options">
+        <span class="option"><input type="checkbox" id="pl-w-1" name="pl-w-1" checked><label for="pl-w-1">Accessibility</label></span>
+        <span class="option"><input type="checkbox" id="pl-w-2" name="pl-w-2"><label for="pl-w-2">Design systems</label></span>
+        <span class="option"><input type="checkbox" id="pl-w-3" name="pl-w-3"><label for="pl-w-3">Typography</label></span>
+        <span class="option"><input type="checkbox" id="pl-w-4" name="pl-w-4" checked><label for="pl-w-4">Performance</label></span>
+        <span class="option"><input type="checkbox" id="pl-w-5" name="pl-w-5"><label for="pl-w-5">Testing</label></span>
+        <span class="option"><input type="checkbox" id="pl-w-6" name="pl-w-6"><label for="pl-w-6">Documentation</label></span>
+        <span class="option"><input type="checkbox" id="pl-w-7" name="pl-w-7"><label for="pl-w-7">Progressive enhancement</label></span>
+      </div>
+    </div>
+  </fieldset>
+
+  <!-- ── 5. Live demo ─────────────────────────────────────────────────── -->
+  <h3>Live demo</h3>
+  <fieldset class="Picklist" data-id="live" data-legend="above" aria-describedby="pl-live-hint">
+    <legend>Toppings</legend>
+    <div class="content">
+      <p class="hint" id="pl-live-hint">Pick as many as you like — Tab into the set, then Space to toggle.</p>
+      <div class="options">
+        <span class="option"><input type="checkbox" id="pl-l-1" name="pl-l-1"><label for="pl-l-1">Mozzarella</label></span>
+        <span class="option"><input type="checkbox" id="pl-l-2" name="pl-l-2" checked><label for="pl-l-2">Basil</label></span>
+        <span class="option"><input type="checkbox" id="pl-l-3" name="pl-l-3"><label for="pl-l-3">Olives</label></span>
+        <span class="option"><input type="checkbox" id="pl-l-4" name="pl-l-4"><label for="pl-l-4">Chili</label></span>
+      </div>
+    </div>
+  </fieldset>
+
+  <!-- ── 6. Reference — the same options as a plain ChoiceGroup, the sibling
+       this component diverges from. Same semantics, different usage context:
+       a list to read down vs chips to pick from. -->
+  <h3>Reference: the same options as a ChoiceGroup</h3>
+  <fieldset class="ChoiceGroup" data-id="reference" data-orientation="vertical" data-legend="above">
+    <legend>Toppings (ChoiceGroup)</legend>
+    <div class="content">
+      <div class="options">
+        <span class="ChoiceField"><input type="checkbox" id="pl-ref-1" name="pl-ref-1"><label for="pl-ref-1">Mozzarella</label></span>
+        <span class="ChoiceField"><input type="checkbox" id="pl-ref-2" name="pl-ref-2" checked><label for="pl-ref-2">Basil</label></span>
+        <span class="ChoiceField"><input type="checkbox" id="pl-ref-3" name="pl-ref-3"><label for="pl-ref-3">Olives</label></span>
+        <span class="ChoiceField"><input type="checkbox" id="pl-ref-4" name="pl-ref-4"><label for="pl-ref-4">Chili</label></span>
+      </div>
+    </div>
+  </fieldset>
+
+</section>
