@@ -136,6 +136,102 @@ test('a long set wraps to multiple rows without clipping', async ({ page }) => {
   }
 })
 
+// ── The two axes: orientation and segmented ───────────────────────────────────
+
+test('segmented collapses the seam to a single border', async ({ page }) => {
+  const labels = page.locator('.Picklist[data-id="segmented"] .option label')
+  await labels.first().scrollIntoViewIfNeeded()
+  const a = await labels.nth(0).boundingBox()
+  const b = await labels.nth(1).boundingBox()
+  // no gap between neighbours…
+  expect(Math.abs(b.x - (a.x + a.width))).toBeLessThan(0.5)
+  // …and the seam is one border, not two stacked
+  const seam = await labels.nth(1).evaluate((el) => {
+    const prev = el.closest('.option').previousElementSibling.querySelector('label')
+    return parseFloat(getComputedStyle(prev).borderRightWidth) + parseFloat(getComputedStyle(el).borderLeftWidth)
+  })
+  expect(seam, 'a doubled seam reads as a 2px line between segments').toBeLessThanOrEqual(1)
+})
+
+test('segmented puts the outer radius only on the two ends', async ({ page }) => {
+  const labels = page.locator('.Picklist[data-id="segmented"] .option label')
+  await labels.first().scrollIntoViewIfNeeded()
+  const radii = (l) => l.evaluate((el) => {
+    const s = getComputedStyle(el)
+    return [s.borderTopLeftRadius, s.borderTopRightRadius, s.borderBottomRightRadius, s.borderBottomLeftRadius]
+      .map((v) => parseFloat(v))
+  })
+  const first = await radii(labels.first())
+  const middle = await radii(labels.nth(1))
+  const last = await radii(labels.last())
+  expect(first[0], 'first segment keeps its leading radius').toBeGreaterThan(0)
+  expect(first[1], 'first segment has no trailing radius').toBe(0)
+  expect(middle.every((r) => r === 0), 'middle segments are square').toBe(true)
+  expect(last[1], 'last segment keeps its trailing radius').toBeGreaterThan(0)
+  expect(last[0], 'last segment has no leading radius').toBe(0)
+})
+
+test('the radius token drives the segmented ends too', async ({ page }) => {
+  // pill vs rectangle is a design value, not an attribute
+  const first = page.locator('.Picklist[data-id="segmented-rect"] .option label').first()
+  await first.scrollIntoViewIfNeeded()
+  const r = await first.evaluate((el) => parseFloat(getComputedStyle(el).borderTopLeftRadius))
+  expect(r).toBeCloseTo(4, 0)   // 0.25rem
+})
+
+test('segmented does not wrap, even when narrow', async ({ page }) => {
+  await page.setViewportSize({ width: 420, height: 900 })
+  const labels = page.locator('.Picklist[data-id="segmented"] .option label')
+  await labels.first().scrollIntoViewIfNeeded()
+  const ys = []
+  for (let i = 0; i < await labels.count(); i++) ys.push(Math.round((await labels.nth(i).boundingBox()).y))
+  expect(new Set(ys).size, 'a joined bar must stay on one row').toBe(1)
+})
+
+test('vertical stacks, and gapped chips hug their own text', async ({ page }) => {
+  const labels = page.locator('.Picklist[data-id="vertical"] .option label')
+  await labels.first().scrollIntoViewIfNeeded()
+  const a = await labels.nth(0).boundingBox()
+  const b = await labels.nth(1).boundingBox()
+  expect(b.y).toBeGreaterThan(a.y + a.height - 1)
+  const widths = []
+  for (let i = 0; i < await labels.count(); i++) widths.push(Math.round((await labels.nth(i).boundingBox()).width))
+  expect(new Set(widths).size, 'gapped chips size to their label, not the group').toBeGreaterThan(1)
+})
+
+test('vertical + segmented fills the bar (labels, not just wrappers)', async ({ page }) => {
+  const labels = page.locator('.Picklist[data-id="vertical-segmented"] .option label')
+  await labels.first().scrollIntoViewIfNeeded()
+  const widths = []
+  for (let i = 0; i < await labels.count(); i++) widths.push(Math.round((await labels.nth(i).boundingBox()).width))
+  // the label IS the segment — stretching only the .option wrapper looks ragged
+  expect(new Set(widths).size, `segments must be equal width, got ${widths.join('/')}`).toBe(1)
+})
+
+test('a focused segment is raised above its neighbour so the ring is not clipped', async ({ page }) => {
+  const first = page.locator('#pl-sg-1')
+  await first.scrollIntoViewIfNeeded()
+  // Establish keyboard modality — :focus-visible does not reliably match a bare
+  // programmatic .focus() in Chromium.
+  await first.focus()
+  await page.keyboard.press('ArrowRight')
+  const focusedLabel = page.locator('.Picklist[data-id="segmented"] label[for="pl-sg-2"]')
+  const s = await focusedLabel.evaluate((el) => {
+    const cs = getComputedStyle(el)
+    return { outlineStyle: cs.outlineStyle, zIndex: cs.zIndex, position: cs.position }
+  })
+  expect(s.outlineStyle).not.toBe('none')
+  expect(s.position).toBe('relative')
+  expect(s.zIndex, 'without a raised segment the next one paints over the ring').toBe('1')
+})
+
+test('the height contract holds in segmented mode', async ({ page }) => {
+  const label = page.locator('.Picklist[data-id="segmented"] .option label').first()
+  await label.scrollIntoViewIfNeeded()
+  const box = await label.boundingBox()
+  expect(box.height).toBe(40)
+})
+
 // ── Hint / error wiring, inherited from the selection family ──────────────────
 
 test('hint is exposed as the group accessible description', async ({ page }) => {

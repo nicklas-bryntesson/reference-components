@@ -197,6 +197,66 @@
     </div>
   </fieldset>
 
+  <!-- Segmented — the gaps collapse, the borders join and the outer radius
+       moves to the two ends, so the set reads as ONE control with N positions
+       instead of N independent chips. Single-select is the honest core here. -->
+  <h4>Segmented (horizontal)</h4>
+  <fieldset class="Picklist" data-id="segmented" data-legend="above" data-segmented="true">
+    <legend>Text alignment</legend>
+    <div class="content">
+      <div class="options">
+        <span class="option"><input type="radio" id="pl-sg-1" name="pl-align" checked><label for="pl-sg-1">Left</label></span>
+        <span class="option"><input type="radio" id="pl-sg-2" name="pl-align"><label for="pl-sg-2">Center</label></span>
+        <span class="option"><input type="radio" id="pl-sg-3" name="pl-align"><label for="pl-sg-3">Right</label></span>
+        <span class="option"><input type="radio" id="pl-sg-4" name="pl-align"><label for="pl-sg-4">Justify</label></span>
+      </div>
+    </div>
+  </fieldset>
+
+  <!-- The pill-vs-rectangle difference is a design VALUE, not an attribute:
+       the same --_pl-chip-radius token that rounds a chip also rounds the two
+       ends of a segmented bar. -->
+  <h4>Segmented with a rectangular radius (token override)</h4>
+  <fieldset class="Picklist" data-id="segmented-rect" data-legend="above" data-segmented="true" style="--_pl-chip-radius: 0.25rem">
+    <legend>Density</legend>
+    <div class="content">
+      <div class="options">
+        <span class="option"><input type="radio" id="pl-sr-1" name="pl-density"><label for="pl-sr-1">Comfortable</label></span>
+        <span class="option"><input type="radio" id="pl-sr-2" name="pl-density" checked><label for="pl-sr-2">Cozy</label></span>
+        <span class="option"><input type="radio" id="pl-sr-3" name="pl-density"><label for="pl-sr-3">Compact</label></span>
+      </div>
+    </div>
+  </fieldset>
+
+  <!-- Vertical + gapped — the chips hug their own text. This is NOT a
+       ChoiceGroup: what separates the two is the item skin (a pill vs a box
+       with a mark), not the direction the items run in. -->
+  <h4>Vertical (gapped — chips hug their text)</h4>
+  <fieldset class="Picklist" data-id="vertical" data-legend="above" data-orientation="vertical">
+    <legend>Delivery window</legend>
+    <div class="content">
+      <div class="options">
+        <span class="option"><input type="checkbox" id="pl-v-1" name="pl-v-1" checked><label for="pl-v-1">Morning</label></span>
+        <span class="option"><input type="checkbox" id="pl-v-2" name="pl-v-2"><label for="pl-v-2">Afternoon</label></span>
+        <span class="option"><input type="checkbox" id="pl-v-3" name="pl-v-3"><label for="pl-v-3">Evening</label></span>
+      </div>
+    </div>
+  </fieldset>
+
+  <!-- Vertical + segmented — the two axes compose; here the segments line up
+       as one bar, so they stretch instead of hugging. -->
+  <h4>Vertical + segmented</h4>
+  <fieldset class="Picklist" data-id="vertical-segmented" data-legend="above" data-orientation="vertical" data-segmented="true">
+    <legend>Sort direction</legend>
+    <div class="content">
+      <div class="options">
+        <span class="option"><input type="radio" id="pl-vs-1" name="pl-sortdir" checked><label for="pl-vs-1">Newest first</label></span>
+        <span class="option"><input type="radio" id="pl-vs-2" name="pl-sortdir"><label for="pl-vs-2">Oldest first</label></span>
+        <span class="option"><input type="radio" id="pl-vs-3" name="pl-sortdir"><label for="pl-vs-3">Recently updated</label></span>
+      </div>
+    </div>
+  </fieldset>
+
   <!-- ── 5. Live demo ─────────────────────────────────────────────────── -->
   <h3>Live demo</h3>
   <fieldset class="Picklist" data-id="live" data-legend="above" aria-describedby="pl-live-hint">
