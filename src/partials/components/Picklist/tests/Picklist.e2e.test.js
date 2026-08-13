@@ -225,6 +225,20 @@ test('a focused segment is raised above its neighbour so the ring is not clipped
   expect(s.zIndex, 'without a raised segment the next one paints over the ring').toBe('1')
 })
 
+test('the simulated focus state is raised in segmented mode too', async ({ page }) => {
+  // data-test-state pairs the real pseudo-class, so the kitchensink row must get
+  // the same raise — otherwise the simulated state lies about what focus looks like.
+  const label = page.locator('.Picklist[data-id="state-seg-focus"] label[for="pl-ssf-2"]')
+  await label.scrollIntoViewIfNeeded()
+  const s = await label.evaluate((el) => {
+    const cs = getComputedStyle(el)
+    return { outlineStyle: cs.outlineStyle, zIndex: cs.zIndex, position: cs.position }
+  })
+  expect(s.outlineStyle).not.toBe('none')
+  expect(s.position).toBe('relative')
+  expect(s.zIndex).toBe('1')
+})
+
 test('the height contract holds in segmented mode', async ({ page }) => {
   const label = page.locator('.Picklist[data-id="segmented"] .option label').first()
   await label.scrollIntoViewIfNeeded()

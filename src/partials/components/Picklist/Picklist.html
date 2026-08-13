@@ -52,6 +52,54 @@
     </div>
   </fieldset>
 
+  <!-- Segmented shares the same simulated states. It needs its own rows because
+       segments touch: the focused segment has to be raised above its neighbour,
+       or the next one paints over the ring's trailing edge. -->
+  <h4>Segmented · default / hover / focus / active</h4>
+  <fieldset class="Picklist" data-id="state-seg-default" data-legend="hidden" data-segmented="true">
+    <legend>Segmented state: default</legend>
+    <div class="content">
+      <div class="options">
+        <span class="option"><input type="radio" id="pl-ssd-1" name="pl-ssd" checked><label for="pl-ssd-1">Selected</label></span>
+        <span class="option"><input type="radio" id="pl-ssd-2" name="pl-ssd"><label for="pl-ssd-2">Unselected</label></span>
+        <span class="option"><input type="radio" id="pl-ssd-3" name="pl-ssd"><label for="pl-ssd-3">Third</label></span>
+      </div>
+    </div>
+  </fieldset>
+
+  <fieldset class="Picklist" data-id="state-seg-hover" data-legend="hidden" data-segmented="true" data-test-state="hover">
+    <legend>Segmented state: hover</legend>
+    <div class="content">
+      <div class="options">
+        <span class="option"><input type="radio" id="pl-ssh-1" name="pl-ssh" checked><label for="pl-ssh-1">Selected</label></span>
+        <span class="option"><input type="radio" id="pl-ssh-2" name="pl-ssh"><label for="pl-ssh-2">Unselected</label></span>
+        <span class="option"><input type="radio" id="pl-ssh-3" name="pl-ssh"><label for="pl-ssh-3">Third</label></span>
+      </div>
+    </div>
+  </fieldset>
+
+  <fieldset class="Picklist" data-id="state-seg-focus" data-legend="hidden" data-segmented="true" data-test-state="focus">
+    <legend>Segmented state: focus</legend>
+    <div class="content">
+      <div class="options">
+        <span class="option"><input type="radio" id="pl-ssf-1" name="pl-ssf" checked><label for="pl-ssf-1">Selected</label></span>
+        <span class="option"><input type="radio" id="pl-ssf-2" name="pl-ssf"><label for="pl-ssf-2">Unselected</label></span>
+        <span class="option"><input type="radio" id="pl-ssf-3" name="pl-ssf"><label for="pl-ssf-3">Third</label></span>
+      </div>
+    </div>
+  </fieldset>
+
+  <fieldset class="Picklist" data-id="state-seg-active" data-legend="hidden" data-segmented="true" data-test-state="active">
+    <legend>Segmented state: active</legend>
+    <div class="content">
+      <div class="options">
+        <span class="option"><input type="radio" id="pl-ssa-1" name="pl-ssa" checked><label for="pl-ssa-1">Selected</label></span>
+        <span class="option"><input type="radio" id="pl-ssa-2" name="pl-ssa"><label for="pl-ssa-2">Unselected</label></span>
+        <span class="option"><input type="radio" id="pl-ssa-3" name="pl-ssa"><label for="pl-ssa-3">Third</label></span>
+      </div>
+    </div>
+  </fieldset>
+
   <!-- ── 2. Disabled — single column: pointer-events are gone, so there is
        no hover/focus to simulate. Both a single disabled chip and the
        <fieldset disabled> cascade. -->

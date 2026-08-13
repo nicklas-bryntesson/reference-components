@@ -1,6 +1,6 @@
 # ADR 0014: Picklist, Toggle and ButtonGroup are distinct components; *selection-vs-action* draws the line
 
-**Status:** Accepted 2026-08-12 · Picklist built; condition 3 held up in the building (see note below)
+**Status:** Accepted 2026-08-12 · Picklist built; condition 3 held up in the building (see note below) · **superseded in part 2026-08-13 by [ADR-0020](0020-action-side-splits-three-ways-buttongroup-retired.md)** — the selection-vs-action *test* stands, but the Toggle and ButtonGroup rulings do not: Toggle became Picklist's `data-segmented` axis and ButtonGroup is retired
 **Date:** 2026-07-21
 **Decider:** Nicklas Bryntesson
 
