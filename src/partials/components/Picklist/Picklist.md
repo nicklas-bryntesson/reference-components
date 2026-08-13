@@ -123,14 +123,39 @@ Two consequences worth keeping when porting:
 The chip's total height is **2.5rem / 40px**, matching every other control in the library. The
 label is `box-sizing: border-box` so the border counts inside that height.
 
-Two details the segmented mode adds, both of which are easy to get wrong:
+### The focus ring is inset — the one place this component leaves the family pattern
 
-- **The focus ring must be raised.** Segments touch, so without `position: relative; z-index: 1`
-  on the focused label the *next* segment paints over the ring's trailing edge — verified in a
-  browser, not a precaution.
-- **Vertical segments need `flex: 1` on the label.** `align-items: stretch` stretches the
-  `.option` wrapper, but the label is a flex item inside that wrapper's own row context and stays
-  at content width — and the label is what the user sees as the segment.
+Every other control in the library draws focus as `outline: 2px solid` with `outline-offset: 1px`,
+i.e. **outward**. Picklist draws it **inward** (`outline-offset: -3px`), and the reason is not
+cosmetic.
+
+A Picklist chip is the only control in the library whose surface *fills* when selected: the label
+becomes `color: Canvas` on `background: CanvasText`. An `outline` with no colour is `currentColor`,
+so on a selected chip the ring is **white** — and an outward ring is drawn on the page behind the
+chip, not on the chip. Measured on the reference page: **1.1:1** contrast, i.e. invisible. The
+unselected state measured 19.1:1, which is exactly why the bug survived review — half the states
+looked right.
+
+Drawn inside, the ring always lands on the chip's **own** fill, where `currentColor` contrasts by
+construction: white on a black chip, black on a white one — 21:1 in both. The same rule holds in
+forced-colors, where the pair becomes `HighlightText` on `Highlight`, so no override is needed
+there.
+
+Two consequences when porting:
+
+- **Keep the ring inset if you keep the filled selected state.** If your selected chip is *not*
+  filled — an outline-only selection, say — an outward ring is fine and matches the rest of the
+  family. The pairing that must not be broken is *filled selection + outward currentColor ring*.
+- **An inset ring needs no `z-index`.** Segments touch, so an outward ring would be painted over by
+  the next segment (verified: the trailing edge simply disappears) and would need
+  `position: relative; z-index: 1`. Inset, it never reaches a neighbour. If you move the offset back
+  to a positive value, the raise has to come back with it — the e2e suite ties the two together.
+
+### Vertical segments need `flex: 1` on the label
+
+`align-items: stretch` stretches the `.option` wrapper, but the label is a flex item inside that
+wrapper's own row context and stays at content width — and the label is what the user sees as the
+segment. Without it the bar renders ragged.
 
 ## Removable chips (the `×`)
 
@@ -212,9 +237,10 @@ forced-colors — so treat it as reviewed code, not tested code.
 
 ### Focus and target size
 
-Focus uses `outline: 2px solid` (currentColor) via `:focus-visible` — the same treatment as the
-rest of the family; it survives forced-colors, where a `box-shadow` ring would not. The chip is
-the whole hit target at 40px tall, which clears the WCAG 2.5.8 (24px) minimum by construction.
+Focus uses `outline: 2px solid` (currentColor) via `:focus-visible`, **inset** — see *The focus ring
+is inset* above for why this one deviates from the family's outward ring. `outline` rather than
+`box-shadow` because a shadow ring disappears in forced-colors. The chip is the whole hit target at
+40px tall, which clears the WCAG 2.5.8 (24px) minimum by construction.
 
 ### Manual accessibility testing (definition of done)
 
@@ -278,6 +304,12 @@ Because behaviour is native, the centre of gravity sits in e2e:
   contract, the `×` deselects and stays out of the accessible name, chips flow in a row and wrap
   at a narrow viewport without overflowing, hint/error surface as the accessible description,
   disabled and the `<fieldset disabled>` cascade block selection, axe clean.
+
+  The focus tests measure **contrast**, not presence. `outlineStyle !== 'none'` is what let the
+  invisible-ring bug ship: the ring was present, 2px, and 1.1:1 against what was behind it. The
+  suite now computes the ratio between the ring colour and the surface it is actually drawn on —
+  the chip's own fill when the offset is negative, the page behind it when positive — and requires
+  ≥ 3:1, for the selected *and* unselected states in both gapped and segmented mode.
 
 ## Non-goals
 

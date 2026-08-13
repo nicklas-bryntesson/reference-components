@@ -208,35 +208,74 @@ test('vertical + segmented fills the bar (labels, not just wrappers)', async ({ 
   expect(new Set(widths).size, `segments must be equal width, got ${widths.join('/')}`).toBe(1)
 })
 
-test('a focused segment is raised above its neighbour so the ring is not clipped', async ({ page }) => {
-  const first = page.locator('#pl-sg-1')
-  await first.scrollIntoViewIfNeeded()
-  // Establish keyboard modality — :focus-visible does not reliably match a bare
-  // programmatic .focus() in Chromium.
-  await first.focus()
-  await page.keyboard.press('ArrowRight')
-  const focusedLabel = page.locator('.Picklist[data-id="segmented"] label[for="pl-sg-2"]')
-  const s = await focusedLabel.evaluate((el) => {
-    const cs = getComputedStyle(el)
-    return { outlineStyle: cs.outlineStyle, zIndex: cs.zIndex, position: cs.position }
-  })
-  expect(s.outlineStyle).not.toBe('none')
-  expect(s.position).toBe('relative')
-  expect(s.zIndex, 'without a raised segment the next one paints over the ring').toBe('1')
+// ── The focus ring must be VISIBLE, not merely present ────────────────────────
+//
+// Asserting `outlineStyle !== 'none'` is not enough and let a real bug ship: a
+// selected chip is `color: Canvas` on `background: CanvasText`, so an outward
+// currentColor ring was white drawn on a near-white page — present, 2px, and
+// invisible. These tests measure contrast against the surface the ring is drawn
+// on, which is what "visible" actually means.
+
+/** WCAG relative luminance + contrast ratio, on computed rgb() strings. */
+const RING_CONTRAST = (page, sel) => page.evaluate((s) => {
+  const el = document.querySelector(s)
+  const cs = getComputedStyle(el)
+  const parse = (c) => c.match(/[\d.]+/g).slice(0, 3).map(Number)
+  const lum = ([r, g, b]) => {
+    const f = (v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4 }
+    return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b)
+  }
+  const offset = parseFloat(cs.outlineOffset)
+  // A negative offset draws the ring inside the element, over its own fill; a
+  // positive one draws it outside, over whatever is behind the element.
+  const behind = offset < 0
+    ? cs.backgroundColor
+    : getComputedStyle(el.closest('.Picklist')).backgroundColor
+  const [a, b] = [lum(parse(cs.outlineColor)), lum(parse(behind))].sort((x, y) => y - x)
+  return { ratio: (a + 0.05) / (b + 0.05), outlineColor: cs.outlineColor, surface: behind, offset }
+}, sel)
+
+test('the focus ring contrasts with the chip it is drawn on — selected and unselected', async ({ page }) => {
+  for (const [id, forId, what] of [
+    ['state-focus', 'pl-sf-2', 'gapped, selected'],
+    ['state-focus', 'pl-sf-1', 'gapped, unselected'],
+    ['state-seg-focus', 'pl-ssf-1', 'segmented, selected'],
+    ['state-seg-focus', 'pl-ssf-2', 'segmented, unselected'],
+  ]) {
+    const sel = `.Picklist[data-id="${id}"] label[for="${forId}"]`
+    await page.locator(sel).scrollIntoViewIfNeeded()
+    const r = await RING_CONTRAST(page, sel)
+    expect(r.offset, `${what}: the ring must be inset so it lands on the chip's own fill`).toBeLessThan(0)
+    expect(
+      r.ratio,
+      `${what}: ring ${r.outlineColor} on ${r.surface} is only ${r.ratio.toFixed(2)}:1`,
+    ).toBeGreaterThanOrEqual(3)
+  }
 })
 
-test('the simulated focus state is raised in segmented mode too', async ({ page }) => {
-  // data-test-state pairs the real pseudo-class, so the kitchensink row must get
-  // the same raise — otherwise the simulated state lies about what focus looks like.
-  const label = page.locator('.Picklist[data-id="state-seg-focus"] label[for="pl-ssf-2"]')
-  await label.scrollIntoViewIfNeeded()
-  const s = await label.evaluate((el) => {
+test('a real keyboard focus on a selected segment is visible', async ({ page }) => {
+  const first = page.locator('#pl-sg-1')          // selected radio in the segmented bar
+  await first.scrollIntoViewIfNeeded()
+  await first.focus()
+  await page.keyboard.press('ArrowRight')          // keyboard modality → :focus-visible
+  await page.keyboard.press('ArrowLeft')           // back onto the selected one
+  const sel = '.Picklist[data-id="segmented"] label[for="pl-sg-1"]'
+  const r = await RING_CONTRAST(page, sel)
+  expect(r.ratio, `ring ${r.outlineColor} on ${r.surface} is only ${r.ratio.toFixed(2)}:1`).toBeGreaterThanOrEqual(3)
+})
+
+test('an inset ring needs no z-index raise, because it never reaches a neighbour', async ({ page }) => {
+  // The outward ring did: the next segment clipped its trailing edge. Guarding
+  // this keeps the two decisions tied together — if the offset ever goes
+  // positive again, the raise has to come back with it.
+  const sel = '.Picklist[data-id="state-seg-focus"] label[for="pl-ssf-2"]'
+  await page.locator(sel).scrollIntoViewIfNeeded()
+  const s = await page.locator(sel).evaluate((el) => {
     const cs = getComputedStyle(el)
-    return { outlineStyle: cs.outlineStyle, zIndex: cs.zIndex, position: cs.position }
+    return { offset: parseFloat(cs.outlineOffset), width: parseFloat(cs.outlineWidth) }
   })
-  expect(s.outlineStyle).not.toBe('none')
-  expect(s.position).toBe('relative')
-  expect(s.zIndex).toBe('1')
+  expect(s.offset).toBeLessThan(0)
+  expect(Math.abs(s.offset), 'the ring must sit fully inside the border box').toBeGreaterThanOrEqual(s.width)
 })
 
 test('the height contract holds in segmented mode', async ({ page }) => {

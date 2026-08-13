@@ -160,12 +160,21 @@
   border-color: var(--_pl-chip-border-color-hover);
 }
 
-/* focus — matches the family: 2px solid currentColor, offset 1px. The ring is
-   drawn on the LABEL, which is the chip, not on the 1px clipped input. */
+/* focus — the ring is drawn on the LABEL, which is the chip, not on the 1px
+   clipped input.
+   INSET, unlike the rest of the field family (which offsets outward by 1px).
+   Picklist is the only component whose control gets a filled surface that
+   inverts currentColor: a selected chip is `color: Canvas` on
+   `background: CanvasText`, so an outward ring of currentColor is white drawn
+   on a near-white page — invisible, which is a focus-appearance failure and not
+   a matter of taste. Drawn inside, the ring always sits on the chip's OWN fill,
+   where currentColor contrasts by construction: white on a black chip, black on
+   a white one. This also works unchanged in forced-colors, where the pair
+   becomes HighlightText on Highlight. */
 .Picklist .option input:focus-visible + label,
 .Picklist[data-test-state="focus"] .option input + label {
   outline: 2px solid;
-  outline-offset: 1px;
+  outline-offset: -3px;
 }
 
 .Picklist .option input:not(:checked):active + label,
@@ -252,14 +261,12 @@
   border-end-end-radius: var(--_pl-chip-radius);
 }
 
-/* Segmented segments touch, so the focus ring of one is painted over by the
-   next unless it is raised. Verified in the browser: without this the ring's
-   trailing edge is missing. */
-.Picklist[data-segmented="true"] .option input:focus-visible + label,
-.Picklist[data-segmented="true"][data-test-state="focus"] .option input + label {
-  position: relative;
-  z-index: 1;
-}
+/* No z-index raise is needed for the focus ring, even though segments touch:
+   the ring is inset (see the focus rule above), so it never reaches into a
+   neighbour's box and cannot be painted over. An OUTWARD ring here would need
+   `position: relative; z-index: 1` — verified in the browser, where the next
+   segment clipped the trailing edge — which is one more reason the inset ring
+   is the right treatment for this component. */
 
 /* ── Legend: above (default) — full-width float, content clears below ─── */
 .Picklist[data-legend="above"] > legend,
@@ -295,17 +302,16 @@
 }
 
 /* Windows High Contrast / forced-colors: the chip is an author-painted <label>,
-   so the platform draws neither the selection nor the ring — redraw both from
-   system colours. Do not delete this block when porting. */
+   so the platform does not draw the selection — redraw it from system colours.
+   The focus ring needs no override here: it is inset currentColor, which becomes
+   HighlightText on a selected (Highlight) segment and CanvasText on an
+   unselected one — contrasting in both cases without naming a colour.
+   Do not delete this block when porting. */
 @media (forced-colors: active) {
   .Picklist .option input:checked + label {
     border-color: Highlight;
     background-color: Highlight;
     color: HighlightText;
-  }
-  .Picklist .option input:focus-visible + label {
-    outline: 2px solid CanvasText;
-    outline-offset: 1px;
   }
   .Picklist .option input:disabled + label {
     color: GrayText;
