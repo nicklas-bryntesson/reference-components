@@ -218,14 +218,50 @@ the whole hit target at 40px tall, which clears the WCAG 2.5.8 (24px) minimum by
 
 ### Manual accessibility testing (definition of done)
 
-- [ ] **Desktop SR:** entering the set, I HEAR the group name (legend) — including when `data-legend="hidden"`.
-- [ ] Tab to a chip — I HEAR its label, its role (radio button / checkbox) and its state (selected, checked, disabled).
-- [ ] Radios: arrow keys move + select, each change announced. Checkboxes: Space toggles, each change announced.
-- [ ] With a hint, I HEAR the hint after the group name; with an error, I HEAR the error.
-- [ ] **Removable chips:** I HEAR the plain label text with no "times"/"x" and no stray pause — the glyph must be silent.
-- [ ] **Mobile SR:** swiping reaches each chip with label + role + state; double-tap toggles and announces.
-- [ ] **200% text zoom:** chips grow with the text and wrap without clipping or overlap.
-- [ ] **Windows High Contrast:** the selected chip is still visibly distinct, and the focus ring is visible.
+Each row is *do this → hear that*, against a named kitchensink section, so a run is repeatable and
+a failure is specific. The component is not done until this list is worked through with a real
+screen reader.
+
+**Desktop screen reader** (NVDA or JAWS on Windows, VoiceOver on macOS)
+
+- [ ] **Group name.** Tab into *Cuisine* (`data-id="single"`) → I hear the group name **"Cuisine"**
+      before or with the first option. Repeat on *Sort order* (`data-id="hidden"`, legend clipped to
+      1px) → I still hear **"Sort order"**. A clipped legend that goes silent is the failure.
+- [ ] **Label, role, state.** On a chip in *Amenities* (`data-id="multi"`) → I hear the label, the
+      role (**"checkbox"**), and the state (**"checked" / "not checked"**). In *Cuisine* the role is
+      **"radio button"** and the state **"selected"**. Hearing "clickable" or a bare label is the
+      failure — that would mean the clipped input lost its semantics.
+- [ ] **Change is announced.** In *Cuisine*, arrow keys move **and** select → each new option is
+      announced as selected. In *Amenities*, Space toggles → the new state is announced. Silence on
+      change is the failure.
+- [ ] **Hint and error.** Enter *Applied filters* (`data-id="removable"`) → I hear the hint after
+      the group name. Enter *Dietary needs* (`data-id="invalid"`) → I hear the error text.
+- [ ] **The `×` is silent** — the one check unique to this component. On a selected chip in
+      *Applied filters* → I hear exactly **"Under 500 kr"**: no "times", no "x", no "graphic", and no
+      stray pause where the glyph sits. The glyph is `aria-hidden`, so anything audible means the
+      decoration leaked into the name.
+- [ ] **Segmented sounds identical to chips.** On *Text alignment* (`data-id="segmented"`) → the
+      announcement matches a gapped Picklist. `data-segmented` is CSS only; if it changes what is
+      spoken, something semantic drifted into a visual axis.
+- [ ] **Disabled.** In *One chip disabled* (`data-id="disabled-single"`) → the disabled chip is
+      announced as unavailable/dimmed, or skipped. In *Whole group disabled* the `<fieldset disabled>`
+      cascade applies to every chip.
+
+**Mobile screen reader** (VoiceOver iOS / TalkBack)
+
+- [ ] Swiping reaches each chip with label + role + state; double-tap toggles and announces the new
+      state.
+- [ ] On a removable chip, double-tapping anywhere — including on the `×` — deselects. The `×` is
+      not a separate target, and must not be announced as one.
+
+**Visual / display**
+
+- [ ] **200% text zoom:** chips grow with the text and wrap without clipping or overlap. Check the
+      long set (`data-id="wrap"`) and both segmented bars — a segmented bar does not wrap, so it must
+      shrink or scroll the page rather than clip.
+- [ ] **Windows High Contrast** (real machine — browsers cannot emulate `forced-colors`): the
+      selected segment stays visibly distinct, the focus ring is visible, and a focused segment is
+      not hidden behind its neighbour.
 
 ## Testing strategy
 
