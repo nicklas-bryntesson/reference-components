@@ -17,35 +17,76 @@
  */
 
 :root {
+  /* ── Appearance ───────────────────────────────────────────────────────
+     `color-scheme` is a PLATFORM declaration, not a design decision: it is
+     what makes system colours, form controls, scrollbars and UA chrome
+     correct. Every component in this library reads Canvas/CanvasText, so this
+     one line is what makes the whole set follow light and dark.
+
+     The projection contract is three rules. An ABSENT data-appearance means
+     "follow the OS" — that is the whole `system` state, so nothing has to be
+     computed or written before first paint, and there is no flash. Only an
+     explicit choice sets the attribute, and its only job is to pin
+     color-scheme. Nothing here applies tokens. (ADR-0021) */
+  color-scheme: light dark;
+
   /* Surface — panels / popovers */
   --ui-surface: Canvas;
   --ui-surface-foreground: CanvasText;
   --ui-surface-padding: 0.75rem;
   --ui-radius: 0.75rem;
+  /* A shadow reads as depth on a light ground; on a dark one the same ink is
+     nearly invisible, so the dark half is both darker and far more opaque.
+     Geometry is shared — only the colour is a pair. */
   --ui-shadow:
-    0px 0px 1px rgba(3, 7, 18, 0.01),
-    0px 1px 4px rgba(3, 7, 18, 0.01),
-    0px 2px 9px rgba(3, 7, 18, 0.02),
-    0px 4px 17px rgba(3, 7, 18, 0.02),
-    0px 7px 26px rgba(3, 7, 18, 0.03),
-    0px 10px 37px rgba(3, 7, 18, 0.03),
-    0px 13px 51px rgba(3, 7, 18, 0.04),
-    0px 17px 66px rgba(3, 7, 18, 0.04),
-    0px 22px 84px rgba(3, 7, 18, 0.05);
+    0px 0px 1px light-dark(rgba(3, 7, 18, 0.01), rgba(0, 0, 0, 0.20)),
+    0px 1px 4px light-dark(rgba(3, 7, 18, 0.01), rgba(0, 0, 0, 0.20)),
+    0px 2px 9px light-dark(rgba(3, 7, 18, 0.02), rgba(0, 0, 0, 0.24)),
+    0px 4px 17px light-dark(rgba(3, 7, 18, 0.02), rgba(0, 0, 0, 0.24)),
+    0px 7px 26px light-dark(rgba(3, 7, 18, 0.03), rgba(0, 0, 0, 0.28)),
+    0px 10px 37px light-dark(rgba(3, 7, 18, 0.03), rgba(0, 0, 0, 0.28)),
+    0px 13px 51px light-dark(rgba(3, 7, 18, 0.04), rgba(0, 0, 0, 0.32)),
+    0px 17px 66px light-dark(rgba(3, 7, 18, 0.04), rgba(0, 0, 0, 0.32)),
+    0px 22px 84px light-dark(rgba(3, 7, 18, 0.05), rgba(0, 0, 0, 0.36));
 
-  /* Lines & focus */
+  /* Lines & focus — already appearance-reactive: they mix against CanvasText,
+     which follows color-scheme, so they need no pair. */
   --ui-border: color-mix(in srgb, CanvasText 12%, transparent);  /* borders + dividers/hairlines */
   --ui-ring: var(--ui-primary);                                  /* focus ring */
 
-  /* Roles */
-  --ui-primary: #0066cc;              /* links, selection, active accent */
-  --ui-primary-foreground: #ffffff;   /* text / tick on a primary fill */
-  --ui-muted-foreground: #6e6e6e;     /* placeholder / secondary text */
+  /* Roles — a light-dark() pair per token. The dark half is lightened and
+     slightly desaturated: the same hue at full saturation vibrates on a dark
+     ground and loses contrast against it. Still DEFAULTS, not prescriptions —
+     a consumer replaces the whole namespace in one pass (ADR-0018). */
+  --ui-primary: light-dark(#0066cc, #6cb6ff);              /* links, selection, active accent */
+  --ui-primary-foreground: light-dark(#ffffff, #0a1929);   /* text / tick on a primary fill */
+  --ui-muted-foreground: light-dark(#6e6e6e, #a1a1a1);     /* placeholder / secondary text */
   --ui-hover: color-mix(in srgb, CanvasText 3%, transparent);    /* hover surface (shadcn: --accent) */
 
   /* State — shared by field-invalid and Notice */
-  --ui-destructive: #c0362c;
-  --ui-warning: #a85a00;
-  --ui-success: #1a7f37;
-  --ui-info: #0b6bcb;
+  --ui-destructive: light-dark(#c0362c, #ff8a80);
+  --ui-warning: light-dark(#a85a00, #ffb74d);
+  --ui-success: light-dark(#1a7f37, #6ee7a0);
+  --ui-info: light-dark(#0b6bcb, #79c0ff);
+}
+
+/* An explicit user choice pins the scheme; absence means "follow the OS".
+   These two rules are the entire projection surface — see ADR-0021. */
+:root[data-appearance="light"] { color-scheme: light; }
+:root[data-appearance="dark"]  { color-scheme: dark; }
+
+/* Contrast is an OS signal with NO user override, so it is deliberately not
+   part of the appearance state machine — it composes here instead. Because
+   light-dark() resolves against the active color-scheme, one block covers all
+   four cells (light/dark × normal/more) without naming any of them. */
+@media (prefers-contrast: more) {
+  :root {
+    --ui-primary: light-dark(#003d7a, #a8d4ff);
+    --ui-muted-foreground: light-dark(#3d3d3d, #d4d4d4);
+    --ui-border: color-mix(in srgb, CanvasText 40%, transparent);
+    --ui-destructive: light-dark(#8c1c14, #ffc4bd);
+    --ui-warning: light-dark(#6b3a00, #ffd699);
+    --ui-success: light-dark(#0f5122, #a8f0c4);
+    --ui-info: light-dark(#064a8f, #b3daff);
+  }
 }

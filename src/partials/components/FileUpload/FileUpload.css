@@ -12,11 +12,13 @@
   --_fu-border-color: currentColor;
   --_fu-border-radius: 4px;
   --_fu-trigger-bg: Canvas;
-  --_fu-trigger-bg-hover: #f0f0f0;
-  --_fu-trigger-bg-active: #e0e0e0;
+  /* Mixed against CanvasText rather than fixed greys, so the hover and active
+     tints follow the appearance instead of staying light on a dark page. */
+  --_fu-trigger-bg-hover: color-mix(in srgb, CanvasText 6%, Canvas);
+  --_fu-trigger-bg-active: color-mix(in srgb, CanvasText 12%, Canvas);
   --_fu-error-color: var(--ui-destructive, #c00);
-  --_fu-drop-zone-border-color: #0070f3;
-  --_fu-drop-zone-bg: #f0f7ff;
+  --_fu-drop-zone-border-color: var(--ui-primary, #0070f3);
+  --_fu-drop-zone-bg: color-mix(in srgb, var(--ui-primary, #0070f3) 8%, Canvas);
 }
 
 /* Hidden native input — zero-sized, never display:none so input.click() works */
@@ -114,7 +116,7 @@
 }
 
 .FileUpload .item-size {
-  color: #6e6e6e;
+  color: var(--ui-muted-foreground, #6e6e6e);
   white-space: nowrap;
 }
 
