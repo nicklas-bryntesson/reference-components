@@ -115,6 +115,93 @@ Whatever you choose, the component is unaware of it. What is contractual is the 
 the root carries the resolved appearance — never where it was computed. The same e2e suite passes
 against a client-restored page and a server-rendered one.
 
+### When you need four modes, not two — CSS map vs JS lookup
+
+This library ships **two** appearances and no contrast values, so it stays in CSS. Your project may
+not have that luxury: EU/Swedish public-sector accessibility rules require honouring the user's
+colour *and* contrast preferences, which is **four modes** — and most teams also want an in-app
+override, because a user whose OS is dark may still want this one site light.
+
+That is where it stops being a styling question and becomes a data-structure question. The signals
+are independent:
+
+| Signal | Source | Values |
+|---|---|---|
+| `prefers-color-scheme` | OS | light · dark |
+| `prefers-contrast` | OS | normal · more |
+| your override | UI | may pin either axis |
+
+And the values are genuinely four, not two inverted pairs. Foreground and background just flip, but a
+**mid-tone does not**: a border that reads against white is not the one that reads against black, and
+in high contrast there is no mid-tone at all — it collapses into the text colour. Four distinct
+values per mid-tone token.
+
+**Route A — CSS, with `light-dark()` and a style query.** Two declarations per token:
+
+```css
+:root { color-scheme: light dark; --contrast: normal; }
+:root[data-appearance="light"] { color-scheme: light; }
+:root[data-appearance="dark"]  { color-scheme: dark; }
+@media (prefers-contrast: more) { :root { --contrast: more; } }
+:root[data-contrast="more"]    { --contrast: more; }   /* the UI override */
+
+.thing { --border: light-dark(darkgrey, lightgrey); }
+@container style(--contrast: more) { .thing { --border: light-dark(black, white); } }
+```
+
+The colour axis needs no `:not()` and no duplicate override blocks, because `light-dark()` reads the
+*used* `color-scheme` and the attribute already pins it. The contrast axis is a **named condition**
+set in one place from either source. Verified: this produces all four cells with the axes
+independent.
+
+> Worth knowing if you have an older codebase: before `light-dark()` and style queries, this needed
+> roughly **eight** blocks — four for the OS combinations and four more whose only job was repairing
+> the crossing between the UI override and the OS contrast query, containing no new values at all.
+> If your existing theme CSS looks like that, the language has moved since it was written.
+
+**Route B — a JS lookup table.** The table lives in one object keyed by token, and a function
+resolves it per mode:
+
+```js
+'--border': { light: 'darkgrey', dark: 'lightgrey',
+              'light-contrast': 'black', 'dark-contrast': 'white' }
+```
+
+**Choose Route A when** the token count is modest and you want values to stay in the cascade — a
+consumer can then override one token on one component with a normal CSS rule, and `light-dark()`
+does the colour axis for free.
+
+**Choose Route B when** any of these bite:
+
+- **Coverage needs verifying.** Nothing in CSS checks that every token has a value in every mode. A
+  forgotten `dark-contrast` inherits silently from the wrong block and surfaces in production as a
+  contrast bug. An object can be linted, tested and iterated.
+- **You want to read the table by token, not by selector.** The cascade sorts by selector; the
+  question you actually ask is "what is `--border` in dark-contrast?" In CSS that answer *emerges*
+  from simulating the cascade. In an object it is one line.
+- **You are generating tokens anyway** — from a design-token pipeline, a CMS, or per-component token
+  files that need aggregating.
+- **You already render server-side.** You are computing the appearance there regardless, so emitting
+  the resolved values costs nothing extra.
+
+**Route B's costs, which are real:**
+
+- **It does not avoid the flash** — the same render-blocking head script is still required, and now
+  it must apply *values*, not just an attribute.
+- **Never assign `documentElement.style.cssText`.** It replaces the whole inline declaration block
+  and silently destroys anything else living there: scroll locks, viewport fixes, view-transition
+  names. Use `setProperty` per token.
+- **Values leave the cascade.** Inline styles on `:root` beat every stylesheet rule, so a consumer
+  overriding one token for one component now has to fight specificity or re-enter the map.
+- **You give up `light-dark()`** doing the colour axis for you, and re-implement that branch in JS.
+
+A reasonable hybrid, if you want the table auditable without leaving CSS: keep the lookup in JS as
+the **source of truth**, and generate a stylesheet from it at build time. You get the validation and
+the by-token reading, and the browser still gets plain cascading CSS.
+
+Whichever route: **the contract this library asserts is unchanged.** The root carries the resolved
+appearance; how the values respond is entirely yours.
+
 ### A second flash, unrelated to theme
 
 An `<svg>` carrying only a `viewBox` falls back to **300×150** until CSS sizes it, which reads as a
