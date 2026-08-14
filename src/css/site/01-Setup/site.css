@@ -6,9 +6,16 @@
 
   /* Demo-page scaffolding, NOT the component seam (that is --ui-*, ADR-0018).
      These three exist so the reference page follows light and dark alongside
-     the components. A consuming site never ships this file. */
-  --page-recessed-bg: light-dark(#f5f4f2, #16181c);   /* body, header, footer */
-  --page-bg: light-dark(#ffffff, #1e2126);            /* the page surface itself */
+     the components. A consuming site never ships this file.
+
+     Both are DERIVED from Canvas rather than invented per appearance, for one
+     reason worth keeping: `--ui-surface` is Canvas too, so the page and a popup
+     share a ground and the popup is separated by its shadow and border alone —
+     in both appearances. An invented dark page value broke that symmetry: the
+     page landed lighter than Canvas, so a popup read as a hole punched into the
+     page rather than a panel lifted off it. */
+  --page-bg: Canvas;                                            /* the page surface */
+  --page-recessed-bg: color-mix(in srgb, CanvasText 4%, Canvas); /* body, header, footer */
   --page-hairline: color-mix(in srgb, CanvasText 10%, transparent);
 }
 

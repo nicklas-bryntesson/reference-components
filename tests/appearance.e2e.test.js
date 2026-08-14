@@ -18,6 +18,28 @@ const computed = (page, selector, prop) =>
     return el ? getComputedStyle(el)[p] : null
   }, [selector, prop])
 
+/**
+ * Read a computed colour as numeric [r, g, b], normalised by the browser.
+ *
+ * GOTCHA (this bit while writing the suite): computed colours are NOT all
+ * `rgb()`. `color-mix()` resolves to `color(srgb 0.96 0.96 0.96)` — components
+ * in 0–1, not 0–255 — so a naive "grab the first three numbers and divide by
+ * 255" parser read #f5f5f5 as near-black and reported black-on-white as 1.01:1.
+ * Painting the value onto a canvas and reading the pixel back makes this immune
+ * to colour syntax, including future oklch()/lab() values.
+ */
+const colorOf = (page, selector, prop) =>
+  page.evaluate(([s, p]) => {
+    const el = document.querySelector(s)
+    if (!el) return null
+    const value = getComputedStyle(el)[p]
+    const ctx = document.createElement('canvas').getContext('2d')
+    ctx.fillStyle = value
+    ctx.fillRect(0, 0, 1, 1)
+    const [r, g, b] = ctx.getImageData(0, 0, 1, 1).data
+    return [r, g, b]
+  }, [selector, prop])
+
 /** Set or clear the appearance override on the root. */
 const setAppearance = async (page, value) => {
   await page.evaluate((v) => {
@@ -44,11 +66,12 @@ const freezeTransitions = (page) => page.addStyleTag({
   }`,
 })
 
-const luminance = (rgb) => {
-  const [r, g, b] = rgb.match(/[\d.]+/g).slice(0, 3).map(Number)
+/** WCAG relative luminance from numeric [r, g, b] (0–255). */
+const luminance = ([r, g, b]) => {
   const f = (v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4 }
   return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b)
 }
+const rgbText = ([r, g, b]) => `rgb(${r}, ${g}, ${b})`
 
 test.beforeEach(async ({ page }) => {
   await page.goto('/')
@@ -78,12 +101,12 @@ test('system colours reach component internals, and invert where the component i
   await page.locator('.Picklist[data-id="single"]').scrollIntoViewIfNeeded()
 
   await setAppearance(page, 'light')
-  const lightUnselected = await computed(page, '.Picklist[data-id="single"] label[for="pl-s-2"]', 'backgroundColor')
-  const lightSelected = await computed(page, '.Picklist[data-id="single"] label[for="pl-s-1"]', 'backgroundColor')
+  const lightUnselected = await colorOf(page, '.Picklist[data-id="single"] label[for="pl-s-2"]', 'backgroundColor')
+  const lightSelected = await colorOf(page, '.Picklist[data-id="single"] label[for="pl-s-1"]', 'backgroundColor')
 
   await setAppearance(page, 'dark')
-  const darkUnselected = await computed(page, '.Picklist[data-id="single"] label[for="pl-s-2"]', 'backgroundColor')
-  const darkSelected = await computed(page, '.Picklist[data-id="single"] label[for="pl-s-1"]', 'backgroundColor')
+  const darkUnselected = await colorOf(page, '.Picklist[data-id="single"] label[for="pl-s-2"]', 'backgroundColor')
+  const darkSelected = await colorOf(page, '.Picklist[data-id="single"] label[for="pl-s-1"]', 'backgroundColor')
 
   // An unselected chip is Canvas: light in light mode, dark in dark mode.
   expect(luminance(lightUnselected)).toBeGreaterThan(0.8)
@@ -100,8 +123,8 @@ test('the page scaffolding flips with the components, not after them', async ({ 
   // unselected chips render dark on a light page (reading as SELECTED) and
   // selected chips go white on white. Half-done is worse than not started.
   await setAppearance(page, 'dark')
-  const body = await computed(page, 'body', 'backgroundColor')
-  const chip = await computed(page, '.Picklist[data-id="single"] label[for="pl-s-2"]', 'backgroundColor')
+  const body = await colorOf(page, 'body', 'backgroundColor')
+  const chip = await colorOf(page, '.Picklist[data-id="single"] label[for="pl-s-2"]', 'backgroundColor')
   expect(luminance(body), 'the page must be dark when the components are').toBeLessThan(0.2)
   expect(Math.abs(luminance(body) - luminance(chip)), 'page and chip must share a ground').toBeLessThan(0.2)
 })
@@ -171,10 +194,10 @@ test('axe is clean in dark, not only in light', async ({ page }) => {
 test('body text keeps contrast against the page in both appearances', async ({ page }) => {
   for (const appearance of ['light', 'dark']) {
     await setAppearance(page, appearance)
-    const fg = await computed(page, 'body', 'color')
-    const bg = await computed(page, 'body', 'backgroundColor')
+    const fg = await colorOf(page, 'body', 'color')
+    const bg = await colorOf(page, 'body', 'backgroundColor')
     const [a, b] = [luminance(fg), luminance(bg)].sort((x, y) => y - x)
     const ratio = (a + 0.05) / (b + 0.05)
-    expect(ratio, `${appearance}: ${fg} on ${bg} is only ${ratio.toFixed(2)}:1`).toBeGreaterThanOrEqual(4.5)
+    expect(ratio, `${appearance}: ${rgbText(fg)} on ${rgbText(bg)} is only ${ratio.toFixed(2)}:1`).toBeGreaterThanOrEqual(4.5)
   }
 })
