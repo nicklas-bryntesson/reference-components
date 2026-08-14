@@ -1,6 +1,6 @@
 # ADR 0021: Appearance is a `color-scheme` switch, not a token system — and contrast stays out of the state machine
 
-**Status:** Proposed — flips to Accepted when the ThemeSwitch build starts
+**Status:** Accepted 2026-08-14 — ThemeSwitch built; the seam shipped first and separately (PR #39)
 **Date:** 2026-08-13
 **Decider:** Nicklas Bryntesson
 **Supersedes in part:** ADR-0020 (its ThemeSwitch deferral — the blocker it named is resolved here)

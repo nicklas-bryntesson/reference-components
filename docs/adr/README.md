@@ -74,4 +74,4 @@ holds the *why-we-built-it*; the `.md` holds the *how-it-works*.
 | [0018](0018-ui-token-theming-seam.md) | The component theming seam is a flat `--ui-*` token namespace, decoupled from any design system | Convention | Accepted |
 | [0019](0019-class-naming-component-vs-element.md) | Class naming — PascalCase = component (has a contract), lowercase-kebab = internal element; one shared lexicon | Convention | Accepted |
 | [0020](0020-action-side-splits-three-ways-buttongroup-retired.md) | The "action" side splits three ways — ButtonGroup is retired, navigation earns a contract | Architecture | Accepted |
-| [0021](0021-appearance-is-a-color-scheme-switch-not-a-token-system.md) | Appearance is a `color-scheme` switch, not a token system; contrast stays out of the state machine | Architecture | Proposed |
+| [0021](0021-appearance-is-a-color-scheme-switch-not-a-token-system.md) | Appearance is a `color-scheme` switch, not a token system; contrast stays out of the state machine | Architecture | Accepted |
