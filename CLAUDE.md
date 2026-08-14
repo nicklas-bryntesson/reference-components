@@ -83,6 +83,22 @@ Read [`.claude/philosophy.md`](.claude/philosophy.md) before writing any CSS or 
 - **New features / design decisions:** subagent-driven development + full spec + quality review
 - **Mechanical tasks (migrations, renames, type annotations):** inline execution, skip brainstorming
 - **TypeScript migrations:** one component per session; no logic changes
+- **Check the PR state *before* every push**, never after:
+
+  ```bash
+  gh pr list --head <branch> --json number,state
+  ```
+
+  PRs get merged (usually squashed) while work continues on the same branch. `git push` to a branch
+  whose PR has closed **succeeds silently**, so the commits end up orphaned — on the branch, not on
+  `main`, with no PR pointing at them. This has happened more than once, and it is invisible from the
+  agent's side unless the state is checked first.
+
+  When it has already happened: cut a fresh branch from `origin/main` and cherry-pick what is
+  missing. A cherry-pick that reports *"nothing to commit"* means that commit was already included in
+  the squash — `--skip` it rather than creating an empty commit — and confirm the result with
+  `git diff --stat origin/main..HEAD` before opening the PR. Never report "pushed to #N" without
+  having seen that #N is `OPEN`.
 
 ## Decisions (ADRs)
 
