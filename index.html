@@ -8,6 +8,28 @@
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="theme-color" content="Canvas" />
     <meta name="description" content="Reference components" />
+
+    <!--
+      Appearance, applied before first paint (ADR-0021).
+
+      This has to be an inline, render-blocking script in <head>: a module runs
+      after the document is parsed, so by the time ThemeSwitch attaches, the page
+      may already have painted in the wrong appearance. There is no client-side
+      way around that — a server-rendered host reads its cookie and writes the
+      attribute into the markup instead, which is why the contract specifies the
+      DOM end-state and not the mechanism (ADR-0009).
+
+      Note what is NOT here: any handling of `system`. That is the whole point of
+      projecting nothing for it — `color-scheme: light dark` already follows the
+      OS, so the most common case needs no script at all and cannot flash. Only
+      an explicit override has to be restored this early.
+    -->
+    <script>
+      try {
+        var a = localStorage.getItem('appearance-preference')
+        if (a === 'light' || a === 'dark') document.documentElement.setAttribute('data-appearance', a)
+      } catch (e) { /* storage blocked — fall back to following the OS */ }
+    </script>
   </head>
 
   <body>

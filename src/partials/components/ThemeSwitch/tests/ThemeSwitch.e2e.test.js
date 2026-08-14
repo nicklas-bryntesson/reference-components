@@ -110,6 +110,34 @@ test('a choice survives a reload, with the matching segment re-checked', async (
   await expect(page.locator(`${TS} input[value="dark"]`)).toBeChecked()
 })
 
+test('a stored choice is restored before first paint, without the component', async ({ page }) => {
+  // The head script is what prevents a flash: a module runs after parsing, so by
+  // the time the component attaches the page may already have painted in the
+  // wrong appearance. Blocking the module proves the restore is NOT the
+  // component's doing — if this passes with no JS module at all, nothing can
+  // paint wrong first.
+  // Match on pathname, not a glob: the dev server appends a cache-busting query
+  // (`/main.js?v=…`), which `**/main.js` silently fails to match — so the module
+  // still loaded and the test proved nothing.
+  await page.route((url) => url.pathname === '/main.js', (route) => route.abort())
+  await page.addInitScript(() => window.localStorage.setItem('appearance-preference', 'dark'))
+  await page.goto('/', { waitUntil: 'domcontentloaded' })
+
+  expect(await appearanceAttr(page), 'the head script must have done this').toBe('dark')
+  expect(
+    await page.locator(TS).getAttribute('data-initialized'),
+    'and the component must genuinely not have run',
+  ).toBeNull()
+})
+
+test('icons carry an intrinsic size, so they cannot flash at the default 300×150', async ({ page }) => {
+  // An <svg> with only a viewBox falls back to 300×150 until CSS sizes it, which
+  // is visible as a large shape snapping down on load whenever styles arrive late.
+  const missing = await page.locator(`${TS} svg`).evaluateAll((nodes) =>
+    nodes.filter((n) => !n.hasAttribute('width') || !n.hasAttribute('height')).length)
+  expect(missing, 'every icon needs width and height attributes').toBe(0)
+})
+
 test('an explicit choice is NOT revoked when the OS signal flips', async ({ page }) => {
   // The contract, and the rule the kernel exists to hold: a platform signal never
   // overrides an active user decision.

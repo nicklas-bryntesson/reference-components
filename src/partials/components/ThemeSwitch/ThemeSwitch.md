@@ -80,6 +80,28 @@ where it sits is irrelevant as long as it stays focusable and out of layout.
 - **A consumer maps it in one line** — a Tailwind `darkMode` selector, one CSS rule, whatever their
   system uses.
 
+### Restoring an explicit choice before first paint — required of the host
+
+A module runs after the document is parsed, so by the time the component attaches the page may
+already have painted in the wrong appearance. There is **no client-side way around that**: restoring
+a stored override needs a render-blocking inline script in `<head>`.
+
+```html
+<script>
+  try {
+    var a = localStorage.getItem('appearance-preference')
+    if (a === 'light' || a === 'dark') document.documentElement.setAttribute('data-appearance', a)
+  } catch (e) { /* storage blocked — fall back to following the OS */ }
+</script>
+```
+
+Note what the snippet does **not** handle: `system`. That is the payoff for projecting nothing for
+it — `color-scheme: light dark` already follows the OS, so the most common case needs no script at
+all and **cannot** flash. Only an explicit override has to be restored this early.
+
+A server-rendered host skips the script entirely: read the cookie and write
+`<html data-appearance="dark">` into the markup. Same end-state, no flash, no client JS.
+
 ### The end-state is the contract, not the mechanism
 
 What is contractual is that the root carries the resolved appearance. **How it gets there is the
