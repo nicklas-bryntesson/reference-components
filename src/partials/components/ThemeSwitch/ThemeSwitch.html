@@ -1,0 +1,134 @@
+<section class="kitchensink-section" id="ThemeSwitch">
+
+  <h2>ThemeSwitch</h2>
+
+  <p class="prose">
+    Resolves a colour-scheme preference against the OS signal and reflects the answer on
+    <code>&lt;html&gt;</code> as <code>data-appearance</code>. <strong>System</strong> projects no
+    attribute at all — its absence is the state, and <code>color-scheme: light dark</code> already
+    delegates to the OS. Only the live demo below is attached; the state rows are inert copies, so
+    they cannot re-theme the page.
+  </p>
+
+  <!-- ── 1. Live demo — the only attached instance ──────────────────────── -->
+  <h3>Live demo</h3>
+  <fieldset class="ThemeSwitch" data-component="ThemeSwitch" data-id="live">
+    <legend>Colour theme</legend>
+    <div class="options">
+      <input type="radio" id="ts-system" name="ts-appearance" value="system" checked>
+      <label for="ts-system">
+        <span class="visually-hidden">Follow system setting</span>
+        <svg width="18" height="18" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+          <rect x="2" y="3" width="20" height="14" rx="2"></rect><path d="M8 21h8m-4-4v4"></path>
+        </svg>
+      </label>
+
+      <input type="radio" id="ts-light" name="ts-appearance" value="light">
+      <label for="ts-light">
+        <span class="visually-hidden">Light</span>
+        <svg width="18" height="18" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path>
+        </svg>
+      </label>
+
+      <input type="radio" id="ts-dark" name="ts-appearance" value="dark">
+      <label for="ts-dark">
+        <span class="visually-hidden">Dark</span>
+        <svg width="18" height="18" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+          <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path>
+        </svg>
+      </label>
+
+      <span class="indicator" aria-hidden="true"></span>
+    </div>
+  </fieldset>
+
+  <!-- ── 2. Interaction states ──────────────────────────────────────────
+       Inert copies: no data-component, so they never attach and never project.
+       data-test-state on the ROOT; CSS projects it down to the segments. -->
+  <h3>Interaction states</h3>
+
+  <h4>Default</h4>
+  <fieldset class="ThemeSwitch" data-id="state-default">
+    <legend>Interaction state: default</legend>
+    <div class="options">
+      <input type="radio" id="ts-sd-1" name="ts-sd" value="system" checked>
+      <label for="ts-sd-1"><span class="visually-hidden">Follow system setting</span><svg width="18" height="18" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="2" y="3" width="20" height="14" rx="2"></rect><path d="M8 21h8m-4-4v4"></path></svg></label>
+      <input type="radio" id="ts-sd-2" name="ts-sd" value="light">
+      <label for="ts-sd-2"><span class="visually-hidden">Light</span><svg width="18" height="18" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg></label>
+      <input type="radio" id="ts-sd-3" name="ts-sd" value="dark">
+      <label for="ts-sd-3"><span class="visually-hidden">Dark</span><svg width="18" height="18" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path></svg></label>
+      <span class="indicator" aria-hidden="true"></span>
+    </div>
+  </fieldset>
+
+  <h4>Hover</h4>
+  <fieldset class="ThemeSwitch" data-id="state-hover" data-test-state="hover">
+    <legend>Interaction state: hover</legend>
+    <div class="options">
+      <input type="radio" id="ts-sh-1" name="ts-sh" value="system" checked>
+      <label for="ts-sh-1"><span class="visually-hidden">Follow system setting</span><svg width="18" height="18" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="2" y="3" width="20" height="14" rx="2"></rect><path d="M8 21h8m-4-4v4"></path></svg></label>
+      <input type="radio" id="ts-sh-2" name="ts-sh" value="light">
+      <label for="ts-sh-2"><span class="visually-hidden">Light</span><svg width="18" height="18" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg></label>
+      <input type="radio" id="ts-sh-3" name="ts-sh" value="dark">
+      <label for="ts-sh-3"><span class="visually-hidden">Dark</span><svg width="18" height="18" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path></svg></label>
+      <span class="indicator" aria-hidden="true"></span>
+    </div>
+  </fieldset>
+
+  <h4>Focus</h4>
+  <fieldset class="ThemeSwitch" data-id="state-focus" data-test-state="focus">
+    <legend>Interaction state: focus</legend>
+    <div class="options">
+      <input type="radio" id="ts-sf-1" name="ts-sf" value="system" checked>
+      <label for="ts-sf-1"><span class="visually-hidden">Follow system setting</span><svg width="18" height="18" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="2" y="3" width="20" height="14" rx="2"></rect><path d="M8 21h8m-4-4v4"></path></svg></label>
+      <input type="radio" id="ts-sf-2" name="ts-sf" value="light">
+      <label for="ts-sf-2"><span class="visually-hidden">Light</span><svg width="18" height="18" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg></label>
+      <input type="radio" id="ts-sf-3" name="ts-sf" value="dark">
+      <label for="ts-sf-3"><span class="visually-hidden">Dark</span><svg width="18" height="18" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path></svg></label>
+      <span class="indicator" aria-hidden="true"></span>
+    </div>
+  </fieldset>
+
+  <h4>Active</h4>
+  <fieldset class="ThemeSwitch" data-id="state-active" data-test-state="active">
+    <legend>Interaction state: active</legend>
+    <div class="options">
+      <input type="radio" id="ts-sa-1" name="ts-sa" value="system" checked>
+      <label for="ts-sa-1"><span class="visually-hidden">Follow system setting</span><svg width="18" height="18" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="2" y="3" width="20" height="14" rx="2"></rect><path d="M8 21h8m-4-4v4"></path></svg></label>
+      <input type="radio" id="ts-sa-2" name="ts-sa" value="light">
+      <label for="ts-sa-2"><span class="visually-hidden">Light</span><svg width="18" height="18" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg></label>
+      <input type="radio" id="ts-sa-3" name="ts-sa" value="dark">
+      <label for="ts-sa-3"><span class="visually-hidden">Dark</span><svg width="18" height="18" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path></svg></label>
+      <span class="indicator" aria-hidden="true"></span>
+    </div>
+  </fieldset>
+
+  <!-- ── 3. Disabled — the <fieldset disabled> cascade ─────────────────── -->
+  <h3>Disabled</h3>
+  <fieldset class="ThemeSwitch" data-id="disabled" disabled>
+    <legend>Colour theme (unavailable)</legend>
+    <div class="options">
+      <input type="radio" id="ts-dis-1" name="ts-dis" value="system" checked>
+      <label for="ts-dis-1"><span class="visually-hidden">Follow system setting</span><svg width="18" height="18" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="2" y="3" width="20" height="14" rx="2"></rect><path d="M8 21h8m-4-4v4"></path></svg></label>
+      <input type="radio" id="ts-dis-2" name="ts-dis" value="light">
+      <label for="ts-dis-2"><span class="visually-hidden">Light</span><svg width="18" height="18" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg></label>
+      <input type="radio" id="ts-dis-3" name="ts-dis" value="dark">
+      <label for="ts-dis-3"><span class="visually-hidden">Dark</span><svg width="18" height="18" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path></svg></label>
+      <span class="indicator" aria-hidden="true"></span>
+    </div>
+  </fieldset>
+
+  <!-- ── 4. Resolved state — the state machine, legible without DevTools ── -->
+  <h3>Resolved state</h3>
+  <table class="state-table" id="ThemeSwitch-readout">
+    <tbody>
+      <tr><th scope="row">preference</th><td data-readout="preference">—</td></tr>
+      <tr><th scope="row">appearance</th><td data-readout="appearance">—</td></tr>
+      <tr><th scope="row">prefers-color-scheme: dark</th><td data-readout="prefers-dark">—</td></tr>
+      <tr><th scope="row">&lt;html data-appearance&gt;</th><td data-readout="attribute">—</td></tr>
+    </tbody>
+  </table>
+
+</section>

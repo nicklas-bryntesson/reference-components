@@ -140,7 +140,7 @@
       <div class="notice-region" role="alert" aria-live="assertive">
         <div class="Notice" data-variant="error">
           <div class="icon">
-            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
           </div>
           <div class="content">
             <p id="pl-err-text">Pick at least one option to continue.</p>
@@ -186,7 +186,7 @@
        label. Clicking it activates the label, which toggles the input — so it
        deselects with no JS and no second label. Checkbox core only: a native
        radio cannot be unchecked by the user, so an × there would be a lie.
-       Note the markup has NO whitespace before the <svg> — a text node
+       Note the markup has NO whitespace before the <svg width="12" height="12"> — a text node
        "Wi-Fi " would leave a trailing space in the accessible name. -->
   <h4>Removable (checkbox core only)</h4>
   <fieldset class="Picklist" data-id="removable" data-legend="above" aria-describedby="pl-r-hint">
@@ -194,9 +194,9 @@
     <div class="content">
       <p class="hint" id="pl-r-hint">Selected chips show a × — activating it removes the selection.</p>
       <div class="options">
-        <span class="option"><input type="checkbox" id="pl-r-1" name="pl-r-1" checked><label for="pl-r-1">Under 500 kr<svg class="deselect" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M2 2 L10 10 M10 2 L2 10" stroke="currentColor" stroke-width="2" fill="none"/></svg></label></span>
-        <span class="option"><input type="checkbox" id="pl-r-2" name="pl-r-2" checked><label for="pl-r-2">In stock<svg class="deselect" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M2 2 L10 10 M10 2 L2 10" stroke="currentColor" stroke-width="2" fill="none"/></svg></label></span>
-        <span class="option"><input type="checkbox" id="pl-r-3" name="pl-r-3"><label for="pl-r-3">Free delivery<svg class="deselect" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M2 2 L10 10 M10 2 L2 10" stroke="currentColor" stroke-width="2" fill="none"/></svg></label></span>
+        <span class="option"><input type="checkbox" id="pl-r-1" name="pl-r-1" checked><label for="pl-r-1">Under 500 kr<svg width="12" height="12" class="deselect" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M2 2 L10 10 M10 2 L2 10" stroke="currentColor" stroke-width="2" fill="none"/></svg></label></span>
+        <span class="option"><input type="checkbox" id="pl-r-2" name="pl-r-2" checked><label for="pl-r-2">In stock<svg width="12" height="12" class="deselect" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M2 2 L10 10 M10 2 L2 10" stroke="currentColor" stroke-width="2" fill="none"/></svg></label></span>
+        <span class="option"><input type="checkbox" id="pl-r-3" name="pl-r-3"><label for="pl-r-3">Free delivery<svg width="12" height="12" class="deselect" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M2 2 L10 10 M10 2 L2 10" stroke="currentColor" stroke-width="2" fill="none"/></svg></label></span>
       </div>
     </div>
   </fieldset>
