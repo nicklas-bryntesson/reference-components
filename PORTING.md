@@ -23,6 +23,273 @@ Do **not** port:
 - **`*.generate.ts` and `states/`** — repo-internal tooling that regenerates the kitchensink's `.hbs` state partials. You author your demo states directly in your own stack.
 - **`*.unit.test.*`** — these are white-box tests of the *reference implementation* (they call private methods and import the TS class directly). They are **not** the portable contract and carry a TS-adaptation tax for no benefit. The portable contract is the **conformance suite** — the e2e + axe tests, which assert observable behaviour and ARIA structure against your own DOM.
 
+## Appearance (light/dark)
+
+### How far you need to read
+
+Most of what follows may not apply to you. The sections escalate, and **stopping early is the
+correct outcome** — this is a map of limitations and options, not a prescription. Your project may
+run Tailwind, or a token pipeline, or have opinions of its own; the contract this library asserts is
+the same in every case.
+
+| If your project… | You need | Read |
+|---|---|---|
+| has **one** colour scheme | nothing. Map `--ui-*` to your colours and move on | — |
+| follows the **OS** light/dark | **one line**: `color-scheme: light dark`. No JS, no flash, no attribute | *One platform line* |
+| also lets the **user override** | that line + `data-appearance` on the root + a head script | *Preventing FOUC* |
+| must also honour **contrast** (a legal requirement in public-sector work) | a four-mode value table, and a real decision about where it lives | *Four modes* |
+
+The one part that is **not** optional if you ship this library's CSS at all is the first line —
+without it, components that read system colours never follow the OS.
+
+### One platform line
+
+The library follows light and dark through **system colours**, not through a theme system. Every
+component reads `Canvas`/`CanvasText`, so the whole set follows the appearance with no per-component
+work — but only because one line switches it on:
+
+```css
+:root { color-scheme: light dark; }
+```
+
+> **Port this line or the library is light-only, silently.** It lives in
+> [`01-Setup/ui-tokens.css`](src/css/site/01-Setup/ui-tokens.css) and is the one declaration in that
+> file that is *not* a token. A consumer who replaces the file with their own token mapping and drops
+> it gets a library that renders light for a dark-OS user, with nothing visibly broken and no test
+> failing. It is the single most expensive line to lose in the whole port.
+
+### What you owe, and what you don't
+
+| | Reactive by itself | Needs a decision from you |
+|---|---|---|
+| Surfaces, text, borders, hover tints | ✅ system colours and `color-mix` against them | — |
+| `--ui-muted-foreground`, `--ui-primary-foreground` | ✅ derived | — |
+| The five semantic hues + the shadow ink | — | a value that works on both grounds |
+
+Pairs are **not** a requirement. If your brand blue reads well on light and dark, one value is fine;
+supply a pair only where one value cannot serve both. Our defaults use `light-dark()`, but that is a
+convenience, not part of the contract.
+
+**Contrast is deliberately not shipped.** `prefers-contrast: more` has no user override, so it never
+belonged in the state machine and picking high-contrast hues is your design work, not ours. It
+composes in one block, because `light-dark()` resolves against the active `color-scheme`:
+
+```css
+@media (prefers-contrast: more) {
+  :root { --ui-primary: light-dark(<darker>, <lighter>); }
+}
+```
+
+### The projection contract
+
+```html
+<html>                          <!-- "system" — NO attribute -->
+<html data-appearance="light">
+<html data-appearance="dark">
+```
+
+Absence is the system state. The attribute's only job is pinning `color-scheme`; nothing in this
+library applies tokens at runtime. Map it to your own system in one line — a Tailwind `darkMode`
+selector, a single CSS rule, whatever you already use.
+
+### Preventing FOUC — structure, not a workaround
+
+**How the attribute gets onto `<html>` is yours to choose; *when* is not.** If a stored override is
+applied after the document parses, the page paints in the OS appearance and then snaps — a flash on
+every reload. Two conformant structures:
+
+**Server-rendered (preferred — no client JS, no flash by construction).** Read your cookie during
+render and emit the attribute in the markup:
+
+```html
+<html data-appearance="dark">
+```
+
+The preference has to live somewhere the *server* can read, so use a **cookie, not `localStorage`**.
+That is the whole reason the reference Astro implementation this pattern came from used one.
+
+**Static or client-only.** A render-blocking inline script in `<head>`, before your stylesheet.
+There is no alternative: a module runs after parsing, so by the time your component mounts the wrong
+paint has already happened.
+
+```html
+<script>
+  try {
+    var a = localStorage.getItem('appearance-preference')
+    if (a === 'light' || a === 'dark') document.documentElement.setAttribute('data-appearance', a)
+  } catch (e) { /* storage blocked — fall back to following the OS */ }
+</script>
+```
+
+Three things about that snippet are deliberate:
+
+- **It does not handle `system`.** That is the payoff for projecting nothing for it: `color-scheme:
+  light dark` already follows the OS, so the most common case needs no script and **cannot** flash.
+  Only an explicit override is restored this early.
+- **It is inline and synchronous.** An external or `defer`red script defeats the purpose.
+- **It swallows storage errors.** Private-mode Safari and blocked third-party contexts throw on
+  access; a theme preference must never take the page down.
+
+Whatever you choose, the component is unaware of it. What is contractual is the **DOM end-state** —
+the root carries the resolved appearance — never where it was computed. The same e2e suite passes
+against a client-restored page and a server-rendered one.
+
+### When you need four modes, not two — CSS map vs JS lookup
+
+This library ships **two** appearances and no contrast values, so it stays in CSS. Your project may
+not have that luxury: EU/Swedish public-sector accessibility rules require honouring the user's
+colour *and* contrast preferences, which is **four modes** — and most teams also want an in-app
+override, because a user whose OS is dark may still want this one site light.
+
+That is where it stops being a styling question and becomes a data-structure question. The signals
+are independent:
+
+| Signal | Source | Values |
+|---|---|---|
+| `prefers-color-scheme` | OS | light · dark |
+| `prefers-contrast` | OS | normal · more |
+| your override | UI | may pin either axis |
+
+And the values are genuinely four, not two inverted pairs. Foreground and background just flip, but a
+**mid-tone does not**: a border that reads against white is not the one that reads against black, and
+in high contrast there is no mid-tone at all — it collapses into the text colour. Four distinct
+values per mid-tone token.
+
+**Route A — CSS, with `light-dark()` and a style query.** Two declarations per token:
+
+```css
+:root { color-scheme: light dark; --contrast: normal; }
+:root[data-appearance="light"] { color-scheme: light; }
+:root[data-appearance="dark"]  { color-scheme: dark; }
+@media (prefers-contrast: more) { :root { --contrast: more; } }
+:root[data-contrast="more"]    { --contrast: more; }   /* the UI override */
+
+.thing { --border: light-dark(darkgrey, lightgrey); }
+@container style(--contrast: more) { .thing { --border: light-dark(black, white); } }
+```
+
+The colour axis needs no `:not()` and no duplicate override blocks, because `light-dark()` reads the
+*used* `color-scheme` and the attribute already pins it. The contrast axis is a **named condition**
+set in one place from either source. Verified: this produces all four cells with the axes
+independent.
+
+#### Support, and the very different ways these two degrade
+
+Both sit around 89–90% global support — Baseline *newly* available, not *widely* available:
+
+| Feature | Global | First supported |
+|---|---|---|
+| `light-dark()` | ~88.8% | Chrome/Edge 123 · Firefox 120 · Safari 17.5 |
+| `@container style()` | ~90.2% | Chrome/Edge 111 · Safari 18 · Firefox 151 |
+
+(Support tables mark Chrome and Safari "partial" for style queries; the partial part is that only
+*custom properties* can be queried, not regular CSS properties — which is exactly this use.)
+
+The percentages matter less than the failure shapes, which are not comparable:
+
+- **`light-dark()` unsupported** → the declaration is invalid at computed-value time, the custom
+  property becomes guaranteed-invalid, and `var(--ui-x, #literal)` falls back to the literal. The
+  page renders light. Cosmetic, and every token in this library carries a literal fallback for
+  exactly this reason.
+- **Style queries unsupported** → the whole `@container` block is dropped and tokens keep their
+  normal-contrast values, so **the user's high-contrast preference is silently ignored**. That is the
+  obligation you were implementing, failing invisibly.
+
+So do not let the style query carry the OS signal. **Layer it:** a plain media query — support is
+effectively universal — honours the preference, and the style query only adds the in-app override on
+top.
+
+```css
+/* 1. The OS signal, everywhere. */
+@media (prefers-contrast: more) { .thing { --border: light-dark(black, white); } }
+
+/* 2. The in-app override, where style queries exist. */
+@container style(--contrast: more) { .thing { --border: light-dark(black, white); } }
+@container style(--contrast: normal) { .thing { --border: light-dark(darkgrey, lightgrey); } }
+```
+
+A browser without style queries then still respects the OS preference and merely cannot offer the
+in-app toggle — a feature gap rather than an accessibility regression. The duplication is one extra
+block per contrast-sensitive token, and it buys a failure mode you can live with.
+
+If that trade reads badly to you, it is a fair argument for Route B: a JS lookup has no partial
+support and no silent-drop failure mode, at the cost of everything listed under its own heading.
+
+> Worth knowing if you have an older codebase: before `light-dark()` and style queries, this needed
+> roughly **eight** blocks — four for the OS combinations and four more whose only job was repairing
+> the crossing between the UI override and the OS contrast query, containing no new values at all.
+> If your existing theme CSS looks like that, the language has moved since it was written.
+
+**Route B — a JS lookup table.** The table lives in one object keyed by token, and a function
+resolves it per mode:
+
+```js
+'--border': { light: 'darkgrey', dark: 'lightgrey',
+              'light-contrast': 'black', 'dark-contrast': 'white' }
+```
+
+**Choose Route A when** the token count is modest and you want values to stay in the cascade — a
+consumer can then override one token on one component with a normal CSS rule, and `light-dark()`
+does the colour axis for free.
+
+**Choose Route B when** any of these bite:
+
+- **Coverage needs verifying.** Nothing in CSS checks that every token has a value in every mode. A
+  forgotten `dark-contrast` inherits silently from the wrong block and surfaces in production as a
+  contrast bug. An object can be linted, tested and iterated.
+- **You want to read the table by token, not by selector.** The cascade sorts by selector; the
+  question you actually ask is "what is `--border` in dark-contrast?" In CSS that answer *emerges*
+  from simulating the cascade. In an object it is one line.
+- **You are generating tokens anyway** — from a design-token pipeline, a CMS, or per-component token
+  files that need aggregating.
+- **You already render server-side.** You are computing the appearance there regardless, so emitting
+  the resolved values costs nothing extra.
+- **You want the current values legible in DevTools.** This one is underrated. With the CSS route the
+  Styles pane fragments your custom properties across every matched rule and query block, and you
+  read the cascade to work out which won. With a JS map the whole resolved set lands in **one inline
+  block on `<html>`** — every semantic variable and what it means *right now*, in a single list. The
+  Computed pane does flatten values, but it flattens them among everything else; the inline block is
+  the set you actually care about, on its own.
+
+  > Sass does not solve this. It can dedupe the *authoring*, but it compiles to the same scattered
+  > blocks, so the inspector view is unchanged and you have added a build step between you and the
+  > CSS you are debugging. Reported from having tried it.
+
+**Route B's costs, which are real:**
+
+- **It does not avoid the flash** — the same render-blocking head script is still required, and now
+  it must apply *values*, not just an attribute.
+- **Never assign `documentElement.style.cssText`.** It replaces the whole inline declaration block
+  and silently destroys anything else living there: scroll locks, viewport fixes, view-transition
+  names. Use `setProperty` per token.
+- **Values leave the cascade.** Inline styles on `:root` beat every stylesheet rule, so a consumer
+  overriding one token for one component now has to fight specificity or re-enter the map.
+- **You give up `light-dark()`** doing the colour axis for you, and re-implement that branch in JS.
+
+A reasonable hybrid, if you want the table auditable without leaving CSS: keep the lookup in JS as
+the **source of truth**, and generate a stylesheet from it at build time. You get the validation and
+the by-token reading, and the browser still gets plain cascading CSS.
+
+**If you are on Tailwind**, most of this is already answered by whatever you use for `dark:` — point
+its `darkMode` selector at `[data-appearance="dark"]` and your existing variants keep working. The
+contrast axis has no `dark:`-equivalent, so it is still the same decision as above; a custom variant
+over the same named condition is the usual answer.
+
+Whichever route: **the contract this library asserts is unchanged.** The root carries the resolved
+appearance; how the values respond is entirely yours. We are pointing at the limitations and the
+options, not at an answer — a consuming project owns its colour, and may reasonably conclude that
+none of this applies to it.
+
+### A second flash, unrelated to theme
+
+An `<svg>` carrying only a `viewBox` falls back to **300×150** until CSS sizes it, which reads as a
+large shape snapping down whenever styles arrive late (routinely in dev, where CSS is injected by
+JS). Every icon in this library carries explicit `width`/`height` attributes for that reason — keep
+them when you port the markup, even though your CSS overrides them.
+
+> **Auditing tip, learned the hard way:** grepping `<svg` tags for `width=` reports false negatives,
+> because `stroke-width=` contains the substring. Exclude a preceding hyphen.
+
 ## Restyle to your own convention — after the suite is green, never during
 
 Copying the `.css` verbatim is the point of the step above, so if your project writes nested CSS, CSS Modules, scoped styles or utility classes, that translation is a **separate step on a verified baseline**. Doing both at once leaves you two variables and nothing to bisect: when the field misbehaves you cannot tell which half broke it.
@@ -106,6 +373,8 @@ A port is complete when:
 - [ ] All component e2e tests pass against your dev server, **on your chosen browser matrix** (not chromium alone)
 - [ ] `axe` tests pass (zero WCAG 2 AA violations) — with open/animated states settled (see *Entrance animations and `axe`* above)
 - [ ] **Visual parity** checked side-by-side against the reference demo (the suite will not catch appearance regressions)
+- [ ] **`color-scheme: light dark` survived the token mapping**, and the app was viewed once with the OS in dark — losing that line fails nothing and breaks everything
+- [ ] **No flash on reload** with an explicit appearance stored, checked on a *cold* load rather than a warm one
 - [ ] The manual accessibility checklist in each component's `<Name>.md` has been worked through with a real screen reader
 - [ ] The submodule is still clean (`git -C reference-components status`) — operate from your project root, never with your shell `cwd` inside the submodule
 
