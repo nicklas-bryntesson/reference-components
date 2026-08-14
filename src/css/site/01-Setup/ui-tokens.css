@@ -17,35 +17,87 @@
  */
 
 :root {
+  /* ── Appearance ───────────────────────────────────────────────────────
+     `color-scheme` is a PLATFORM declaration, not a design decision: it is
+     what makes system colours, form controls, scrollbars and UA chrome
+     correct. Every component in this library reads Canvas/CanvasText, so this
+     one line is what makes the whole set follow light and dark.
+
+     The projection contract is three rules. An ABSENT data-appearance means
+     "follow the OS" — that is the whole `system` state, so nothing has to be
+     computed or written before first paint, and there is no flash. Only an
+     explicit choice sets the attribute, and its only job is to pin
+     color-scheme. Nothing here applies tokens. (ADR-0021) */
+  color-scheme: light dark;
+
   /* Surface — panels / popovers */
   --ui-surface: Canvas;
   --ui-surface-foreground: CanvasText;
   --ui-surface-padding: 0.75rem;
   --ui-radius: 0.75rem;
+  /* A shadow reads as depth on a light ground; on a dark one the same ink is
+     nearly invisible, so the dark half is both darker and far more opaque.
+     Geometry is shared — only the colour is a pair. */
   --ui-shadow:
-    0px 0px 1px rgba(3, 7, 18, 0.01),
-    0px 1px 4px rgba(3, 7, 18, 0.01),
-    0px 2px 9px rgba(3, 7, 18, 0.02),
-    0px 4px 17px rgba(3, 7, 18, 0.02),
-    0px 7px 26px rgba(3, 7, 18, 0.03),
-    0px 10px 37px rgba(3, 7, 18, 0.03),
-    0px 13px 51px rgba(3, 7, 18, 0.04),
-    0px 17px 66px rgba(3, 7, 18, 0.04),
-    0px 22px 84px rgba(3, 7, 18, 0.05);
+    0px 0px 1px light-dark(rgba(3, 7, 18, 0.01), rgba(0, 0, 0, 0.20)),
+    0px 1px 4px light-dark(rgba(3, 7, 18, 0.01), rgba(0, 0, 0, 0.20)),
+    0px 2px 9px light-dark(rgba(3, 7, 18, 0.02), rgba(0, 0, 0, 0.24)),
+    0px 4px 17px light-dark(rgba(3, 7, 18, 0.02), rgba(0, 0, 0, 0.24)),
+    0px 7px 26px light-dark(rgba(3, 7, 18, 0.03), rgba(0, 0, 0, 0.28)),
+    0px 10px 37px light-dark(rgba(3, 7, 18, 0.03), rgba(0, 0, 0, 0.28)),
+    0px 13px 51px light-dark(rgba(3, 7, 18, 0.04), rgba(0, 0, 0, 0.32)),
+    0px 17px 66px light-dark(rgba(3, 7, 18, 0.04), rgba(0, 0, 0, 0.32)),
+    0px 22px 84px light-dark(rgba(3, 7, 18, 0.05), rgba(0, 0, 0, 0.36));
 
-  /* Lines & focus */
+  /* Lines & focus — already appearance-reactive: they mix against CanvasText,
+     which follows color-scheme, so they need no pair. */
   --ui-border: color-mix(in srgb, CanvasText 12%, transparent);  /* borders + dividers/hairlines */
   --ui-ring: var(--ui-primary);                                  /* focus ring */
 
-  /* Roles */
-  --ui-primary: #0066cc;              /* links, selection, active accent */
-  --ui-primary-foreground: #ffffff;   /* text / tick on a primary fill */
-  --ui-muted-foreground: #6e6e6e;     /* placeholder / secondary text */
+  /* Roles.
+     Anything that CAN derive from a system colour does, so it is reactive for
+     free and costs no design decision. Only a hue that cannot be derived — an
+     accent, a semantic state — carries a light-dark() pair, and those five are
+     the only real colour decisions in this file. They are DEFAULTS so the
+     reference looks right with nothing wired; a consumer replaces the whole
+     namespace in one pass (ADR-0018). */
+  --ui-primary: light-dark(#0066cc, #6cb6ff);              /* links, selection, active accent */
+  /* "on a primary fill" derives: the accent inverts its lightness along with the
+     ground, so the ground itself is always the correct contrast against it —
+     white on the light-mode blue, near-black on the dark-mode blue. */
+  --ui-primary-foreground: Canvas;
+  /* Derives, so it needs no pair — but the ratio is picked against the TIGHTEST
+     surface it lands on, not against Canvas. Placeholder text sits on a filled
+     field (#f7f7f7 in light), and at 55% this measured 4.42:1 there: five units
+     lighter than the hardcoded #6e6e6e it replaced, which was enough to cross
+     the 4.5 line. 60% clears it on that surface in both appearances. */
+  --ui-muted-foreground: color-mix(in srgb, CanvasText 60%, Canvas);
   --ui-hover: color-mix(in srgb, CanvasText 3%, transparent);    /* hover surface (shadcn: --accent) */
 
   /* State — shared by field-invalid and Notice */
-  --ui-destructive: #c0362c;
-  --ui-warning: #a85a00;
-  --ui-success: #1a7f37;
-  --ui-info: #0b6bcb;
+  --ui-destructive: light-dark(#c0362c, #ff8a80);
+  --ui-warning: light-dark(#a85a00, #ffb74d);
+  --ui-success: light-dark(#1a7f37, #6ee7a0);
+  --ui-info: light-dark(#0b6bcb, #79c0ff);
 }
+
+/* An explicit user choice pins the scheme; absence means "follow the OS".
+   These two rules are the entire projection surface — see ADR-0021. */
+:root[data-appearance="light"] { color-scheme: light; }
+:root[data-appearance="dark"]  { color-scheme: dark; }
+
+/* Increased contrast is deliberately NOT shipped with values.
+   It is an OS signal with no user override, so it never belonged in the
+   appearance state machine — and picking high-contrast hues is design work that
+   belongs to the consuming project, not to a reference library.
+
+   What is worth recording is that it composes cleanly, and that a consumer needs
+   exactly one block to cover all four cells (light/dark × normal/more), because
+   light-dark() resolves against the active color-scheme:
+
+     @media (prefers-contrast: more) {
+       :root { --ui-primary: light-dark(<darker>, <lighter>); }
+     }
+
+   Nothing in this library reads `prefers-contrast`; forced-colors is handled
+   separately and per-component, where it genuinely has to be. */
