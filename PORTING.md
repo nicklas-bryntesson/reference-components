@@ -23,6 +23,108 @@ Do **not** port:
 - **`*.generate.ts` and `states/`** — repo-internal tooling that regenerates the kitchensink's `.hbs` state partials. You author your demo states directly in your own stack.
 - **`*.unit.test.*`** — these are white-box tests of the *reference implementation* (they call private methods and import the TS class directly). They are **not** the portable contract and carry a TS-adaptation tax for no benefit. The portable contract is the **conformance suite** — the e2e + axe tests, which assert observable behaviour and ARIA structure against your own DOM.
 
+## Appearance (light/dark) — one platform line, and the flash you must prevent yourself
+
+The library follows light and dark through **system colours**, not through a theme system. Every
+component reads `Canvas`/`CanvasText`, so the whole set follows the appearance with no per-component
+work — but only because one line switches it on:
+
+```css
+:root { color-scheme: light dark; }
+```
+
+> **Port this line or the library is light-only, silently.** It lives in
+> [`01-Setup/ui-tokens.css`](src/css/site/01-Setup/ui-tokens.css) and is the one declaration in that
+> file that is *not* a token. A consumer who replaces the file with their own token mapping and drops
+> it gets a library that renders light for a dark-OS user, with nothing visibly broken and no test
+> failing. It is the single most expensive line to lose in the whole port.
+
+### What you owe, and what you don't
+
+| | Reactive by itself | Needs a decision from you |
+|---|---|---|
+| Surfaces, text, borders, hover tints | ✅ system colours and `color-mix` against them | — |
+| `--ui-muted-foreground`, `--ui-primary-foreground` | ✅ derived | — |
+| The five semantic hues + the shadow ink | — | a value that works on both grounds |
+
+Pairs are **not** a requirement. If your brand blue reads well on light and dark, one value is fine;
+supply a pair only where one value cannot serve both. Our defaults use `light-dark()`, but that is a
+convenience, not part of the contract.
+
+**Contrast is deliberately not shipped.** `prefers-contrast: more` has no user override, so it never
+belonged in the state machine and picking high-contrast hues is your design work, not ours. It
+composes in one block, because `light-dark()` resolves against the active `color-scheme`:
+
+```css
+@media (prefers-contrast: more) {
+  :root { --ui-primary: light-dark(<darker>, <lighter>); }
+}
+```
+
+### The projection contract
+
+```html
+<html>                          <!-- "system" — NO attribute -->
+<html data-appearance="light">
+<html data-appearance="dark">
+```
+
+Absence is the system state. The attribute's only job is pinning `color-scheme`; nothing in this
+library applies tokens at runtime. Map it to your own system in one line — a Tailwind `darkMode`
+selector, a single CSS rule, whatever you already use.
+
+### Preventing FOUC — structure, not a workaround
+
+**How the attribute gets onto `<html>` is yours to choose; *when* is not.** If a stored override is
+applied after the document parses, the page paints in the OS appearance and then snaps — a flash on
+every reload. Two conformant structures:
+
+**Server-rendered (preferred — no client JS, no flash by construction).** Read your cookie during
+render and emit the attribute in the markup:
+
+```html
+<html data-appearance="dark">
+```
+
+The preference has to live somewhere the *server* can read, so use a **cookie, not `localStorage`**.
+That is the whole reason the reference Astro implementation this pattern came from used one.
+
+**Static or client-only.** A render-blocking inline script in `<head>`, before your stylesheet.
+There is no alternative: a module runs after parsing, so by the time your component mounts the wrong
+paint has already happened.
+
+```html
+<script>
+  try {
+    var a = localStorage.getItem('appearance-preference')
+    if (a === 'light' || a === 'dark') document.documentElement.setAttribute('data-appearance', a)
+  } catch (e) { /* storage blocked — fall back to following the OS */ }
+</script>
+```
+
+Three things about that snippet are deliberate:
+
+- **It does not handle `system`.** That is the payoff for projecting nothing for it: `color-scheme:
+  light dark` already follows the OS, so the most common case needs no script and **cannot** flash.
+  Only an explicit override is restored this early.
+- **It is inline and synchronous.** An external or `defer`red script defeats the purpose.
+- **It swallows storage errors.** Private-mode Safari and blocked third-party contexts throw on
+  access; a theme preference must never take the page down.
+
+Whatever you choose, the component is unaware of it. What is contractual is the **DOM end-state** —
+the root carries the resolved appearance — never where it was computed. The same e2e suite passes
+against a client-restored page and a server-rendered one.
+
+### A second flash, unrelated to theme
+
+An `<svg>` carrying only a `viewBox` falls back to **300×150** until CSS sizes it, which reads as a
+large shape snapping down whenever styles arrive late (routinely in dev, where CSS is injected by
+JS). Every icon in this library carries explicit `width`/`height` attributes for that reason — keep
+them when you port the markup, even though your CSS overrides them.
+
+> **Auditing tip, learned the hard way:** grepping `<svg` tags for `width=` reports false negatives,
+> because `stroke-width=` contains the substring. Exclude a preceding hyphen.
+
 ## Restyle to your own convention — after the suite is green, never during
 
 Copying the `.css` verbatim is the point of the step above, so if your project writes nested CSS, CSS Modules, scoped styles or utility classes, that translation is a **separate step on a verified baseline**. Doing both at once leaves you two variables and nothing to bisect: when the field misbehaves you cannot tell which half broke it.
@@ -106,6 +208,8 @@ A port is complete when:
 - [ ] All component e2e tests pass against your dev server, **on your chosen browser matrix** (not chromium alone)
 - [ ] `axe` tests pass (zero WCAG 2 AA violations) — with open/animated states settled (see *Entrance animations and `axe`* above)
 - [ ] **Visual parity** checked side-by-side against the reference demo (the suite will not catch appearance regressions)
+- [ ] **`color-scheme: light dark` survived the token mapping**, and the app was viewed once with the OS in dark — losing that line fails nothing and breaks everything
+- [ ] **No flash on reload** with an explicit appearance stored, checked on a *cold* load rather than a warm one
 - [ ] The manual accessibility checklist in each component's `<Name>.md` has been worked through with a real screen reader
 - [ ] The submodule is still clean (`git -C reference-components status`) — operate from your project root, never with your shell `cwd` inside the submodule
 
