@@ -154,6 +154,48 @@ The colour axis needs no `:not()` and no duplicate override blocks, because `lig
 set in one place from either source. Verified: this produces all four cells with the axes
 independent.
 
+#### Support, and the very different ways these two degrade
+
+Both sit around 89–90% global support — Baseline *newly* available, not *widely* available:
+
+| Feature | Global | First supported |
+|---|---|---|
+| `light-dark()` | ~88.8% | Chrome/Edge 123 · Firefox 120 · Safari 17.5 |
+| `@container style()` | ~90.2% | Chrome/Edge 111 · Safari 18 · Firefox 151 |
+
+(Support tables mark Chrome and Safari "partial" for style queries; the partial part is that only
+*custom properties* can be queried, not regular CSS properties — which is exactly this use.)
+
+The percentages matter less than the failure shapes, which are not comparable:
+
+- **`light-dark()` unsupported** → the declaration is invalid at computed-value time, the custom
+  property becomes guaranteed-invalid, and `var(--ui-x, #literal)` falls back to the literal. The
+  page renders light. Cosmetic, and every token in this library carries a literal fallback for
+  exactly this reason.
+- **Style queries unsupported** → the whole `@container` block is dropped and tokens keep their
+  normal-contrast values, so **the user's high-contrast preference is silently ignored**. That is the
+  obligation you were implementing, failing invisibly.
+
+So do not let the style query carry the OS signal. **Layer it:** a plain media query — support is
+effectively universal — honours the preference, and the style query only adds the in-app override on
+top.
+
+```css
+/* 1. The OS signal, everywhere. */
+@media (prefers-contrast: more) { .thing { --border: light-dark(black, white); } }
+
+/* 2. The in-app override, where style queries exist. */
+@container style(--contrast: more) { .thing { --border: light-dark(black, white); } }
+@container style(--contrast: normal) { .thing { --border: light-dark(darkgrey, lightgrey); } }
+```
+
+A browser without style queries then still respects the OS preference and merely cannot offer the
+in-app toggle — a feature gap rather than an accessibility regression. The duplication is one extra
+block per contrast-sensitive token, and it buys a failure mode you can live with.
+
+If that trade reads badly to you, it is a fair argument for Route B: a JS lookup has no partial
+support and no silent-drop failure mode, at the cost of everything listed under its own heading.
+
 > Worth knowing if you have an older codebase: before `light-dark()` and style queries, this needed
 > roughly **eight** blocks — four for the OS combinations and four more whose only job was repairing
 > the crossing between the UI override and the OS contrast query, containing no new values at all.
