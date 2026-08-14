@@ -54,13 +54,24 @@
   --ui-border: color-mix(in srgb, CanvasText 12%, transparent);  /* borders + dividers/hairlines */
   --ui-ring: var(--ui-primary);                                  /* focus ring */
 
-  /* Roles — a light-dark() pair per token. The dark half is lightened and
-     slightly desaturated: the same hue at full saturation vibrates on a dark
-     ground and loses contrast against it. Still DEFAULTS, not prescriptions —
-     a consumer replaces the whole namespace in one pass (ADR-0018). */
+  /* Roles.
+     Anything that CAN derive from a system colour does, so it is reactive for
+     free and costs no design decision. Only a hue that cannot be derived — an
+     accent, a semantic state — carries a light-dark() pair, and those five are
+     the only real colour decisions in this file. They are DEFAULTS so the
+     reference looks right with nothing wired; a consumer replaces the whole
+     namespace in one pass (ADR-0018). */
   --ui-primary: light-dark(#0066cc, #6cb6ff);              /* links, selection, active accent */
-  --ui-primary-foreground: light-dark(#ffffff, #0a1929);   /* text / tick on a primary fill */
-  --ui-muted-foreground: light-dark(#6e6e6e, #a1a1a1);     /* placeholder / secondary text */
+  /* "on a primary fill" derives: the accent inverts its lightness along with the
+     ground, so the ground itself is always the correct contrast against it —
+     white on the light-mode blue, near-black on the dark-mode blue. */
+  --ui-primary-foreground: Canvas;
+  /* Derives, so it needs no pair — but the ratio is picked against the TIGHTEST
+     surface it lands on, not against Canvas. Placeholder text sits on a filled
+     field (#f7f7f7 in light), and at 55% this measured 4.42:1 there: five units
+     lighter than the hardcoded #6e6e6e it replaced, which was enough to cross
+     the 4.5 line. 60% clears it on that surface in both appearances. */
+  --ui-muted-foreground: color-mix(in srgb, CanvasText 60%, Canvas);
   --ui-hover: color-mix(in srgb, CanvasText 3%, transparent);    /* hover surface (shadcn: --accent) */
 
   /* State — shared by field-invalid and Notice */
@@ -75,18 +86,18 @@
 :root[data-appearance="light"] { color-scheme: light; }
 :root[data-appearance="dark"]  { color-scheme: dark; }
 
-/* Contrast is an OS signal with NO user override, so it is deliberately not
-   part of the appearance state machine — it composes here instead. Because
-   light-dark() resolves against the active color-scheme, one block covers all
-   four cells (light/dark × normal/more) without naming any of them. */
-@media (prefers-contrast: more) {
-  :root {
-    --ui-primary: light-dark(#003d7a, #a8d4ff);
-    --ui-muted-foreground: light-dark(#3d3d3d, #d4d4d4);
-    --ui-border: color-mix(in srgb, CanvasText 40%, transparent);
-    --ui-destructive: light-dark(#8c1c14, #ffc4bd);
-    --ui-warning: light-dark(#6b3a00, #ffd699);
-    --ui-success: light-dark(#0f5122, #a8f0c4);
-    --ui-info: light-dark(#064a8f, #b3daff);
-  }
-}
+/* Increased contrast is deliberately NOT shipped with values.
+   It is an OS signal with no user override, so it never belonged in the
+   appearance state machine — and picking high-contrast hues is design work that
+   belongs to the consuming project, not to a reference library.
+
+   What is worth recording is that it composes cleanly, and that a consumer needs
+   exactly one block to cover all four cells (light/dark × normal/more), because
+   light-dark() resolves against the active color-scheme:
+
+     @media (prefers-contrast: more) {
+       :root { --ui-primary: light-dark(<darker>, <lighter>); }
+     }
+
+   Nothing in this library reads `prefers-contrast`; forced-colors is handled
+   separately and per-component, where it genuinely has to be. */
