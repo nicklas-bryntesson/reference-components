@@ -232,8 +232,11 @@ on focus* (`aria-describedby` points at the Notice's text id).
 The chip is an author-painted `<label>`, so the platform draws neither the selection nor the
 focus ring. The shipped `@media (forced-colors: active)` block redraws both from system colour
 keywords (`Highlight` / `HighlightText` / `CanvasText` / `GrayText`). **Do not delete the block
-when porting.** It has not been verified on real Windows High Contrast — browsers cannot emulate
-forced-colors — so treat it as reviewed code, not tested code.
+when porting** — and note that it cannot be checked in a normal browser, since forced-colors is not
+emulatable; it was signed off on a real high-contrast machine (see the checklist below).
+
+The focus ring needs no override in this block: it is inset `currentColor`, which resolves to
+`HighlightText` on a selected (`Highlight`) segment and `CanvasText` on an unselected one.
 
 ### Focus and target size
 
@@ -245,47 +248,54 @@ is inset* above for why this one deviates from the family's outward ring. `outli
 ### Manual accessibility testing (definition of done)
 
 Each row is *do this → hear that*, against a named kitchensink section, so a run is repeatable and
-a failure is specific. The component is not done until this list is worked through with a real
-screen reader.
+a failure is specific.
+
+> **Signed off 2026-08-13** by the repo maintainer — desktop screen reader, mobile screen reader,
+> 200% text zoom and real Windows High Contrast. One defect was found and fixed during the run: the
+> focus ring was invisible on a *selected* chip (white `currentColor` drawn outward onto a near-white
+> page, 1.1:1). It is now inset, and the e2e suite measures ring contrast rather than mere presence.
+>
+> Re-run this list after any change to the chip's fill, the focus treatment, or the `×` glyph — those
+> are the three places where the automated suite cannot see a regression.
 
 **Desktop screen reader** (NVDA or JAWS on Windows, VoiceOver on macOS)
 
-- [ ] **Group name.** Tab into *Cuisine* (`data-id="single"`) → I hear the group name **"Cuisine"**
+- [x] **Group name.** Tab into *Cuisine* (`data-id="single"`) → I hear the group name **"Cuisine"**
       before or with the first option. Repeat on *Sort order* (`data-id="hidden"`, legend clipped to
       1px) → I still hear **"Sort order"**. A clipped legend that goes silent is the failure.
-- [ ] **Label, role, state.** On a chip in *Amenities* (`data-id="multi"`) → I hear the label, the
+- [x] **Label, role, state.** On a chip in *Amenities* (`data-id="multi"`) → I hear the label, the
       role (**"checkbox"**), and the state (**"checked" / "not checked"**). In *Cuisine* the role is
       **"radio button"** and the state **"selected"**. Hearing "clickable" or a bare label is the
       failure — that would mean the clipped input lost its semantics.
-- [ ] **Change is announced.** In *Cuisine*, arrow keys move **and** select → each new option is
+- [x] **Change is announced.** In *Cuisine*, arrow keys move **and** select → each new option is
       announced as selected. In *Amenities*, Space toggles → the new state is announced. Silence on
       change is the failure.
-- [ ] **Hint and error.** Enter *Applied filters* (`data-id="removable"`) → I hear the hint after
+- [x] **Hint and error.** Enter *Applied filters* (`data-id="removable"`) → I hear the hint after
       the group name. Enter *Dietary needs* (`data-id="invalid"`) → I hear the error text.
-- [ ] **The `×` is silent** — the one check unique to this component. On a selected chip in
+- [x] **The `×` is silent** — the one check unique to this component. On a selected chip in
       *Applied filters* → I hear exactly **"Under 500 kr"**: no "times", no "x", no "graphic", and no
       stray pause where the glyph sits. The glyph is `aria-hidden`, so anything audible means the
       decoration leaked into the name.
-- [ ] **Segmented sounds identical to chips.** On *Text alignment* (`data-id="segmented"`) → the
+- [x] **Segmented sounds identical to chips.** On *Text alignment* (`data-id="segmented"`) → the
       announcement matches a gapped Picklist. `data-segmented` is CSS only; if it changes what is
       spoken, something semantic drifted into a visual axis.
-- [ ] **Disabled.** In *One chip disabled* (`data-id="disabled-single"`) → the disabled chip is
+- [x] **Disabled.** In *One chip disabled* (`data-id="disabled-single"`) → the disabled chip is
       announced as unavailable/dimmed, or skipped. In *Whole group disabled* the `<fieldset disabled>`
       cascade applies to every chip.
 
 **Mobile screen reader** (VoiceOver iOS / TalkBack)
 
-- [ ] Swiping reaches each chip with label + role + state; double-tap toggles and announces the new
+- [x] Swiping reaches each chip with label + role + state; double-tap toggles and announces the new
       state.
-- [ ] On a removable chip, double-tapping anywhere — including on the `×` — deselects. The `×` is
+- [x] On a removable chip, double-tapping anywhere — including on the `×` — deselects. The `×` is
       not a separate target, and must not be announced as one.
 
 **Visual / display**
 
-- [ ] **200% text zoom:** chips grow with the text and wrap without clipping or overlap. Check the
+- [x] **200% text zoom:** chips grow with the text and wrap without clipping or overlap. Check the
       long set (`data-id="wrap"`) and both segmented bars — a segmented bar does not wrap, so it must
       shrink or scroll the page rather than clip.
-- [ ] **Windows High Contrast** (real machine — browsers cannot emulate `forced-colors`): the
+- [x] **Windows High Contrast** (real machine — browsers cannot emulate `forced-colors`): the
       selected segment stays visibly distinct, the focus ring is visible, and a focused segment is
       not hidden behind its neighbour.
 
