@@ -23,7 +23,26 @@ Do **not** port:
 - **`*.generate.ts` and `states/`** — repo-internal tooling that regenerates the kitchensink's `.hbs` state partials. You author your demo states directly in your own stack.
 - **`*.unit.test.*`** — these are white-box tests of the *reference implementation* (they call private methods and import the TS class directly). They are **not** the portable contract and carry a TS-adaptation tax for no benefit. The portable contract is the **conformance suite** — the e2e + axe tests, which assert observable behaviour and ARIA structure against your own DOM.
 
-## Appearance (light/dark) — one platform line, and the flash you must prevent yourself
+## Appearance (light/dark)
+
+### How far you need to read
+
+Most of what follows may not apply to you. The sections escalate, and **stopping early is the
+correct outcome** — this is a map of limitations and options, not a prescription. Your project may
+run Tailwind, or a token pipeline, or have opinions of its own; the contract this library asserts is
+the same in every case.
+
+| If your project… | You need | Read |
+|---|---|---|
+| has **one** colour scheme | nothing. Map `--ui-*` to your colours and move on | — |
+| follows the **OS** light/dark | **one line**: `color-scheme: light dark`. No JS, no flash, no attribute | *One platform line* |
+| also lets the **user override** | that line + `data-appearance` on the root + a head script | *Preventing FOUC* |
+| must also honour **contrast** (a legal requirement in public-sector work) | a four-mode value table, and a real decision about where it lives | *Four modes* |
+
+The one part that is **not** optional if you ship this library's CSS at all is the first line —
+without it, components that read system colours never follow the OS.
+
+### One platform line
 
 The library follows light and dark through **system colours**, not through a theme system. Every
 component reads `Canvas`/`CanvasText`, so the whole set follows the appearance with no per-component
@@ -225,6 +244,16 @@ does the colour axis for free.
   files that need aggregating.
 - **You already render server-side.** You are computing the appearance there regardless, so emitting
   the resolved values costs nothing extra.
+- **You want the current values legible in DevTools.** This one is underrated. With the CSS route the
+  Styles pane fragments your custom properties across every matched rule and query block, and you
+  read the cascade to work out which won. With a JS map the whole resolved set lands in **one inline
+  block on `<html>`** — every semantic variable and what it means *right now*, in a single list. The
+  Computed pane does flatten values, but it flattens them among everything else; the inline block is
+  the set you actually care about, on its own.
+
+  > Sass does not solve this. It can dedupe the *authoring*, but it compiles to the same scattered
+  > blocks, so the inspector view is unchanged and you have added a build step between you and the
+  > CSS you are debugging. Reported from having tried it.
 
 **Route B's costs, which are real:**
 
@@ -241,8 +270,15 @@ A reasonable hybrid, if you want the table auditable without leaving CSS: keep t
 the **source of truth**, and generate a stylesheet from it at build time. You get the validation and
 the by-token reading, and the browser still gets plain cascading CSS.
 
+**If you are on Tailwind**, most of this is already answered by whatever you use for `dark:` — point
+its `darkMode` selector at `[data-appearance="dark"]` and your existing variants keep working. The
+contrast axis has no `dark:`-equivalent, so it is still the same decision as above; a custom variant
+over the same named condition is the usual answer.
+
 Whichever route: **the contract this library asserts is unchanged.** The root carries the resolved
-appearance; how the values respond is entirely yours.
+appearance; how the values respond is entirely yours. We are pointing at the limitations and the
+options, not at an answer — a consuming project owns its colour, and may reasonably conclude that
+none of this applies to it.
 
 ### A second flash, unrelated to theme
 
