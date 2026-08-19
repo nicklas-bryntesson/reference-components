@@ -8,6 +8,7 @@ import AffixField from "../partials/components/AffixField/AffixField.ts";
 import MotionRegion from "../partials/components/MotionRegion/MotionRegion.ts";
 import ScrollArea from "../partials/components/ScrollArea/ScrollArea.ts";
 import ThemeSwitch from "../partials/components/ThemeSwitch/ThemeSwitch.ts";
+import RangeScale from "../partials/components/RangeScale/RangeScale.ts";
 
 import "../partials/components/ToggleTip/ToggleTip";
 
@@ -26,6 +27,7 @@ AffixField.attach();
 MotionRegion.attach();
 ScrollArea.attach();
 ThemeSwitch.attach();
+RangeScale.attach();
 
 // Kitchensink-only: mirror ThemeSwitch's resolved state into its readout table.
 // This is also the worked example of why `theme-change` exists — a host listens
