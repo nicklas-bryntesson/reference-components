@@ -75,3 +75,6 @@ holds the *why-we-built-it*; the `.md` holds the *how-it-works*.
 | [0019](0019-class-naming-component-vs-element.md) | Class naming — PascalCase = component (has a contract), lowercase-kebab = internal element; one shared lexicon | Convention | Accepted |
 | [0020](0020-action-side-splits-three-ways-buttongroup-retired.md) | The "action" side splits three ways — ButtonGroup is retired, navigation earns a contract | Architecture | Accepted |
 | [0021](0021-appearance-is-a-color-scheme-switch-not-a-token-system.md) | Appearance is a `color-scheme` switch, not a token system; contrast stays out of the state machine | Architecture | Accepted |
+| [0022](0022-choose-the-element-before-styling-a-scale.md) | Choose the element before styling a scale; ticks are decoration and the visible scale is the source of truth | Convention | Accepted |
+| [0023](0023-the-range-family-splits-three-ways.md) | The range family splits three ways — RangeField, RangeScale, RangeGroup | Component | Accepted |
+| [0024](0024-a-scale-of-words-is-its-own-component.md) | A scale of words is its own component, not a RangeScale variant | Component | Proposed |

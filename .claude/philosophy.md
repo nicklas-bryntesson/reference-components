@@ -176,6 +176,28 @@ shorter control), and `data-look`/`data-shape` (names the category, not the thin
 A design *value* is not an attribute at all — pill versus rounded rectangle is
 `--_pl-chip-radius`, i.e. the `--_`/`--ui-*` seam.
 
+### Choose the element before styling it
+
+A control is picked by what it *is*, never by what it should look like. One test: **does the same
+distance along the track mean the same thing everywhere?** If there is no unit to answer in, there
+is no scale — only ordered options, and those are radios (`ChoiceGroup` + `ChoiceField`, or
+`Picklist`), or a `<select>` when the list is long. Continuous quantity is a range. A measurement
+that is read but not set is `<meter>`, never a disabled range. Two values bounding a span are two
+inputs; `multiple` on range was never implemented.
+
+The order matters because presentation leaks into semantics on this family. `appearance: none` —
+the first line of any styling attempt — removes the browser's `<datalist>` ticks and the focus ring
+and hands you a coordinate system, so the meaning of a scale lives only in the visual layer until
+someone mirrors it into `aria-valuetext`. Two symptoms that the element is wrong: the control needs
+a "no answer yet" state but a range always carries a value, and the word list is written twice —
+once in markup, once in CSS or JS.
+
+**Tick marks are decoration.** Nothing in ARIA models them, so they belong in CSS. Marks without
+labels need no ARIA at all: `step` already makes the keyboard land on exactly those values, so both
+channels agree for free. Labels *are* information, and the visible label is the source of truth —
+mirrored into `aria-valuetext`, never derived in a stylesheet. A word that exists only as CSS
+`content` cannot be selected, copied, translated, or read back by JS.
+
 ### No impossible states in markup
 
 The component's source of truth (JS logic + `generate.ts` for state partials) defines which attribute combinations are valid. CSS never needs to guard against states that can't exist — they can't be authored.
