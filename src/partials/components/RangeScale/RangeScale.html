@@ -176,6 +176,62 @@
     </tbody>
   </table>
 
+  <!-- Reference layer -->
+  <h3>Reference layer</h3>
+  <p>
+    A second measurement on the same lane that is <strong>not</strong> the value: consumption
+    already used, a recommended band, a threshold. It cannot live inside the field — a range input
+    has exactly two addressable insides and both are spent — and it is an <em>axis</em> rather than
+    a component, because reference and thumb count are orthogonal. Encoding both as component
+    identity would give a 2×2 matrix with a fourth component nobody wants.
+  </p>
+  <p>
+    The numbers are static custom properties from the server, so the whole axis costs
+    <strong>zero JavaScript</strong>. A <code>region</code> is the special case of a
+    <code>band</code> whose start is min, plus a <code>min()</code> clamp that replaces the JS
+    branch a production slider needed for exactly this; a <code>marker</code> is a band of no width.
+  </p>
+  <table class="state-table">
+    <tbody>
+      <tr>
+        <th scope="row"><code>region</code> — drag below 20 and it stops following</th>
+        <td>{{> components/RangeScale/states/_ref-region}}</td>
+      </tr>
+      <tr>
+        <th scope="row"><code>region</code>, no fill — nothing to clamp against</th>
+        <td>{{> components/RangeScale/states/_ref-region-nofill}}</td>
+      </tr>
+      <tr>
+        <th scope="row"><code>band</code> — a bracket above the lane by default</th>
+        <td>{{> components/RangeScale/states/_ref-band}}</td>
+      </tr>
+      <tr>
+        <th scope="row"><code>band</code> + variant — colour-coded, drawn on the fill</th>
+        <td>{{> components/RangeScale/states/_ref-band-variant}}</td>
+      </tr>
+      <tr>
+        <th scope="row"><code>band</code> forced <code>under</code> — why it is not the default</th>
+        <td>{{> components/RangeScale/states/_ref-band-under}}</td>
+      </tr>
+      <tr>
+        <th scope="row"><code>marker</code> — a band of no width</th>
+        <td>{{> components/RangeScale/states/_ref-marker}}</td>
+      </tr>
+      <tr>
+        <th scope="row">band + ticks — same expression, neither knows the other</th>
+        <td>{{> components/RangeScale/states/_ref-with-ticks}}</td>
+      </tr>
+    </tbody>
+  </table>
+  <p>
+    <strong>Colour is never the only carrier</strong> (WCAG 1.4.1). Each of these pairs the layer
+    with a hint, and the swatch beside the text inherits the layer's own
+    <code>--_rs-ref-ink</code> — so it cannot drift, and the author never restates the variant. The
+    hint says what the zone <em>means</em>, not where it is. The four variants map to the same
+    <code>--ui-*</code> tokens Notice uses, so the component hard-codes no colour and dark mode
+    follows for free.
+  </p>
+
   <!-- Live demo -->
   <h3>Live demo</h3>
   <p>
