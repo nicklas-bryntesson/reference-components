@@ -11,7 +11,7 @@
     "test:e2e": "npm run generate:states && playwright test",
     "test": "vitest run && npm run generate:states && playwright test",
     "typecheck": "tsc --noEmit",
-    "generate:states": "vite-node src/partials/components/DateField/DateField.generate.ts && vite-node src/partials/components/FileUpload/FileUpload.generate.ts && vite-node src/partials/components/DateTimeField/DateTimeField.generate.ts && vite-node src/partials/components/TimeField/TimeField.generate.ts && vite-node src/partials/components/MonthField/MonthField.generate.ts && vite-node src/partials/components/WeekField/WeekField.generate.ts && vite-node src/partials/components/AffixField/AffixField.generate.ts"
+    "generate:states": "vite-node src/partials/components/DateField/DateField.generate.ts && vite-node src/partials/components/FileUpload/FileUpload.generate.ts && vite-node src/partials/components/DateTimeField/DateTimeField.generate.ts && vite-node src/partials/components/TimeField/TimeField.generate.ts && vite-node src/partials/components/MonthField/MonthField.generate.ts && vite-node src/partials/components/WeekField/WeekField.generate.ts && vite-node src/partials/components/AffixField/AffixField.generate.ts && vite-node src/partials/components/RangeField/RangeField.generate.ts"
   },
   "devDependencies": {
     "@playwright/test": "^1.58.2",
