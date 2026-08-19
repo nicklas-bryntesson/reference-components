@@ -26,9 +26,18 @@ interface StateDefinition {
   output?: { suffix?: string; initial: string } | null
   /** Stops as [normalised position, label]. Labels are numeric by definition. */
   ticks?: [number, string][]
+  /** A reference layer: a second measurement on the lane that is NOT the value. */
+  reference?: { from?: number; to: number }
+  /** Hint text the reference's meaning lives in — colour is never the only carrier. */
+  hint?: string
 }
 
 // ─── Attribute serializers ────────────────────────────────────────────────────
+
+/** A region always starts at min, so its `from` is not authored. */
+function ref0(state: StateDefinition): number {
+  return state.reference?.from ?? 0
+}
 
 function attrs(obj: Attrs): string {
   return Object.entries(obj)
@@ -66,7 +75,10 @@ function canonical(state: StateDefinition): string {
   // The position MERGES into any authored style — an overwrite would silently
   // drop a state's own declarations (it dropped --_rs-inset and font-size once).
   const { style: authored, ...rest } = state.scale ?? {}
-  const style = [`--_rs-p: ${p}`, authored].filter(Boolean).join('; ')
+  const ref = state.reference
+    ? `--_rs-ref-from: ${ref0(state)}; --_rs-ref-to: ${state.reference.to}`
+    : ''
+  const style = [`--_rs-p: ${p}`, ref, authored].filter(Boolean).join('; ')
 
   const scaleAttrs = rootAttrs({
     'data-component': 'RangeScale',
@@ -83,10 +95,21 @@ function canonical(state: StateDefinition): string {
         .join('')}\n  </span>`
     : ''
 
+  const referenceLine = state.reference ? '\n  <span class="reference"></span>' : ''
+
   const outputLine = state.output
     ? `\n  <output class="value" for="${state.id}"${
         state.output.suffix ? ` data-suffix="${state.output.suffix}"` : ''
       }>${state.output.initial}</output>`
+    : ''
+
+  const hintId = `${state.id}-hint`
+  // The hint lives INSIDE the lane, in its own grid row. It has to: the swatch
+  // must match the reference layer's colour, and inheriting --_rs-ref-ink is the
+  // only way to guarantee that without the author repeating the variant by hand.
+  const hintLine = state.hint
+    ? `\n  <p class="hint" id="${hintId}">` +
+      `<span class="swatch" aria-hidden="true"></span>${state.hint}</p>`
     : ''
 
   return `<label for="${state.id}">${state.label}</label>
@@ -94,8 +117,11 @@ function canonical(state: StateDefinition): string {
   class="RangeScale"${scaleAttrs}
 >
   <span class="track"></span>
-  <span class="fill"></span>
-  <input class="RangeField" type="range" id="${state.id}" name="${state.id}"${attrs(state.input ?? {})} />${ticksLine}${outputLine}
+  <span class="fill"></span>${referenceLine}
+  <input class="RangeField" type="range" id="${state.id}" name="${state.id}"${attrs({
+    ...(state.hint ? { 'aria-describedby': hintId } : {}),
+    ...(state.input ?? {}),
+  })} />${ticksLine}${outputLine}${hintLine}
 </div>
 `
 }
@@ -205,6 +231,81 @@ const states: StateDefinition[] = [
     input: { min: '0', max: '100', step: '10', value: '40' },
     output: { suffix: 'bar', initial: '40 bar' },
     ticks: [[0, '0'], [0.1, '10'], [0.3, '30'], [0.7, '70'], [1, '100']] },
+
+  // ── Reference layer ─────────────────────────────────────────────────────────
+  //
+  // A second measurement on the lane that is NOT the value. Static numbers from
+  // the server, so the whole axis costs zero JavaScript. Three forms; the layer's
+  // position in the stack follows the form, because the wrong default is
+  // invisible in the worst case.
+
+  // region — one number, always from min. min() keeps it from overrunning the
+  // fill, which replaces the JS branch a production slider needed for exactly this.
+  { file: '_ref-region', id: 'rs-ref-region', rootId: 'rangescale-ref-region',
+    label: 'Data allowance',
+    scale: { 'data-reference': 'region' },
+    input: { min: '0', max: '100', step: '1', value: '50' },
+    output: { suffix: 'GB', initial: '50 GB' },
+    reference: { to: 0.2 },
+    hint: 'Already used: 20 GB. Setting the limit below that stops all traffic.' },
+
+  // region with no fill: nothing to clamp against, so it is only itself.
+  { file: '_ref-region-nofill', id: 'rs-ref-region-nofill', rootId: 'rangescale-ref-region-nofill',
+    label: 'Data allowance (no fill)',
+    scale: { 'data-reference': 'region', 'data-fill': 'none' },
+    input: { min: '0', max: '100', step: '1', value: '50' },
+    output: null,
+    reference: { to: 0.2 },
+    hint: 'Already used: 20 GB.' },
+
+  // band — two numbers. Defaults to a bracket ABOVE the lane: behind the fill it
+  // would be least legible exactly when the value sits inside it.
+  { file: '_ref-band', id: 'rs-ref-band', rootId: 'rangescale-ref-band',
+    label: 'Loan amount',
+    scale: { 'data-reference': 'band' },
+    input: { min: '0', max: '1000', step: '10', value: '400' },
+    output: { suffix: 'tkr', initial: '400 tkr' },
+    reference: { from: 0.3, to: 0.5 },
+    hint: 'Recommended level: 300–500 tkr.' },
+
+  // band with a semantic variant: colour-coded meaning, drawn on the fill. The
+  // colour comes from the theming seam, never from this component.
+  { file: '_ref-band-variant', id: 'rs-ref-band-variant', rootId: 'rangescale-ref-band-variant',
+    label: 'Loan amount (colour-coded)',
+    scale: { 'data-reference': 'band', 'data-reference-variant': 'warning' },
+    input: { min: '0', max: '1000', step: '10', value: '400' },
+    output: { suffix: 'tkr', initial: '400 tkr' },
+    reference: { from: 0.3, to: 0.5 },
+    hint: 'Above 500 tkr the interest rate increases.' },
+
+  // The layer position as an explicit override, so both readings are on the page.
+  { file: '_ref-band-under', id: 'rs-ref-band-under', rootId: 'rangescale-ref-band-under',
+    label: 'Band, forced under the fill',
+    scale: { 'data-reference': 'band', 'data-reference-layer': 'under',
+             'data-reference-variant': 'info' },
+    input: { min: '0', max: '100', step: '5', value: '60' },
+    output: null, reference: { from: 0.3, to: 0.5 },
+    hint: 'Least legible exactly when the value covers it — which is why it is not the default.' },
+
+  // marker — a band of no width. A median, a threshold, a target.
+  { file: '_ref-marker', id: 'rs-ref-marker', rootId: 'rangescale-ref-marker',
+    label: 'Your bid',
+    scale: { 'data-reference': 'marker', 'data-reference-variant': 'success' },
+    input: { min: '0', max: '100', step: '1', value: '35' },
+    output: { suffix: '%', initial: '35 %' },
+    reference: { from: 0.62, to: 0.62 },
+    hint: 'Median bid in this area: 62 %.' },
+
+  // A reference layer alongside ticks: both read the same expression, so they
+  // agree without either knowing about the other.
+  { file: '_ref-with-ticks', id: 'rs-ref-with-ticks', rootId: 'rangescale-ref-with-ticks',
+    label: 'Pressure (band + ticks)',
+    scale: { 'data-reference': 'band', 'data-ticks': 'labels',
+             'data-reference-variant': 'success', 'data-lane': 'flush' },
+    input: { min: '0', max: '100', step: '25', value: '50' },
+    output: { suffix: 'bar', initial: '50 bar' },
+    ticks: quarters, reference: { from: 0.25, to: 0.75 },
+    hint: 'Safe operating band: 25–75 bar.' },
 
   // ── Live demo (e2e test target) ─────────────────────────────────────────────
   { file: '_live', id: 'rs-live', rootId: 'rangescale-live', label: 'Volume', input: mid, output: pct },

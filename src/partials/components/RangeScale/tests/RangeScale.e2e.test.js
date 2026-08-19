@@ -311,3 +311,180 @@ test('the label row reserves its own height and does not collide with the readou
   })
   expect(clash).toBe(false)
 })
+
+// ── Reference layer ───────────────────────────────────────────────────────────
+
+const referenceGeometry = (page, id) =>
+  page.evaluate((laneId) => {
+    const lane = document.querySelector(`[data-id="${laneId}"]`)
+    const track = lane.querySelector('.track').getBoundingClientRect()
+    const ref = lane.querySelector('.reference')
+    const box = ref.getBoundingClientRect()
+    const cs = getComputedStyle(ref)
+    const fill = lane.querySelector('.fill')
+    return {
+      form: lane.dataset.reference,
+      from: Number(getComputedStyle(lane).getPropertyValue('--_rs-ref-from')),
+      to: Number(getComputedStyle(lane).getPropertyValue('--_rs-ref-to')),
+      startOffset: box.left - track.left,
+      width: box.width,
+      trackWidth: track.width,
+      zIndex: Number(cs.zIndex),
+      pointerEvents: cs.pointerEvents,
+      ink: cs.backgroundColor,
+      borderInk: cs.borderTopColor,
+      fillInk: fill ? getComputedStyle(fill).backgroundColor : null,
+      fillDisplay: fill ? getComputedStyle(fill).display : null,
+      thumbZ: Number(getComputedStyle(lane.querySelector('.RangeField')).zIndex),
+      swatchInk: (() => {
+        const sw = lane.querySelector('.swatch')
+        return sw ? getComputedStyle(sw).backgroundColor : null
+      })(),
+    }
+  }, id)
+
+test('a band spans exactly the two numbers it was given', async ({ page }) => {
+  // The flush lane has inset 0, so the expected geometry is p × width with no
+  // half-thumb term — the one case a test can predict without re-deriving it.
+  const g = await referenceGeometry(page, 'rangescale-ref-with-ticks')
+  expect(g.startOffset).toBeCloseTo(g.from * g.trackWidth, 0)
+  expect(g.width).toBeCloseTo((g.to - g.from) * g.trackWidth, 0)
+})
+
+test('a marker is a band of no width, centred on its position', async ({ page }) => {
+  const g = await referenceGeometry(page, 'rangescale-ref-marker')
+  expect(g.to).toBe(g.from)
+  expect(g.width).toBeLessThan(4)     // a hairline, not a span
+  expect(g.width).toBeGreaterThan(0)  // but never zero, or it disappears
+})
+
+/**
+ * min() in CSS replaces the JS branch a production slider needed for exactly
+ * this: consumption is never drawn past the limit the user has set.
+ */
+test('a region is clamped to the fill, without JavaScript', async ({ page }) => {
+  const lane = '[data-id="rangescale-ref-region"]'
+  await page.locator(`${lane} .RangeField`).scrollIntoViewIfNeeded()
+
+  const widthAt = (value) =>
+    page.evaluate(([sel, v]) => {
+      const l = document.querySelector(sel)
+      const f = l.querySelector('.RangeField')
+      f.value = String(v)
+      f.dispatchEvent(new Event('input', { bubbles: true }))
+      return l.querySelector('.reference').getBoundingClientRect().width
+    }, [lane, value])
+
+  const free = await widthAt(90)     // limit well above consumption
+  const atRest = await widthAt(50)
+  const clamped = await widthAt(10)  // limit below consumption
+
+  expect(atRest).toBeCloseTo(free, 0)      // unclamped while there is room
+  expect(clamped).toBeLessThan(free)       // and it stops following below it
+})
+
+test('without a fill there is nothing to clamp against', async ({ page }) => {
+  const g = await referenceGeometry(page, 'rangescale-ref-region-nofill')
+  // The element stays in the markup and is switched off, so the state is one
+  // attribute rather than two shapes of DOM.
+  expect(g.fillDisplay).toBe('none')
+
+  // And the region is then only itself: unaffected by where the thumb sits.
+  const widths = await page.evaluate(() => {
+    const l = document.querySelector('[data-id="rangescale-ref-region-nofill"]')
+    const f = l.querySelector('.RangeField')
+    const w = () => l.querySelector('.reference').getBoundingClientRect().width
+    f.value = '5'; f.dispatchEvent(new Event('input', { bubbles: true }))
+    const low = w()
+    f.value = '95'; f.dispatchEvent(new Event('input', { bubbles: true }))
+    return { low, high: w() }
+  })
+  expect(widths.low).toBeCloseTo(widths.high, 1)
+})
+
+test('the layer never rises above the thumb and never takes the pointer', async ({ page }) => {
+  for (const id of ['rangescale-ref-region', 'rangescale-ref-band',
+                    'rangescale-ref-band-variant', 'rangescale-ref-band-under',
+                    'rangescale-ref-marker']) {
+    const g = await referenceGeometry(page, id)
+    expect(g.zIndex, id).toBeLessThan(g.thumbZ)
+    expect(g.pointerEvents, id).toBe('none')
+  }
+})
+
+test('the layer position follows the form, and under is only ever explicit', async ({ page }) => {
+  const band = await referenceGeometry(page, 'rangescale-ref-band')
+  const region = await referenceGeometry(page, 'rangescale-ref-region')
+  const forced = await referenceGeometry(page, 'rangescale-ref-band-under')
+
+  // A band defaults to a bracket above the lane, drawn with a border rather than
+  // an area — least legible behind the fill is exactly when the value is inside it.
+  expect(band.ink).toBe('rgba(0, 0, 0, 0)')
+  expect(band.borderInk).not.toBe('rgba(0, 0, 0, 0)')
+
+  // A region is rarely covered, so it sits on the fill as an area.
+  expect(region.ink).not.toBe('rgba(0, 0, 0, 0)')
+  expect(region.zIndex).toBeGreaterThan(-2)
+
+  // `under` is the reading that hides a band, so it has to be asked for.
+  expect(forced.zIndex).toBe(-2)
+})
+
+/**
+ * A tint of currentColor over a fill of currentColor is invisible. The neutral
+ * ink therefore has to differ from the fill, and a coloured variant has to come
+ * from the theming seam rather than from this component.
+ */
+test('the neutral reference reads against the fill', async ({ page }) => {
+  const g = await referenceGeometry(page, 'rangescale-ref-region')
+  expect(g.ink).not.toBe(g.fillInk)
+})
+
+test('a variant takes its colour from the --ui-* seam', async ({ page }) => {
+  const warning = await referenceGeometry(page, 'rangescale-ref-band-variant')
+  const success = await referenceGeometry(page, 'rangescale-ref-marker')
+  const info = await referenceGeometry(page, 'rangescale-ref-band-under')
+
+  const inks = [warning.ink, success.ink, info.ink]
+  expect(new Set(inks).size).toBe(3)            // three different semantics
+  for (const ink of inks) expect(ink).toMatch(/^rgb/)   // resolved, not a fallback keyword
+})
+
+/**
+ * Colour is never the only carrier (WCAG 1.4.1). The swatch inherits the layer's
+ * own ink, so the author never restates the variant and the two cannot drift.
+ */
+test('the swatch matches the layer it explains, without restating the variant', async ({ page }) => {
+  for (const id of ['rangescale-ref-band-variant', 'rangescale-ref-marker',
+                    'rangescale-ref-band-under', 'rangescale-ref-region']) {
+    const g = await referenceGeometry(page, id)
+    expect(g.swatchInk, id).toBe(g.ink === 'rgba(0, 0, 0, 0)' ? g.borderInk : g.ink)
+  }
+})
+
+test('the hint is inside the lane and the field points at it', async ({ page }) => {
+  const wired = await page.evaluate(() => {
+    const lane = document.querySelector('[data-id="rangescale-ref-band-variant"]')
+    const hint = lane.querySelector('.hint')
+    const field = lane.querySelector('.RangeField')
+    return {
+      inside: !!hint,
+      describedBy: field.getAttribute('aria-describedby'),
+      hintId: hint.id,
+      swatchHidden: hint.querySelector('.swatch').getAttribute('aria-hidden'),
+    }
+  })
+  expect(wired.inside).toBe(true)
+  expect(wired.describedBy).toBe(wired.hintId)
+  expect(wired.swatchHidden).toBe('true')
+})
+
+test('a reference layer and ticks agree without knowing about each other', async ({ page }) => {
+  const g = await referenceGeometry(page, 'rangescale-ref-with-ticks')
+  const ticks = await tickGeometry(page, 'rangescale-ref-with-ticks')
+
+  // The band's edges sit on the stops that share their normalised position.
+  const stopX = (p) => ticks.insetStart + p * (g.trackWidth - ticks.insetStart - ticks.insetEnd)
+  expect(g.startOffset).toBeCloseTo(stopX(g.from), 0)
+  expect(g.startOffset + g.width).toBeCloseTo(stopX(g.to), 0)
+})
