@@ -9,6 +9,7 @@ import MotionRegion from "../partials/components/MotionRegion/MotionRegion.ts";
 import ScrollArea from "../partials/components/ScrollArea/ScrollArea.ts";
 import ThemeSwitch from "../partials/components/ThemeSwitch/ThemeSwitch.ts";
 import RangeScale from "../partials/components/RangeScale/RangeScale.ts";
+import RangeGroup from "../partials/components/RangeGroup/RangeGroup.ts";
 
 import "../partials/components/ToggleTip/ToggleTip";
 
@@ -28,6 +29,7 @@ MotionRegion.attach();
 ScrollArea.attach();
 ThemeSwitch.attach();
 RangeScale.attach();
+RangeGroup.attach();
 
 // Kitchensink-only: mirror ThemeSwitch's resolved state into its readout table.
 // This is also the worked example of why `theme-change` exists — a host listens

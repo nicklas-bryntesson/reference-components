@@ -69,6 +69,7 @@ Components are built against [atomica11y](https://www.atomica11y.com) acceptance
 | Notice | Reference implementation + full test suite |
 | RangeField | Reference implementation + full test suite |
 | RangeScale | Reference implementation + full test suite |
+| RangeGroup | Reference implementation + full test suite |
 | Combobox | Parked legacy reference |
 | TabAccordion | Parked legacy reference — rebuild planned |
 
@@ -76,4 +77,4 @@ Components are built against [atomica11y](https://www.atomica11y.com) acceptance
 
 ### Next in line
 
-The library keeps growing on the same accessibility-first model — contract first, kernel reuse where behaviour is shared, kitchensink + automated and manual a11y verification before a component ships. Planned next: tick marks and a reference band for **RangeScale**, then **RangeGroup** — the fieldset pairing two fields into a min–max span — followed by a rebuilt **TabAccordion** and a **navigation group**.
+The library keeps growing on the same accessibility-first model — contract first, kernel reuse where behaviour is shared, kitchensink + automated and manual a11y verification before a component ships. Planned next: a rebuilt **TabAccordion** and a **navigation group**.

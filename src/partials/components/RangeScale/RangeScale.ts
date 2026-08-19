@@ -15,6 +15,12 @@
  * PROGRESSIVE: `--_rs-p` can be server-rendered in the style attribute for a
  * correct first paint. This class then keeps it live. Without JavaScript the
  * lane shows the authored value — frozen, but true.
+ *
+ * A lane may hold TWO controls (a span). It then publishes both ends as
+ * `--_rs-a` and `--_rs-b`, sorted by value rather than by document order,
+ * because an owner may have just clamped one of them. The lane still does not
+ * interpret the pair — clamping, the combined announcement and pointer
+ * arbitration belong to whatever owns the two controls.
  */
 
 type MountedElement = HTMLElement & { __rangeScaleInstance?: RangeScale }
@@ -28,20 +34,25 @@ export default class RangeScale {
   }
 
   #root: HTMLElement
-  #field: HTMLInputElement
+  #fields: HTMLInputElement[]
   #output: HTMLOutputElement | null
 
   constructor(root: HTMLElement) {
-    const field = root.querySelector<HTMLInputElement>('input[type="range"]')
-    if (!field) throw new Error('RangeScale: no input[type="range"] found')
+    const fields = [...root.querySelectorAll<HTMLInputElement>('input[type="range"]')]
+    if (fields.length === 0) throw new Error('RangeScale: no input[type="range"] found')
 
     this.#root = root
-    this.#field = field
+    this.#fields = fields
     this.#output = root.querySelector<HTMLOutputElement>('output.value')
 
-    this.#field.addEventListener('input', this.sync)
+    for (const field of fields) field.addEventListener('input', this.sync)
     this.sync()
     ;(root as MountedElement).__rangeScaleInstance = this
+  }
+
+  /** The single-field case, and the one every layer reads by default. */
+  get #field(): HTMLInputElement {
+    return this.#fields[0]
   }
 
   /**
@@ -53,24 +64,41 @@ export default class RangeScale {
    * from RangeField, and the reason it is documented rather than hidden.
    */
   sync = (): void => {
-    const field = this.#field
-    const min = Number(field.min || 0)
-    const max = Number(field.max || 100)
-    const span = max - min
+    const positions = this.#fields.map((f) => RangeScale.#position(f))
 
-    // A zero span has no position to express; clamp rather than divide by zero.
-    const p = span === 0 ? 0 : (field.valueAsNumber - min) / span
+    // A lane with two controls publishes both ends. Sorted, because which input
+    // is the lower one is a fact about the values, not about document order — and
+    // a clamping owner may have just corrected one of them.
+    if (positions.length > 1) {
+      const [a, b] = [...positions].sort((x, y) => x - y)
+      this.#root.style.setProperty('--_rs-a', String(a))
+      this.#root.style.setProperty('--_rs-b', String(b))
+    }
 
-    this.#root.style.setProperty('--_rs-p', String(p))
+    // Always published, so anything reading a single position still works.
+    this.#root.style.setProperty('--_rs-p', String(positions[positions.length - 1]))
 
     // The lane owns the formatted value, and mirrors it downward. Only when it
     // actually has one — an authored aria-valuetext on a field with no output is
     // the host's, and overwriting it would be a regression, not a sync.
-    if (this.#output) {
+    //
+    // With two controls the lane deliberately does NOT mirror: a span's spoken
+    // value is "lowest of a–b" and "highest of a–b", which is a statement about
+    // the pair. Whatever owns the pair writes that; the lane would only be able
+    // to guess.
+    if (this.#output && this.#fields.length === 1) {
       const text = this.#format()
       this.#output.textContent = text
-      field.setAttribute('aria-valuetext', text)
+      this.#field.setAttribute('aria-valuetext', text)
     }
+  }
+
+  static #position(field: HTMLInputElement): number {
+    const min = Number(field.min || 0)
+    const max = Number(field.max || 100)
+    const span = max - min
+    // A zero span has no position to express; clamp rather than divide by zero.
+    return span === 0 ? 0 : (field.valueAsNumber - min) / span
   }
 
   /** `data-suffix` on the output carries the unit; absent means the bare number. */
@@ -88,7 +116,7 @@ export default class RangeScale {
   }
 
   destroy(): void {
-    this.#field.removeEventListener('input', this.sync)
+    for (const field of this.#fields) field.removeEventListener('input', this.sync)
     delete (this.#root as MountedElement).__rangeScaleInstance
   }
 }
