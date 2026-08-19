@@ -49,6 +49,10 @@ Contract rules (enforced by the unit test):
 |---|---|---|---|
 | `data-lane` | `inset` · `flush` | `inset` | How far into the lane the thumb's centre may travel — see below |
 | `data-ticks` | `marks` · `labels` | — | Absent draws nothing. `marks` renders the stops, `labels` adds their text — **same markup either way** |
+| `data-reference` | `region` · `band` · `marker` | — | A second measurement that is **not** the value — see below |
+| `data-reference-variant` | `error` · `warning` · `success` · `info` | — | Colour-coded meaning, from the same `--ui-*` tokens Notice uses |
+| `data-reference-layer` | `under` · `over` · `outside` | *follows the form* | Override only; the default is chosen because the wrong one is invisible |
+| `data-fill` | `none` | — | A lane whose value is not drawn as a filled portion |
 | `data-orientation` | `horizontal` · `vertical` | `horizontal` | Lane direction; mirrors the field's |
 | `data-min` | `top` | — | Vertical only: which end the fill is anchored in. Mirrors the field's |
 | `data-invalid` | `"true"` | — | Invalid skin on the track; pair with the field's |
@@ -65,7 +69,15 @@ Contract rules (enforced by the unit test):
 | `--_rs-radius` | `1e5px` | Track corner |
 | `--_rs-track-color` | `color-mix(in oklab, currentColor 20%, transparent)` | Unfilled track |
 | `--_rs-fill-color` | `currentColor` | Filled portion |
-| `--_rs-gap` | `0.25em` | Lane → ticks → value rows |
+| `--_rs-gap` | `0.25em` | Lane → ticks → value → hint rows |
+| `--_rs-ref-from` | `0` | Reference layer start, 0–1 — static, from the server |
+| `--_rs-ref-to` | `0` | Reference layer end, 0–1 |
+| `--_rs-ref-ink` | mid tone of `CanvasText` | Layer colour. **Set by the variant, never authored** |
+| `--_rs-ref-marker-width` | `2px` | Marker/bracket thickness — a hairline, so px |
+| `--_rs-ref-outside-size` | `0.75em` | Bracket height above the lane |
+| `--_rs-hint-size` | `0.875em` | Hint text |
+| `--_rs-hint-color` | `var(--ui-muted-foreground, GrayText)` | Hint text |
+| `--_rs-swatch-size` | `0.75em` | Hint swatch |
 | `--_rs-tick-size` | `0.375em` | Mark length |
 | `--_rs-tick-width` | `1px` | Mark thickness — a hairline, so px: it must not round to zero |
 | `--_rs-tick-color` | `color-mix(in oklab, currentColor 45%, transparent)` | Mark |
@@ -146,6 +158,59 @@ waiting to happen — the eye reads "Mid" and the screenreader says "2".
 > drifted with it. The label's typography lives on the child `<span>` for that reason, not for
 > tidiness.
 
+### The reference layer
+
+A second measurement on the same lane that is **not** the value: consumption already used, a
+recommended band, a threshold. It cannot live inside the field — a range input has exactly two
+addressable insides and both are spent — and it is an **axis rather than a component**, because
+reference presence and thumb count are orthogonal (a price filter can want a median marker).
+Encoding both as component identity yields a 2×2 matrix with a fourth component nobody wants.
+
+The numbers are static custom properties from the server, so the layer costs **zero JavaScript**.
+
+| Form | Numbers | Example |
+|---|---|---|
+| `region` | one, always from min | consumption used, a spent budget |
+| `band` | two | a recommended range, a safe operating window |
+| `marker` | one, drawn with no width | a median, a threshold, a target |
+
+`region` is the special case of `band` whose start is min, plus a clamp: `min()` keeps it from
+being drawn past the fill, which is the JS branch a production slider needed for exactly this.
+Without a fill there is nothing to clamp against, and then the region is only itself.
+
+A band needs a **position** for one end and a **length** for the span, so the travel
+(`100% - 2 × inset`) is factored out of the shared expression. That keeps the position formula in
+one copy while a length along the lane stays expressible.
+
+**The layer's place in the stack follows the form, because the wrong default is invisible in the
+worst case.** A band behind the fill is least legible exactly when the value sits inside it — the
+desirable state — so a band and a marker default to a bracket *above* the lane. A region is rarely
+covered, so it sits on the fill. `data-reference-layer` exists to override that, and `under` is the
+reading that hides a band, so it always has to be asked for.
+
+Whichever applies, the invariant holds: **never above the thumb, never taking the pointer.**
+
+### Colour-coded meaning, and why colour is never enough
+
+A filled layer needs a colour of its **own**. A tint of `currentColor` over a fill of
+`currentColor` is invisible — measured — which is why the neutral ink is a mid tone rather than
+`CanvasText`, and why an area drawn *outside* the lane is marked by its edges instead.
+
+The colour never comes from this component. `data-reference-variant` points at the same four
+semantic tokens `Notice` uses, so replacing the `--ui-*` namespace carries this along and the
+`light-dark()` pairs make dark mode free.
+
+**Colour must never be the only carrier** (WCAG 1.4.1). Pair the layer with a hint, and write what
+the zone *means* rather than where it is — "above 500 tkr the rate increases", never "the band is
+at 30–50 %". The hint lives **inside** the lane in its own grid row, and that is not a layout
+preference: the swatch beside the text inherits `--_rs-ref-ink`, which is the only way to guarantee
+it matches without the author restating the variant. Its presence is the switch; there is no
+attribute. In forced-colors the variant's hue is discarded, and the words are what carry the
+meaning — which they were doing anyway.
+
+Formatting beyond `data-suffix` is the host's. `400 tkr` reads; `400000 kr` does not, and thousands
+separators are `Intl.NumberFormat`'s job, not a reference library's.
+
 ### Direction and orientation
 
 The fill is anchored in the **min end**. One rule, three cases, two of them free:
@@ -202,6 +267,10 @@ stepping, Home/End, the label. The lane adds **no ARIA of its own** — it draws
 - [ ] **Mobile SR:** swipe focuses; swipe up/down or volume buttons change and announce.
 - [ ] **RTL:** the fill grows from the right and the announced value is unchanged.
 - [ ] **Vertical:** Up increases, and the fill grows from the end the thumb moved away from.
+- [ ] **With a reference layer:** the hint is read after the label, and the layer itself is silent
+      (it is decoration; the words carry it).
+- [ ] **Forced colors with a variant:** the layer is still distinguishable from track and fill, and
+      the hint still explains it.
 - [ ] **With ticks:** the arrow keys land on every drawn stop, and the stops themselves are
       silent (they are decoration — hearing them would mean they are announced twice).
 - [ ] **Forced colors:** track and fill are both distinguishable, and the thumb is visible on both.
@@ -211,8 +280,10 @@ stepping, Home/End, the label. The lane adds **no ARIA of its own** — it draws
 
 ## Non-goals
 
-- **A reference band** (`region` / `band` / `marker`). Next increment.
-- **A value bubble.** After that.
+- **A value bubble as an API.** It has no state, no behaviour and no ARIA of its own — it is fifteen
+  lines of placement over an element that already exists, which makes it layout rather than a
+  contract. `data-lane` earns an attribute because it changes the coordinate system every layer
+  reads; a bubble changes only where one element sits. Written down as a recipe below instead.
 - **A scale of words.** A separate proposed component: the value is an index that stands for a
   meaning, which is a contract about keeping two things in step, not about drawing a lane.
 - **Ticks and a readout beside a vertical lane.** The tick and value rows sit under a horizontal
@@ -220,6 +291,49 @@ stepping, Home/End, the label. The lane adds **no ARIA of its own** — it draws
 - **Two thumbs.** That is RangeGroup: a `<fieldset>` holding two fields on one shared lane.
 - **Formatting beyond `data-suffix`.** Locale-aware number formatting is the host's.
 - **A page-level scrim while dragging.** Not modality, and a page concern.
+
+## Recipe: a value bubble
+
+Not an attribute, for the reason in the non-goals. The readout is already the right element and the
+position is already published, so moving it to the thumb is placement:
+
+```css
+/* The bubble is the same <output>, moved onto the lane. --p feeds the shared
+   expression, exactly as the fill and every tick do. */
+.my-slider .RangeScale .value {
+  --p: var(--_rs-p);
+  grid-area: lane;
+  justify-self: start;
+  inset-inline-start: var(--_rs-pos);
+  position: relative;
+  translate: -50% -150%;
+  padding: 0.125em 0.375em;
+  border-radius: 0.25em;
+  background: var(--ui-surface, Canvas);
+  box-shadow: var(--ui-shadow);
+  white-space: nowrap;
+}
+```
+
+**It is not `aria-hidden`, and it should not be.** This `<output>` is not a live region, so it is not
+announced on change — keeping it readable costs nothing and gives back information a hidden bubble
+takes away.
+
+**It overflows the lane by half its own width at min and max, and that is inherent.** CSS cannot
+clamp against an element's own width: `translate: -50%` knows it, but `min()` and `max()` cannot
+express "100% minus my own width". The three honest responses, in order of what they cost:
+
+1. **Let it spill, and give the lane room.** Same conversation the `flush` lane already has — the
+   overhang is the consuming layout's to plan for.
+2. **Constrain the text.** A short value with a `min-inline-size` spills predictably little, and then
+   padding on the lane is enough.
+3. **Measure the bubble in JavaScript.** A `ResizeObserver` on the bubble, recomputing padding as the
+   text changes width mid-drag. This is the option to avoid: it would be the first time this family
+   measured the DOM, and it would be for a decorative layer.
+
+**When it stops being a recipe:** the day it needs to flip above or below, clamp against a
+neighbour, or avoid a collision, it has behaviour — and behaviour is where a contract starts. At
+that point it belongs with `popup-position` in the kernel, not in an attribute here.
 
 ## Kernel dependencies
 

@@ -45,6 +45,7 @@
   --_rs-radius: 1e5px;
   --_rs-inset: calc(var(--_rs-thumb) / 2);   /* the lane model — see above */
   --_rs-p: 0;                                /* 0–1, written by RangeScale.ts */
+  --_rs-p-live: var(--_rs-p);                /* alias: a region clamps against the fill */
   --_rs-track-color: color-mix(in oklab, currentColor 20%, transparent);
   --_rs-fill-color: currentColor;
   --_rs-gap: 0.25em;                 /* lane → ticks → value rows */
@@ -53,6 +54,18 @@
   --_rs-tick-color: color-mix(in oklab, currentColor 45%, transparent);
   --_rs-tick-label-color: currentColor;
   --_rs-tick-label-size: 0.75em;
+  --_rs-ref-from: 0;                 /* reference layer start, 0–1 — static, from the server */
+  --_rs-ref-to: 0;                   /* reference layer end, 0–1 */
+  /* The neutral ink is a MID tone, not CanvasText: the fill is currentColor, so a
+     full-strength reference layer drawn on it is black on black — invisible.
+     Without a variant the layer has no colour of its own, so it has to read
+     against both the fill and the empty track. */
+  --_rs-ref-ink: color-mix(in oklab, CanvasText 45%, Canvas);
+  --_rs-ref-marker-width: 2px;       /* a hairline: px so it cannot round to zero */
+  --_rs-ref-outside-size: 0.75em;    /* bracket height above the lane */
+  --_rs-hint-size: 0.875em;
+  --_rs-hint-color: var(--ui-muted-foreground, GrayText);
+  --_rs-swatch-size: 0.75em;
 
   /* The positioning expression is NOT declared here — see the shared rule below.
      A custom property is substituted when its value is computed on the element
@@ -69,7 +82,8 @@
   grid-template-areas:
     "lane"
     "ticks"
-    "value";
+    "value"
+    "hint";
   align-items: center;
   row-gap: var(--_rs-gap);
   isolation: isolate;                /* keeps the negative layers LOCAL: -1, -2, -3 */
@@ -80,6 +94,7 @@
    target and the layers are stacked, not laid out. */
 .RangeScale .track,
 .RangeScale .fill,
+.RangeScale .reference,
 .RangeScale .RangeField {
   grid-area: lane;
 }
@@ -95,8 +110,13 @@
    The error from ignoring it is up to half a thumb and CHANGES SIGN along the
    track, which is exactly why there is only one copy. */
 .RangeScale .fill,
-.RangeScale .ticks > i {
-  --_rs-pos: calc(var(--_rs-inset) + var(--p, 0) * (100% - 2 * var(--_rs-inset)));
+.RangeScale .ticks > i,
+.RangeScale .reference {
+  /* The travel is factored out so a LENGTH along the lane (a band's width) can be
+     expressed without a second copy of the position formula. A band has two ends,
+     so it needs a position for one of them and a length for the span between. */
+  --_rs-travel: calc(100% - 2 * var(--_rs-inset));
+  --_rs-pos: calc(var(--_rs-inset) + var(--p, 0) * var(--_rs-travel));
 }
 
 .RangeScale .track,
@@ -122,6 +142,14 @@
   inline-size: var(--_rs-pos);
   background: var(--_rs-fill-color);
   z-index: -2;
+}
+
+/* A lane without a fill is a legitimate design, not a broken one: the browser
+   positions the thumb, and the track alone can be the whole visual. The element
+   stays in the markup and is switched off, so the state is one attribute rather
+   than two shapes of DOM. */
+.RangeScale[data-fill="none"] .fill {
+  display: none;
 }
 
 /* The composed field sits above the layers; its own track goes transparent
@@ -197,6 +225,126 @@
   block-size: calc(var(--_rs-tick-size) + var(--_rs-gap) + 1lh);
 }
 
+/* ── Reference layer ──────────────────────────────────────────────────────
+   A second measurement on the same lane that is NOT the value: consumption
+   already used, a recommended band, a threshold. It cannot live inside the field
+   — a range input has exactly two addressable insides and both are spent — and
+   it is an AXIS rather than a component, because reference and thumb count are
+   orthogonal (a price filter can want a median marker). Encoding both as
+   component identity would give a 2×2 matrix with a fourth component nobody
+   wants to maintain.
+
+   One layer, three forms. `region` is the special case of `band` whose start is
+   min, plus a clamp; `marker` is a band of no width. The numbers are static CSS
+   custom properties from the server, so the layer costs ZERO JavaScript. */
+.RangeScale .reference {
+  --p: var(--_rs-ref-from);
+  /* border-box, so a bracket's OUTER edges mark the zone. With content-box the
+     border sat outside the computed width and the bracket read 4px wide. */
+  box-sizing: border-box;
+  pointer-events: none;
+  grid-area: lane;
+  justify-self: start;
+  inset-inline-start: var(--_rs-pos);
+  inline-size: calc((var(--_rs-ref-to) - var(--_rs-ref-from)) * var(--_rs-travel));
+  block-size: var(--_rs-track);
+  border-radius: var(--_rs-radius);
+  background: var(--_rs-ref-ink);
+  z-index: -1;                       /* ON the fill by default — see below */
+  position: relative;
+}
+
+/* REGION — one number, always from min: consumption, a spent budget.
+   min() replaces a JS branch: the region is never drawn past the fill. */
+.RangeScale[data-reference="region"] .reference {
+  --p: 0;
+  inset-inline-start: 0;
+  inline-size: calc(var(--_rs-inset) + min(var(--_rs-ref-to), var(--_rs-p-live)) * var(--_rs-travel));
+}
+
+/* Nothing to clamp against without a fill — then the region is only itself. */
+.RangeScale[data-fill="none"][data-reference="region"] .reference {
+  inline-size: calc(var(--_rs-inset) + var(--_rs-ref-to) * var(--_rs-travel));
+}
+
+/* MARKER — a band of no width. A hairline needs a minimum, so it is a length
+   rather than zero, centred on its own position. */
+.RangeScale[data-reference="marker"] .reference {
+  inline-size: var(--_rs-ref-marker-width);
+  margin-inline-start: calc(var(--_rs-ref-marker-width) / -2);
+  border-radius: 0;
+}
+
+/* ── Reference: colour-coded meaning ──────────────────────────────────────
+   A filled layer needs a colour of its OWN. A tint of currentColor over a fill
+   of currentColor is invisible — measured. The colour never comes from this
+   component: the variant points at the same four semantic tokens Notice uses, so
+   a consumer who replaces the --ui-* namespace gets this for free, and the
+   light-dark() pairs make dark mode free too.
+
+   Colour must never be the only carrier (WCAG 1.4.1). Pair the band with a
+   swatch beside the hint text reading the SAME token, and let the hint say what
+   the zone means rather than where it is. The swatch belongs to the hint, i.e.
+   to the consumer's content — this contract only documents the token. */
+.RangeScale[data-reference-variant="error"]   { --_rs-ref-ink: var(--ui-destructive, #c0362c); }
+.RangeScale[data-reference-variant="warning"] { --_rs-ref-ink: var(--ui-warning,     #a85a00); }
+.RangeScale[data-reference-variant="success"] { --_rs-ref-ink: var(--ui-success,      #1a7f37); }
+.RangeScale[data-reference-variant="info"]    { --_rs-ref-ink: var(--ui-info,         #0b6bcb); }
+
+/* ── Reference: where it sits in the stack ────────────────────────────────
+   The default follows the FORM, because the wrong default is invisible in the
+   worst case. A band behind the fill is least legible exactly when the value
+   covers it — the desirable state — so band and marker default to `outside`. A
+   region is rarely covered, so it sits on the fill. `data-reference-layer` is an
+   override for the cases where a design wants the other reading; it is not a
+   choice an author has to make.
+
+   The invariant, whichever applies: never above the thumb (z-index 1, set by the
+   composed field), and always pointer-events: none.
+
+   `under` is only ever an explicit choice — it is the reading that hides a band. */
+.RangeScale[data-reference-layer="under"] .reference {
+  z-index: -2;
+}
+
+/* over — on the fill. Needs a variant to be visible in a monochrome skeleton,
+   which is also why a variant on its own resolves here. */
+.RangeScale[data-reference-layer="over"] .reference,
+.RangeScale[data-reference-variant]:not([data-reference-layer]) .reference {
+  z-index: 0;
+}
+
+/* outside — a bracket above the lane, legible at every value and never fighting
+   the fill for the same pixels. The neutral skeleton marks the zone's EDGES
+   rather than its area, because a currentColor area over a currentColor fill is
+   invisible; with a variant the area works and the fill below still reads. */
+.RangeScale[data-reference-layer="outside"],
+.RangeScale[data-reference="band"]:not([data-reference-layer]):not([data-reference-variant]),
+.RangeScale[data-reference="marker"]:not([data-reference-layer]):not([data-reference-variant]) {
+  padding-block-start: var(--_rs-ref-outside-size);
+}
+
+.RangeScale[data-reference-layer="outside"] .reference,
+.RangeScale[data-reference="band"]:not([data-reference-layer]):not([data-reference-variant]) .reference,
+.RangeScale[data-reference="marker"]:not([data-reference-layer]):not([data-reference-variant]) .reference {
+  align-self: start;
+  margin-block-start: calc(-1 * var(--_rs-ref-outside-size));
+  block-size: calc(var(--_rs-ref-outside-size) / 2);
+  border-radius: 0;
+  background: none;
+  border: var(--_rs-ref-marker-width) solid var(--_rs-ref-ink);
+  border-block-end: 0;               /* open downwards: a bracket, not a box */
+  z-index: 0;
+}
+
+/* A marker has no width to bracket, so outside it is a tick rather than a frame. */
+.RangeScale[data-reference-layer="outside"][data-reference="marker"] .reference,
+.RangeScale[data-reference="marker"]:not([data-reference-layer]):not([data-reference-variant]) .reference {
+  inline-size: var(--_rs-ref-marker-width);
+  background: var(--_rs-ref-ink);
+  border: 0;
+}
+
 /* ── Optional value readout ───────────────────────────────────────────────
    `<output class="value" for="…">` — the right element, and `for` points at what
    contributed. NEVER aria-live: the slider already announces on every change, so
@@ -213,6 +361,37 @@
      anything locale-sensitive belongs in the host's Intl.NumberFormat. */
   unicode-bidi: isolate;
 }
+
+/* ── Reference hint ───────────────────────────────────────────────────────
+   Colour must never be the only carrier (WCAG 1.4.1), so a coloured reference
+   layer is paired with words. The hint lives INSIDE the lane rather than beside
+   it for one reason: the swatch has to match the layer, and inheriting
+   --_rs-ref-ink is the only way to guarantee that without the author writing the
+   variant twice. Its presence is the switch; there is no attribute.
+
+   Write what the zone MEANS, not where it is — "above 500 000 kr the rate
+   increases", never "the band is at 30–50 %". */
+.RangeScale .hint {
+  grid-area: hint;
+  display: flex;
+  align-items: baseline;
+  gap: 0.5em;
+  margin: 0;
+  font-size: var(--_rs-hint-size);
+  color: var(--_rs-hint-color);
+}
+
+.RangeScale .hint .swatch {
+  flex: none;
+  inline-size: var(--_rs-swatch-size);
+  block-size: var(--_rs-swatch-size);
+  border-radius: 2px;
+  background: var(--_rs-ref-ink);    /* inherited — never restated by the author */
+  translate: 0 0.1em;
+}
+
+/* Without a reference layer there is nothing for a swatch to key to. */
+.RangeScale:not([data-reference]) .hint .swatch { display: none; }
 
 /* ── Lane model ───────────────────────────────────────────────────────────
    `flush` widens the input by one thumb and pulls it back half a thumb, so the
@@ -234,7 +413,7 @@
 .RangeScale[data-orientation="vertical"] {
   justify-items: center;
   block-size: 12em;
-  grid-template-areas: "lane";        /* no value or tick row beside a tall lane (yet) */
+  grid-template-areas: "lane";        /* no value, tick or hint row beside a tall lane (yet) */
 }
 
 /* The LANE owns its length, and the field stretches to it. RangeField's own
@@ -246,7 +425,8 @@
 }
 
 .RangeScale[data-orientation="vertical"] .track,
-.RangeScale[data-orientation="vertical"] .fill {
+.RangeScale[data-orientation="vertical"] .fill,
+.RangeScale[data-orientation="vertical"] .reference {
   inline-size: var(--_rs-track);
   justify-self: center;
 }
@@ -293,4 +473,8 @@
   }
   .RangeScale .track { background: ButtonFace; border: 1px solid ButtonText; }
   .RangeScale .fill { background: Highlight; }
+  /* A reference layer's meaning is carried by its colour, which forced-colors
+     discards — so it falls back to a distinguishable system colour, and the hint
+     text beside it is what actually carries the meaning either way. */
+  .RangeScale .reference { forced-color-adjust: none; --_rs-ref-ink: GrayText; }
 }
