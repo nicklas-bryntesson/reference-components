@@ -66,6 +66,20 @@
   unicode-bidi: isolate;
 }
 
+/* Room for the widest NUMBER this group can show, so the component's width does
+   not follow its content: a value crossing into another digit otherwise widened
+   the whole group, and with it the lane, which made the thumb jump mid-drag.
+
+   Digits only, and in `ch` — under tabular numerals that is exactly a digit's
+   width. The unit sits outside this element and costs its natural width, because
+   reserving the whole string over-reserved by a quarter. Set by RangeGroup.ts from
+   min/max; override --_rg-readout-digits by hand for an unusual format. */
+.RangeGroup .roles [data-readout] .digits {
+  display: inline-block;
+  min-inline-size: calc(var(--_rg-readout-digits, 0) * 1ch);
+  text-align: end;
+}
+
 /* The end labels mirror the lane's ends, so in RTL they swap with it. */
 .RangeGroup .roles label:last-child {
   text-align: end;

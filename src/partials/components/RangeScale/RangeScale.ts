@@ -45,6 +45,8 @@ export default class RangeScale {
     this.#fields = fields
     this.#output = root.querySelector<HTMLOutputElement>('output.value')
 
+    this.#reserveReadoutWidth()
+
     for (const field of fields) field.addEventListener('input', this.sync)
     this.sync()
     ;(root as MountedElement).__rangeScaleInstance = this
@@ -87,10 +89,29 @@ export default class RangeScale {
     // the pair. Whatever owns the pair writes that; the lane would only be able
     // to guess.
     if (this.#output && this.#fields.length === 1) {
-      const text = this.#format()
-      this.#output.textContent = text
-      this.#field.setAttribute('aria-valuetext', text)
+      // Only the number is written; the unit is markup and stays put.
+      this.#output.querySelector('.digits')?.replaceChildren(this.#field.value)
+      this.#field.setAttribute('aria-valuetext', this.#format())
     }
+  }
+
+  /**
+   * Reserve room for the widest NUMBER the readout can show, so the lane's width
+   * does not follow its content. A value crossing into another digit is one
+   * character wider, and in a shrink-to-fit container that widens the lane — which
+   * recomputes every position and makes the thumb jump mid-drag.
+   *
+   * Digits only, in `ch`, which under tabular numerals is exactly a digit's width.
+   * The unit is static markup and costs its natural width: reserving the whole
+   * string over-reserved by a quarter, and permanent width is a worse defect than
+   * the jump it removes.
+   */
+  #reserveReadoutWidth(): void {
+    if (!this.#output) return
+    const digits = Math.max(
+      ...this.#fields.flatMap((f) => [(f.min || '0').length, (f.max || '100').length]),
+    )
+    this.#root.style.setProperty('--_rs-value-digits', String(digits))
   }
 
   static #position(field: HTMLInputElement): number {

@@ -255,3 +255,60 @@ test('no axe violations across RangeGroup states', async ({ page }) => {
   await injectAxe(page)
   await checkA11y(page, '#RangeGroup')
 })
+
+// ── The component's width must not follow its content ─────────────────────────
+//
+// Reported from the test environment: dragging the upper end to maximum made the
+// container reflow. "700" is one character narrower than "1000", so crossing into
+// four digits widened the readout, the label, the fieldset and — because the lane
+// is inside it — the track. Every position then recomputed and the thumb jumped
+// under the finger mid-drag.
+
+test('crossing a digit boundary does not resize the group or the lane', async ({ page }) => {
+  const widths = await page.evaluate(() => {
+    const g = document.querySelector('[data-id="rangegroup-flush"]')
+    const upper = g.querySelector('[data-role="upper"]')
+    const lane = g.querySelector('.RangeScale')
+    const track = lane.querySelector('.track')
+    const out = []
+    for (const v of [200, 700, 990, 1000]) {
+      upper.value = String(v)
+      upper.dispatchEvent(new Event('input', { bubbles: true }))
+      out.push({
+        value: upper.value,
+        group: g.getBoundingClientRect().width,
+        lane: lane.getBoundingClientRect().width,
+        track: track.getBoundingClientRect().width,
+        readout: g.querySelector('[data-readout="upper"]').getBoundingClientRect().width,
+      })
+    }
+    return out
+  })
+
+  // The widest value is actually reached, or the test proves nothing.
+  expect(widths.at(-1).value).toBe('1000')
+
+  for (const key of ['group', 'lane', 'track', 'readout']) {
+    const unique = new Set(widths.map((w) => Math.round(w[key])))
+    expect(unique.size, `${key} widths: ${[...unique].join(', ')}`).toBe(1)
+  }
+})
+
+test('only the digits are reserved, so the unit costs its natural width', async ({ page }) => {
+  const measured = await page.evaluate(() => {
+    const g = document.querySelector('[data-id="rangegroup-flush"]')
+    const readout = g.querySelector('[data-readout="upper"]')
+    const digits = readout.querySelector('.digits')
+    return {
+      reserved: Number(getComputedStyle(g).getPropertyValue('--_rg-readout-digits')),
+      digitsText: digits.textContent,
+      unitInMarkup: readout.textContent.replace(digits.textContent, '').trim(),
+      // The reservation covers the digits only; the readout is wider by the unit.
+      digitsWidth: digits.getBoundingClientRect().width,
+      readoutWidth: readout.getBoundingClientRect().width,
+    }
+  })
+  expect(measured.reserved).toBe(4)            // "1000"
+  expect(measured.unitInMarkup).toBe('tkr')    // static markup, not written by JS
+  expect(measured.readoutWidth).toBeGreaterThan(measured.digitsWidth)
+})

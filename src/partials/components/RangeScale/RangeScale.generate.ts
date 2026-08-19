@@ -97,10 +97,15 @@ function canonical(state: StateDefinition): string {
 
   const referenceLine = state.reference ? '\n  <span class="reference"></span>' : ''
 
+  // The digits sit in their own element so width can be reserved for them alone,
+  // and the unit is static markup — reserving the whole string in `ch` over-reserves
+  // by a quarter, because a space and lowercase letters are far narrower than a zero.
   const outputLine = state.output
     ? `\n  <output class="value" for="${state.id}"${
         state.output.suffix ? ` data-suffix="${state.output.suffix}"` : ''
-      }>${state.output.initial}</output>`
+      }><span class="digits">${state.input?.value ?? '0'}</span>${
+        state.output.suffix ? ` ${state.output.suffix}` : ''
+      }</output>`
     : ''
 
   const hintId = `${state.id}-hint`

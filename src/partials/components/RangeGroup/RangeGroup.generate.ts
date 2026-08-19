@@ -89,8 +89,14 @@ function canonical(state: StateDefinition): string {
   })
 
   const suffix = state.suffix ? ` data-suffix="${state.suffix}"` : ''
+  // The digits live in their own element so width can be reserved for them alone.
+  // Reserving the whole string in `ch` over-reserves by a quarter — a space and
+  // three lowercase letters are far narrower than a zero — and paying permanent
+  // width to remove a jump is the wrong trade. The suffix is static markup, which
+  // it should be anyway: a unit is not data.
   const readout = (side: 'lower' | 'upper', value: number) =>
-    `<b data-readout="${side}"${suffix}>${value}${state.suffix ? ` ${state.suffix}` : ''}</b>`
+    `<b data-readout="${side}"${suffix}><span class="digits">${value}</span>` +
+    `${state.suffix ? ` ${state.suffix}` : ''}</b>`
 
   const field = (side: 'lower' | 'upper', id: string, value: number) =>
     `<input class="RangeField" type="range" id="${id}" name="${id}" data-role="${side}"` +

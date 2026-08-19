@@ -67,6 +67,7 @@ There is **no `data-clamp`**. See below.
 | `--_rg-role-size` | `0.875em` | Role labels and legend |
 | `--_rg-role-color` | `currentColor` | Role labels and legend |
 | `--_rg-readout-color` | `currentColor` | The two values |
+| `--_rg-readout-digits` | *set by JS from `max`* | Digits reserved in the readout — see below |
 
 Everything about the lane — its model, ticks, a reference layer — is RangeScale's API, untouched.
 A span is the same lane, told that it holds two controls.
@@ -121,6 +122,25 @@ permanently unreachable the moment they meet.
 
 Both are read along the lane's inline axis, so they hold in RTL — where the lower end is on the
 right.
+
+### The readout reserves width, and only for the digits
+
+A readout whose width follows its content makes the **component** follow its content: `700` is one
+character narrower than `1000`, so crossing into four digits widened the readout, the label, the
+fieldset and — because the lane is inside it — the track. Every position then recomputed and the
+thumb jumped under the finger mid-drag. Reported from a test environment, not caught by any test.
+
+So the digits sit in their own element and their width is reserved from `max`:
+`min-inline-size: calc(var(--_rg-readout-digits) * 1ch)`, which under `tabular-nums` is exactly a
+digit's width. Taken from the contract, never measured from the DOM — the same idea as AffixField's
+`--_af-input-chars`.
+
+**Only the digits.** Reserving the whole string over-reserved by a quarter, because a space and
+three lowercase letters are far narrower than a zero: it cost ~51px of permanent width to remove a
+12px jump, which is a worse defect than the one it fixed. The unit is static markup instead, so it
+costs its natural width — and a unit is not data, so that is where it belonged anyway.
+
+Override `--_rg-readout-digits` for an unusual format (a thousands separator adds characters).
 
 ## Two consequences, documented rather than hidden
 

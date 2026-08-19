@@ -74,6 +74,8 @@ export default class RangeGroup {
       upper: root.querySelector<HTMLElement>('[data-readout="upper"]'),
     }
 
+    this.#reserveReadoutWidth()
+
     lower.addEventListener('input', this.#onLower)
     upper.addEventListener('input', this.#onUpper)
     // pointermove, not just pointerdown: by the time a pointerdown listener runs
@@ -85,6 +87,31 @@ export default class RangeGroup {
 
     this.sync()
     ;(root as MountedElement).__rangeGroupInstance = this
+  }
+
+  /**
+   * Reserve room for the widest NUMBER the readouts can ever show.
+   *
+   * Without this the component's width follows its content: "700" is one character
+   * narrower than "1000", so crossing into four digits widened the whole group by
+   * ~12px in a shrink-to-fit container. That is not cosmetic — the lane widens with
+   * it, every position recomputes, and the thumb jumps under the finger mid-drag.
+   *
+   * Only the digits are reserved, and only in `ch`, which under tabular numerals is
+   * exactly a digit's width. Reserving the whole string instead over-reserved by a
+   * quarter, because a space and three lowercase letters are much narrower than a
+   * zero — and paying 51px of permanent width to remove a 12px jump is the wrong
+   * trade. The unit is static markup, so it costs its natural width and no more.
+   *
+   * Same idea as AffixField's --_af-input-chars: taken from the contract, never
+   * measured from the DOM.
+   */
+  #reserveReadoutWidth(): void {
+    const digits = Math.max(
+      (this.#lower.min || '0').length,
+      (this.#upper.max || '100').length,
+    )
+    this.#root.style.setProperty('--_rg-readout-digits', String(digits))
   }
 
   #onLower = (): void => this.#clamp('lower')
@@ -132,8 +159,9 @@ export default class RangeGroup {
     lo.setAttribute('aria-valuetext', `${loText}, within ${span}`)
     hi.setAttribute('aria-valuetext', `${hiText}, within ${span}`)
 
-    if (this.#outputs.lower) this.#outputs.lower.textContent = loText
-    if (this.#outputs.upper) this.#outputs.upper.textContent = hiText
+    // Only the number is written; the unit is markup and stays put.
+    this.#digits('lower')?.replaceChildren(lo.value)
+    this.#digits('upper')?.replaceChildren(hi.value)
 
     // The lane owns the drawing; ask it to redraw from the corrected values.
     const scale = this.#scale as HTMLElement & { __rangeScaleInstance?: ScaleLike }
@@ -177,6 +205,10 @@ export default class RangeGroup {
     // one thumb is on top at any moment, so the off state carries style too.
     this.#lower.setAttribute('data-on-top', String(nearerLower))
     this.#upper.setAttribute('data-on-top', String(!nearerLower))
+  }
+
+  #digits(side: 'lower' | 'upper'): HTMLElement | null {
+    return this.#outputs[side]?.querySelector<HTMLElement>('.digits') ?? null
   }
 
   /** Both readouts carry the same unit; the lower one is the canonical source. */

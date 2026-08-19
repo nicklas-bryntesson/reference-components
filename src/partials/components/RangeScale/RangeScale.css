@@ -395,6 +395,7 @@
 .RangeScale .value {
   grid-area: value;
   justify-self: end;
+  text-align: end;
   font-variant-numeric: tabular-nums;
   /* The readout is a number plus a unit, i.e. its own bidi run. Isolating it
      keeps it from reordering the text around it in a mixed-direction document.
@@ -430,6 +431,16 @@
   border-radius: 2px;
   background: var(--_rs-ref-ink);    /* inherited — never restated by the author */
   translate: 0 0.1em;
+}
+
+/* Room for the widest NUMBER this lane can show, so its width does not follow its
+   content: a value crossing into another digit otherwise widens the lane in a
+   shrink-to-fit container, which recomputes every position and makes the thumb jump.
+   Digits only, in `ch`; the unit sits outside and costs its natural width. */
+.RangeScale .value .digits {
+  display: inline-block;
+  min-inline-size: calc(var(--_rs-value-digits, 0) * 1ch);
+  text-align: end;
 }
 
 /* Without a reference layer there is nothing for a swatch to key to. */
