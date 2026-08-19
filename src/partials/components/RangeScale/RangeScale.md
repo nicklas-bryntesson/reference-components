@@ -280,7 +280,10 @@ stepping, Home/End, the label. The lane adds **no ARIA of its own** — it draws
 
 ## Non-goals
 
-- **A value bubble.** Next increment.
+- **A value bubble as an API.** It has no state, no behaviour and no ARIA of its own — it is fifteen
+  lines of placement over an element that already exists, which makes it layout rather than a
+  contract. `data-lane` earns an attribute because it changes the coordinate system every layer
+  reads; a bubble changes only where one element sits. Written down as a recipe below instead.
 - **A scale of words.** A separate proposed component: the value is an index that stands for a
   meaning, which is a contract about keeping two things in step, not about drawing a lane.
 - **Ticks and a readout beside a vertical lane.** The tick and value rows sit under a horizontal
@@ -288,6 +291,49 @@ stepping, Home/End, the label. The lane adds **no ARIA of its own** — it draws
 - **Two thumbs.** That is RangeGroup: a `<fieldset>` holding two fields on one shared lane.
 - **Formatting beyond `data-suffix`.** Locale-aware number formatting is the host's.
 - **A page-level scrim while dragging.** Not modality, and a page concern.
+
+## Recipe: a value bubble
+
+Not an attribute, for the reason in the non-goals. The readout is already the right element and the
+position is already published, so moving it to the thumb is placement:
+
+```css
+/* The bubble is the same <output>, moved onto the lane. --p feeds the shared
+   expression, exactly as the fill and every tick do. */
+.my-slider .RangeScale .value {
+  --p: var(--_rs-p);
+  grid-area: lane;
+  justify-self: start;
+  inset-inline-start: var(--_rs-pos);
+  position: relative;
+  translate: -50% -150%;
+  padding: 0.125em 0.375em;
+  border-radius: 0.25em;
+  background: var(--ui-surface, Canvas);
+  box-shadow: var(--ui-shadow);
+  white-space: nowrap;
+}
+```
+
+**It is not `aria-hidden`, and it should not be.** This `<output>` is not a live region, so it is not
+announced on change — keeping it readable costs nothing and gives back information a hidden bubble
+takes away.
+
+**It overflows the lane by half its own width at min and max, and that is inherent.** CSS cannot
+clamp against an element's own width: `translate: -50%` knows it, but `min()` and `max()` cannot
+express "100% minus my own width". The three honest responses, in order of what they cost:
+
+1. **Let it spill, and give the lane room.** Same conversation the `flush` lane already has — the
+   overhang is the consuming layout's to plan for.
+2. **Constrain the text.** A short value with a `min-inline-size` spills predictably little, and then
+   padding on the lane is enough.
+3. **Measure the bubble in JavaScript.** A `ResizeObserver` on the bubble, recomputing padding as the
+   text changes width mid-drag. This is the option to avoid: it would be the first time this family
+   measured the DOM, and it would be for a decorative layer.
+
+**When it stops being a recipe:** the day it needs to flip above or below, clamp against a
+neighbour, or avoid a collision, it has behaviour — and behaviour is where a contract starts. At
+that point it belongs with `popup-position` in the kernel, not in an attribute here.
 
 ## Kernel dependencies
 
