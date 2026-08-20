@@ -75,6 +75,17 @@ Components are built against [atomica11y](https://www.atomica11y.com) acceptance
 
 **Parked legacy reference** = kept for inspection but not maintained to the current contract standard: still `.js`, no test suite, no `.md` contract guarantee. They are not in-progress work and not TypeScript-migration targets — when one is needed, it is rebuilt from scratch on the current model rather than migrated.
 
+### Typography is yours
+
+This is not a design project. The type family, the scale, the ratio and the rhythm belong to the
+consuming project — install your own typography components, utility classes, or nothing at all, and
+nothing here will fight you. What the components own is the mechanics: tabular figures on a value
+that changes in place, bidi isolation on a number-plus-unit, reading line height rather than setting
+it, and tolerating the text-spacing overrides WCAG 1.4.12 lets a user force.
+
+The practical consequence: **installed bare, some text here inherits browser defaults and looks
+plain.** That is the boundary working, not a missing stylesheet.
+
 ### Next in line
 
 The library keeps growing on the same accessibility-first model — contract first, kernel reuse where behaviour is shared, kitchensink + automated and manual a11y verification before a component ships. Planned next: a rebuilt **TabAccordion** and a **navigation group**.

@@ -93,6 +93,31 @@ Components take design through **one** host-facing namespace: `--ui-*` (in `01-S
 
 Never read design from `--SITE--*` — that namespace is *site layout scaffolding* (padding / max-width / grid), not the component seam — and never invent a new host token. If a role is missing, add it to `ui-tokens.css`, don't reach past the seam. See ADR-0018.
 
+### Typography is the consumer's; we own the mechanics
+
+**This is not a design project.** The family, the scale, the ratio and the rhythm belong to the
+consuming project, which is expected to replace anything here with its own typography components,
+utility classes, or nothing at all. Another design system may have reached entirely different
+conclusions, and a reference that ships a scale forces its taxonomy onto every consumer.
+
+One test decides whether a typographic declaration belongs here: **does the value follow from a
+mechanism or a criterion, or is it taste?** If removing it only makes things look worse, it is taste.
+If removing it measurably breaks something, it is mechanics.
+
+**Ours:** `tabular-nums` on a value that changes in place (without it the digits jump);
+`unicode-bidi: isolate` on a number-plus-unit run; `1lh` to *read* line height in a calculation,
+never to set one; the `text-wrap: balance` / `pretty` trade; `hyphens` depending on a correct `lang`;
+and surviving WCAG 1.4.12 Text Spacing.
+
+**Not ours:** `font-family`, the size scale and its ratio, `letter-spacing` as a value, margins
+between blocks, and which variant to reach for.
+
+**Express relationships, never a scale.** A hint at `0.875em` is not a type step — it is the
+statement *"supporting text is smaller than what it supports"*, and in `em` it survives whatever
+scale the consumer installs. Two relationships cover the whole component set; a third is drift.
+The failure mode is writing the same relationship as `0.875em` in one component and `0.75em` in
+another, which is how the current inconsistency happened.
+
 ### Interaction states are paired selectors
 
 Every real pseudo-class has a `data-test-state` counterpart on the component root. This makes all states renderable in the kitchensink without JS.

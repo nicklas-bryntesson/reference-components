@@ -37,8 +37,6 @@
 .RangeGroup > legend {
   padding: 0;
   font-size: var(--_rg-role-size);
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
   color: var(--_rg-role-color);
 }
 
