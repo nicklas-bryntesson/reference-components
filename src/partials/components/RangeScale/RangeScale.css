@@ -45,6 +45,8 @@
   --_rs-radius: 1e5px;
   --_rs-inset: calc(var(--_rs-thumb) / 2);   /* the lane model — see above */
   --_rs-p: 0;                                /* 0–1, written by RangeScale.ts */
+  --_rs-a: 0;                                /* two-field lane: the lower position */
+  --_rs-b: 0;                                /* two-field lane: the upper position */
   --_rs-p-live: var(--_rs-p);                /* alias: a region clamps against the fill */
   --_rs-track-color: color-mix(in oklab, currentColor 20%, transparent);
   --_rs-fill-color: currentColor;
@@ -152,6 +154,18 @@
   display: none;
 }
 
+/* A lane holding two controls fills BETWEEN them. This is one axis, not two: a
+   fill from min is meaningless once there are two positions, so field count and
+   fill origin are not independent and do not get separate attributes.
+
+   The start uses the shared expression; the width uses the travel directly,
+   exactly as a reference band does. */
+.RangeScale[data-fields="2"] .fill {
+  --p: var(--_rs-a);
+  margin-inline-start: var(--_rs-pos);
+  inline-size: calc((var(--_rs-b) - var(--_rs-a)) * var(--_rs-travel));
+}
+
 /* The composed field sits above the layers; its own track goes transparent
    because the lane draws one. A documented override, in one direction. */
 .RangeScale .RangeField {
@@ -223,6 +237,34 @@
    value row and the two collide. */
 .RangeScale[data-ticks="labels"] .ticks {
   block-size: calc(var(--_rs-tick-size) + var(--_rs-gap) + 1lh);
+}
+
+/* ── Two fields on one lane ───────────────────────────────────────────────
+   Native range has no `multiple`, so a span is two inputs. Stacked in the same
+   grid area they would each claim the whole surface, so the INPUT gives up the
+   pointer and only the thumbs keep it — otherwise the topmost input would swallow
+   every click and the lower thumb could never be grabbed.
+
+   Keyboard is unaffected: Tab reaches both regardless. */
+/* `data-fields` is an AUTHORED fact, not a `:has()` reading of the DOM. This rule
+   is load-bearing — without it the topmost input swallows every click and the
+   lower thumb can never be grabbed — and load-bearing selectors do not get to
+   depend on feature detection. */
+.RangeScale[data-fields="2"] .RangeField {
+  pointer-events: none;
+}
+
+.RangeScale[data-fields="2"] .RangeField::-webkit-slider-thumb {
+  pointer-events: auto;
+}
+.RangeScale[data-fields="2"] .RangeField::-moz-range-thumb {
+  pointer-events: auto;
+}
+
+/* When both sit on the same value the thumbs overlap and one is unreachable by
+   pointer. RangeGroup raises whichever is nearer the pointer on pointerdown. */
+.RangeScale .RangeField[data-on-top="true"] {
+  z-index: 2;
 }
 
 /* ── Reference layer ──────────────────────────────────────────────────────
@@ -353,6 +395,7 @@
 .RangeScale .value {
   grid-area: value;
   justify-self: end;
+  text-align: end;
   font-variant-numeric: tabular-nums;
   /* The readout is a number plus a unit, i.e. its own bidi run. Isolating it
      keeps it from reordering the text around it in a mixed-direction document.
@@ -388,6 +431,16 @@
   border-radius: 2px;
   background: var(--_rs-ref-ink);    /* inherited — never restated by the author */
   translate: 0 0.1em;
+}
+
+/* Room for the widest NUMBER this lane can show, so its width does not follow its
+   content: a value crossing into another digit otherwise widens the lane in a
+   shrink-to-fit container, which recomputes every position and makes the thumb jump.
+   Digits only, in `ch`; the unit sits outside and costs its natural width. */
+.RangeScale .value .digits {
+  display: inline-block;
+  min-inline-size: calc(var(--_rs-value-digits, 0) * 1ch);
+  text-align: end;
 }
 
 /* Without a reference layer there is nothing for a swatch to key to. */

@@ -488,3 +488,34 @@ test('a reference layer and ticks agree without knowing about each other', async
   expect(g.startOffset).toBeCloseTo(stopX(g.from), 0)
   expect(g.startOffset + g.width).toBeCloseTo(stopX(g.to), 0)
 })
+
+// ── The lane's width must not follow its readout ──────────────────────────────
+//
+// The same defect as the one reported against RangeGroup, latent here: a value
+// crossing into another digit widens the readout, and in a shrink-to-fit container
+// that widens the lane — which recomputes every position mid-drag.
+
+test('crossing a digit boundary does not resize the lane', async ({ page }) => {
+  const widths = await page.evaluate(() => {
+    const lane = document.querySelector('[data-id="rangescale-ref-band"]')
+    const field = lane.querySelector('.RangeField')
+    const out = []
+    for (const v of [0, 400, 990, 1000]) {
+      field.value = String(v)
+      field.dispatchEvent(new Event('input', { bubbles: true }))
+      out.push({
+        value: field.value,
+        lane: lane.getBoundingClientRect().width,
+        track: lane.querySelector('.track').getBoundingClientRect().width,
+        readout: lane.querySelector('output.value').getBoundingClientRect().width,
+      })
+    }
+    return out
+  })
+
+  expect(widths.at(-1).value).toBe('1000')
+  for (const key of ['lane', 'track', 'readout']) {
+    const unique = new Set(widths.map((w) => Math.round(w[key])))
+    expect(unique.size, `${key} widths: ${[...unique].join(', ')}`).toBe(1)
+  }
+})

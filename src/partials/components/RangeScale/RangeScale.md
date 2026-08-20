@@ -78,6 +78,7 @@ Contract rules (enforced by the unit test):
 | `--_rs-hint-size` | `0.875em` | Hint text |
 | `--_rs-hint-color` | `var(--ui-muted-foreground, GrayText)` | Hint text |
 | `--_rs-swatch-size` | `0.75em` | Hint swatch |
+| `--_rs-value-digits` | *set by JS from `max`* | Digits reserved in the readout — see below |
 | `--_rs-tick-size` | `0.375em` | Mark length |
 | `--_rs-tick-width` | `1px` | Mark thickness — a hairline, so px: it must not round to zero |
 | `--_rs-tick-color` | `color-mix(in oklab, currentColor 45%, transparent)` | Mark |
@@ -210,6 +211,19 @@ meaning — which they were doing anyway.
 
 Formatting beyond `data-suffix` is the host's. `400 tkr` reads; `400000 kr` does not, and thousands
 separators are `Intl.NumberFormat`'s job, not a reference library's.
+
+### The readout reserves width, and only for the digits
+
+A readout whose width follows its content makes the **lane** follow its content in any shrink-to-fit
+container: a value crossing into another digit widens the readout, which widens the lane, which
+recomputes every position — and the thumb jumps mid-drag. The digits therefore sit in their own
+element with `min-inline-size: calc(var(--_rs-value-digits) * 1ch)`, reserved from `max` and exactly
+a digit's width under `tabular-nums`.
+
+**Only the digits**, because reserving the whole string over-reserves by roughly a quarter: a space
+and lowercase letters are much narrower than a zero, and permanent width is a worse defect than the
+jump it removes. The unit is static markup and costs its natural width, which is also where a unit
+belongs — it is not data.
 
 ### Direction and orientation
 

@@ -1,0 +1,150 @@
+<section class="kitchensink-section" id="RangeGroup">
+
+  <h2>RangeGroup</h2>
+
+  <p>
+    Two <strong>RangeFields</strong> on one shared <strong>RangeScale</strong>, bounding a span.
+    Native range has no <code>multiple</code> — it was never implemented — so a span is two inputs,
+    and each one keeps its own role, its own keyboard and its own entry in the form data. The
+    <code>&lt;fieldset&gt;</code> gives the group its intrinsic name from <code>&lt;legend&gt;</code>
+    and the disabled cascade for free.
+  </p>
+  <p>
+    <strong>Hard stop is the only clamping strategy, and there is no attribute for it.</strong> The
+    other two are not styling choices: <em>push</em> silently moves a value the user did not touch,
+    and <em>swap</em> changes a control's identity mid-interaction — focus stays on the same element
+    while it now drives the other end — which no ARIA mechanism can announce.
+  </p>
+
+  <!-- Interaction states -->
+  <h3>Interaction states</h3>
+  <p>
+    The group has no interaction states of its own. What these verify is that it does not swallow
+    the fields': both thumbs stay reachable through the stack, and the lane keeps the pointer only
+    where a thumb is.
+  </p>
+  <table class="state-table">
+    <tbody>
+      <tr>
+        <th scope="row">default</th>
+        <td>{{> components/RangeGroup/states/_default}}</td>
+      </tr>
+      <tr>
+        <th scope="row">hover</th>
+        <td>{{> components/RangeGroup/states/_hover}}</td>
+      </tr>
+      <tr>
+        <th scope="row">focus</th>
+        <td>{{> components/RangeGroup/states/_focus}}</td>
+      </tr>
+      <tr>
+        <th scope="row">active</th>
+        <td>{{> components/RangeGroup/states/_active}}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Disabled -->
+  <h3>Disabled</h3>
+  <p>
+    <code>disabled</code> on the <code>&lt;fieldset&gt;</code> only — native cascades it to both
+    fields, which is the whole reason the group is a fieldset rather than a div.
+  </p>
+  <table class="state-table">
+    <tbody>
+      <tr>
+        <th scope="row">group disabled</th>
+        <td>{{> components/RangeGroup/states/_disabled}}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Invalid -->
+  <h3>Invalid</h3>
+  <table class="state-table">
+    <tbody>
+      <tr>
+        <th scope="row">out of policy</th>
+        <td>{{> components/RangeGroup/states/_invalid}}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Collision -->
+  <h3>When the two ends meet</h3>
+  <p>
+    On the same value the thumbs overlap and only one can be reached by pointer, so whichever is
+    nearer the press is raised. <strong>Press near the left of the handle, then near the right</strong>
+    — a different end moves each time. The keyboard never has this problem: Tab reaches both
+    regardless, which is also why the <em>swap</em> strategy was rejected rather than styled around.
+  </p>
+  <table class="state-table">
+    <tbody>
+      <tr>
+        <th scope="row">both ends on the same value</th>
+        <td>{{> components/RangeGroup/states/_collided}}</td>
+      </tr>
+      <tr>
+        <th scope="row">both at minimum</th>
+        <td>{{> components/RangeGroup/states/_at-min}}</td>
+      </tr>
+      <tr>
+        <th scope="row">both at maximum</th>
+        <td>{{> components/RangeGroup/states/_at-max}}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Variants -->
+  <h3>Variants</h3>
+  <p>
+    A span inherits the lane's own axes untouched — it is the same
+    <strong>RangeScale</strong>, told that it holds two controls.
+  </p>
+  <table class="state-table">
+    <tbody>
+      <tr>
+        <th scope="row"><code>flush</code> lane</th>
+        <td>{{> components/RangeGroup/states/_lane-flush}}</td>
+      </tr>
+      <tr>
+        <th scope="row">with tick labels — stops and both ends share one expression</th>
+        <td>{{> components/RangeGroup/states/_with-ticks}}</td>
+      </tr>
+      <tr>
+        <th scope="row">RTL — the lane's ends and the role labels swap together</th>
+        <td>{{> components/RangeGroup/states/_rtl}}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Live demo -->
+  <h3>Live demo</h3>
+  <p>
+    Drag either end into the other: it stops rather than pushing. Tab to one and hold an arrow key
+    through the meeting point — nothing you did not touch moves, and the value you were watching
+    never starts running backwards.
+  </p>
+  <div>
+    {{> components/RangeGroup/states/_live}}
+  </div>
+
+  <!-- Native reference -->
+  <h3>Native reference</h3>
+  <p>
+    Two plain <code>&lt;input type="number"&gt;</code> bounding the same span: zero JavaScript, no
+    overlap, no clamping strategy, no <code>aria-valuetext</code> — and the value can be typed. When
+    the span must be exact, or is mostly filled in by keyboard, <strong>this is the better
+    answer</strong>, and it is worth asking why a slider was wanted before building the three
+    behaviours above.
+  </p>
+  <table class="state-table">
+    <tbody>
+      <tr>
+        <th scope="row">two number inputs</th>
+        <td>{{> components/RangeGroup/states/_native-numbers}}</td>
+      </tr>
+    </tbody>
+  </table>
+
+</section>
