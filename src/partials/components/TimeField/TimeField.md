@@ -33,7 +33,7 @@ State attributes set by JS: `data-initialized="true"`, `data-open="true"`, `data
 | `0`–`9` | Digit entry with fast-advance |
 | `ArrowUp` / `ArrowDown` | Increment / decrement with wrap |
 | `ArrowLeft` / `ArrowRight` | Move between segments |
-| `Tab` / `Shift+Tab` | Leave the segment group (roving tabindex — the segments are one tab stop): Tab moves to the trigger, Shift+Tab exits the field |
+| `Tab` / `Shift+Tab` | Leave the segment group (roving tabindex — the segments are one tab stop): Tab moves to the trigger, Shift+Tab exits the field. The tab stop stays on the segment that had focus, so Shift+Tab back from the trigger returns to it — a roving tabindex has to rove **back** or the group becomes keyboard-unreachable |
 | `Backspace` | Clear segment, move left |
 | `A` / `P` | Set AM / PM (ampm segment only) |
 | `Tab` (popup) | Cyclic focus trap: wheels → footer buttons (Clear, Now) |

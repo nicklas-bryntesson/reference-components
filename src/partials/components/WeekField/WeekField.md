@@ -59,7 +59,7 @@ Two inline spinbutton segments, in order **week → year** separated by `/`, pre
 | `0`–`9` | Digit entry. Week accepts 1–max with fast-advance (a first digit ≥6 commits); year accepts up to 4 digits |
 | `ArrowUp` / `ArrowDown` | Week steps ±1 and **wraps** at the year boundary (1 ↔ 52/53); year steps ±1 and **clamps** to bounds |
 | `ArrowLeft` / `ArrowRight` | Move between segments |
-| `Tab` / `Shift+Tab` | Leave the segment group (roving tabindex — the segments are one tab stop): Tab moves to the trigger, Shift+Tab exits the field |
+| `Tab` / `Shift+Tab` | Leave the segment group (roving tabindex — the segments are one tab stop): Tab moves to the trigger, Shift+Tab exits the field. The tab stop stays on the segment that had focus, so Shift+Tab back from the trigger returns to it — a roving tabindex has to rove **back** or the group becomes keyboard-unreachable |
 | `Backspace` | Clear segment, move left |
 | `Space` / `Enter` (trigger) | Open the popup; focus moves into the week grid |
 

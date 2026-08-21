@@ -390,13 +390,6 @@ class WeekField {
     }
   }
 
-  _focusTrigger(): void {
-    this._segmentEls.forEach(s => {
-      s.removeAttribute('data-focused')
-      s.setAttribute('tabindex', '-1')
-    })
-    this.trigger.focus()
-  }
 
   // ─── Segment events ───────────────────────────────────────────────────────
 
@@ -436,12 +429,6 @@ class WeekField {
       case 'ArrowRight':
         e.preventDefault()
         this._moveSegmentFocus(seg, 1)
-        break
-      case 'Tab':
-        if (!e.shiftKey && isLast) {
-          e.preventDefault()
-          this._focusTrigger()
-        }
         break
       case 'Backspace':
         e.preventDefault()
