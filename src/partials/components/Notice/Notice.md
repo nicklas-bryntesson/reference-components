@@ -56,7 +56,7 @@ and the tint derives from it; adjust the rest globally.
 | `--_nt-gap` | `1rem` | Icon → content |
 | `--_nt-content-gap` | `0.25rem` | Title → body |
 | `--_nt-icon-size` | `1.5rem` | Icon box |
-| `--_nt-max-inline-size` | `50rem` | Max width |
+| `--_nt-max-inline-size` | `50rem` | Max width of the **component** — the text measure lands at ~75 characters, under the 80-character ceiling (measured, see below) |
 
 ### Icons: inline SVG + currentColor
 
@@ -92,6 +92,16 @@ to match the notice you put in it.
 A statically server-rendered Notice that is present on first paint does not need this dance —
 but a reference must show the robust (injectable) pattern, so the kitchensink demonstrates the
 region.
+
+### The width cap is the component, not the text
+
+`--_nt-max-inline-size` caps the whole Notice, and the icon, the gap and the padding sit inside it.
+Measured at the cap: the text line reaches roughly **75 characters**, under the 80-character ceiling
+that WCAG 1.4.8 (AAA) sets for line length. Raising the cap raises the measure with it — past about
+`54rem` the text crosses 80 characters, so treat that as the limit rather than a round number.
+
+If you restyle the icon away or drop the padding, re-measure: the same cap then gives the text more
+room and the measure grows.
 
 ## Accessibility
 
