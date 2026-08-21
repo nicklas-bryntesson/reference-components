@@ -12,12 +12,12 @@ export default defineConfig({
     'src/kernel/**/tests/*.e2e.test.js',
   ],
   use: {
-    baseURL: externalBase ?? 'http://localhost:5173',
+    baseURL: externalBase ?? 'http://localhost:5175',
     ...devices['Desktop Chrome'],
   },
   webServer: externalBase ? undefined : {
     command: 'npm run dev',
-    url: 'http://localhost:5173',
+    url: 'http://localhost:5175',
     reuseExistingServer: !process.env.CI,
   },
 })

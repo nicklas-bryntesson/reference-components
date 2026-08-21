@@ -2,19 +2,11 @@
 
   <h2>RangeField</h2>
 
-  <p>
-    A styled native range: a track and a thumb, and nothing else. The browser positions the
-    thumb, so there is no JavaScript here and nothing that could fall out of sync. The filled
-    portion, tick marks, a value bubble and a reference band all belong to
-    <strong>RangeScale</strong>, which composes this component.
-  </p>
-
   <!-- Interaction states -->
   <h3>Interaction states</h3>
   <p>
-    A range <strong>always carries a value</strong> — there is no empty state, and
-    <code>required</code> cannot express "no answer yet". So the two rows are
-    <em>at minimum</em> and <em>partially filled</em>, not the family's usual empty/filled pair.
+    A range <strong>always carries a value</strong>, so the rows are <em>at minimum</em> and
+    <em>partially filled</em> rather than the family's usual empty/filled pair.
   </p>
   <table class="state-table">
     <thead>
@@ -46,10 +38,6 @@
 
   <!-- Disabled -->
   <h3>Disabled</h3>
-  <p>
-    The native <code>disabled</code> attribute only — there is no <code>data-disabled</code>
-    here, because the input <em>is</em> the component root.
-  </p>
   <table class="state-table">
     <tbody>
       <tr>
@@ -125,9 +113,8 @@
   <!-- Native reference -->
   <h3>Native reference</h3>
   <p>
-    The browser's own track, thumb and <code>&lt;datalist&gt;</code> tick marks — every one of
-    which <code>appearance: none</code> takes away. Compare the tick marks here with the
-    variant above, which has the same <code>&lt;datalist&gt;</code> and draws nothing.
+    The browser's own track, thumb and <code>&lt;datalist&gt;</code> tick marks. Compare the marks here
+    with the variant above, which has the same <code>&lt;datalist&gt;</code> and draws none.
   </p>
   <table class="state-table">
     <tbody>

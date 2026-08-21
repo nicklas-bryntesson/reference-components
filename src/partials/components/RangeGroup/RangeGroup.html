@@ -2,26 +2,10 @@
 
   <h2>RangeGroup</h2>
 
-  <p>
-    Two <strong>RangeFields</strong> on one shared <strong>RangeScale</strong>, bounding a span.
-    Native range has no <code>multiple</code> — it was never implemented — so a span is two inputs,
-    and each one keeps its own role, its own keyboard and its own entry in the form data. The
-    <code>&lt;fieldset&gt;</code> gives the group its intrinsic name from <code>&lt;legend&gt;</code>
-    and the disabled cascade for free.
-  </p>
-  <p>
-    <strong>Hard stop is the only clamping strategy, and there is no attribute for it.</strong> The
-    other two are not styling choices: <em>push</em> silently moves a value the user did not touch,
-    and <em>swap</em> changes a control's identity mid-interaction — focus stays on the same element
-    while it now drives the other end — which no ARIA mechanism can announce.
-  </p>
-
   <!-- Interaction states -->
   <h3>Interaction states</h3>
   <p>
-    The group has no interaction states of its own. What these verify is that it does not swallow
-    the fields': both thumbs stay reachable through the stack, and the lane keeps the pointer only
-    where a thumb is.
+    The group has no interaction states of its own; these rows verify it does not swallow the fields'.
   </p>
   <table class="state-table">
     <tbody>
@@ -46,10 +30,6 @@
 
   <!-- Disabled -->
   <h3>Disabled</h3>
-  <p>
-    <code>disabled</code> on the <code>&lt;fieldset&gt;</code> only — native cascades it to both
-    fields, which is the whole reason the group is a fieldset rather than a div.
-  </p>
   <table class="state-table">
     <tbody>
       <tr>
@@ -73,10 +53,8 @@
   <!-- Collision -->
   <h3>When the two ends meet</h3>
   <p>
-    On the same value the thumbs overlap and only one can be reached by pointer, so whichever is
-    nearer the press is raised. <strong>Press near the left of the handle, then near the right</strong>
-    — a different end moves each time. The keyboard never has this problem: Tab reaches both
-    regardless, which is also why the <em>swap</em> strategy was rejected rather than styled around.
+    <strong>Press near the left of the handle, then near the right</strong> — a different end moves each
+    time. The keyboard never has this problem.
   </p>
   <table class="state-table">
     <tbody>
@@ -97,10 +75,6 @@
 
   <!-- Variants -->
   <h3>Variants</h3>
-  <p>
-    A span inherits the lane's own axes untouched — it is the same
-    <strong>RangeScale</strong>, told that it holds two controls.
-  </p>
   <table class="state-table">
     <tbody>
       <tr>

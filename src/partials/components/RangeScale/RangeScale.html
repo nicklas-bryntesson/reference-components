@@ -2,20 +2,11 @@
 
   <h2>RangeScale</h2>
 
-  <p>
-    The lane a <strong>RangeField</strong> is measured against. The field draws a track and a
-    thumb, because a native range has exactly two addressable insides; everything else on the
-    same lane lives here as sibling elements in a grid stack. This is the only tier in the
-    family with JavaScript, and it has it for one reason — CSS cannot read an input's
-    <code>value</code>, so anything whose length depends on it has to be told.
-  </p>
-
   <!-- Interaction states -->
   <h3>Interaction states</h3>
   <p>
-    The lane has no interaction states of its own. What these rows verify is that it does not
-    <em>swallow</em> the field's: hover, focus and active all still reach the thumb through the
-    stack, and the whole lane surface remains the input's hit target.
+    The lane has no interaction states of its own; these rows verify it does not swallow the field's,
+    and that the whole surface stays the input's hit target.
   </p>
   <table class="state-table">
     <thead>
@@ -58,10 +49,6 @@
 
   <!-- Invalid -->
   <h3>Invalid</h3>
-  <p>
-    <code>data-invalid</code> goes on <strong>both</strong>: the lane draws the track, the field
-    draws the thumb. <code>aria-invalid</code> goes on the control, which is the field.
-  </p>
   <table class="state-table">
     <tbody>
       <tr>
@@ -73,17 +60,6 @@
 
   <!-- Lane model -->
   <h3>Lane model — a documented choice</h3>
-  <p>
-    How far into the lane the thumb's <em>centre</em> may travel is one length,
-    <code>--_rs-inset</code>, and it is the whole difference between the two models. Every layer
-    positions with the same expression, so there is only ever one copy of the maths:
-  </p>
-  <pre><code>--_rs-pos: calc(var(--_rs-inset) + var(--_rs-p) * (100% - 2 * var(--_rs-inset)))</code></pre>
-  <p>
-    At <code>thumb / 2</code> it reduces to <code>thumb/2 + p × (100% − thumb)</code>; at
-    <code>0</code> it reduces to <code>p × 100%</code>. Pick by what the consuming layout can
-    afford, not by which looks better in isolation.
-  </p>
   <table class="state-table">
     <tbody>
       <tr>
@@ -111,19 +87,6 @@
 
   <!-- Ticks -->
   <h3>Ticks</h3>
-  <p>
-    One element per stop, each carrying its own <code>--p</code> — positioned by the
-    <strong>same single expression</strong> as the fill, because custom properties resolve on the
-    element that uses them. A repeating gradient would be cheaper in DOM but can only express
-    <em>even</em> spacing, and it needs its own period arithmetic against an inset background box.
-  </p>
-  <p>
-    The stops are <code>aria-hidden</code>, and that is not a compromise: nothing in ARIA models
-    tick marks, and <code>step</code> already makes the keyboard land on exactly these values — so
-    what the eye sees and what the keyboard feels agree without any ARIA at all. The labels are
-    <strong>numeric by definition</strong>: a scale of words is an ordered set, which is a radio
-    group and not a range, so there is nothing to mirror into <code>aria-valuetext</code>.
-  </p>
   <table class="state-table">
     <tbody>
       <tr>
@@ -178,19 +141,6 @@
 
   <!-- Reference layer -->
   <h3>Reference layer</h3>
-  <p>
-    A second measurement on the same lane that is <strong>not</strong> the value: consumption
-    already used, a recommended band, a threshold. It cannot live inside the field — a range input
-    has exactly two addressable insides and both are spent — and it is an <em>axis</em> rather than
-    a component, because reference and thumb count are orthogonal. Encoding both as component
-    identity would give a 2×2 matrix with a fourth component nobody wants.
-  </p>
-  <p>
-    The numbers are static custom properties from the server, so the whole axis costs
-    <strong>zero JavaScript</strong>. A <code>region</code> is the special case of a
-    <code>band</code> whose start is min, plus a <code>min()</code> clamp that replaces the JS
-    branch a production slider needed for exactly this; a <code>marker</code> is a band of no width.
-  </p>
   <table class="state-table">
     <tbody>
       <tr>
@@ -223,14 +173,6 @@
       </tr>
     </tbody>
   </table>
-  <p>
-    <strong>Colour is never the only carrier</strong> (WCAG 1.4.1). Each of these pairs the layer
-    with a hint, and the swatch beside the text inherits the layer's own
-    <code>--_rs-ref-ink</code> — so it cannot drift, and the author never restates the variant. The
-    hint says what the zone <em>means</em>, not where it is. The four variants map to the same
-    <code>--ui-*</code> tokens Notice uses, so the component hard-codes no colour and dark mode
-    follows for free.
-  </p>
 
   <!-- Live demo -->
   <h3>Live demo</h3>
@@ -245,10 +187,8 @@
   <!-- Native reference -->
   <h3>Native reference</h3>
   <p>
-    The browser's own range, for comparison: no fill in Chromium or WebKit, and no readout.
-    Firefox alone fills its track via <code>::-moz-range-progress</code> — which is exactly why
-    this component does not rely on that pseudo-element. A fill that appears in one engine and
-    not the others is a visual inconsistency, not progressive enhancement.
+    The browser's own range: no fill in Chromium or WebKit, and no readout. Firefox alone fills its
+    track via <code>::-moz-range-progress</code> — which is why this component does not rely on it.
   </p>
   <table class="state-table">
     <tbody>
