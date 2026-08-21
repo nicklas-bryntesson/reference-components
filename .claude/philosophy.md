@@ -93,6 +93,26 @@ Components take design through **one** host-facing namespace: `--ui-*` (in `01-S
 
 Never read design from `--SITE--*` — that namespace is *site layout scaffolding* (padding / max-width / grid), not the component seam — and never invent a new host token. If a role is missing, add it to `ui-tokens.css`, don't reach past the seam. See ADR-0018.
 
+#### `Canvas` means two different things — only one of them is a token
+
+The system colour `Canvas` appears in two roles that look identical in a stylesheet and behave
+nothing alike:
+
+- **As the counterpart to `currentColor`** — a checkbox tick on a filled box, a ring around a
+  thumb, the foreground of a selected chip. Here `Canvas` is right and must stay literal. The
+  point is that it is *whatever the ground is*, so it can never fail to contrast, and
+  forced-colors maps the pair on its own. Same reasoning as `--ui-primary-foreground: Canvas`.
+- **As a surface something blends into** — a gradient's end stop, a fade's colour, a popover's
+  own background. Here `Canvas` is a **guess about the host**, correct only while the surface
+  happens to be the page. Write `var(--ui-surface, Canvas)`: identical rendering standalone,
+  and correct once a consumer gives its panels a colour of their own.
+
+The failure mode is silent in this repo and only in this repo, because our popovers *are* the page
+surface — the two values coincide, so nothing looks wrong until someone ports it. A hardcoded
+`Canvas` faded to near-black over a lighter panel across every wheel field at once, and the
+kernel file doing it was already reading `--ui-surface-foreground` for the ink one line above.
+When a declaration names a ground, ask whose ground it is.
+
 ### Typography is the consumer's; we own the mechanics
 
 **This is not a design project.** The family, the scale, the ratio and the rhythm belong to the
