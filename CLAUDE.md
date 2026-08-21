@@ -47,6 +47,7 @@ src/css/site/01-Setup/ui-tokens.css # --ui-* component theming seam — the ONE 
 src/css/site/01-Setup/tokens.css  # --SITE--* site layout scaffolding only (padding/max-width/grid) — not the component seam
 docs/adr/                         # Architecture Decision Records — tracked; the "why" behind every direction
 tasks/                            # current specs & implementation plans (gitignored, local)
+tasks/probes/                     # throwaway measurement scripts — see below
 docs/superpowers/                 # historical specs/plans archive — no longer the active workflow
 ```
 
@@ -100,11 +101,35 @@ Read [`.claude/philosophy.md`](.claude/philosophy.md) before writing any CSS or 
   `git diff --stat origin/main..HEAD` before opening the PR. Never report "pushed to #N" without
   having seen that #N is `OPEN`.
 
+## Throwaway probes
+
+One-off scripts that measure something in a real browser — "does author-set `aria-valuemax` reach
+the accessibility tree", "is this component's width content-dependent" — go in **`tasks/probes/`**.
+
+`tasks/` is gitignored, so nothing leaks into a PR, and Node still resolves `playwright` and
+everything else from the repo root:
+
+```bash
+node tasks/probes/whatever.mjs
+```
+
+Do **not** put them in the repo root. They cannot be imported from a system temp directory (module
+resolution fails), so the root is the tempting place — and then they sit there untracked, waiting to
+be swept into a `git add -A`.
+
+A probe that turns out to be worth keeping graduates into a real test; the rest are disposable by
+design and nobody needs to read them again.
+
 ## Decisions (ADRs)
 
 Direction-level decisions are recorded as numbered, immutable ADRs in `docs/adr/`
 (tracked in git — the durable counterpart to the gitignored `tasks/` working docs).
 An ADR is written once; revisiting a decision means writing a new one that supersedes it.
+
+**The tests those ADRs establish are collected in [`docs/adr/TESTS.md`](docs/adr/TESTS.md)** —
+thirteen questions with their source ADR, from "does this earn its own component" to "mechanics or
+taste". Read it before reasoning a boundary question out from first principles; the `decide` skill
+exists to make that reflex. When an ADR introduces a new test, add it there in the same pass.
 
 **Write an ADR when** a new component idea earns a place, a repo-wide convention is set
 or broken, a behaviour is promoted to `src/kernel/`, or a cross-cutting default flips.
