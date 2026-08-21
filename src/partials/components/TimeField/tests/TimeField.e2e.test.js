@@ -237,6 +237,40 @@ test('wheel column ArrowUp decreases value in segment', async ({ page }) => {
   await expect(hourSeg).toHaveAttribute('aria-valuenow', '9')
 })
 
+test('tapping a wheel option with a mouse selects it', async ({ page }) => {
+  // Pointer capture retargets the compatibility mouse events, so `click` on a
+  // wheel column always arrives with .Wheel as its target and never with an
+  // option. Only a real browser produces those events, which is why this lives
+  // here: a tap looked fine on touch and did nothing at all with a mouse.
+  await page.locator(`${TF} .trigger`).click()
+  const hourCol = page.locator(`${TF} .Wheel[data-segment="hour"]`)
+  await expect(hourCol).toBeVisible()
+
+  const option = hourCol.locator('.option[data-value]').nth(1)
+  const wanted = await option.getAttribute('data-value')  // slots recycle on render
+  await option.click()
+  await page.waitForTimeout(500)
+
+  await expect(page.locator(`${TF} .segment[data-segment="hour"]`))
+    .toHaveAttribute('aria-valuenow', wanted)
+})
+
+test('the wheel column publishes the value it just committed', async ({ page }) => {
+  // render() writes aria-valuenow out of the committed value, so committing
+  // second published the PREVIOUS value on every rest — nothing on the first
+  // gesture from an empty field. Visible only to a screenreader.
+  await page.locator(`${TF} .trigger`).click()
+  const hourCol = page.locator(`${TF} .Wheel[data-segment="hour"]`)
+  const option = hourCol.locator('.option[data-value]').nth(1)
+  const wanted = await option.getAttribute('data-value')
+
+  await option.click()
+  await page.waitForTimeout(500)
+
+  await expect(hourCol).toHaveAttribute('aria-valuenow', wanted)
+  await expect(hourCol).not.toHaveAttribute('aria-valuetext', '--')
+})
+
 test('"Now" button syncs the wheel with the current time', async ({ page }) => {
   await page.locator(`${TF} .trigger`).click()
   const nowBtn = page.locator(`${TF} .footer-now`)

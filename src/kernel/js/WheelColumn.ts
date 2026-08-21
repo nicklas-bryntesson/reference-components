@@ -26,6 +26,11 @@ const WHEEL_SNAP_DELAY_MS = 100
 let _activeWheelCol: WheelColumn | null = null
 const WHEEL_MIN_DELTA = 15  // rows/event — below this we treat it as inertia tail
 
+// A press that travels less than this is a tap on an option, not a drag of the
+// column. Measured as total distance travelled, so a drag that wanders down and
+// comes back is still a drag — the wheel moved and has to snap.
+const TAP_SLOP_PX = 4
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function readRowHeight(el: HTMLElement): number {
@@ -69,6 +74,9 @@ class WheelColumn {
 
   private _dragActive: boolean = false
   private _dragLastY: number = 0
+  /** Total distance this press has travelled, and what it started on. */
+  private _dragTravel: number = 0
+  private _downOption: HTMLElement | null = null
   private _dragLastTime: number = 0
 
   private _lastMoveTime: number = 0
@@ -143,7 +151,8 @@ class WheelColumn {
 
     this.el.addEventListener('pointerdown', this._onPointerDown, { signal })
     this.el.addEventListener('wheel', this._onWheel as EventListener, { passive: false, signal })
-    this.el.addEventListener('click', this._onClick, { signal })
+    // No `click` listener. Selecting by tap is resolved in the pointer flow
+    // instead — see _onPointerDown for why a click handler cannot work here.
   }
 
   private _onPointerDown = (e: PointerEvent): void => {
@@ -152,6 +161,14 @@ class WheelColumn {
     this._stop()
 
     this._dragActive = true
+    // Which option the press landed on has to be read HERE. The next line
+    // captures the pointer, and capture retargets the compatibility mouse
+    // events that follow — mousedown, mouseup and click all arrive with
+    // `.Wheel` as their target, so a click handler asking `closest('.option')`
+    // finds nothing and silently never selects. This is why tapping a number
+    // worked on touch (no compatibility events) and never with a mouse.
+    this._downOption = (e.target as HTMLElement | null)?.closest<HTMLElement>('.option') ?? null
+    this._dragTravel = 0
     this._dragLastY = e.clientY
     this._dragLastTime = performance.now()
     this._velocity = 0
@@ -178,6 +195,7 @@ class WheelColumn {
     // Rolling average matches prototype exactly: weight recent move 60%, history 40%
     this._velocity = this._velocity * 0.4 + (dPos / dtm * 1000) * 0.6
 
+    this._dragTravel += Math.abs(dy)
     this._dragLastY = e.clientY
     this._dragLastTime = now
     this._lastMoveTime = now
@@ -204,6 +222,15 @@ class WheelColumn {
     this._velocity = Math.max(-MAX_V, Math.min(MAX_V, v * 0.4))
 
     this._externalSet = false
+
+    // A press that never travelled is a tap: animate to the option it landed
+    // on rather than snapping back to where the column already was. A cancelled
+    // pointer is not a tap — the gesture was taken away, not completed.
+    const option = this._downOption
+    this._downOption = null
+    if (e.type !== 'pointercancel' && this._dragTravel <= TAP_SLOP_PX && option) {
+      if (this._selectOption(option)) return
+    }
 
     if (Math.abs(this._velocity) > MOMENTUM_THRESHOLD && !this._prefersReducedMotion()) {
       this._startMomentum()
@@ -242,21 +269,24 @@ class WheelColumn {
     }, WHEEL_SNAP_DELAY_MS)
   }
 
-  private _onClick = (e: MouseEvent): void => {
-    if (this._destroyed) return
-    const option = (e.target as HTMLElement).closest<HTMLElement>('.option')
-    if (!option) return
-
+  /**
+   * Animate to a tapped option. Returns false when the element carries no
+   * usable value, so the caller can fall back to snapping.
+   */
+  private _selectOption(option: HTMLElement): boolean {
     const raw = option.dataset.value
-    if (raw == null || raw === '') return
+    if (raw == null || raw === '') return false
     const displayValue = Number(raw)
-    if (isNaN(displayValue)) return
+    if (isNaN(displayValue)) return false
 
     this._externalSet = false
     const i = this._resolveIndex(displayValue - this.opts.min)
+    // Travel to the nearest copy of that index, so a tap near the edge of a
+    // looping column moves a row or two rather than winding all the way round.
     const target = i + this.count * Math.round((this.pos - i) / this.count)
     this._animateTo(target)
     this._currentValue = displayValue
+    return true
   }
 
   // ─── Physics loop ────────────────────────────────────────────────────────────
@@ -280,8 +310,16 @@ class WheelColumn {
 
         if (Math.abs(diff) < 0.005) {
           this.pos = this._snapTarget
-          this.render()
+          // Commit BEFORE rendering. render() writes aria-valuenow and
+          // aria-valuetext out of _currentValue, and _commit() is what sets it,
+          // so the old order published the PREVIOUS value every time the wheel
+          // came to rest — "--" on the first gesture from an empty field, and one
+          // step behind forever after. The wheel moved, the field updated, and
+          // only the spinbutton lied. Committing first also normalises `pos`, so
+          // a looping column renders its wrapped resting position rather than
+          // the pre-wrap one.
           this._commit()
+          this.render()
           this._rafId = null
           this._snapping = false
           return
@@ -324,8 +362,9 @@ class WheelColumn {
 
     if (this._prefersReducedMotion()) {
       this.pos = target
-      this.render()
+      // Same order as the snap branch above, and for the same reason.
       this._commit()
+      this.render()
       return
     }
 
@@ -509,6 +548,12 @@ class WheelColumn {
       clearTimeout(this._wheelTimer)
       this._wheelTimer = null
     }
+
+    // The wheel lock is module-level, so a column torn down mid-scroll — a
+    // popup closing while the trackpad still coasts — would leave itself named
+    // as the owner forever, and every surviving column would ignore the wheel.
+    // The release on the happy path only runs for a column that lives to snap.
+    if (_activeWheelCol === this) _activeWheelCol = null
 
     this._abortController.abort()
   }
