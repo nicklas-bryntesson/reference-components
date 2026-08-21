@@ -328,3 +328,39 @@ test('wheel event on the calendar surface (off a wheel) is defaultPrevented', as
   }, ROOT)
   expect(prevented).toBe(true)
 })
+
+// ── Roving tabindex: out and back in ──────────────────────────────────────────
+// The suite could tab *within* the segment group and *off* it, but never off and
+// back, so a roving tabindex that never roved back was invisible: intercepting
+// Tab on the last segment set every segment to -1, leaving the whole group with
+// no tab stop and the field keyboard-unreachable for the rest of the page's
+// life. A WCAG 2.1.1 failure that axe has no rule for.
+test('the segment group keeps a tab stop after focus leaves it', async ({ page }) => {
+  const segs = page.locator(`${ROOT} .segment[tabindex]`)
+  const n = await segs.count()
+  expect(n).toBeGreaterThan(1)
+
+  await segs.first().focus()
+  // Arrowing is the only keyboard route to the last segment.
+  for (let i = 0; i < n - 1; i++) await page.keyboard.press('ArrowRight')
+  await page.keyboard.press('Tab')
+
+  // Exactly one segment stays tabbable — the one that had focus.
+  const tabindexes = await segs.evaluateAll((els) => els.map((e) => e.getAttribute('tabindex')))
+  expect(tabindexes.filter((t) => t === '0')).toHaveLength(1)
+  expect(tabindexes[tabindexes.length - 1]).toBe('0')
+})
+
+test('Shift+Tab returns into the segment that was being edited', async ({ page }) => {
+  const segs = page.locator(`${ROOT} .segment[tabindex]`)
+  const n = await segs.count()
+
+  await segs.first().focus()
+  for (let i = 0; i < n - 1; i++) await page.keyboard.press('ArrowRight')
+  const editing = await page.evaluate(() => document.activeElement?.dataset?.segment ?? null)
+
+  await page.keyboard.press('Tab')
+  await page.keyboard.press('Shift+Tab')
+
+  await expect(page.locator(`${ROOT} .segment[data-segment="${editing}"]`)).toBeFocused()
+})

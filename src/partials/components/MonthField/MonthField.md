@@ -36,7 +36,7 @@ The popup **month wheel** shows the localized month **name** ("Juni"); the inlin
 | `0`–`9` | Digit entry. Month accepts a 1-based value (1–12) with fast-advance; year accepts up to 4 digits |
 | `ArrowUp` / `ArrowDown` | Month steps ±1 and **wraps** Dec↔Jan; year steps ±1 and **clamps** to bounds |
 | `ArrowLeft` / `ArrowRight` | Move between segments |
-| `Tab` / `Shift+Tab` | Leave the segment group (roving tabindex — the segments are one tab stop): Tab moves to the trigger, Shift+Tab exits the field |
+| `Tab` / `Shift+Tab` | Leave the segment group (roving tabindex — the segments are one tab stop): Tab moves to the trigger, Shift+Tab exits the field. The tab stop stays on the segment that had focus, so Shift+Tab back from the trigger returns to it — a roving tabindex has to rove **back** or the group becomes keyboard-unreachable |
 | `Backspace` | Clear segment, move left |
 | `Space` / `Enter` (trigger) | Open the popup; focus stays on the trigger — Tab moves into the wheels |
 | `ArrowUp` / `ArrowDown` (wheel) | `WheelColumn.stepBy` — spin the focused wheel |
