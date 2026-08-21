@@ -94,7 +94,10 @@ class MonthField {
 
   // State
   fieldId: string
+  /** Collapsed translation key — indexes `translations`, never given to Intl. */
   locale: string
+  /** Raw locale tag as authored — what Intl must receive. See ADR-0011. */
+  localeTag: string
   instanceId: number
   minYear: number
   maxYear: number
@@ -133,7 +136,8 @@ class MonthField {
     this.announce = el.querySelector<HTMLElement>('.announce')!
 
     this.fieldId = el.dataset.id ?? `monthfield-${this.instanceId}`
-    this.locale = resolveLocale(readLocale(el), MonthField.translations)
+    this.localeTag = readLocale(el)
+    this.locale = resolveLocale(this.localeTag, MonthField.translations)
 
     this.t = MonthField.translations[this.locale]
     this._segmentEls = []
@@ -407,14 +411,14 @@ class MonthField {
   _valueText(type: MonthSegmentType, value: number): string {
     if (type === 'month') {
       const year = this._getSegmentValueByType('year') ?? new Date().getFullYear()
-      const name = getMonthName(year, value, this.locale)
+      const name = getMonthName(year, value, this.localeTag)
       const yearVal = this._getSegmentValueByType('year')
       return yearVal == null ? name : `${name} ${yearVal}`
     }
     // year
     const monthVal = this._getSegmentValueByType('month')
     if (monthVal == null) return String(value)
-    return `${getMonthName(value, monthVal, this.locale)} ${value}`
+    return `${getMonthName(value, monthVal, this.localeTag)} ${value}`
   }
 
   _setSegmentValue(seg: HTMLSpanElement, value: number): void {
@@ -630,7 +634,7 @@ class MonthField {
   _announceValue(monthStr: string): void {
     const parsed = parseMonthISO(monthStr)
     this.announce.textContent = parsed
-      ? `${getMonthName(parsed.year, parsed.month, this.locale)} ${parsed.year}`
+      ? `${getMonthName(parsed.year, parsed.month, this.localeTag)} ${parsed.year}`
       : monthStr
     setTimeout(() => {
       this.announce.textContent = ''
@@ -716,7 +720,7 @@ class MonthField {
     // Month wheel: loops (Dec↔Jan), shows localized month NAME (O2).
     const monthOpts: WheelColumnOptions = {
       min: 0, max: 11, value: currentMonth, loop: true,
-      format: (v) => getMonthName(currentYear ?? new Date().getFullYear(), v, this.locale),
+      format: (v) => getMonthName(currentYear ?? new Date().getFullYear(), v, this.localeTag),
       onChange: (m) => this._selectPopupOption('month', m),
     }
     this._wheels.set('month', new WheelColumn(monthHost, monthOpts))

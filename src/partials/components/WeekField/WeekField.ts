@@ -130,7 +130,10 @@ class WeekField {
 
   // State
   fieldId: string
+  /** Collapsed translation key — indexes `translations`, never given to Intl. */
   locale: string
+  /** Raw locale tag as authored — what Intl must receive. See ADR-0011. */
+  localeTag: string
   instanceId: number
   minYear: number
   maxYear: number
@@ -175,7 +178,8 @@ class WeekField {
     this.announce = el.querySelector<HTMLElement>('.announce')!
 
     this.fieldId = el.dataset.id ?? `weekfield-${this.instanceId}`
-    this.locale = resolveLocale(readLocale(el), WeekField.translations)
+    this.localeTag = readLocale(el)
+    this.locale = resolveLocale(this.localeTag, WeekField.translations)
 
     this.t = WeekField.translations[this.locale]
     this._segmentEls = []
@@ -857,7 +861,7 @@ class WeekField {
 
   _renderWeekdays(): void {
     if (!this.popupEl) return
-    const names = getWeekdayNames(this.locale)
+    const names = getWeekdayNames(this.localeTag)
     const ths = this.popupEl.querySelectorAll('.calendar-grid thead th')
     // ths[0] is the week-number column head; days start at index 1.
     const weekHead = ths[0]
@@ -871,14 +875,14 @@ class WeekField {
       th.textContent = name
       const anchor = new Date(2024, 0, 1) // a Monday
       anchor.setDate(anchor.getDate() + i)
-      th.setAttribute('aria-label', new Intl.DateTimeFormat(this.locale, { weekday: 'long' }).format(anchor))
+      th.setAttribute('aria-label', new Intl.DateTimeFormat(this.localeTag, { weekday: 'long' }).format(anchor))
     })
   }
 
   _renderMonth(): void {
     if (!this.popupEl) return
     const label = this.popupEl.querySelector<HTMLElement>('.calendar-month-year')!
-    label.textContent = `${getMonthName(this.viewYear, this.viewMonth, this.locale)} ${this.viewYear}`
+    label.textContent = `${getMonthName(this.viewYear, this.viewMonth, this.localeTag)} ${this.viewYear}`
 
     const tbody = this.popupEl.querySelector<HTMLTableSectionElement>('.calendar-grid tbody')!
     tbody.innerHTML = ''
@@ -924,7 +928,7 @@ class WeekField {
     tr.setAttribute('tabindex', '-1')
     const sunday = new Date(monday)
     sunday.setDate(monday.getDate() + 6)
-    const range = `${monday.toLocaleDateString(this.locale, { day: 'numeric', month: 'long' })} – ${sunday.toLocaleDateString(this.locale, { day: 'numeric', month: 'long' })}`
+    const range = `${monday.toLocaleDateString(this.localeTag, { day: 'numeric', month: 'long' })} – ${sunday.toLocaleDateString(this.localeTag, { day: 'numeric', month: 'long' })}`
     const suffixes = [
       isSelected ? `, ${this.t.selected}` : '',
       isDisabled ? `, ${this.t.notAvailable}` : '',

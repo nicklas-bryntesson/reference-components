@@ -530,7 +530,7 @@ export class DateTimeField {
 
     if (type === 'month') {
       const year = this._getSegmentValueByType('year') ?? new Date().getFullYear()
-      seg.setAttribute('aria-valuetext', getMonthName(year, numericValue - 1, this.locale))
+      seg.setAttribute('aria-valuetext', getMonthName(year, numericValue - 1, this.localeTag))
       seg.textContent = String(numericValue).padStart(2, '0')
       // Clamp the day if needed after month change
       const daySeg = this._getSegmentEl('day')
@@ -606,7 +606,7 @@ export class DateTimeField {
     if (this.native.value !== next) {
       this.native.value = next
       this.native.dispatchEvent(new Event('change', { bubbles: true }))
-      const label = dt.toLocaleString(this.locale, {
+      const label = dt.toLocaleString(this.localeTag, {
         dateStyle: 'long',
         timeStyle: this._showSeconds() ? 'medium' : 'short',
       })
@@ -854,7 +854,7 @@ export class DateTimeField {
 
     const header = this.calendarEl.querySelector<HTMLElement>('.calendar-month-year')
     if (header) {
-      header.textContent = `${getMonthName(this.currentYear, this.currentMonth, this.locale)} ${this.currentYear}`
+      header.textContent = `${getMonthName(this.currentYear, this.currentMonth, this.localeTag)} ${this.currentYear}`
     }
 
     const grid = this.calendarEl.querySelector<HTMLElement>('.calendar-grid')
@@ -863,7 +863,7 @@ export class DateTimeField {
 
     // Weekday header row
     const headerRow = document.createElement('tr')
-    getWeekdayNames(this.locale).forEach(name => {
+    getWeekdayNames(this.localeTag).forEach(name => {
       const th = document.createElement('th')
       th.setAttribute('scope', 'col')
       th.textContent = name
@@ -1231,7 +1231,7 @@ export class DateTimeField {
     monthHost.setAttribute('aria-label', this.t.month)
     this._pickerWheels.set('month', new WheelColumn(monthHost, {
       min: 0, max: 11, value: this.currentMonth, loop: true,
-      format: (v) => getMonthName(this.currentYear, v, this.locale),
+      format: (v) => getMonthName(this.currentYear, v, this.localeTag),
       onChange: (m) => applyPickerDate(this.currentYear, m),
     }))
 

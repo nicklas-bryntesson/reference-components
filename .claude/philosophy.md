@@ -138,6 +138,31 @@ scale the consumer installs. Two relationships cover the whole component set; a 
 The failure mode is writing the same relationship as `0.875em` in one component and `0.75em` in
 another, which is how the current inconsistency happened.
 
+### A locale tag and a translation key are two different values
+
+Anything localised reads **two** values off one attribute, and they are not interchangeable:
+
+- **The raw tag** (`readLocale` → `de-DE`) is what `Intl` gets. It is the only value that can
+  produce correctly localised month names, weekday names, hour cycle and segment order.
+- **The collapsed key** (`resolveLocale` → `en`, because there is no `de` bundle) indexes our own
+  translation strings, and nothing else. Falling back to English for a *string we wrote* is
+  correct; falling back to English for a name **ICU already knows** is a bug.
+
+Store both, name both, and never let the key reach `Intl`:
+
+```ts
+this.localeTag = readLocale(el)                                  // → Intl
+this.locale    = resolveLocale(this.localeTag, X.translations)   // → this.t
+```
+
+This one is worth stating twice because it already drifted once. ADR-0011 decided exactly this
+rule and applied it to hour cycle and segment order; every *name* kept receiving the collapsed
+key, so all four calendar fields rendered English under `de-DE`. It survived because the
+kitchensink demos only `en-GB` and `sv-SE` — the two locales where collapsing preserves the
+language, so the defect is invisible in the only cases anyone looks at. **A demo set that agrees
+with the bug is not coverage.** If a rule has a region-sensitive half, one demo has to exercise
+the region.
+
 ### Interaction states are paired selectors
 
 Every real pseudo-class has a `data-test-state` counterpart on the component root. This makes all states renderable in the kitchensink without JS.

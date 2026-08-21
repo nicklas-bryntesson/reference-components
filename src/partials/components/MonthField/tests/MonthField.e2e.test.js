@@ -298,3 +298,35 @@ test('Shift+Tab returns into the segment that was being edited', async ({ page }
 
   await expect(page.locator(`${MF} .segment[data-segment="${editing}"]`)).toBeFocused()
 })
+
+// ── A region-qualified locale must reach Intl ─────────────────────────────────
+// The collapsed translation key (de-DE → en, because there is no `de` bundle) was
+// being handed to Intl as well, so every name Intl produces came out English
+// under any locale whose region matters. Invisible in the kitchensink, which only
+// demos en-GB and sv-SE — the two locales where the collapse happens to preserve
+// the language. Expectations are computed from ICU in-page rather than hardcoded,
+// so this asserts the wiring and not a snapshot of one ICU version.
+async function serveAs(page, locale) {
+  await page.route('**/*', async (route) => {
+    const r = await route.fetch()
+    if (!(r.headers()['content-type'] ?? '').includes('text/html')) {
+      return route.fulfill({ response: r })
+    }
+    const body = (await r.text()).replace(/data-locale="[^"]*"/g, `data-locale="${locale}"`)
+    await route.fulfill({ response: r, body })
+  })
+  await page.goto(targetPath())
+}
+
+test('de-DE renders German month names, not English ones', async ({ page }) => {
+  await serveAs(page, 'de-DE')
+  await page.locator(`${MF} .trigger`).first().click()
+
+  const expected = await page.evaluate(() =>
+    new Intl.DateTimeFormat('de-DE', { month: 'long' }).format(new Date(2026, 9, 1)))
+  expect(expected).not.toBe('October')   // guard: the probe itself must be meaningful
+
+  const names = await page.locator(`${MF} .Wheel[data-picker="month"] .option`)
+    .evaluateAll((els) => els.map((e) => e.textContent.trim()))
+  expect(names).toContain(expected)
+})

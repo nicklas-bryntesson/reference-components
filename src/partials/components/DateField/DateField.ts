@@ -442,7 +442,7 @@ class DateField {
 
     if (type === 'month') {
       const year = this._getSegmentValueByType('year') ?? new Date().getFullYear()
-      seg.setAttribute('aria-valuetext', getMonthName(year, numericValue - 1, this.locale))
+      seg.setAttribute('aria-valuetext', getMonthName(year, numericValue - 1, this.localeTag))
       seg.textContent = String(numericValue).padStart(2, '0')
       const daySeg = this._getSegmentEl('day')
       if (daySeg) {
@@ -571,7 +571,7 @@ class DateField {
     this.native.dispatchEvent(new Event('change', { bubbles: true }))
     this._syncingFromCustom = false
 
-    const label = date.toLocaleDateString(this.locale, { dateStyle: 'long' })
+    const label = date.toLocaleDateString(this.localeTag, { dateStyle: 'long' })
     this.announce.textContent = `${this.t.announceSelected} ${label}`
   }
 
@@ -815,7 +815,7 @@ class DateField {
 
     this._pickerWheels.set('month', new WheelColumn(monthHost, {
       min: 0, max: 11, value: this.currentMonth, loop: true,
-      format: (v) => getMonthName(this.currentYear, v, this.locale),
+      format: (v) => getMonthName(this.currentYear, v, this.localeTag),
       onChange: (m) => applyPickerDate(this.currentYear, m),
     }))
 
@@ -862,20 +862,20 @@ class DateField {
   }
 
   _renderWeekdays(): void {
-    const names = getWeekdayNames(this.locale)
+    const names = getWeekdayNames(this.localeTag)
     const ths = this.calendarEl!.querySelectorAll('.grid thead th')
     ths.forEach((th, i) => {
       if (!names[i]) return
       th.textContent = names[i]
       const anchor = new Date(2024, 0, 1)
       anchor.setDate(anchor.getDate() + i)
-      th.setAttribute('aria-label', new Intl.DateTimeFormat(this.locale, { weekday: 'long' }).format(anchor))
+      th.setAttribute('aria-label', new Intl.DateTimeFormat(this.localeTag, { weekday: 'long' }).format(anchor))
     })
   }
 
   _renderMonth(): void {
     const monthYearTrigger = this.calendarEl!.querySelector<HTMLButtonElement>('.month-year-trigger')
-    const monthName = getMonthName(this.currentYear, this.currentMonth, this.locale)
+    const monthName = getMonthName(this.currentYear, this.currentMonth, this.localeTag)
     if (monthYearTrigger) monthYearTrigger.textContent = `${monthName} ${this.currentYear}`
 
     const tbody = this.calendarEl!.querySelector<HTMLTableSectionElement>('.grid tbody')!
@@ -947,7 +947,7 @@ class DateField {
     btn.setAttribute('tabindex', '-1')
     btn.dataset.date = formatISO(date)
 
-    const dateLabel = date.toLocaleDateString(this.locale, { dateStyle: 'long' })
+    const dateLabel = date.toLocaleDateString(this.localeTag, { dateStyle: 'long' })
     const suffixes = [
       isToday ? `, ${this.t.today}` : '',
       isSelected ? `, ${this.t.selected}` : '',
@@ -1004,7 +1004,7 @@ class DateField {
     this._setSegmentValue(this._getSegmentEl('day')!, date.getDate())
     this._setSegmentValue(this._getSegmentEl('month')!, date.getMonth() + 1)
     this._setSegmentValue(this._getSegmentEl('year')!, date.getFullYear())
-    const label = date.toLocaleDateString(this.locale, { dateStyle: 'long' })
+    const label = date.toLocaleDateString(this.localeTag, { dateStyle: 'long' })
     this.announce.textContent = `${this.t.announceSelected} ${label}`
     const clearBtn = this.calendarEl?.querySelector<HTMLButtonElement>('.calendar-footer-clear')
     if (clearBtn) clearBtn.disabled = false
