@@ -13,6 +13,12 @@ moves on.
 Unlike `tasks/` and `docs/superpowers/` (ephemeral, gitignored working docs), **ADRs
 are tracked in git.** They are part of the contract set, like each component's `.md`.
 
+## The tests these decisions establish
+
+Many ADRs also establish a **test** — a question you ask to reach the same kind of decision again.
+Those are collected in [`TESTS.md`](TESTS.md), with the source ADR for each. The ADR stays
+authoritative; the index exists because a test nobody can find gets re-derived, usually worse.
+
 ## When to write one
 
 Write an ADR when the change is a *direction*, not a mechanical edit:
