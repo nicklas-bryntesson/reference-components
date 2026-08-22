@@ -84,6 +84,22 @@ Read [`.claude/philosophy.md`](.claude/philosophy.md) before writing any CSS or 
 - **New features / design decisions:** subagent-driven development + full spec + quality review
 - **Mechanical tasks (migrations, renames, type annotations):** inline execution, skip brainstorming
 - **TypeScript migrations:** one component per session; no logic changes
+- **Always branch from `origin/main`, explicitly:**
+
+  ```bash
+  git fetch -q origin && git checkout -b <branch> origin/main
+  ```
+
+  A bare `git checkout -b <branch>` branches from wherever HEAD happens to be, which — mid-session,
+  after finishing a PR — is the *previous* feature branch. The new branch then carries the previous
+  branch's commits. That is survivable while the parent PR is open, but the moment it is
+  **squash-merged** `main` holds the same changes under a different hash, and the child branch
+  conflicts against content it already agrees with. Rebasing away the duplicate is the fix
+  (`git rebase --onto origin/main HEAD~<n>`), but not creating it is cheaper.
+
+  The same accidental stacking is what orphans commits in the rule below, so these two are one
+  habit: **branch from `origin/main`, verify against `origin/main`.**
+
 - **Check the PR state *before* every push**, never after:
 
   ```bash
