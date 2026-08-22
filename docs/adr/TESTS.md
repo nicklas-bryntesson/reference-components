@@ -164,6 +164,22 @@ documented reach-in variable distinct from a token.
 
 ---
 
+## 14 · Is this name identity or decoration?
+
+**If a test, a `querySelector`, or another component needs to *find* it, it is identity → `data-part`.
+If only a stylesheet needs it, it is decoration → a class, and the consuming project may delete it**
+(ADR-0026).
+
+A lowercase element class cannot be both, because the two jobs have opposite lifetimes: identity must
+survive a restyle, decoration is meant not to. Keeping them in one string is what makes ADR-0019's
+swap map nearly-true instead of true.
+
+> **Worked:** `.popup` is identity — 118 occurrences in the suite depend on finding it — so it becomes
+> `[data-part="popup"]`. The rounded corner on it is decoration and stays in a class the consumer may
+> throw away. Part identity was already an attribute in 31 selectors (`data-panel`, `data-picker`,
+> `data-segment`) before this decision; ADR-0019's own worked example mixes both mechanisms in a
+> single rule.
+
 ## Conventions you do not need to re-decide
 
 Not tests — settled rules, listed so they are not re-litigated:
@@ -173,7 +189,7 @@ Not tests — settled rules, listed so they are not re-litigated:
 | `data-*` attributes are the component's public API | ADR-0002 |
 | Bounded CSS: gate selectors over the mobile-first cascade | ADR-0003 |
 | Boolean state carries the explicit literal `"true"` | `philosophy.md` |
-| Class naming: PascalCase = component, lowercase-kebab = element | ADR-0019 |
+| Class naming: PascalCase = component; part identity is `data-part` | ADR-0019, ADR-0026 |
 | Demos default to English | ADR-0011 |
 | Custom controls fall back to native on coarse pointers | ADR-0006 |
 | Popover light-dismiss never refocuses the trigger | ADR-0007 |
