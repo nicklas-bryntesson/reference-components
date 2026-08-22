@@ -428,3 +428,37 @@ test('Shift+Tab returns into the segment that was being edited', async ({ page }
 
   await expect(page.locator(`${TARGET} .segment[data-segment="${editing}"]`)).toBeFocused()
 })
+
+// ── A region-qualified locale must reach Intl ─────────────────────────────────
+// The collapsed translation key (de-DE → en, because there is no `de` bundle) was
+// being handed to Intl as well, so every name Intl produces came out English
+// under any locale whose region matters. Invisible in the kitchensink, which only
+// demos en-GB and sv-SE — the two locales where the collapse happens to preserve
+// the language. Expectations are computed from ICU in-page rather than hardcoded,
+// so this asserts the wiring and not a snapshot of one ICU version.
+async function serveAs(page, locale) {
+  await page.route('**/*', async (route) => {
+    const r = await route.fetch()
+    if (!(r.headers()['content-type'] ?? '').includes('text/html')) {
+      return route.fulfill({ response: r })
+    }
+    const body = (await r.text()).replace(/data-locale="[^"]*"/g, `data-locale="${locale}"`)
+    await route.fulfill({ response: r, body })
+  })
+  await page.goto(targetPath())
+}
+
+test('de-DE renders German weekday names, not English ones', async ({ page }) => {
+  await serveAs(page, 'de-DE')
+  await page.locator(`${TARGET} .trigger`).first().click()
+
+  const expected = await page.evaluate(() =>
+    [...Array(7)].map((_, i) =>
+      new Intl.DateTimeFormat('de-DE', { weekday: 'short' }).format(new Date(2026, 5, 1 + i))))
+
+  const heads = await page.locator(`${TARGET} thead th`).evaluateAll((els) =>
+    els.map((e) => e.textContent.trim()).filter(Boolean))
+
+  // A week-number column may lead the row; compare the trailing seven.
+  expect(heads.slice(-7)).toEqual(expected)
+})
