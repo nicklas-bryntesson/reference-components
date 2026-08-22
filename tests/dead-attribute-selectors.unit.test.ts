@@ -72,7 +72,69 @@ function attributesWritten(source: string): Set<string> {
   }
   // setAttribute('data-x'), a generator's { 'data-x': … }, markup's data-x=
   for (const m of source.matchAll(/['"`](data-[a-z0-9-]+)['"`]/g)) out.add(m[1])
-  for (const m of source.matchAll(/(data-[a-z0-9-]+)\s*=/g)) out.add(m[1])
+  for (const m of source.matchAll(/(?<!\[)(data-[a-z0-9-]+)\s*=/g)) out.add(m[1])
+  return out
+}
+
+/** Literal values a source assigns to each attribute, plus which ones it writes dynamically. */
+function valuesWritten(source: string): { literal: Map<string, Set<string>>; dynamic: Set<string> } {
+  const literal = new Map<string, Set<string>>()
+  const dynamic = new Set<string>()
+  const add = (attr: string, value: string): void => {
+    if (!literal.has(attr)) literal.set(attr, new Set())
+    literal.get(attr)!.add(value)
+  }
+  // markup: data-x="v" — skip anything with a template hole, that is dynamic.
+  //
+  // The lookbehind is load-bearing. A querySelector string `'[data-picker="month"]'`
+  // is indistinguishable from markup to a flat regex, so without it a typo in a JS
+  // selector registers itself as a written value and the check can never fail on
+  // it — which is exactly how the first version of this test passed against a
+  // planted typo. Markup is preceded by whitespace; a selector by `[`.
+  for (const m of source.matchAll(/(?<!\[)(data-[a-z0-9-]+)\s*=\s*["']([^"'{}$]*)["']/g)) {
+    add(m[1], m[2])
+  }
+  // a generator's attribute map: 'data-x': 'v'
+  for (const m of source.matchAll(/['"](data-[a-z0-9-]+)['"]\s*:\s*['"]([^'"]*)['"]/g)) add(m[1], m[2])
+  for (const m of source.matchAll(/setAttribute\(\s*['"](data-[a-z0-9-]+)['"]\s*,\s*([^)]*)\)/g)) {
+    const v = m[2].trim()
+    if (/^['"][^'"]*['"]$/.test(v)) add(m[1], v.slice(1, -1))
+    else dynamic.add(m[1])
+  }
+  // `=(?!=)` matters: `dataset.panel === active` is a comparison, and reading it
+  // as an assignment marked the attribute dynamic, which silently switched this
+  // whole check off for it. That is how the first version of this test passed
+  // against a deliberately planted typo.
+  for (const m of source.matchAll(/dataset\.([A-Za-z0-9]+)\s*=(?!=)\s*([^\n;]*)/g)) {
+    const attr = 'data-' + m[1].replace(/[A-Z]/g, (c) => '-' + c.toLowerCase())
+    const v = m[2].trim()
+    if (/^['"][^'"]*['"]$/.test(v)) add(attr, v.slice(1, -1))
+    else dynamic.add(attr)
+  }
+  // any template or binding form makes the value unknowable from here
+  for (const m of source.matchAll(/(data-[a-z0-9-]+)\s*=\s*["']?\{?\$?\{/g)) dynamic.add(m[1])
+
+  // A contract table row documents the permitted set:
+  //   | `data-reference-layer` | `under` · `over` · `outside` | … |
+  for (const line of source.split('\n')) {
+    const decl = line.match(/`(data-[a-z0-9-]+)`/)
+    if (!decl || !line.trimStart().startsWith('|')) continue
+    for (const v of line.matchAll(/`([a-z0-9-]+)`/g)) {
+      if (v[1] !== decl[1].slice(5) && !v[1].startsWith('data-')) add(decl[1], v[1])
+    }
+  }
+  return { literal, dynamic }
+}
+
+/** Attribute values a stylesheet or a querySelector literal selects on. */
+function valuesRead(sources: string[]): Map<string, Set<string>> {
+  const out = new Map<string, Set<string>>()
+  for (const src of sources) {
+    for (const m of src.matchAll(/\[(data-[a-z0-9-]+)\s*=\s*["']([^"']+)["']\]/g)) {
+      if (!out.has(m[1])) out.set(m[1], new Set())
+      out.get(m[1])!.add(m[2])
+    }
+  }
   return out
 }
 
@@ -106,6 +168,51 @@ describe('no component styles an attribute nobody writes', () => {
         composers.length ? `Searched ${name} and its composers: ${composers.join(', ')}.` : `Searched ${name}.`,
         'Either the component should set it, a composing component should, or the',
         'contract should document it as the consumer\'s to author.',
+      ].join('\n')).toEqual([])
+    })
+  }
+})
+
+/**
+ * The same question one level down: not just "does anything write this
+ * attribute", but "does anything write THIS VALUE". A selector keyed on a value
+ * nothing produces is dead in exactly the same way, and it is the failure mode a
+ * move to `data-part` would introduce at scale — `[data-part="poppup"]` is a
+ * silent no-op that a grep for `popup` will never find, where a misspelt `.popup`
+ * at least stands out as a class that exists nowhere else.
+ *
+ * An attribute written dynamically (`setAttribute('data-x', String(flag))`) has no
+ * knowable value set, so it is skipped rather than guessed at. A contract table
+ * row counts as a declaration: the permitted values of a consumer-authored
+ * attribute live in the `.md`, not in our markup, and `data-reference-layer="over"`
+ * is deliberately documented without appearing in any demo.
+ */
+describe('no component selects on an attribute value nobody produces', () => {
+  for (const name of componentNames()) {
+    const css = read(join(DIR, name, `${name}.css`))
+    if (!css) continue
+
+    it(`${name}`, () => {
+      const js = ['ts', 'js'].map((e) => read(join(DIR, name, `${name}.${e}`))).join('\n')
+      const reads = valuesRead([css.replace(/\/\*[\s\S]*?\*\//g, ''), js])
+
+      const composers = componentNames().filter(
+        (other) => other !== name && sourcesOf(other).includes(`data-component="${name}"`),
+      )
+      const { literal, dynamic } = valuesWritten([name, ...composers].map(sourcesOf).join('\n'))
+
+      const dead: string[] = []
+      for (const [attr, values] of reads) {
+        if (dynamic.has(attr) || NOT_A_COMPONENT_CONCERN.test(attr)) continue
+        for (const value of values) {
+          if (!literal.get(attr)?.has(value)) dead.push(`[${attr}="${value}"]`)
+        }
+      }
+
+      expect(dead, [
+        `${name} selects on ${dead.length} attribute value(s) that nothing produces:`,
+        ...dead.map((d) => `  ${d}`),
+        'Either write the value, or document it in the contract as the consumer\'s.',
       ].join('\n')).toEqual([])
     })
   }

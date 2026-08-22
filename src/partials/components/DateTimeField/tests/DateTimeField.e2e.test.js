@@ -1,7 +1,7 @@
 // src/partials/components/DateTimeField/tests/DateTimeField.e2e.test.js
 import { test, expect } from '@playwright/test'
 import { checkA11y, injectAxe } from 'axe-playwright'
-import { targetPath, targetId } from '../../../../e2e-helpers/target.js'
+import { targetPath, targetId, expectEveryPopupButtonReachable } from '../../../../e2e-helpers/target.js'
 
 // Scope to the live-demo instance; the kitchensink renders many DateTimeFields,
 // only this one carries data-id="meeting-time". Override via TARGET_ID when
@@ -458,4 +458,43 @@ test('a day outside the allowed range is marked disabled and rendered muted', as
   expect(colours.disabledCount).toBeGreaterThan(0)
   expect(colours.enabledCount).toBeGreaterThan(0)
   expect(colours.offColour).not.toBe(colours.onColour)
+})
+
+// ── Tab-stop membership ───────────────────────────────────────────────────────
+// Containment and membership are different properties. The trap tests above prove
+// focus cannot escape the popup; this proves the cycle actually includes every
+// control in it. A dropped tab stop leaves the first property intact and makes a
+// control keyboard-unreachable — WCAG 2.1.1, and invisible to axe.
+test('every standalone control in the popup is reachable by Tab', async ({ page }) => {
+  await page.locator(`${ROOT} .trigger`).first().click()
+  await expect(page.locator(`${ROOT} [role="dialog"]`)).toBeVisible()
+
+  await expectEveryPopupButtonReachable(page, expect, ROOT)
+})
+
+test('the same holds for controls that only become actionable with a value', async ({ page }) => {
+  // Clear is disabled while the field is empty, so the check above cannot see it —
+  // and `.footer-clear` / `.calendar-footer-clear` were among the tab-stop lookups
+  // that survived mutation. Populate through the UI, then check the fuller set.
+  await page.locator(`${ROOT} .trigger`).first().click()
+  await page.locator(`${ROOT} .calendar-footer-today`).click()
+  if (!(await page.locator(`${ROOT} [role="dialog"]`).isVisible())) {
+    await page.locator(`${ROOT} .trigger`).first().click()
+  }
+  await expect(page.locator(`${ROOT} [role="dialog"]`)).toBeVisible()
+
+  await expectEveryPopupButtonReachable(page, expect, ROOT)
+})
+
+test('Clear is disabled while there is nothing to clear', async ({ page }) => {
+  // The lookup that maintains this was another mutation survivor: break it and
+  // Clear stays enabled on an empty field, offering an action that does nothing.
+  await page.locator(`${ROOT} .trigger`).first().click()
+  await expect(page.locator(`${ROOT} .calendar-footer-clear`)).toBeDisabled()
+
+  await page.locator(`${ROOT} .calendar-footer-today`).click()
+  if (!(await page.locator(`${ROOT} [role="dialog"]`).isVisible())) {
+    await page.locator(`${ROOT} .trigger`).first().click()
+  }
+  await expect(page.locator(`${ROOT} .calendar-footer-clear`)).toBeEnabled()
 })

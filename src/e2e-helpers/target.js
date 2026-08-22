@@ -75,3 +75,64 @@ export async function scopedCheckA11y(page, scope, options = {}) {
   await waitForStable(page, scope)
   return checkA11y(page, scope, options)
 }
+
+/**
+ * Assert every standalone control in an open popup is reachable by Tab.
+ *
+ * The suite already checked that focus stays *inside* an `aria-modal` popup. It
+ * never checked *what* was in the cycle, and those are different properties: a
+ * component that silently drops a tab stop still contains focus perfectly. So a
+ * control could become keyboard-unreachable — the WCAG 2.1.1 failure mode — with
+ * the trap tests all green.
+ *
+ * That gap is measurable. Breaking one class selector at a time in a component's
+ * JS, 10 of 44 mutants survived the whole suite, and the tab-stop lookups in
+ * `_calendarTabStops` / `_popupTabStops` were the largest cluster: DateField's
+ * `.month-year-trigger`, `.calendar-footer-clear` and `.calendar-footer-today`
+ * all survived while `.grid`, `.prev-month` and `.next-month` — in the very same
+ * function — were caught.
+ *
+ * "Standalone" excludes composite widgets. A calendar grid and a wheel column are
+ * deliberately ONE tab stop with roving tabindex inside, so their 42 day buttons
+ * must not each be tabbable. Composite membership is judged strictly inside the
+ * popup, because `closest('table')` otherwise walks out of the component
+ * entirely and matches the kitchensink's own layout table — which silently
+ * classified every footer button as composite and made this check pass while
+ * measuring nothing.
+ */
+export async function expectEveryPopupButtonReachable(page, expect, root) {
+  const collect = (sel) => {
+    const el = document.querySelector(sel)
+    const popup = el?.querySelector('[role="dialog"]')
+    if (!popup) return { error: `no [role="dialog"] inside ${sel}` }
+    const standalone = [...popup.querySelectorAll('button')].filter((btn) => {
+      if (btn.disabled) return false
+      const composite = btn.closest('table, [role="grid"], [role="listbox"]')
+      if (composite && popup.contains(composite)) return false
+      const box = btn.getBoundingClientRect()
+      return box.width > 0 && box.height > 0
+    })
+    standalone.forEach((btn, i) => btn.setAttribute('data-tabprobe', String(i)))
+    return { labels: standalone.map((b) => b.className.split(' ')[0] || b.tagName) }
+  }
+
+  const found = await page.evaluate(collect, root)
+  if (found.error) throw new Error(`expectEveryPopupButtonReachable: ${found.error}`)
+  // A popup with no standalone control would make this pass while asserting
+  // nothing — the failure mode scopedCheckA11y had.
+  expect(found.labels.length, `${root}: no standalone popup control to check`).toBeGreaterThan(0)
+
+  const reached = new Set()
+  for (let i = 0; i < found.labels.length * 3 + 5; i++) {
+    const hit = await page.evaluate(() => document.activeElement?.getAttribute?.('data-tabprobe'))
+    if (hit != null) reached.add(hit)
+    await page.keyboard.press('Tab')
+  }
+
+  const unreachable = found.labels.filter((_, i) => !reached.has(String(i)))
+  expect(
+    unreachable,
+    `${root}: ${unreachable.length} popup control(s) cannot be reached by Tab — ` +
+      `focus is contained but the cycle does not include them: ${unreachable.join(', ')}`,
+  ).toEqual([])
+}
