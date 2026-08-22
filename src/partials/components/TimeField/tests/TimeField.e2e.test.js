@@ -330,9 +330,10 @@ test('Tab past the last footer button keeps focus inside the popup', async ({ pa
   // back into the popup, not escape to the page behind the aria-modal dialog.
   await page.locator(`${TF} .footer-now`).focus()
   await page.keyboard.press('Tab')
-  const inside = await page.evaluate(() =>
-    document.querySelector('.popup')?.contains(document.activeElement) ?? false,
-  )
+  const inside = await page.evaluate((rootSel) => {
+    const popup = document.querySelector(`${rootSel} .popup`)
+    return popup?.contains(document.activeElement) ?? false
+  }, TF)
   expect(inside).toBe(true)
 })
 
@@ -343,21 +344,22 @@ test('Shift+Tab from the first wheel keeps focus inside the popup (wraps, does n
   await page.keyboard.press('Shift+Tab')
   // Popup stays open and focus is still within it (wraps to the last footer button).
   await expect(page.locator(`${TF} .popup`)).toBeVisible()
-  const inside = await page.evaluate(() =>
-    document.querySelector('.popup')?.contains(document.activeElement) ?? false,
-  )
+  const inside = await page.evaluate((rootSel) => {
+    const popup = document.querySelector(`${rootSel} .popup`)
+    return popup?.contains(document.activeElement) ?? false
+  }, TF)
   expect(inside).toBe(true)
 })
 
 test('wheel event on the popup surface (off a column) is defaultPrevented', async ({ page }) => {
   await page.locator(`${TF} .trigger`).click()
   await expect(page.locator(`${TF} .popup`)).toBeVisible()
-  const prevented = await page.evaluate(() => {
-    const popup = document.querySelector('.popup')
+  const prevented = await page.evaluate((rootSel) => {
+    const popup = document.querySelector(`${rootSel} .popup`)
     const ev = new WheelEvent('wheel', { deltaY: 120, bubbles: true, cancelable: true })
     popup.dispatchEvent(ev)
     return ev.defaultPrevented
-  })
+  }, TF)
   expect(prevented).toBe(true)
 })
 

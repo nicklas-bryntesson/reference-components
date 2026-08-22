@@ -339,9 +339,10 @@ test('Tab past the last footer button keeps focus inside the calendar', async ({
   // back into the calendar, not escape the aria-modal dialog.
   await page.locator(`${TARGET} .popup .calendar-footer-today`).focus()
   await page.keyboard.press('Tab')
-  const inside = await page.evaluate(() =>
-    document.querySelector('.popup')?.contains(document.activeElement) ?? false,
-  )
+  const inside = await page.evaluate((rootSel) => {
+    const popup = document.querySelector(`${rootSel} .popup`)
+    return popup?.contains(document.activeElement) ?? false
+  }, TARGET)
   expect(inside).toBe(true)
 })
 
@@ -351,9 +352,10 @@ test('Shift+Tab from the first tab stop keeps focus inside the calendar', async 
   await page.locator(`${TARGET} .popup .prev-month`).focus()
   await page.keyboard.press('Shift+Tab')
   await expect(page.locator(`${TARGET} .popup`)).toBeVisible()
-  const inside = await page.evaluate(() =>
-    document.querySelector('.popup')?.contains(document.activeElement) ?? false,
-  )
+  const inside = await page.evaluate((rootSel) => {
+    const popup = document.querySelector(`${rootSel} .popup`)
+    return popup?.contains(document.activeElement) ?? false
+  }, TARGET)
   expect(inside).toBe(true)
 })
 
@@ -384,12 +386,12 @@ test('Escape closes the calendar and returns focus to the trigger', async ({ pag
 test('wheel event on the calendar surface (off a wheel) is defaultPrevented', async ({ page }) => {
   await page.locator('[data-id="birthdate"] .trigger').click()
   await expect(page.locator(`${TARGET} .popup`)).toBeVisible()
-  const prevented = await page.evaluate(() => {
-    const popup = document.querySelector('.popup')
+  const prevented = await page.evaluate((rootSel) => {
+    const popup = document.querySelector(`${rootSel} .popup`)
     const ev = new WheelEvent('wheel', { deltaY: 120, bubbles: true, cancelable: true })
     popup.dispatchEvent(ev)
     return ev.defaultPrevented
-  })
+  }, TARGET)
   expect(prevented).toBe(true)
 })
 

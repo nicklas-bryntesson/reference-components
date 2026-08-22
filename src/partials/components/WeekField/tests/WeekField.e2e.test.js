@@ -247,9 +247,10 @@ test('Tab past the last footer button keeps focus inside the popup', async ({ pa
   // "This week" is the last enabled tab stop (Clear is disabled while empty).
   await page.locator(`${WF} .calendar-footer-now`).focus()
   await page.keyboard.press('Tab')
-  const inside = await page.evaluate(() =>
-    document.querySelector('.popup')?.contains(document.activeElement) ?? false,
-  )
+  const inside = await page.evaluate((rootSel) => {
+    const popup = document.querySelector(`${rootSel} .popup`)
+    return popup?.contains(document.activeElement) ?? false
+  }, WF)
   expect(inside).toBe(true)
 })
 
@@ -259,21 +260,22 @@ test('Shift+Tab from the first tab stop keeps focus inside the popup (wraps)', a
   await page.locator(`${WF} .popup .prev-month`).focus()
   await page.keyboard.press('Shift+Tab')
   await expect(page.locator(`${WF} .popup`)).toBeVisible()
-  const inside = await page.evaluate(() =>
-    document.querySelector('.popup')?.contains(document.activeElement) ?? false,
-  )
+  const inside = await page.evaluate((rootSel) => {
+    const popup = document.querySelector(`${rootSel} .popup`)
+    return popup?.contains(document.activeElement) ?? false
+  }, WF)
   expect(inside).toBe(true)
 })
 
 test('wheel event on the popup surface is defaultPrevented', async ({ page }) => {
   await page.locator(`${WF} .trigger`).click()
   await expect(page.locator(`${WF} .popup`)).toBeVisible()
-  const prevented = await page.evaluate(() => {
-    const popup = document.querySelector('.popup')
+  const prevented = await page.evaluate((rootSel) => {
+    const popup = document.querySelector(`${rootSel} .popup`)
     const ev = new WheelEvent('wheel', { deltaY: 120, bubbles: true, cancelable: true })
     popup.dispatchEvent(ev)
     return ev.defaultPrevented
-  })
+  }, WF)
   expect(prevented).toBe(true)
 })
 

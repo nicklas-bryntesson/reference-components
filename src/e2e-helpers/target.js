@@ -60,6 +60,18 @@ export async function waitForStable(page, scope) {
 }
 
 export async function scopedCheckA11y(page, scope, options = {}) {
+  // A scope that matches nothing makes axe audit nothing and report success, so
+  // the check passes hardest exactly when the component is absent. Two of
+  // ToggleTip's tests were measured passing with the component not on the page at
+  // all, and the undocumented per-component section ids (#Picklist, #Notice,
+  // #ChoiceField) stayed invisible for the same reason: nothing fails when the
+  // selector is wrong. Assert the scope exists before auditing it.
+  const count = await page.locator(scope).count()
+  if (count === 0) {
+    throw new Error(
+      `scopedCheckA11y: no element matches ${scope} — axe would have audited nothing and passed.`,
+    )
+  }
   await waitForStable(page, scope)
   return checkA11y(page, scope, options)
 }
