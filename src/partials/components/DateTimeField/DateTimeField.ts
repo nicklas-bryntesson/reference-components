@@ -875,6 +875,7 @@ export class DateTimeField {
 
     // Day grid
     const tbody = document.createElement('tbody')
+    const today = new Date()
     const firstDay = getFirstWeekdayOfMonth(this.currentYear, this.currentMonth)
     const daysInMonth = getDaysInMonth(this.currentYear, this.currentMonth)
     const prevMonth = this.currentMonth === 0 ? 11 : this.currentMonth - 1
@@ -905,8 +906,16 @@ export class DateTimeField {
       btn.type = 'button'
       btn.dataset.date = formatISO(date)
 
+      // Both of these are read by this component's own stylesheet
+      // (`td[data-today="true"] button`, `td[data-disabled="true"] button`) and
+      // neither was ever set, so today was not bold and an out-of-range day
+      // looked ordinary. The aria half was already correct, which is why only the
+      // sighted rendering was wrong. DateField and WeekField both set them.
+      if (date.toDateString() === today.toDateString()) td.dataset.today = 'true'
+
       const disabled = isDayDisabled(date, this.min, this.max)
       if (disabled) {
+        td.dataset.disabled = 'true'
         td.setAttribute('aria-disabled', 'true')
         btn.setAttribute('tabindex', '-1')
       } else {

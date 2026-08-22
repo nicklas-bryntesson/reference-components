@@ -398,3 +398,64 @@ test('de-DE renders German weekday names, not English ones', async ({ page }) =>
   // A week-number column may lead the row; compare the trailing seven.
   expect(heads.slice(-7)).toEqual(expected)
 })
+
+// ── Calendar cell state must reach the stylesheet ─────────────────────────────
+// `_renderMonth()` styled `td[data-today="true"]` and `td[data-disabled="true"]`
+// without ever setting either, so today was not bold and an out-of-range day
+// looked ordinary — while DateField and WeekField, on the same markup shape, set
+// both. The aria half was already correct, which is why no accessibility test
+// could see it. The static dead-selector check catches the `data-today` half but
+// cannot see element context, so the rendering is asserted here.
+
+test('today is marked in the calendar and rendered differently', async ({ page }) => {
+  await page.locator(`${ROOT} .trigger`).click()
+
+  const today = page.locator(`${ROOT} .calendar-grid td[data-today="true"] button`)
+  await expect(today).toHaveCount(1)
+
+  const weights = await page.evaluate((root) => {
+    const el = document.querySelector(root)
+    const t = el.querySelector('td[data-today="true"] button')
+    const other = [...el.querySelectorAll('td button')].find(
+      (b) => b !== t && b.textContent.trim() && !b.closest('td[data-outside-month]'))
+    return { today: getComputedStyle(t).fontWeight, other: getComputedStyle(other).fontWeight }
+  }, ROOT)
+
+  expect(weights.today).not.toBe(weights.other)
+})
+
+test('a day outside the allowed range is marked disabled and rendered muted', async ({ page }) => {
+  // No kitchensink instance authors a range, so inject one. The 15th always has
+  // days both before and after it inside the same month.
+  const now = new Date()
+  const min = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-15T00:00`
+  await page.route('**/*', async (route) => {
+    const r = await route.fetch()
+    if (!(r.headers()['content-type'] ?? '').includes('text/html')) {
+      return route.fulfill({ response: r })
+    }
+    const body = (await r.text()).replace(
+      /data-component="DateTimeField"/g, `data-component="DateTimeField" data-min="${min}"`)
+    await route.fulfill({ response: r, body })
+  })
+  await page.goto(targetPath())
+  await page.locator(`${ROOT} .trigger`).click()
+
+  const colours = await page.evaluate((root) => {
+    const el = document.querySelector(root)
+    const cells = [...el.querySelectorAll('.calendar-grid td[data-date], .calendar-grid td')]
+      .filter((td) => td.querySelector('button[data-date]'))
+    const off = cells.find((td) => td.dataset.disabled === 'true')
+    const on = cells.find((td) => td.dataset.disabled !== 'true')
+    return {
+      disabledCount: cells.filter((td) => td.dataset.disabled === 'true').length,
+      enabledCount: cells.filter((td) => td.dataset.disabled !== 'true').length,
+      offColour: off ? getComputedStyle(off.querySelector('button')).color : null,
+      onColour: on ? getComputedStyle(on.querySelector('button')).color : null,
+    }
+  }, ROOT)
+
+  expect(colours.disabledCount).toBeGreaterThan(0)
+  expect(colours.enabledCount).toBeGreaterThan(0)
+  expect(colours.offColour).not.toBe(colours.onColour)
+})

@@ -216,6 +216,25 @@ Boolean state always carries the explicit literal value `"true"` — never a bar
 <div class="DateField" data-component="DateField" data-disabled="true">
 ```
 
+#### If CSS selects on it, something has to write it
+
+A rule keyed on an attribute nobody sets is dead, and it fails in the worst
+available way: the feature looks implemented, the suite stays green, and only the
+rendering is wrong. DateTimeField styled `td[data-today="true"]` and
+`td[data-disabled="true"]` and set neither, so today was not bold and a day
+outside the range looked ordinary — while DateField and WeekField, on the same
+markup shape, set both. Its `aria-disabled` was correct throughout, so no
+accessibility test could see it either.
+
+`tests/dead-attribute-selectors.unit.test.ts` now checks the whole set: every
+`data-*` a stylesheet selects on must be written by the component, by a component
+that composes it, or documented in the contract as the consumer's to author. It is
+static — asking *who writes this* rather than *is it on the page* — because a
+runtime version flags mutually exclusive states (`data-direction="top"` and
+`="bottom"` on one instance) that can never be reachable at once. It reads
+attribute names, not element context, so the `<td>` half of the defect above still
+needs a rendering test; that limit is written into the file.
+
 ### Boolean or enum — decided by the orthogonality test
 
 Before adding a `data-*`, ask whether each axis is meaningful **on its own**:
