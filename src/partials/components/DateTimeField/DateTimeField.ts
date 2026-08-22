@@ -611,6 +611,7 @@ export class DateTimeField {
         timeStyle: this._showSeconds() ? 'medium' : 'short',
       })
       this.announce.textContent = `${this.t.announceSelected} ${label}`
+      this._updateClearButton()
     }
     this.selectedDatetime = dt
     this._syncingFromCustom = false
@@ -825,8 +826,23 @@ export class DateTimeField {
     this._renderMonth()
     this._setupTimeWheels()
     this._bindCalendarEvents()
+    this._updateClearButton()
 
     this.calendarEl.querySelector<HTMLElement>('.calendar-grid td:not([data-outside-month]):not([aria-disabled]) button, .calendar-footer-today')?.focus()
+  }
+
+  /**
+   * Keep Clear actionable only when there is something to clear.
+   *
+   * `_calendarTabStops()` already filters on `!clearBtn.disabled`, so the code
+   * expected this to exist — but nothing ever set it, and Clear sat enabled on an
+   * empty field offering an action that does nothing. The other four fields in the
+   * family disable it; this brings the fifth in line.
+   */
+  private _updateClearButton(): void {
+    if (!this.calendarEl) return
+    const clearBtn = this.calendarEl.querySelector<HTMLButtonElement>('.calendar-footer-clear')
+    if (clearBtn) clearBtn.disabled = this.native.value === ''
   }
 
   _closeCalendar(refocusTrigger = true): void {
