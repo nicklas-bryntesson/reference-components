@@ -258,7 +258,17 @@ class WheelColumn {
     this._velocity = 0
     this._externalSet = false
 
-    this.pos -= e.deltaY / 120
+    // Scroll model, not grab model. A wheel is not a finger: every other
+    // scrollable surface on a desktop moves FORWARD through content on
+    // wheel-down, and so does this component's own keyboard — `stepBy(+1)`, bound
+    // to ArrowDown, raises the value. The wheel used to do the opposite, so the
+    // two disagreed inside one control.
+    //
+    // The drag deliberately keeps the grab model (see _onPointerMove): a finger
+    // holds the cylinder and the content follows it, which is what a native touch
+    // picker does. Same physical direction, opposite mapping, because the two
+    // gestures mean different things.
+    this.pos += e.deltaY / 120
     this._clampPos()
     this.render()
 

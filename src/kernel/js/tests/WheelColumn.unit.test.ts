@@ -358,3 +358,69 @@ describe('WheelColumn — the spinbutton cannot lag its own value', () => {
     wheel.destroy()
   })
 })
+
+describe('WheelColumn — gesture direction', () => {
+  // A wheel and a finger are not the same gesture and must not share a mapping.
+  //
+  //   wheel  → SCROLL model: wheel-down moves forward through the values, like
+  //            every other scrollable surface, and like this component's own
+  //            ArrowDown (`stepBy(+1)`).
+  //   drag   → GRAB model: the finger holds the cylinder and the content follows
+  //            it, so dragging down brings EARLIER values into view — what a
+  //            native touch picker does.
+  //
+  // These used to share the grab model, which meant the wheel and the keyboard
+  // disagreed inside one control. The first assertion is the invariant rather
+  // than a hardcoded direction, because agreement is the property that broke.
+  function wheel(el: HTMLElement, deltaY: number): void {
+    el.dispatchEvent(new WheelEvent('wheel', { deltaY, bubbles: true, cancelable: true }))
+  }
+  function drag(el: HTMLElement, fromY: number, toY: number): void {
+    ;(el as unknown as { setPointerCapture: () => void }).setPointerCapture = () => {}
+    ;(el as unknown as { releasePointerCapture: () => void }).releasePointerCapture = () => {}
+    el.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true, clientY: fromY }))
+    el.dispatchEvent(new MouseEvent('pointermove', { bubbles: true, clientY: toY }))
+    el.dispatchEvent(new MouseEvent('pointerup', { bubbles: true, clientY: toY }))
+  }
+
+  it('wheel-down moves the same way as ArrowDown', () => {
+    const a = makeWheel({ min: 0, max: 11, value: 0 })
+    const b = makeWheel({ min: 0, max: 11, value: 0 })
+
+    const beforeWheel = a.wheel.pos
+    wheel(a.el, 120)
+    const wheelDelta = Math.sign(a.wheel.pos - beforeWheel)
+
+    const beforeStep = b.wheel.pos
+    b.wheel.stepBy(1) // what ArrowDown is bound to
+    const stepDelta = Math.sign(b.wheel.pos - beforeStep)
+
+    expect(wheelDelta).not.toBe(0)
+    expect(wheelDelta, 'the wheel and the keyboard must agree').toBe(stepDelta)
+
+    a.wheel.destroy()
+    b.wheel.destroy()
+  })
+
+  it('wheel-down advances and wheel-up retreats', () => {
+    const { el, wheel: w } = makeWheel({ min: 0, max: 11, value: 5 })
+    const start = w.pos
+    wheel(el, 120)
+    expect(w.pos).toBeGreaterThan(start)
+
+    const mid = w.pos
+    wheel(el, -120)
+    expect(w.pos).toBeLessThan(mid)
+    w.destroy()
+  })
+
+  it('dragging keeps the grab model — down brings earlier values', () => {
+    // Deliberately the opposite mapping to the wheel: the content follows the
+    // finger, which is what a native touch picker does.
+    const { el, wheel: w } = makeWheel({ min: 0, max: 11, value: 5 })
+    const start = w.pos
+    drag(el, 100, 160) // downward
+    expect(w.pos).toBeLessThan(start)
+    w.destroy()
+  })
+})

@@ -57,6 +57,12 @@ destroy(): void                                        // aborts listeners, canc
   release under reduced motion skips only momentum — the snap easing still animates.
 - **External vs user change.** `setValue` sets an internal `_externalSet` flag so syncing the wheel
   from the field does **not** re-fire `onChange` (no feedback loop). User gestures and `stepBy` do fire it.
+- **Wheel and drag map the same physical direction to opposite results, on purpose.** The wheel uses
+  the **scroll** model: wheel-down moves forward through the values, matching every other scrollable
+  surface and matching `stepBy(+1)` (what ArrowDown is bound to). The drag uses the **grab** model:
+  the finger holds the cylinder and the content follows it, so dragging down brings *earlier* values
+  into view — what a native touch picker does. Porting one mapping to both gestures makes the wheel
+  disagree with the component's own keyboard, which is how this was found.
 - **Cross-column wheel lock.** When several wheels sit side by side, a module-level lock + min-delta
   gate prevents trackpad inertia from one column bleeding into its neighbour.
 
