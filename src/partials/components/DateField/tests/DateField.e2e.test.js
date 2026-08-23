@@ -503,3 +503,25 @@ test('Clear is disabled while there is nothing to clear', async ({ page }) => {
   }
   await expect(page.locator(`${TARGET} .calendar-footer-clear`)).toBeEnabled()
 })
+
+// ── Opening with a mouse must place focus inside ───────────────────────────────
+// The Escape handler lives inside the popup, so a popup opened with focus left on
+// the trigger cannot be dismissed by keyboard at all — Escape reaches nothing. A
+// keyboard user never saw it, because Tab carried them inside before they pressed
+// anything. Two of the five fields shipped this way.
+test('a mouse-opened popup takes focus, so Escape can close it', async ({ page }) => {
+  await page.locator(`${TARGET} .trigger`).first().click()
+  const dialog = page.locator(`${TARGET} [role="dialog"]`)
+  await expect(dialog).toBeVisible()
+
+  // aria-modal claims the rest of the page is inert; focus has to be here to match.
+  await expect(dialog).toHaveAttribute('aria-modal', 'true')
+  const inside = await page.evaluate((sel) => {
+    const dlg = document.querySelector(`${sel} [role="dialog"]`)
+    return Boolean(dlg && dlg.contains(document.activeElement))
+  }, TARGET)
+  expect(inside, 'focus is still outside the popup after opening').toBe(true)
+
+  await page.keyboard.press('Escape')
+  await expect(dialog).toBeHidden()
+})

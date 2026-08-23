@@ -752,6 +752,14 @@ class MonthField {
     setTimeout(() => {
       document.addEventListener('click', this._outsideClickHandler!)
     }, 0)
+    // An aria-modal dialog opened with a mouse has to take focus. The Escape
+    // handler lives inside the popup, so with focus left on the trigger the key
+    // never reaches it and Escape does nothing at all — a keyboard user was fine
+    // only because Tab happened to carry them inside. Focus the first tab stop,
+    // reusing the order the trap already computes so the entry point and the
+    // cycle can never disagree. DateField, DateTimeField and WeekField all
+    // already do this; these two were the outliers.
+    this._popupTabStops()[0]?.focus()
   }
 
   // Ordered tab stops for the focus trap: wheel columns in DOM order, then the

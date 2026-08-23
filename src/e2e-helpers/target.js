@@ -18,7 +18,7 @@ export function targetPath() {
 
 const DEFAULT_TARGET = {
   DateField: '[data-id="birthdate"]',
-  DateTimeField: '[data-component="DateTimeField"][data-id="meeting-time"]',
+  DateTimeField: '[data-component="DateTimeField"][data-id="meeting-datetime"]',
   TimeField: '[data-component="TimeField"][data-id="meeting-time"]',
   MonthField: '[data-component="MonthField"][data-id="meeting-month"]',
   WeekField: '[data-component="WeekField"][data-id="meeting-week"]',

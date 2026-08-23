@@ -37,7 +37,7 @@ State attributes set by JS: `data-initialized="true"`, `data-open="true"`, `data
 | `Backspace` | Clear segment, move left |
 | `A` / `P` | Set AM / PM (ampm segment only) |
 | `Tab` (popup) | Cyclic focus trap: wheels → footer buttons (Clear, Now) |
-| `Escape` | Close popup |
+| `Escape` | Close popup. Opening moves focus into the popup — including a mouse-driven open — because the handler is scoped to the popup and could not otherwise receive the key |
 
 ## Popup footer
 
