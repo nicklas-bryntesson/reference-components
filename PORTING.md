@@ -23,6 +23,58 @@ Do **not** port:
 - **`*.generate.ts` and `states/`** — repo-internal tooling that regenerates the kitchensink's `.hbs` state partials. You author your demo states directly in your own stack.
 - **`*.unit.test.*`** — these are white-box tests of the *reference implementation* (they call private methods and import the TS class directly). They are **not** the portable contract and carry a TS-adaptation tax for no benefit. The portable contract is the **conformance suite** — the e2e + axe tests, which assert observable behaviour and ARIA structure against your own DOM.
 
+## Which component first, and how to not end up in three half-ports
+
+The order above is *layers* — kernel before component. This is the other axis: **which**
+component, and **how many at once**. Get this wrong and the failure mode is specific and
+unpleasant: three components half-ported, none of them green, and no budget left to finish any of
+them. A half-port is worth less than nothing, because you cannot tell a wrong port from an
+unfinished one.
+
+Two rules, and the second matters more than the first.
+
+### One at a time, and "done" means green and committed
+
+**Never start a second component while the first one's conformance suite is red.** A component is
+done when its e2e + axe suite passes against your dev server and the work is committed. Not when
+the markup looks right, not when it renders — when the suite is green. That is the only checkpoint
+that survives you walking away, and it is the unit you resume from.
+
+This is the same discipline as *"Restyle to your own convention — after the suite is green, never
+during"* further down: one axis of change at a time, each one finished before the next begins.
+
+### The order, cheapest first
+
+Cost here is lines you have to read and get green — contract, behaviour, stylesheet and the
+conformance suite together. It is a proxy for budget, and the spread is **8×** from top to bottom,
+so treat the bottom rows as multi-session work rather than a long afternoon.
+
+| # | Port | Cost | Kernel it needs | Why here |
+|---|---|---|---|---|
+| 1 | `Notice`, `ChoiceGroup`, `ChoiceField` | 318–371 | none | **Zero JavaScript.** They teach the `--ui-*` token seam and the `data-*` contract with nothing else in the way. If your token wiring is wrong, you find out here for 300 lines instead of 2500. |
+| 2 | `MotionRegion`, `ThemeSwitch` | 494, 824 | `motion-policy`, `theme-preference` | One primitive each, one component each. |
+| 3 | `ToggleTip` | 683 | `popup-position` | The cheapest way to port popover positioning — the same maths five bigger fields need later. |
+| 4 | `RangeField` → `RangeScale` → `RangeGroup` | 748 → 1551 → 841 | none | A family that builds on itself with no kernel at all. Port in that order; each tier composes the previous one. |
+| 5 | `AffixField`, `ScrollArea`, `Picklist`, `FileUpload` | 763–1192 | none | Independent. Take whichever you actually need. |
+| 6 | `MonthField` | 1766 | all six | **The first date field, and deliberately the smallest.** It exercises `WheelColumn`, `Wheel.css`, `popup-position`, `popup-interaction`, `dates` and `locale` — the whole shared surface — for the least code. Do not start here, and do not start with `DateTimeField`. |
+| 7 | `TimeField`, `WeekField`, `DateField` | 1857–2253 | same six | Now much cheaper than the number suggests: the kernel is already ported and verified, so what is left is this component's own logic. |
+| 8 | `DateTimeField` | 2546 | same six | Last. It is the largest, and it composes both a calendar and time wheels — the two hardest things in the library, in one component. |
+
+The date family (6–8) shares **exactly** the same six primitives. That is why one of them costs a
+lot and the next three cost much less: you are paying for the kernel once, in step 6.
+
+### If you run out of budget mid-component
+
+Split at the seam, not in the middle of a file. Every popup field has a natural halfway point:
+
+1. **The closed field** — segments, keyboard entry, the native input, validity. Its tests pass with
+   the popup never opened.
+2. **The popup** — the trigger, the trap, the wheels or the grid, the footer.
+
+Getting (1) green and committed is a real deliverable. You can open the popup next session and the
+suite will tell you exactly what is still missing. Stopping halfway through the *segments* is not a
+deliverable, because nothing verifies it.
+
 ## Appearance (light/dark)
 
 ### How far you need to read

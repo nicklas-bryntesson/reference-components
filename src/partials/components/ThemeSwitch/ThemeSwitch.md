@@ -110,6 +110,12 @@ consumer reads a cookie and renders `<html data-appearance="dark">` server-side 
 Both satisfy the same contract and pass the same e2e assertions. The persistence medium is
 deliberately not specified.
 
+## Kernel dependencies
+
+| Kernel module | Kind | Used for |
+|---|---|---|
+| [`js/theme-preference`](../../../kernel/js/theme-preference.md) | JS | reading and persisting the stored preference, and resolving `system` against the OS |
+
 ## The state machine
 
 The decisions live in the kernel — [`theme-preference`](../../../kernel/js/theme-preference.md) —
