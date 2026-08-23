@@ -41,7 +41,7 @@ The popup **month wheel** shows the localized month **name** ("Juni"); the inlin
 | `Space` / `Enter` (trigger) | Open the popup; focus stays on the trigger — Tab moves into the wheels |
 | `ArrowUp` / `ArrowDown` (wheel) | `WheelColumn.stepBy` — spin the focused wheel |
 | `Tab` (popup) | Cycle month wheel → year wheel → footer buttons |
-| `Escape` | Close the popup; focus returns to the trigger |
+| `Escape` | Close the popup; focus returns to the trigger. Opening moves focus into the popup — including a mouse-driven open — because the handler is scoped to the popup and could not otherwise receive the key |
 
 Light-dismiss (outside click) closes the popup but **never** calls `trigger.focus()` — this avoids scroll-jump and focus-steal (TimeField is the reference for this rule).
 

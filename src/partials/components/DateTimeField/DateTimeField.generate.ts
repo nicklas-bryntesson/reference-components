@@ -80,7 +80,7 @@ const states: { name: string; id: string; attrs: Record<string, string>; locale?
   // Localization showcase (ADR-0011): Swedish — 24h, Y/M/D order, Swedish names
   { name: '_localized-sv', id: 'dtf-sv', attrs: { 'data-value': '2026-05-27T14:35' }, locale: 'sv-SE' },
   // Live demo (e2e test target) — unique id so the e2e can scope to a single instance on /
-  { name: '_live-demo', id: 'meeting-time', attrs: {} },
+  { name: '_live-demo', id: 'meeting-datetime', attrs: {} },
 ]
 
 states.forEach(({ name, id, attrs, locale }) => {

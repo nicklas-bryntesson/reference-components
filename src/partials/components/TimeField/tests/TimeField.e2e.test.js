@@ -3,7 +3,8 @@ import { test, expect } from '@playwright/test'
 import { checkA11y, injectAxe } from 'axe-playwright'
 import { targetPath, targetId, scopedCheckA11y, expectEveryPopupButtonReachable } from '../../../../e2e-helpers/target.js'
 
-// DateTimeField also uses data-id="meeting-time" — scope to this component only.
+// `data-id` is unique per page, so `meeting-time` is this component's alone;
+// DateTimeField's live demo is `meeting-datetime`. Still scoped to the component.
 // Override via TARGET_ID when porting the suite to your own page.
 const TF = targetId('TimeField')
 
@@ -436,4 +437,26 @@ test('Clear is disabled while there is nothing to clear', async ({ page }) => {
     await page.locator(`${TF} .trigger`).first().click()
   }
   await expect(page.locator(`${TF} .footer-clear`)).toBeEnabled()
+})
+
+// ── Opening with a mouse must place focus inside ───────────────────────────────
+// The Escape handler lives inside the popup, so a popup opened with focus left on
+// the trigger cannot be dismissed by keyboard at all — Escape reaches nothing. A
+// keyboard user never saw it, because Tab carried them inside before they pressed
+// anything. Two of the five fields shipped this way.
+test('a mouse-opened popup takes focus, so Escape can close it', async ({ page }) => {
+  await page.locator(`${TF} .trigger`).first().click()
+  const dialog = page.locator(`${TF} [role="dialog"]`)
+  await expect(dialog).toBeVisible()
+
+  // aria-modal claims the rest of the page is inert; focus has to be here to match.
+  await expect(dialog).toHaveAttribute('aria-modal', 'true')
+  const inside = await page.evaluate((sel) => {
+    const dlg = document.querySelector(`${sel} [role="dialog"]`)
+    return Boolean(dlg && dlg.contains(document.activeElement))
+  }, TF)
+  expect(inside, 'focus is still outside the popup after opening').toBe(true)
+
+  await page.keyboard.press('Escape')
+  await expect(dialog).toBeHidden()
 })
