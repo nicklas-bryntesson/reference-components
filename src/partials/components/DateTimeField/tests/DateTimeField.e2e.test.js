@@ -22,8 +22,6 @@ test('passes axe accessibility audit', async ({ page }) => {
     detailedReport: true,
     axeOptions: {
       rules: {
-        'duplicate-id': { enabled: false },
-        'color-contrast': { enabled: false },
       },
     },
   })

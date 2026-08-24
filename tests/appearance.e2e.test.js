@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test'
 import { checkA11y, injectAxe } from 'axe-playwright'
+import { targetPath } from '../src/e2e-helpers/target.js'
 
 // The appearance seam (ADR-0021). This is the first suite in the repo that
 // asserts COMPUTED COLOUR rather than DOM structure, and it exists because a
@@ -74,7 +75,7 @@ const luminance = ([r, g, b]) => {
 const rgbText = ([r, g, b]) => `rgb(${r}, ${g}, ${b})`
 
 test.beforeEach(async ({ page }) => {
-  await page.goto('/')
+  await page.goto(targetPath())
   await freezeTransitions(page)
   await setAppearance(page, null)
 })

@@ -9,6 +9,17 @@ git submodule add <repo-url> reference-components
 git submodule update --init
 ```
 
+A plain `git clone` outside your repo works just as well and leaves no `.gitmodules` entry to
+remember to remove. Either way this is a **reference you read**, not a dependency you build against
+— there is deliberately no package to install, because a dependency whose purpose is to be deleted
+is a contradiction.
+
+**One thing should survive the disconnect: the conformance suite.** Copy it into your project as
+your own test files and adapt the locators to your DOM. If it leaves with the submodule you have
+also removed the only thing that can tell you when a later refactor breaks a behaviour you ported
+— and the suite is the part of this repo with the longest useful life in your codebase, precisely
+because it asserts behaviour rather than appearance.
+
 ## What you port (and what you don't)
 
 Port in this order:
@@ -74,6 +85,32 @@ Split at the seam, not in the middle of a file. Every popup field has a natural 
 Getting (1) green and committed is a real deliverable. You can open the popup next session and the
 suite will tell you exactly what is still missing. Stopping halfway through the *segments* is not a
 deliverable, because nothing verifies it.
+
+## Server-rendered ports: paint attributes ship early, behaviour gates ship late
+
+`data-*` is one namespace, and the contract specifies the DOM **end state** without saying when
+each part of it may appear. A client-rendered port never notices. A server-rendered one has to
+split the namespace in two, and getting either half wrong is silent.
+
+| Kind | Where it belongs | What breaks otherwise |
+|---|---|---|
+| **Paint** — CSS keys off it to decide what is *visible* | **server markup** | a flash of the wrong control |
+| **Behaviour gate** — tests and code read it to mean *"handlers are attached"* | **after hydration** | the suite's readiness gate becomes a no-op |
+
+`data-input-mode` is the first kind: the stylesheet defaults `.overlay { display: none }`, so
+withholding it until hydration shows the raw native input first. `data-initialized` is the second:
+this suite's `beforeEach` waits on it, so emitting it in server markup makes that wait resolve
+instantly and gate nothing — every test then races the handlers.
+
+Measured dead-control windows in a Next.js port, i.e. how long the control looks ready and is not:
+WeekField 90–95 ms, RangeGroup ~100 ms, MonthField 68 ms, ScrollArea 6–11 ms. TimeField had none.
+That window is the thing `data-initialized` exists to make visible; if you paint it early you have
+hidden it rather than closed it.
+
+The reference itself is client-rendered and uses the init gate as a CSS mechanism (`overflow:
+hidden` until `data-initialized="true"`), which is why PORTING tells you to drop those rules — see
+step 2. Dropping the *rules* is not the same as dropping the *attribute*: keep emitting it, after
+hydration.
 
 ## Appearance (light/dark)
 
@@ -343,6 +380,22 @@ them when you port the markup, even though your CSS overrides them.
 > because `stroke-width=` contains the substring. Exclude a preceding hyphen.
 
 ## Restyle to your own convention — after the suite is green, never during
+
+**This is squarely aimed at utility-first ports, because that is where the temptation is strongest.**
+A Tailwind-native port's whole proposition is the end state this section tells you to reach
+*separately*: no component stylesheet, design values as utilities in markup. Collapsing the two
+steps is tempting precisely because the second one looks like wasted work — and it forfeits the one
+thing that makes a failure diagnosable. With both changed at once, a broken port and a botched
+translation look identical, and the suite cannot tell them apart because it asserts behaviour, not
+appearance.
+
+Two phases per component, then:
+
+1. **Verbatim.** Copy `<Name>.css` unchanged, port the behaviour, get the suite green. The only
+   edits sanctioned here are dropping the runtime-only init-gate rules.
+2. **Translate.** Move design values onto the same DOM. Guard it with the cheap net: snapshot
+   `getComputedStyle` for the trigger, the segments, the popup and the footer with the popup
+   **open**, translate, snapshot again, diff.
 
 Copying the `.css` verbatim is the point of the step above, so if your project writes nested CSS, CSS Modules, scoped styles or utility classes, that translation is a **separate step on a verified baseline**. Doing both at once leaves you two variables and nothing to bisect: when the field misbehaves you cannot tell which half broke it.
 

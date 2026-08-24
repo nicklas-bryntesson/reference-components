@@ -20,12 +20,13 @@ test('passes axe accessibility audit on empty state', async ({ page }) => {
     detailedReport: true,
     axeOptions: {
       rules: {
-        // Multiple kitchensink instances share hard-coded IDs by design
-        'duplicate-id': { enabled: false },
-        // WCAG 1.4.3 exempts disabled UI components from contrast requirements.
-        // Axe does not fully honour aria-disabled on group containers for child text,
-        // so we suppress the rule — disabled states are visually intentional.
-        'color-contrast': { enabled: false },
+        // `color-contrast` stays ENABLED. It used to be suppressed here with a
+        // reason about disabled states — but the four nodes that actually failed
+        // were WeekField's and AffixField's disabled instances, dragged in by the
+        // unqualified scope above. With the scope corrected there is nothing to
+        // exempt, and the rule is back to being able to catch a real defect in
+        // this component.
+
       },
     },
   })
@@ -34,19 +35,21 @@ test('passes axe accessibility audit on empty state', async ({ page }) => {
 // ─── Static kitchensink states ───────────────────────────────────────────────
 
 test('all kitchensink states pass axe', async ({ page }) => {
-  await checkA11y(page, '.kitchensink-section', {
+  // `.kitchensink-section` unqualified resolves to the FIRST section in the
+  // document — DateField's — so this test audited another component for its whole
+  // life. Qualify it. The section ids only exist for the newer components, so
+  // `:has()` is the form that works everywhere (AffixField already does this).
+  await checkA11y(page, '.kitchensink-section:has([data-component="FileUpload"])', {
     detailedReport: true,
     axeOptions: {
       rules: {
-        'duplicate-id': { enabled: false },
-        // WCAG 1.4.3 exempts disabled UI components from contrast requirements.
-        // Axe does not fully honour aria-disabled on group containers for child text,
-        // so we suppress the rule — disabled states are visually intentional.
-        'color-contrast': { enabled: false },
-        // The kitchensink state tables use an intentionally blank corner <th>
-        // (top-left of the row×column state grid). This is valid table markup
-        // — the cell is a spacer, not a data header.
-        'empty-table-header': { enabled: false },
+        // `color-contrast` stays ENABLED. It used to be suppressed here with a
+        // reason about disabled states — but the four nodes that actually failed
+        // were WeekField's and AffixField's disabled instances, dragged in by the
+        // unqualified scope above. With the scope corrected there is nothing to
+        // exempt, and the rule is back to being able to catch a real defect in
+        // this component.
+
       },
     },
   })
