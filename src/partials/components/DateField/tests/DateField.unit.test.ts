@@ -148,7 +148,7 @@ function makeField({ disabled = false, value = '', min = '', max = '', locale = 
             <button type="button" class="month-year-trigger" aria-live="polite" aria-atomic="true"></button>
             <button type="button" class="next-month">&#8250;</button>
           </div>
-          <table class="grid" role="grid">
+          <table class="calendar-grid" role="grid">
             <thead><tr role="row">
               <th scope="col"></th><th scope="col"></th><th scope="col"></th>
               <th scope="col"></th><th scope="col"></th><th scope="col"></th>
@@ -532,7 +532,7 @@ describe('DateField — prop application from wrapper data attributes', () => {
               <button type="button" class="month-year-trigger" aria-live="polite" aria-atomic="true"></button>
               <button type="button" class="next-month">&#8250;</button>
             </div>
-            <table class="grid" role="grid">
+            <table class="calendar-grid" role="grid">
               <thead><tr role="row">
                 <th scope="col"></th><th scope="col"></th><th scope="col"></th>
                 <th scope="col"></th><th scope="col"></th><th scope="col"></th>
@@ -570,7 +570,7 @@ describe('DateField — prop application from wrapper data attributes', () => {
               <button type="button" class="month-year-trigger" aria-live="polite" aria-atomic="true"></button>
               <button type="button" class="next-month">&#8250;</button>
             </div>
-            <table class="grid" role="grid">
+            <table class="calendar-grid" role="grid">
               <thead><tr role="row">
                 <th scope="col"></th><th scope="col"></th><th scope="col"></th>
                 <th scope="col"></th><th scope="col"></th><th scope="col"></th>
@@ -610,7 +610,7 @@ describe('DateField — prop application from wrapper data attributes', () => {
               <button type="button" class="month-year-trigger" aria-live="polite" aria-atomic="true"></button>
               <button type="button" class="next-month">&#8250;</button>
             </div>
-            <table class="grid" role="grid">
+            <table class="calendar-grid" role="grid">
               <thead><tr role="row">
                 <th scope="col"></th><th scope="col"></th><th scope="col"></th>
                 <th scope="col"></th><th scope="col"></th><th scope="col"></th>
@@ -648,7 +648,7 @@ describe('DateField — prop application from wrapper data attributes', () => {
               <button type="button" class="month-year-trigger" aria-live="polite" aria-atomic="true"></button>
               <button type="button" class="next-month">&#8250;</button>
             </div>
-            <table class="grid" role="grid">
+            <table class="calendar-grid" role="grid">
               <thead><tr role="row">
                 <th scope="col"></th><th scope="col"></th><th scope="col"></th>
                 <th scope="col"></th><th scope="col"></th><th scope="col"></th>
@@ -686,7 +686,7 @@ describe('DateField — prop application from wrapper data attributes', () => {
               <button type="button" class="month-year-trigger" aria-live="polite" aria-atomic="true"></button>
               <button type="button" class="next-month">&#8250;</button>
             </div>
-            <table class="grid" role="grid">
+            <table class="calendar-grid" role="grid">
               <thead><tr role="row">
                 <th scope="col"></th><th scope="col"></th><th scope="col"></th>
                 <th scope="col"></th><th scope="col"></th><th scope="col"></th>

@@ -89,16 +89,16 @@ test('date selection closes calendar and syncs native input', async ({ page }) =
 test('aria-selected is on td not button', async ({ page }) => {
   await page.locator('[data-id="birthdate"] .trigger').click()
   // All td elements in grid should have aria-selected
-  const tdsWithAriaSelected = page.locator(`${TARGET} .grid td[aria-selected]`)
+  const tdsWithAriaSelected = page.locator(`${TARGET} .calendar-grid td[aria-selected]`)
   const count = await tdsWithAriaSelected.count()
   expect(count).toBeGreaterThan(0)
   // No buttons should have aria-selected
-  await expect(page.locator(`${TARGET} .grid button[aria-selected]`)).toHaveCount(0)
+  await expect(page.locator(`${TARGET} .calendar-grid button[aria-selected]`)).toHaveCount(0)
 })
 
 test('aria-disabled is on td not button for disabled cells', async ({ page }) => {
   await page.locator('[data-id="birthdate"] .trigger').click()
-  const disabledButtons = page.locator(`${TARGET} .grid button[aria-disabled="true"]`)
+  const disabledButtons = page.locator(`${TARGET} .calendar-grid button[aria-disabled="true"]`)
   expect(await disabledButtons.count()).toBe(0) // aria-disabled never on button — only on td
   await page.keyboard.press('Escape')
 })
@@ -277,7 +277,7 @@ test('ArrowRight moves focus to next day in calendar grid', async ({ page }) => 
   await firstDay.focus()
   const initialDate = await firstDay.getAttribute('data-date')
   await page.keyboard.press('ArrowRight')
-  const focused = page.locator(`${TARGET} .grid button:focus`)
+  const focused = page.locator(`${TARGET} .calendar-grid button:focus`)
   const nextDate = await focused.getAttribute('data-date')
   expect(nextDate).not.toBe(initialDate)
   await page.keyboard.press('Escape')
@@ -290,7 +290,7 @@ test('ArrowLeft moves focus to previous day in calendar grid', async ({ page }) 
   await secondDay.focus()
   const initialDate = await secondDay.getAttribute('data-date')
   await page.keyboard.press('ArrowLeft')
-  const focused = page.locator(`${TARGET} .grid button:focus`)
+  const focused = page.locator(`${TARGET} .calendar-grid button:focus`)
   const prevDate = await focused.getAttribute('data-date')
   expect(prevDate).not.toBe(initialDate)
   await page.keyboard.press('Escape')
@@ -302,7 +302,7 @@ test('ArrowDown moves focus one week forward in calendar grid', async ({ page })
   await firstDay.focus()
   const initialDate = await firstDay.getAttribute('data-date')
   await page.keyboard.press('ArrowDown')
-  const focused = page.locator(`${TARGET} .grid button:focus`)
+  const focused = page.locator(`${TARGET} .calendar-grid button:focus`)
   const nextDate = await focused.getAttribute('data-date')
   expect(nextDate).not.toBe(initialDate)
   await page.keyboard.press('Escape')
@@ -312,7 +312,7 @@ test('PageDown moves calendar to next month', async ({ page }) => {
   await page.locator('[data-id="birthdate"] .trigger').click()
   const monthLabel = page.locator(`${TARGET} .month-year-trigger`)
   const initialLabel = await monthLabel.textContent()
-  await page.locator(`${TARGET} .grid`).focus()
+  await page.locator(`${TARGET} .calendar-grid`).focus()
   await page.keyboard.press('PageDown')
   const nextLabel = await monthLabel.textContent()
   expect(nextLabel).not.toBe(initialLabel)
@@ -323,7 +323,7 @@ test('PageUp moves calendar to previous month', async ({ page }) => {
   await page.locator('[data-id="birthdate"] .trigger').click()
   const monthLabel = page.locator(`${TARGET} .month-year-trigger`)
   const initialLabel = await monthLabel.textContent()
-  await page.locator(`${TARGET} .grid`).focus()
+  await page.locator(`${TARGET} .calendar-grid`).focus()
   await page.keyboard.press('PageUp')
   const nextLabel = await monthLabel.textContent()
   expect(nextLabel).not.toBe(initialLabel)
@@ -368,7 +368,7 @@ test('Tab from a focused grid day exits the grid as one composite stop (→ next
   await day.focus()
   await page.keyboard.press('Tab')
   const landedOnDay = await page.evaluate(() =>
-    Boolean(document.activeElement?.closest('.grid td button')),
+    Boolean(document.activeElement?.closest('.calendar-grid td button')),
   )
   expect(landedOnDay).toBe(false)
   await expect(page.locator(`${TARGET} .popup .next-month`)).toBeFocused()
@@ -377,7 +377,7 @@ test('Tab from a focused grid day exits the grid as one composite stop (→ next
 test('Escape closes the calendar and returns focus to the trigger', async ({ page }) => {
   await page.locator('[data-id="birthdate"] .trigger').click()
   await expect(page.locator(`${TARGET} .popup`)).toBeVisible()
-  await page.locator(`${TARGET} .grid`).focus()
+  await page.locator(`${TARGET} .calendar-grid`).focus()
   await page.keyboard.press('Escape')
   await expect(page.locator(`${TARGET} .popup`)).toHaveCount(0)
   await expect(page.locator('[data-id="birthdate"] .trigger')).toBeFocused()

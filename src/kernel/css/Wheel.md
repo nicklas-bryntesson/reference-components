@@ -10,7 +10,7 @@ pair** — shipping `WheelColumn` without `Wheel.css` renders the options as ove
 | Class | Authored / injected | Role |
 |-------|--------------------|------|
 | `.Wheel` | **authored** (host) | sizing, perspective, overflow clip, focus ring |
-| `.ring` | injected by JS | the rotating 3D ring |
+| `.cylinder` | injected by JS | the rotating 3D cylinder |
 | `.option` | injected by JS | one row; `[aria-selected="true"]` is the centred value |
 | `.band` | injected by JS | per-column highlight band — currently **hidden** (`display: none`); superseded by `.WheelColumns::before` |
 | `.WheelColumns` | **authored** (wrapper around the `.Wheel` columns) | draws the visible full-width centre band (`::before`) and top/bottom fade (`::after`); declares its own `--_wheel-row-height: 38px` that must stay in sync with `.Wheel`'s |

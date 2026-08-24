@@ -52,7 +52,7 @@ const MOMENTUM_THRESHOLD = 7  // rows/s — above this, use momentum; below, sna
 class WheelColumn {
   private opts: WheelColumnOptions
   private el: HTMLElement
-  private ring!: HTMLDivElement
+  private cylinder!: HTMLDivElement
   private slots: Slot[] = []
 
   pos: number = 0
@@ -124,23 +124,23 @@ class WheelColumn {
       this.el.setAttribute('tabindex', '0')
     }
 
-    this.ring = document.createElement('div')
-    this.ring.className = 'ring'
-    this.ring.style.transformStyle = 'preserve-3d'
-    this.ring.style.transform = `translateZ(${-this.radius}px)`
+    this.cylinder = document.createElement('div')
+    this.cylinder.className = 'cylinder'
+    this.cylinder.style.transformStyle = 'preserve-3d'
+    this.cylinder.style.transform = `translateZ(${-this.radius}px)`
 
     for (let o = -HALF; o <= HALF; o++) {
       const slotEl = document.createElement('div')
       slotEl.className = 'option'
       slotEl.setAttribute('aria-hidden', 'true')
-      this.ring.appendChild(slotEl)
+      this.cylinder.appendChild(slotEl)
       this.slots.push({ el: slotEl, o })
     }
 
     const band = document.createElement('div')
     band.className = 'band'
 
-    this.el.appendChild(this.ring)
+    this.el.appendChild(this.cylinder)
     this.el.appendChild(band)
   }
 
