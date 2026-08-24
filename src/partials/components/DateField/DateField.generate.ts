@@ -57,7 +57,7 @@ function canonical(id: string, label: string, rootAttrs: string, inputAttrs: str
             <button type="button" class="next-month">&#8250;</button>
           </div>
           <div data-panel="calendar" data-active="true">
-            <table class="grid" role="grid">
+            <table class="calendar-grid" role="grid">
               <thead><tr role="row"><th scope="col"></th><th scope="col"></th><th scope="col"></th><th scope="col"></th><th scope="col"></th><th scope="col"></th><th scope="col"></th></tr></thead>
               <tbody></tbody>
             </table>

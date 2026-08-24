@@ -181,6 +181,15 @@ Case carries meaning:
 
 - **A component is `PascalCase`, no dash** (`.DateField`, `.Wheel`, `.ChoiceField`) — the root *and* any nested/composed sub-component. Litmus: *it has its own `.md` contract* (or is a kernel primitive with one).
 - **An internal element is `lowercase-kebab`** (`.calendar-header`, `.content`, `.options`, `.arrow`) — a presentational part with no standalone contract. **No `Component-` prefix** — it's redundant once nested under the root, and it bloats the footprint.
+  - **…and it may not be a bare utility-class name.** `.grid` and `.ring` both shipped, and both
+    broke in a Tailwind port — not as a specificity fight, but because **the cascade resolves per
+    declaration**. `.DateField .popup .grid` sets `width` and `border-collapse` and no `display`, so
+    Tailwind's `.grid { display: grid }` met nothing and turned the calendar `<table>` into a
+    one-column grid. `.Wheel .ring` sets no `box-shadow`, so `.ring { box-shadow: … }` drew a grey
+    ring around every wheel column. Our higher specificity protected nothing, because it never named
+    the hijacked property. The test is simple: **is the name a part, or a CSS behaviour?** `grid`,
+    `ring`, `container`, `table`, `hidden`, `absolute`, `truncate` are behaviours. `calendar-grid`
+    and `cylinder` are parts. Guarded by `tests/utility-name-collisions.unit.test.ts`.
 
 **Every rule is fully qualified from the root** — `.Component .element`, never a bare `.element` and never `&`-nested. The `.Component { }` block holds only the tokens and the properties applied to the root itself; every part is its own flat, rooted rule:
 

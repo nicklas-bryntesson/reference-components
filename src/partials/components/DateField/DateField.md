@@ -42,7 +42,7 @@ An accessible date input that renders editable day, month, and year segments wit
             <button type="button" class="next-month">&#8250;</button>
           </div>
           <div class="panel" data-panel="calendar" data-active="true">
-            <table class="grid" role="grid">
+            <table class="calendar-grid" role="grid">
               <thead><tr role="row">
                 <th scope="col"></th><th scope="col"></th><th scope="col"></th>
                 <th scope="col"></th><th scope="col"></th><th scope="col"></th><th scope="col"></th>

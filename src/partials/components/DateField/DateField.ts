@@ -863,7 +863,7 @@ class DateField {
 
   _renderWeekdays(): void {
     const names = getWeekdayNames(this.localeTag)
-    const ths = this.calendarEl!.querySelectorAll('.grid thead th')
+    const ths = this.calendarEl!.querySelectorAll('.calendar-grid thead th')
     ths.forEach((th, i) => {
       if (!names[i]) return
       th.textContent = names[i]
@@ -878,7 +878,7 @@ class DateField {
     const monthName = getMonthName(this.currentYear, this.currentMonth, this.localeTag)
     if (monthYearTrigger) monthYearTrigger.textContent = `${monthName} ${this.currentYear}`
 
-    const tbody = this.calendarEl!.querySelector<HTMLTableSectionElement>('.grid tbody')!
+    const tbody = this.calendarEl!.querySelector<HTMLTableSectionElement>('.calendar-grid tbody')!
     tbody.innerHTML = ''
 
     const today = new Date()
@@ -970,7 +970,7 @@ class DateField {
   }
 
   _updateRovingTabindex(): void {
-    const grid = this.calendarEl!.querySelector<HTMLElement>('.grid')!
+    const grid = this.calendarEl!.querySelector<HTMLElement>('.calendar-grid')!
     grid.querySelectorAll('td button').forEach(b => b.setAttribute('tabindex', '-1'))
 
     const todayISO = formatISO(new Date())
@@ -984,7 +984,7 @@ class DateField {
   }
 
   _moveFocusIntoCalendar(): void {
-    const grid = this.calendarEl!.querySelector<HTMLElement>('.grid')!
+    const grid = this.calendarEl!.querySelector<HTMLElement>('.calendar-grid')!
     const todayISO = formatISO(new Date())
     const todayBtn = grid.querySelector<HTMLButtonElement>(`button[data-date="${todayISO}"]`)
     const todayEnabled = todayBtn && !todayBtn.closest('[aria-disabled="true"]') ? todayBtn : null
@@ -1033,7 +1033,7 @@ class DateField {
       return
     }
 
-    const grid = this.calendarEl!.querySelector<HTMLElement>('.grid')!
+    const grid = this.calendarEl!.querySelector<HTMLElement>('.calendar-grid')!
     const focusedBtn = grid.querySelector<HTMLButtonElement>('button:focus')
 
     if (e.key === 'Escape') {
@@ -1127,7 +1127,7 @@ class DateField {
       ].filter((el): el is HTMLElement => Boolean(el))
     }
 
-    const grid = this.calendarEl.querySelector<HTMLElement>('.grid')!
+    const grid = this.calendarEl.querySelector<HTMLElement>('.calendar-grid')!
     const prevBtn = this.calendarEl.querySelector<HTMLButtonElement>('.prev-month')
     const monthYearTrigger = this.calendarEl.querySelector<HTMLButtonElement>('.month-year-trigger')
     const nextBtn = this.calendarEl.querySelector<HTMLButtonElement>('.next-month')
@@ -1168,7 +1168,7 @@ class DateField {
     }
 
     if (btn) {
-      const grid = this.calendarEl!.querySelector<HTMLElement>('.grid')!
+      const grid = this.calendarEl!.querySelector<HTMLElement>('.calendar-grid')!
       grid.querySelectorAll('td button').forEach(b => b.setAttribute('tabindex', '-1'))
       btn.setAttribute('tabindex', '0')
       btn.focus()

@@ -197,11 +197,11 @@
   text-align: center;
 }
 
-.DateField .popup .grid {
+.DateField .popup .calendar-grid {
   width: 100%;
   border-collapse: collapse;
 }
-.DateField .popup .grid th {
+.DateField .popup .calendar-grid th {
   border: 0;
   padding: 0;
   padding-block-end: 0.25rem;
@@ -210,11 +210,11 @@
   color: var(--_df-calendar-color-muted);
   min-inline-size: 2rem;
 }
-.DateField .popup .grid td {
+.DateField .popup .calendar-grid td {
   border: 0;
   padding: 0;
 }
-.DateField .popup .grid td button {
+.DateField .popup .calendar-grid td button {
   display: block;
   inline-size: 2rem;
   block-size: 2rem;
@@ -224,22 +224,22 @@
   border-radius: 2px;
   font-variant-numeric: tabular-nums;
 }
-.DateField .popup .grid td button:focus-visible {
+.DateField .popup .calendar-grid td button:focus-visible {
   outline: 2px solid;
   outline-offset: 2px;
 }
-.DateField .popup .grid td[data-today="true"] button {
+.DateField .popup .calendar-grid td[data-today="true"] button {
   font-weight: bold;
 }
-.DateField .popup .grid td[data-selected="true"] button {
+.DateField .popup .calendar-grid td[data-selected="true"] button {
   background-color: var(--ui-primary);
   color: var(--ui-primary-foreground);
 }
-.DateField .popup .grid td[data-disabled="true"] button {
+.DateField .popup .calendar-grid td[data-disabled="true"] button {
   color: var(--_df-calendar-color-muted);
   cursor: not-allowed;
 }
-.DateField .popup .grid td[data-outside-month="true"] button {
+.DateField .popup .calendar-grid td[data-outside-month="true"] button {
   color: var(--_df-calendar-color-muted);
 }
 
