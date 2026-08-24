@@ -393,6 +393,54 @@ The reference appends its popups at **full opacity** — no fade — so `axe` al
 - Animate a property that doesn't affect contrast (`transform`/slide), or pop in instantly and only fade *out* (the suite never samples during close).
 - Keep the reference's no-animation behaviour.
 
+### If your port uses shadow DOM
+
+Measured, so you can decide before you build rather than after:
+
+| | `page.locator` | `document.querySelector` in an `evaluate` |
+|---|---|---|
+| light DOM | works | works |
+| **open** shadow root | **works — pierces** | returns `null` |
+| **closed** shadow root | 0 matches, `shadowRoot` is `null` | returns `null` |
+
+A **closed** shadow root makes this suite unrunnable, and no selector style changes that. If you
+want the conformance suite to be your evidence, use `mode: 'open'`.
+
+For an **open** one, the suite now uses two patterns that survive the boundary, and it is worth
+copying them rather than the shapes they replaced:
+
+```js
+// Resolve with a locator, then evaluate on the element it hands you. This keeps
+// computed styles and geometry — which locators cannot read — while gaining the
+// piercing and the scoping. `page.evaluate(() => document.querySelector(…))`
+// gets neither.
+const box = await page.locator(`${ROOT} .track`).evaluate((el) => ({
+  width: el.getBoundingClientRect().width,
+  colour: getComputedStyle(el).color,
+}))
+
+// "Is focus inside this container" — `getRootNode()`, never `document`. Inside an
+// open shadow root `document.activeElement` is the HOST element, so
+// `container.contains(document.activeElement)` answers false while focus really is
+// inside. In the light DOM `getRootNode()` *is* `document`, so this form is
+// identical there and correct in both.
+const inside = await page.locator(`${ROOT} [role="dialog"]`).evaluate((el) =>
+  el.contains(el.getRootNode().activeElement))
+```
+
+What is **not** solved: 42 `document.querySelector` calls remain inside `evaluate` bodies. Most are
+deliberately document-wide — the id-graph and text-spacing checks assert things about the whole
+page, which is the point — but some are simply not converted yet. They will fail against a
+shadow-DOM port, and the failure looks like a missing element rather than a boundary problem, so
+check for that before assuming your markup is wrong.
+
+Two more things the boundary breaks that no selector fixes, and both matter more than the queries:
+
+- **`aria-labelledby` / `aria-describedby` / `for` cannot cross it.** This library carries **217**
+  such references. If the label and the control end up in different trees, the relationship is
+  simply not announced. `aria-label` survives, which is why three of the five popups already use it.
+- **`aria-activedescendant`** has the same problem, and the roving-tabindex grids depend on ids.
+
 ## What the tests expect
 
 Tests navigate to `TARGET_PATH` (default `/`) and locate components by their `data-component` attribute and `data-id` / `data-initialized="true"` state attributes. Your page needs to render the component with the correct HTML contract — see each component's `<Name>.md` for the required markup.

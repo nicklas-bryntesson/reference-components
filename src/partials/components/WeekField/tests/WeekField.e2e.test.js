@@ -247,10 +247,10 @@ test('Tab past the last footer button keeps focus inside the popup', async ({ pa
   // "This week" is the last enabled tab stop (Clear is disabled while empty).
   await page.locator(`${WF} .calendar-footer-now`).focus()
   await page.keyboard.press('Tab')
-  const inside = await page.evaluate((rootSel) => {
-    const popup = document.querySelector(`${rootSel} .popup`)
-    return popup?.contains(document.activeElement) ?? false
-  }, WF)
+  const inside = await page.locator(`${WF} .popup`).evaluate((el) =>
+    // `getRootNode()` not `document`: inside an open shadow root
+    // document.activeElement is the HOST, so contains() answers false.
+    el.contains(el.getRootNode().activeElement))
   expect(inside).toBe(true)
 })
 
@@ -260,10 +260,10 @@ test('Shift+Tab from the first tab stop keeps focus inside the popup (wraps)', a
   await page.locator(`${WF} .popup .prev-month`).focus()
   await page.keyboard.press('Shift+Tab')
   await expect(page.locator(`${WF} .popup`)).toBeVisible()
-  const inside = await page.evaluate((rootSel) => {
-    const popup = document.querySelector(`${rootSel} .popup`)
-    return popup?.contains(document.activeElement) ?? false
-  }, WF)
+  const inside = await page.locator(`${WF} .popup`).evaluate((el) =>
+    // `getRootNode()` not `document`: inside an open shadow root
+    // document.activeElement is the HOST, so contains() answers false.
+    el.contains(el.getRootNode().activeElement))
   expect(inside).toBe(true)
 })
 
@@ -416,10 +416,10 @@ test('a mouse-opened popup takes focus, so Escape can close it', async ({ page }
 
   // aria-modal claims the rest of the page is inert; focus has to be here to match.
   await expect(dialog).toHaveAttribute('aria-modal', 'true')
-  const inside = await page.evaluate((sel) => {
-    const dlg = document.querySelector(`${sel} [role="dialog"]`)
-    return Boolean(dlg && dlg.contains(document.activeElement))
-  }, WF)
+  const inside = await page.locator(`${WF} [role="dialog"]`).evaluate((el) =>
+    // `getRootNode()` not `document`: inside an open shadow root
+    // document.activeElement is the HOST, so contains() answers false.
+    el.contains(el.getRootNode().activeElement))
   expect(inside, 'focus is still outside the popup after opening').toBe(true)
 
   await page.keyboard.press('Escape')

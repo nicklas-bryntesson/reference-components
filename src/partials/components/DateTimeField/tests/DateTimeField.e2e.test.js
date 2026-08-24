@@ -281,10 +281,10 @@ test('Tab past the last footer button keeps focus inside the calendar', async ({
   // escape the aria-modal dialog (this calendar previously had no Tab trap).
   await page.locator(`${ROOT} .popup .calendar-footer-now`).focus()
   await page.keyboard.press('Tab')
-  const inside = await page.evaluate((rootSel) => {
-    const popup = document.querySelector(`${rootSel} .popup`)
-    return popup?.contains(document.activeElement) ?? false
-  }, ROOT)
+  const inside = await page.locator(`${ROOT} .popup`).evaluate((el) =>
+    // `getRootNode()` not `document`: inside an open shadow root
+    // document.activeElement is the HOST, so contains() answers false.
+    el.contains(el.getRootNode().activeElement))
   expect(inside).toBe(true)
 })
 
@@ -294,10 +294,10 @@ test('Shift+Tab from the first tab stop keeps focus inside the calendar', async 
   await page.locator(`${ROOT} .popup .prev-month`).focus()
   await page.keyboard.press('Shift+Tab')
   await expect(page.locator(`${ROOT} .popup`)).toBeVisible()
-  const inside = await page.evaluate((rootSel) => {
-    const popup = document.querySelector(`${rootSel} .popup`)
-    return popup?.contains(document.activeElement) ?? false
-  }, ROOT)
+  const inside = await page.locator(`${ROOT} .popup`).evaluate((el) =>
+    // `getRootNode()` not `document`: inside an open shadow root
+    // document.activeElement is the HOST, so contains() answers false.
+    el.contains(el.getRootNode().activeElement))
   expect(inside).toBe(true)
 })
 
@@ -413,13 +413,12 @@ test('today is marked in the calendar and rendered differently', async ({ page }
   const today = page.locator(`${ROOT} .calendar-grid td[data-today="true"] button`)
   await expect(today).toHaveCount(1)
 
-  const weights = await page.evaluate((root) => {
-    const el = document.querySelector(root)
+  const weights = await page.locator(ROOT).evaluate((el) => {
     const t = el.querySelector('td[data-today="true"] button')
     const other = [...el.querySelectorAll('td button')].find(
       (b) => b !== t && b.textContent.trim() && !b.closest('td[data-outside-month]'))
     return { today: getComputedStyle(t).fontWeight, other: getComputedStyle(other).fontWeight }
-  }, ROOT)
+  })
 
   expect(weights.today).not.toBe(weights.other)
 })
@@ -441,8 +440,7 @@ test('a day outside the allowed range is marked disabled and rendered muted', as
   await page.goto(targetPath())
   await page.locator(`${ROOT} .trigger`).click()
 
-  const colours = await page.evaluate((root) => {
-    const el = document.querySelector(root)
+  const colours = await page.locator(ROOT).evaluate((el) => {
     const cells = [...el.querySelectorAll('.calendar-grid td[data-date], .calendar-grid td')]
       .filter((td) => td.querySelector('button[data-date]'))
     const off = cells.find((td) => td.dataset.disabled === 'true')
@@ -453,7 +451,7 @@ test('a day outside the allowed range is marked disabled and rendered muted', as
       offColour: off ? getComputedStyle(off.querySelector('button')).color : null,
       onColour: on ? getComputedStyle(on.querySelector('button')).color : null,
     }
-  }, ROOT)
+  })
 
   expect(colours.disabledCount).toBeGreaterThan(0)
   expect(colours.enabledCount).toBeGreaterThan(0)
@@ -511,10 +509,10 @@ test('a mouse-opened popup takes focus, so Escape can close it', async ({ page }
 
   // aria-modal claims the rest of the page is inert; focus has to be here to match.
   await expect(dialog).toHaveAttribute('aria-modal', 'true')
-  const inside = await page.evaluate((sel) => {
-    const dlg = document.querySelector(`${sel} [role="dialog"]`)
-    return Boolean(dlg && dlg.contains(document.activeElement))
-  }, ROOT)
+  const inside = await page.locator(`${ROOT} [role="dialog"]`).evaluate((el) =>
+    // `getRootNode()` not `document`: inside an open shadow root
+    // document.activeElement is the HOST, so contains() answers false.
+    el.contains(el.getRootNode().activeElement))
   expect(inside, 'focus is still outside the popup after opening').toBe(true)
 
   await page.keyboard.press('Escape')
