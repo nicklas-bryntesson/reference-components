@@ -1,8 +1,9 @@
 import { test, expect } from '@playwright/test'
 import { checkA11y, injectAxe } from 'axe-playwright'
+import { targetPath } from '../../../../e2e-helpers/target.js'
 
 test.beforeEach(async ({ page }) => {
-  await page.goto('/')
+  await page.goto(targetPath())
 })
 
 // ── Open / close ───────────────────────────────────────────────────────────
@@ -144,8 +145,10 @@ test('no axe violations on open state', async ({ page }) => {
   await tip.scrollIntoViewIfNeeded()
   await tip.locator('button').click()
   await injectAxe(page)
-  // color-contrast is disabled: axe cannot resolve CSS custom properties on
-  // custom elements and incorrectly reports #888888 instead of the computed
-  // rgb(0,0,0). Verified manually: black text on white background passes AA.
-  await checkA11y(page, 'toggle-tip[data-id="center"]', { axeOptions: { rules: { 'color-contrast': { enabled: false } } } })
+  // `color-contrast` used to be disabled here, with a measured reason: axe could
+  // not resolve CSS custom properties on custom elements and reported #888888
+  // instead of the computed rgb(0,0,0). Re-measured — it passes with the rule
+  // enabled, so the axe limitation is gone and the suppression was only still
+  // standing down a rule that now works.
+  await checkA11y(page, 'toggle-tip[data-id="center"]')
 })

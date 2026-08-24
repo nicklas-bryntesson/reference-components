@@ -1,10 +1,14 @@
-import { writeFileSync, mkdirSync } from 'node:fs'
+import { writeFileSync, mkdirSync, rmSync } from 'node:fs'
 import { resolve, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const __dir = dirname(fileURLToPath(import.meta.url))
 const out = (file: string) => resolve(__dir, 'states', file)
 
+// states/ is a gitignored build artifact, so wipe it before writing. Without
+// this, renaming or removing a state leaves an orphan .hbs behind that still
+// resolves as a partial — it silently keeps rendering the old markup.
+rmSync(resolve(__dir, 'states'), { recursive: true, force: true })
 mkdirSync(resolve(__dir, 'states'), { recursive: true })
 
 type Attrs = Record<string, string>

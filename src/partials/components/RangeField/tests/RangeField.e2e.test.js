@@ -1,8 +1,9 @@
 import { test, expect } from '@playwright/test'
 import { checkA11y, injectAxe } from 'axe-playwright'
+import { targetPath } from '../../../../e2e-helpers/target.js'
 
 test.beforeEach(async ({ page }) => {
-  await page.goto('/')
+  await page.goto(targetPath())
 })
 
 const LIVE = '#rf-live'

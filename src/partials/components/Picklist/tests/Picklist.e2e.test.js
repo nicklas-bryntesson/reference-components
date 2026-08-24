@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test'
 import { checkA11y, injectAxe } from 'axe-playwright'
+import { targetPath } from '../../../../e2e-helpers/target.js'
 
 // Picklist has no JS, so the e2e layer carries the weight: it proves that
 // native actually delivers the contract in a real browser, and that the chip
@@ -10,7 +11,7 @@ import { checkA11y, injectAxe } from 'axe-playwright'
 // and `.options` are page-global words shared across components.
 
 test.beforeEach(async ({ page }) => {
-  await page.goto('/')
+  await page.goto(targetPath())
 })
 
 // ── The legend is the group's accessible name ─────────────────────────────────

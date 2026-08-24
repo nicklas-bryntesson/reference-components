@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test'
 import { checkA11y, injectAxe } from 'axe-playwright'
+import { targetPath } from '../../../../e2e-helpers/target.js'
 
 // ThemeSwitch is the first component that mutates GLOBAL page state, so every
 // test starts from a known root: no stored preference, no attribute. Playwright
@@ -68,7 +69,7 @@ const freezeTransitions = (page) => page.addStyleTag({
 // cleared with addInitScript, which would also run on the reload inside the
 // persistence test and wipe the very value under test.
 test.beforeEach(async ({ page }) => {
-  await page.goto('/')
+  await page.goto(targetPath())
   await freezeTransitions(page)
   await page.locator(TS).scrollIntoViewIfNeeded()
 })
