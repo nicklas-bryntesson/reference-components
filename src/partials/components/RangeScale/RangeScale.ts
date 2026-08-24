@@ -88,10 +88,23 @@ export default class RangeScale {
     // value is "lowest of a–b" and "highest of a–b", which is a statement about
     // the pair. Whatever owns the pair writes that; the lane would only be able
     // to guess.
-    if (this.#output && this.#fields.length === 1) {
+    if (this.#fields.length === 1) {
       // Only the number is written; the unit is markup and stays put.
-      this.#output.querySelector('.digits')?.replaceChildren(this.#field.value)
-      this.#field.setAttribute('aria-valuetext', this.#format())
+      this.#output?.querySelector('.digits')?.replaceChildren(this.#field.value)
+
+      // Own `aria-valuetext` whenever the unit is knowable — from a visible
+      // readout, or from `data-suffix` on the lane itself. A lane with no readout
+      // still has a unit, and the only way to announce it used to be authoring a
+      // static `aria-valuetext`, which then drifted silently: the demo shipped
+      // `"50 %"` and seven arrow presses later the value was 57 and the
+      // announcement still said 50.
+      //
+      // With neither source we leave the attribute alone. An authored value we
+      // cannot format is the host's, and overwriting it would be a regression
+      // rather than a sync.
+      if (this.#suffixSource !== null) {
+        this.#field.setAttribute('aria-valuetext', this.#format())
+      }
     }
   }
 
@@ -122,9 +135,25 @@ export default class RangeScale {
     return span === 0 ? 0 : (field.valueAsNumber - min) / span
   }
 
-  /** `data-suffix` on the output carries the unit; absent means the bare number. */
+  /**
+   * Where the unit comes from, or `null` when nothing declares one.
+   *
+   * `data-suffix` on the lane root is the general form — it works with or without
+   * a visible readout. On the output it is the older, narrower spelling and stays
+   * supported; the root wins when both are present.
+   */
+  get #suffixSource(): string | null {
+    const root = this.#root.dataset.suffix
+    if (root != null) return root
+    const output = this.#output?.dataset.suffix
+    if (output != null) return output
+    // An output with no declared unit still means "we own the readout" — the
+    // announcement is then the bare number, which is true.
+    return this.#output ? '' : null
+  }
+
   #format(): string {
-    const suffix = this.#output?.dataset.suffix ?? ''
+    const suffix = this.#suffixSource ?? ''
     return suffix ? `${this.#field.value} ${suffix}` : this.#field.value
   }
 

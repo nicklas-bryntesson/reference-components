@@ -100,8 +100,13 @@ function canonical(state: StateDefinition): string {
   // The digits sit in their own element so width can be reserved for them alone,
   // and the unit is static markup — reserving the whole string in `ch` over-reserves
   // by a quarter, because a space and lowercase letters are far narrower than a zero.
+  // `aria-live="off"` is load-bearing. A bare <output> computes to role=status
+  // with live=polite and atomic=true — measured in the accessibility tree — so it
+  // announces on every value change. The slider is the focused control and already
+  // announces its own value through aria-valuetext, so leaving the output live
+  // says everything twice, and during a drag it says it at every step.
   const outputLine = state.output
-    ? `\n  <output class="value" for="${state.id}"${
+    ? `\n  <output class="value" aria-live="off" for="${state.id}"${
         state.output.suffix ? ` data-suffix="${state.output.suffix}"` : ''
       }><span class="digits">${state.input?.value ?? '0'}</span>${
         state.output.suffix ? ` ${state.output.suffix}` : ''
@@ -192,7 +197,10 @@ const states: StateDefinition[] = [
 
   // ── Without an output: presence is the switch, so absence is a valid state ──
   { file: '_no-output', id: 'rs-no-output', rootId: 'rangescale-no-output', label: 'Volume (no readout)',
-    input: { ...mid, 'aria-valuetext': '50 %' }, output: null },
+    // `data-suffix` on the lane, not an authored `aria-valuetext`: the component
+    // then keeps the announcement in step. The static form used to drift — value
+    // 57, announcement still "50 %".
+    scale: { 'data-suffix': '%' }, input: mid, output: null },
 
   // ── Units — the whole lane scales with the local text ───────────────────────
   { file: '_text-scaled', id: 'rs-text-scaled', rootId: 'rangescale-text-scaled', label: 'Volume (font-size: 1.5rem)',

@@ -23,7 +23,7 @@ Custom properties only flow downward, so a field can never publish its own posit
     <i style="--p: 0.5"><span>50</span></i>
     <i style="--p: 1"><span>100</span></i>
   </span>
-  <output class="value" for="volume" data-suffix="%">50 %</output>
+  <output class="value" aria-live="off" for="volume" data-suffix="%">50 %</output>
 </div>
 ```
 
@@ -250,21 +250,38 @@ carrying its own, so there is no second authored length to drift.
 | `destroy()` | Unbinds |
 
 The component sets `--_rs-p`, writes the `<output>` text, and mirrors that text into the field's
-`aria-valuetext` so the seen and the announced value cannot drift. It mirrors **only** when it has
-an output — an authored `aria-valuetext` on a field with no readout belongs to the host, and
-overwriting it would be a regression rather than a sync.
+`aria-valuetext` so the seen and the announced value cannot drift.
 
-`data-suffix` on the output carries a unit. It is a **convenience for simple cases**: a number and
-a unit form their own bidi run (the readout is `unicode-bidi: isolate` so it cannot reorder the
-text around it), but how the two order *within* a given locale is a formatting question. Anything
-locale-sensitive belongs in the host's `Intl.NumberFormat`.
+It mirrors whenever the unit is **knowable** — from a visible readout, or from `data-suffix` on the
+lane root. With neither it leaves `aria-valuetext` alone: a value it cannot format is the host's,
+and overwriting it would be a regression rather than a sync.
+
+`data-suffix` carries the unit, and it belongs on the **lane**:
+
+```html
+<div class="RangeScale" data-component="RangeScale" data-suffix="%">
+```
+
+A lane with no visible readout still has a unit, and putting the suffix only on the `<output>` left
+one way to announce it — authoring a static `aria-valuetext` — which then went stale the moment
+anyone moved the handle. On the output it is the older, narrower spelling and stays supported; the
+root wins when both are present.
+
+It is a **convenience for simple cases**: a number and a unit form their own bidi run (the readout
+is `unicode-bidi: isolate` so it cannot reorder the text around it), but how the two order *within*
+a given locale is a formatting question. Anything locale-sensitive belongs in the host's
+`Intl.NumberFormat`.
 
 ## Accessibility
 
 Semantics come entirely from the composed field: `role="slider"`, the value properties, arrow
 stepping, Home/End, the label. The lane adds **no ARIA of its own** — it draws.
 
-- **`<output>`, never a live region.** The slider announces on change; a live region duplicates it.
+- **`<output>`, never a live region — and it takes `aria-live="off"` to mean it.** A bare `<output>`
+  is not neutral: it computes to `role="status"` with `live="polite"` and `atomic="true"`. The
+  slider is the focused control and already announces its own value, so a live readout says
+  everything twice, and during a drag it says it at every step. The suppression is authored markup,
+  not something the component adds at runtime, so a port that rebuilds the readout has to carry it.
 - **The layers are `pointer-events: none`**, so the input keeps the whole lane as its target.
 - **Forced colors:** the lane draws its own track and fill, so it owes the same debt the field
   does. The shipped `@media (forced-colors: active)` block repaints both from system colours.

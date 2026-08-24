@@ -86,9 +86,16 @@ describe('RangeScale state partials', () => {
     expect(read(file)).not.toMatch(/aria-value(min|max|now)=/)
   })
 
-  it.each(files)('%s — the readout is never a live region', (file) => {
+  // This test used to assert the OPPOSITE and enforce the defect: it required
+  // `aria-live` to be absent, on the assumption that absence means silence. A
+  // bare <output> computes to role=status with live=polite, so absence is the one
+  // state that guarantees announcing. Suppression has to be written down.
+  it.each(files)('%s — the readout suppresses its implicit live region', (file) => {
     const html = read(file)
-    expect(html).not.toMatch(/aria-live=/)
+    if (!html.includes('<output')) return
+    expect(html).toMatch(/<output[^>]*aria-live="off"/)
+    // Still no explicit status role — the point is to quieten the implicit one,
+    // not to add a second announcing surface.
     expect(html).not.toMatch(/role="status"/)
   })
 

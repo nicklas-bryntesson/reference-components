@@ -46,11 +46,14 @@ test('dragging syncs the fill, the readout and the announced value together', as
   expect(after.fill.w).toBeGreaterThan(before.fill.w)
 })
 
-test('the readout is an <output> and never a live region', async ({ page }) => {
+test('the readout is an <output> and suppresses its implicit live region', async ({ page }) => {
   const out = page.locator(`${LANE} output.value`)
   await out.scrollIntoViewIfNeeded()
   await expect(out).toHaveAttribute('for', 'rs-live')
-  await expect(out).not.toHaveAttribute('aria-live')
+  // Absence is not silence: a bare <output> computes to live="polite". This
+  // assertion used to require the attribute to be MISSING, which enforced the
+  // announcing behaviour it was named after preventing.
+  await expect(out).toHaveAttribute('aria-live', 'off')
   await expect(out).not.toHaveAttribute('role')
 })
 
@@ -518,4 +521,51 @@ test('crossing a digit boundary does not resize the lane', async ({ page }) => {
     const unique = new Set(widths.map((w) => Math.round(w[key])))
     expect(unique.size, `${key} widths: ${[...unique].join(', ')}`).toBe(1)
   }
+})
+
+// ── The readout must not announce ─────────────────────────────────────────────
+// A bare <output> computes to role=status with live=polite and atomic=true. The
+// slider is the focused control and already announces its own value through
+// aria-valuetext, so a live readout says everything twice — and during a drag it
+// says it at every step.
+//
+// Asserted through the accessibility tree, not the DOM attribute. The attribute is
+// what we wrote; the computed `live` property is what a screenreader acts on, and
+// only the second one is the claim worth testing.
+test('the readout is not a live region', async ({ page }) => {
+  const output = page.locator(`${LANE} output.value`)
+  await expect(output).toBeVisible()
+
+  const cdp = await page.context().newCDPSession(page)
+  await cdp.send('Accessibility.enable')
+  const doc = await cdp.send('DOM.getDocument')
+  const { nodeId } = await cdp.send('DOM.querySelector', {
+    nodeId: doc.root.nodeId,
+    selector: `${LANE} output.value`,
+  })
+  const { nodes } = await cdp.send('Accessibility.getPartialAXTree', {
+    nodeId,
+    fetchRelatives: false,
+  })
+  const live = nodes[0]?.properties?.find((p) => p.name === 'live')?.value?.value
+
+  expect(live ?? 'none', 'the readout is announcing on every value change').toBe('none')
+})
+
+// ── A lane with no readout still has a unit ──────────────────────────────────
+// `data-suffix` on the lane is what makes that possible. The only way to announce
+// a unit without a visible readout used to be authoring a static aria-valuetext,
+// which then drifted silently: the demo shipped "50 %" and seven arrow presses
+// later the value was 57 while the announcement still said 50.
+test('aria-valuetext tracks the value when there is no readout', async ({ page }) => {
+  const field = page.locator('[data-id="rangescale-no-output"] input[type="range"]')
+  await expect(field).toHaveAttribute('aria-valuetext', /^\d+ %$/)
+
+  const before = await field.inputValue()
+  await field.focus()
+  for (let i = 0; i < 7; i++) await page.keyboard.press('ArrowRight')
+
+  const after = await field.inputValue()
+  expect(after).not.toBe(before)
+  await expect(field).toHaveAttribute('aria-valuetext', `${after} %`)
 })
