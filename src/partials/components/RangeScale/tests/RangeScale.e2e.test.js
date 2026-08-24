@@ -8,9 +8,13 @@ test.beforeEach(async ({ page }) => {
 const LANE = '[data-id="rangescale-live"]'
 const FIELD = '#rs-live'
 
+// `locator.evaluate` rather than `page.evaluate` + `document.querySelector`:
+// the locator resolves the element first — through an open shadow root if the
+// port put one there — and hands it in. `document.querySelector` inside an
+// evaluate can never cross that boundary, measured: it returns null while the
+// locator returns the element, its box and its computed style.
 const laneMetrics = (page, selector) =>
-  page.evaluate((sel) => {
-    const lane = document.querySelector(sel)
+  page.locator(selector).evaluate((lane) => {
     const r = (el) => { const b = el.getBoundingClientRect(); return { l: b.left, r: b.right, w: b.width } }
     const cs = getComputedStyle(lane)
     return {
@@ -22,7 +26,7 @@ const laneMetrics = (page, selector) =>
       output: lane.querySelector('output.value')?.textContent ?? null,
       valuetext: lane.querySelector('.RangeField').getAttribute('aria-valuetext'),
     }
-  }, selector)
+  })
 
 // ── The one thing this tier exists for ────────────────────────────────────────
 
@@ -60,15 +64,14 @@ test('the readout is an <output> and suppresses its implicit live region', async
 test('sync() is public, because `input` does not fire on a programmatic value', async ({ page }) => {
   await page.locator(FIELD).scrollIntoViewIfNeeded()
 
-  const drift = await page.evaluate((sel) => {
-    const lane = document.querySelector(sel)
+  const drift = await page.locator(LANE).evaluate((lane) => {
     const field = lane.querySelector('.RangeField')
     field.value = '80'                                  // no event fires
     const stale = getComputedStyle(lane).getPropertyValue('--_rs-p').trim()
     lane.__rangeScaleInstance.sync()
     const synced = getComputedStyle(lane).getPropertyValue('--_rs-p').trim()
     return { stale, synced }
-  }, LANE)
+  })
 
   expect(drift.stale).not.toBe('0.8')   // the drift is real …
   expect(drift.synced).toBe('0.8')      // … and sync() is the documented cure
@@ -181,16 +184,15 @@ test('grabbing the thumb does not reflow the page', async ({ page }) => {
   const field = page.locator(FIELD)
   await field.scrollIntoViewIfNeeded()
 
-  const measure = () => page.evaluate((sel) => {
-    const el = document.querySelector(sel)
+  const measure = () => page.locator(FIELD).evaluate((el) => {
     const r = el.getBoundingClientRect()
     return { h: r.height, top: r.top, doc: document.documentElement.scrollHeight }
-  }, FIELD)
+  })
 
   const idle = await measure()
-  await page.evaluate((sel) => document.querySelector(sel).setAttribute('data-test-state', 'active'), FIELD)
+  await page.locator(FIELD).evaluate((el) => el.setAttribute('data-test-state', 'active'))
   const active = await measure()
-  await page.evaluate((sel) => document.querySelector(sel).removeAttribute('data-test-state'), FIELD)
+  await page.locator(FIELD).evaluate((el) => el.removeAttribute('data-test-state'))
 
   // The thumb grows by transform, which does not participate in layout.
   expect(active.h).toBe(idle.h)

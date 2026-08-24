@@ -217,8 +217,7 @@ test('vertical + segmented fills the bar (labels, not just wrappers)', async ({ 
 // on, which is what "visible" actually means.
 
 /** WCAG relative luminance + contrast ratio, on computed rgb() strings. */
-const RING_CONTRAST = (page, sel) => page.evaluate((s) => {
-  const el = document.querySelector(s)
+const RING_CONTRAST = (page, sel) => page.locator(sel).evaluate((el) => {
   const cs = getComputedStyle(el)
   const parse = (c) => c.match(/[\d.]+/g).slice(0, 3).map(Number)
   const lum = ([r, g, b]) => {
@@ -233,7 +232,7 @@ const RING_CONTRAST = (page, sel) => page.evaluate((s) => {
     : getComputedStyle(el.closest('.Picklist')).backgroundColor
   const [a, b] = [lum(parse(cs.outlineColor)), lum(parse(behind))].sort((x, y) => y - x)
   return { ratio: (a + 0.05) / (b + 0.05), outlineColor: cs.outlineColor, surface: behind, offset }
-}, sel)
+})
 
 test('the focus ring contrasts with the chip it is drawn on — selected and unselected', async ({ page }) => {
   for (const [id, forId, what] of [

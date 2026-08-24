@@ -10,8 +10,7 @@ const LOWER = '#rg-live-lower'
 const UPPER = '#rg-live-upper'
 
 const state = (page, group = GROUP) =>
-  page.evaluate((sel) => {
-    const g = document.querySelector(sel)
+  page.locator(group).evaluate((g) => {
     const scale = g.querySelector('.RangeScale')
     const lo = g.querySelector('[data-role="lower"]')
     const hi = g.querySelector('[data-role="upper"]')
@@ -36,7 +35,7 @@ const state = (page, group = GROUP) =>
         upper: hi.getAttribute('data-on-top'),
       },
     }
-  }, group)
+  })
 
 // ── Clamping: hard stop, and nothing else moves ───────────────────────────────
 
@@ -92,8 +91,7 @@ test('the fill spans between the two ends, not from min', async ({ page }) => {
 test('the published positions are sorted by value, not by document order', async ({ page }) => {
   // Force the upper input below the lower one from script, then sync: a/b must
   // still come out in order, because a clamping owner may have just corrected one.
-  const sorted = await page.evaluate((sel) => {
-    const g = document.querySelector(sel)
+  const sorted = await page.locator(GROUP).evaluate((g) => {
     const scale = g.querySelector('.RangeScale')
     g.querySelector('[data-role="upper"]').value = '100'
     scale.__rangeScaleInstance.sync()
@@ -102,7 +100,7 @@ test('the published positions are sorted by value, not by document order', async
       a: Number(cs.getPropertyValue('--_rs-a')),
       b: Number(cs.getPropertyValue('--_rs-b')),
     }
-  }, GROUP)
+  })
   expect(sorted.a).toBeLessThanOrEqual(sorted.b)
 })
 
@@ -237,13 +235,12 @@ test('disabled on the fieldset reaches both fields', async ({ page }) => {
 })
 
 test('sync() is public, for the same reason the lane needs one', async ({ page }) => {
-  const drift = await page.evaluate((sel) => {
-    const g = document.querySelector(sel)
+  const drift = await page.locator(GROUP).evaluate((g) => {
     g.querySelector('[data-role="upper"]').value = '900'   // no event fires
     const stale = g.querySelector('[data-role="lower"]').getAttribute('aria-valuemax')
     g.__rangeGroupInstance.sync()
     return { stale, synced: g.querySelector('[data-role="lower"]').getAttribute('aria-valuemax') }
-  }, GROUP)
+  })
   expect(drift.stale).not.toBe('900')
   expect(drift.synced).toBe('900')
 })
