@@ -185,16 +185,22 @@ swap map nearly-true instead of true.
 ## 15 · Which tier does an accessibility assertion belong to?
 
 **If it can be read from the accessibility tree, it belongs in e2e+axe. If it is about what is
-*spoken* — announcement on change, silence, repetition — it belongs in the spoken suite
-(`test:vo`). If it needs human judgment — is this noise, does the order make sense, mobile — it
-stays on the manual checklist** (ADR-0027).
+*spoken* — announcement on change, silence, repetition — guard its mechanical CAUSE in a unit or
+e2e test, and put the listening itself on the manual checklist. If it needs human judgment — is
+this noise, does the order make sense, mobile — it stays on the manual checklist**
+(ADR-0027 established the layers, ADR-0028 rejected screenreader automation and re-routed the
+spoken lane).
 
 The failure mode this guards: a correct-looking tree that speaks wrongly. Both 2026-08-25 speech
 defects (RangeField's frozen `aria-valuetext`, MotionRegion's silent label swap) passed every tree
-check; and conversely, listening for what the tree already proves wastes the scarce manual pass.
+check — and both had causes a simpler tier could assert: a never-author rule in a contract test, a
+`role="status"` write proven in jsdom. When listening finds a defect, the fix lands with a
+cause-guard proven failing first, and the checklist gains an item that listens for the failure mode.
 
 > **Worked:** "the trigger has `aria-haspopup="dialog"`" → tree, e2e. "arrowing announces the new
-> value once" → spoken. "is announcing the placeholder as 'dd' confusing?" → human.
+> value once" → cause-guard ("no bare RangeField authors `aria-valuetext`") + checklist item
+> ("I HEAR each new value, fresh every step"). "is announcing the placeholder as 'dd' confusing?"
+> → human.
 
 ## Conventions you do not need to re-decide
 
