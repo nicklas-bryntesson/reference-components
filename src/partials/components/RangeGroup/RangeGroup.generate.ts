@@ -94,8 +94,13 @@ function canonical(state: StateDefinition): string {
   // three lowercase letters are far narrower than a zero — and paying permanent
   // width to remove a jump is the wrong trade. The suffix is static markup, which
   // it should be anyway: a unit is not data.
+  // `aria-hidden="true"` is load-bearing. The readout sits inside the <label>,
+  // so without it the value enters the field's accessible name ("Lowest 200 tkr")
+  // — a name that mutates on every step, and a value spoken twice, since the
+  // input already announces it through aria-valuetext. Hidden, the name is the
+  // stable role word alone and the valuetext carries value, unit and span.
   const readout = (side: 'lower' | 'upper', value: number) =>
-    `<b data-readout="${side}"${suffix}><span class="digits">${value}</span>` +
+    `<b data-readout="${side}" aria-hidden="true"${suffix}><span class="digits">${value}</span>` +
     `${state.suffix ? ` ${state.suffix}` : ''}</b>`
 
   const field = (side: 'lower' | 'upper', id: string, value: number) =>

@@ -82,6 +82,18 @@ test('native input is aria-hidden and tabindex -1', async ({ page }) => {
   await expect(native).toHaveAttribute('tabindex', '-1')
 })
 
+test('the segment group is named from the <label for>', async ({ page }) => {
+  const wired = await page.locator(ROOT).evaluate((root) => {
+    const group = root.querySelector('.segments')
+    const labelId = group.getAttribute('aria-labelledby')
+    const label = labelId && document.getElementById(labelId)
+    return { labelId, isLabel: label?.tagName.toLowerCase(), text: label?.textContent.trim() }
+  })
+  expect(wired.labelId).toBeTruthy()
+  expect(wired.isLabel).toBe('label')
+  expect(wired.text).toBe('Meeting date and time')
+})
+
 // ─── Calendar popup ───────────────────────────────────────────────────────────
 
 test('trigger button opens the calendar popup', async ({ page }) => {
@@ -95,6 +107,15 @@ test('popup has role=dialog and aria-modal=true', async ({ page }) => {
   const dialog = page.locator(`${ROOT} .popup`)
   await expect(dialog).toHaveAttribute('role', 'dialog')
   await expect(dialog).toHaveAttribute('aria-modal', 'true')
+})
+
+test('the trigger declares its popup, and the dialog gets a title — not the trigger label', async ({ page }) => {
+  const trigger = page.locator(`${ROOT} .trigger`)
+  await expect(trigger).toHaveAttribute('aria-haspopup', 'dialog')
+  await trigger.click()
+  // A dialog is named by what it IS ("Choose date and time"), not by the action
+  // that opened it ("Open calendar") — the sibling fields all follow this.
+  await expect(page.locator(`${ROOT} .popup`)).toHaveAttribute('aria-label', 'Choose date and time')
 })
 
 test('Escape closes the calendar and restores focus to trigger', async ({ page }) => {

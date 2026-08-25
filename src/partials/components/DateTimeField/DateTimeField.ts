@@ -33,6 +33,7 @@ interface TranslationStrings {
   pm: string
   openCalendar: string
   closeCalendar: string
+  popupLabel: string
   prevMonth: string
   nextMonth: string
   today: string
@@ -81,6 +82,7 @@ export class DateTimeField {
       hour: 'Hour', minute: 'Minute', second: 'Second',
       am: 'AM', pm: 'PM',
       openCalendar: 'Open calendar', closeCalendar: 'Close calendar',
+      popupLabel: 'Choose date and time',
       prevMonth: 'Previous month', nextMonth: 'Next month',
       today: 'today', now: 'now',
       selected: 'selected', notAvailable: 'not available',
@@ -95,6 +97,7 @@ export class DateTimeField {
       hour: 'Timme', minute: 'Minut', second: 'Sekund',
       am: 'AM', pm: 'PM',
       openCalendar: 'Öppna kalender', closeCalendar: 'Stäng kalender',
+      popupLabel: 'Välj datum och tid',
       prevMonth: 'Föregående månad', nextMonth: 'Nästa månad',
       today: 'idag', now: 'nu',
       selected: 'vald', notAvailable: 'inte tillgänglig',
@@ -241,6 +244,16 @@ export class DateTimeField {
 
   _initInteractive(): void {
     this.root.dataset.inputMode = 'custom'
+
+    const labelEl = this.native.id
+      ? document.querySelector<HTMLLabelElement>(`label[for="${this.native.id}"]`)
+      : null
+    if (labelEl) {
+      if (!labelEl.id) labelEl.id = `${this.fieldId}-label`
+      this.segments.setAttribute('aria-labelledby', labelEl.id)
+    } else if (this.root.dataset.labelField) {
+      this.segments.setAttribute('aria-label', this.root.dataset.labelField)
+    }
 
     this._buildSegments()
     this._bindSegmentEvents()
@@ -804,7 +817,7 @@ export class DateTimeField {
     this._rail.appendChild(this.calendarEl)
     this._updateLayout()
 
-    this.calendarEl.setAttribute('aria-label', this.t.openCalendar)
+    this.calendarEl.setAttribute('aria-label', this.t.popupLabel)
     // The month/year trigger swaps an in-dialog panel of spinbutton wheels (not a
     // listbox popup), so it carries aria-controls + aria-expanded — not aria-haspopup.
     const pickerPanel = this.calendarEl.querySelector<HTMLElement>('[data-panel="picker"]')

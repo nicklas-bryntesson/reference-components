@@ -15,8 +15,8 @@ The lane draws. This component owns only the rules that are about the **pair**.
 <fieldset class="RangeGroup" data-component="RangeGroup">
   <legend>Price</legend>
   <div class="roles">
-    <label for="price-lower">Lowest <b data-readout="lower" data-suffix="tkr">200 tkr</b></label>
-    <label for="price-upper">Highest <b data-readout="upper" data-suffix="tkr">700 tkr</b></label>
+    <label for="price-lower">Lowest <b data-readout="lower" aria-hidden="true" data-suffix="tkr">200 tkr</b></label>
+    <label for="price-upper">Highest <b data-readout="upper" aria-hidden="true" data-suffix="tkr">700 tkr</b></label>
   </div>
   <div class="RangeScale" data-component="RangeScale" data-fields="2"
        style="--_rs-a: 0.2; --_rs-b: 0.7">
@@ -36,6 +36,9 @@ Contract rules (enforced by the unit test):
   group name.
 - **Each field has its own `<label>`.** "Lowest" and "highest" is what each control *is*; a span is
   not one value with two handles, and a single label for the pair would leave one end unnamed.
+- **The readout inside the label is `aria-hidden="true"`.** Visible next to the role word, but kept
+  out of the accessible name — un-hidden, the name would be "Lowest 200 tkr": a name that mutates on
+  every step, and a value spoken twice, since `aria-valuetext` already carries it.
 - **`data-role="lower"` / `"upper"` is the discriminator**, and it is a role rather than a position:
   in RTL the lower end sits on the right.
 - **Both fields share `min`, `max` and `step`.** Two different scales on one lane would make the
@@ -104,7 +107,9 @@ So the same fact is carried in words as well, which is the half that is honoured
 `aria-valuetext` reads *"200 tkr, within 200–700 tkr"*. It deliberately does **not** repeat the role
 — the `<label>` already says which end this is, and a screenreader announces name, then role, then
 this. "Lowest, slider, 200 tkr, lowest of…" says it twice. What is missing from the announcement is
-the pair, so that is what the text adds.
+the pair, so that is what the text adds. The name half is protected the same way: the visible
+readout inside the label is `aria-hidden`, so the name stays "Lowest" rather than "Lowest 200 tkr"
+— the same value spoken twice from the other direction.
 
 If the measurement comes back negative elsewhere, delete the two attribute lines: the words already
 carry it.
