@@ -76,8 +76,12 @@ function canonical(state: StateDefinition): string {
 // A range ALWAYS carries a value — there is no empty state (ADR-0022). So the
 // two interaction rows are `min` (at the minimum, nothing filled) and `mid`
 // (partially filled), not the family's usual empty/filled pair.
-const min = { min: '0', max: '100', step: '1', value: '0', 'aria-valuetext': '0 %' }
-const mid = { min: '0', max: '100', step: '1', value: '50', 'aria-valuetext': '50 %' }
+//
+// No aria-valuetext anywhere: RangeField ships no JavaScript, so an authored
+// valuetext freezes on the first arrow key — the value moves, the speech does
+// not. The spoken unit belongs to RangeScale, whose JS owns the attribute.
+const min = { min: '0', max: '100', step: '1', value: '0' }
+const mid = { min: '0', max: '100', step: '1', value: '50' }
 
 const states: StateDefinition[] = [
   // ── Interaction states — at minimum ─────────────────────────────────────────
@@ -111,7 +115,7 @@ const states: StateDefinition[] = [
   //    so the keyboard can land on every mark. No marks are drawn here — this
   //    component has nowhere to put them.
   { file: '_variant-stepped', id: 'rf-variant-stepped', rootId: 'rangefield-stepped', label: 'Volume (steps of 25)',
-    input: { min: '0', max: '100', step: '25', value: '75', 'aria-valuetext': '75 %' } },
+    input: { min: '0', max: '100', step: '25', value: '75' } },
 
   // 2. Resized: --_rf-thumb is the shared geometry constant, so overriding it
   //    moves the thumb, the track centring and the ring together. Relative units,
@@ -124,19 +128,19 @@ const states: StateDefinition[] = [
   { file: '_variant-text-scaled', id: 'rf-variant-text-scaled', rootId: 'rangefield-text-scaled', label: 'Volume (font-size: 1.5rem)',
     input: { ...mid, style: 'font-size: 1.5rem' } },
 
-  // 4. aria-valuetext carries a unit the number alone does not convey.
-  { file: '_variant-valuetext', id: 'rf-variant-valuetext', rootId: 'rangefield-valuetext', label: 'Budget',
-    input: { min: '0', max: '1000', step: '50', value: '250', 'aria-valuetext': '250 kr' } },
+  // (There is deliberately no aria-valuetext variant. It used to exist — a static
+  // "250 kr" that froze the moment the value moved, because nothing here updates
+  // it. A value that must SPEAK its unit is RangeScale's job.)
 
-  // 5. Vertical, min at the bottom — the default recipe (volume, mixer).
+  // 4. Vertical, min at the bottom — the default recipe (volume, mixer).
   { file: '_variant-vertical', id: 'rf-variant-vertical', rootId: 'rangefield-vertical', label: 'Volume (vertical)',
     input: { ...mid, 'data-orientation': 'vertical' } },
 
-  // 6. Vertical, min at the top — the other anchor.
+  // 5. Vertical, min at the top — the other anchor.
   { file: '_variant-vertical-top', id: 'rf-variant-vertical-top', rootId: 'rangefield-vertical-top', label: 'Depth (min at top)',
     input: { ...mid, 'data-orientation': 'vertical', 'data-min': 'top' } },
 
-  // 7. A datalist is correct markup and renders NOTHING here: appearance:none
+  // 6. A datalist is correct markup and renders NOTHING here: appearance:none
   //    removed the browser's marks. Kept to document that, not to show it.
   { file: '_variant-datalist', id: 'rf-variant-datalist', rootId: 'rangefield-datalist', label: 'Volume (datalist, no marks drawn)',
     input: { min: '0', max: '100', step: '25', value: '50', list: 'rf-variant-datalist-ticks' } },

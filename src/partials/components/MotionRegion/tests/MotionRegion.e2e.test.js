@@ -37,6 +37,19 @@ test('the control pauses motion and the CSS gate stops the animation', async ({ 
   await expect(region.locator('.control')).toHaveAttribute('aria-label', /play/i)
 })
 
+// A screenreader does not re-announce a name change on the focused element, so
+// the label swap alone is silent (measured with VoiceOver). The status region
+// speaks the resolved state — but starts empty: a page load announces nothing.
+test('a user toggle writes the status region; load leaves it empty', async ({ page }) => {
+  const region = page.locator(MR)
+  const status = region.locator('[role="status"]')
+  await expect(status).toHaveText('')
+  await region.locator('.control').click()
+  await expect(status).toHaveText('Background animation paused')
+  await region.locator('.control').click()
+  await expect(status).toHaveText('Background animation playing')
+})
+
 test('passes an axe audit', async ({ page }) => {
   await scopedCheckA11y(page, MR)
 })

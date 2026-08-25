@@ -87,6 +87,11 @@ reduced-motion — that is an accessibility footgun (WCAG 2.3.3), and a non-goal
 - **Pause control (WCAG 2.2.2).** When motion can run, the component renders a real `<button>` toggle
   (accessible label swaps play/pause via `data-play-text` / `data-pause-text`, `aria-controls` points
   at the media, icon is `aria-hidden`). This is a requirement, not a nicety.
+- **The toggle is heard, not just relabelled.** A screenreader does not re-announce a name change on
+  the focused element, so the label swap alone is silent until focus leaves and returns (measured
+  with VoiceOver). A visually hidden `role="status"` region speaks the resolved state on each user
+  toggle — `data-playing-text` / `data-paused-text` — and **only** on user toggles: policy changes
+  (scrolling out of view, a reduced-motion flip) stay quiet, or every viewport exit would announce.
 - **Reduced motion (WCAG 2.3.3).** Respected by default; the user opt-in override above is the only
   exception, and it re-evaluates on every reduced-motion change.
 - **Progressive-enhancement floor.** With no JS, a `<noscript>` native-controls `<video>` renders — a
@@ -100,6 +105,7 @@ reduced-motion — that is an accessibility footgun (WCAG 2.3.3), and a non-goal
 | `data-autoplay` | `"off"` \| `"policy"` | Author opt-in, the autostart gate. `"policy"` (default) lets motion autostart when unblocked; `"off"` never autostarts — motion waits for the user, who can still play it. |
 | `data-motion` | `"running"` \| `"paused"` | **Set by JS.** The resolved state; the CSS gate and e2e assertions key on it. Absent until the component initializes. |
 | `data-play-text` / `data-pause-text` | string | Accessible labels for the toggle (default `"Play video"` / `"Pause video"`; override per media). |
+| `data-playing-text` / `data-paused-text` | string | Spoken status after a user toggle, written to the `role="status"` region (default `"Motion playing"` / `"Motion paused"`; override per media). |
 | `data-initialized` | `"true"` | Set by JS once attached. |
 
 ## JS API
@@ -151,7 +157,10 @@ Test with a real screenreader before shipping. The animated media is decorative
 
 - [ ] The animated media is NOT announced as content — no stray image/video node in the reading order
 - [ ] Tab reaches the control; it is announced as a button with a clear label ("Pause background animation" / "Play background animation")
-- [ ] Space/Enter toggles motion; the label updates to the next action and the state change is perceivable
+- [ ] Space/Enter toggles motion; the label updates to the next action and the new state is
+      announced immediately via the status region ("Motion paused" / "Motion playing"), without
+      leaving the button
+- [ ] Scrolling the region out of view (policy pause) announces NOTHING — only user toggles speak
 - [ ] With OS reduced-motion on, motion does not autostart; the control still starts it and is labelled "Play…"
 - [ ] The control's `aria-controls` points at the media it governs (video backend)
 

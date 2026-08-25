@@ -15,14 +15,14 @@ third. Anything else drawn on the same lane — tick marks, a value bubble, a re
 a second thumb — belongs to **RangeScale**, which composes this component.
 
 `role="slider"`, `aria-valuemin/max/now`, arrow-key stepping, Home/End, form participation
-and label association are all native. We add no ARIA except the optional `aria-valuetext`.
+and label association are all native. We add **no ARIA at all**.
 
 ## Contract
 
 ```html
 <label for="volume">Volume</label>
 <input class="RangeField" type="range" id="volume" name="volume"
-       min="0" max="100" step="1" value="50" aria-valuetext="50 %">
+       min="0" max="100" step="1" value="50">
 ```
 
 Contract rules (enforced by the unit test):
@@ -33,9 +33,13 @@ Contract rules (enforced by the unit test):
   remove the latter.
 - **Never author `aria-valuemin`, `aria-valuemax` or `aria-valuenow`.** They are derived
   from `min`, `max` and `value`. Writing them by hand is at best redundant.
-- **`aria-valuetext` when the number is not the meaning** — a unit, a currency, a word. Set
-  the starting value in the HTML so it degrades without JS, and update it on `input`.
-  When the number *is* the meaning, omit it.
+- **Never author `aria-valuetext` either — for a worse reason.** The other three are
+  redundant; this one is a trap. RangeField ships no JavaScript, so an authored valuetext
+  freezes on the first arrow key: the value moves, the speech does not (measured with
+  VoiceOver — value at 51, spoken "50 %"). A value that must *speak* its unit needs an
+  owner that updates it on every `input`, and that owner is **RangeScale**, whose script
+  already does exactly this. When the number is the meaning, the native announcement is
+  correct and fresh by itself.
 - **`step` must match any tick values** drawn by a composing RangeScale, or the keyboard
   cannot land on them.
 
@@ -48,7 +52,6 @@ Contract rules (enforced by the unit test):
 | `disabled` | present / absent | Functional state — `pointer-events: none`, so no hover/focus |
 | `required` | present / absent | Native constraint validation. Note a range **always** carries a value, so `required` cannot express "no answer yet" — if the form needs that state, a range is the wrong control |
 | `list` | id ref | A `<datalist>` of tick values. **Renders nothing here** — `appearance: none` removes the browser's marks. Keep it as correct markup; draw marks with RangeScale |
-| `aria-valuetext` | string | The spoken value when the number is not the meaning |
 | `data-orientation` | `horizontal` (default) · `vertical` | Writing-mode, geometry and arrow mapping. See below |
 | `data-min` | `top` | Vertical only: puts min at the **top**. Default is min at the bottom |
 | `data-invalid` | `"true"` | Visual invalid skin (pair with `aria-invalid="true"`) |
@@ -210,8 +213,9 @@ which a `box-shadow` ring would not.
 
 - [ ] **Desktop SR (NVDA/JAWS/VoiceOver):** Tab to the field — I HEAR its purpose, that it is a
       slider/range, its label read with it, and its current value.
-- [ ] Arrow keys change the value by one step — I HEAR each new value.
-- [ ] With `aria-valuetext` set, I HEAR the text (unit or word), not the bare number.
+- [ ] Arrow keys change the value by one step — I HEAR each new value, **fresh every step**
+      (a value that repeats while the thumb moves means someone authored `aria-valuetext`;
+      see the contract rule — that belongs to RangeScale).
 - [ ] Home / End reach min and max and announce them.
 - [ ] **Mobile SR:** swipe focuses the field with purpose, role and value; swipe up/down (iOS) or
       volume buttons (Android) change it one step and announce.
