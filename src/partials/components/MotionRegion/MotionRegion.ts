@@ -41,6 +41,8 @@ export default class MotionRegion {
   autoplay: 'off' | 'policy'
   playLabel: string
   pauseLabel: string
+  playingStatus: string
+  pausedStatus: string
 
   userPaused = false
   userStarted = false
@@ -50,6 +52,7 @@ export default class MotionRegion {
   video: HTMLVideoElement | null = null
   appliedVideoState: MotionState | null = null
   control: HTMLButtonElement | null = null
+  statusRegion: HTMLElement | null = null
   iconPath: SVGPathElement | null = null
   reducedMotionQuery: MediaQueryList | null = null
   connection: NetworkInformationLike | null = null
@@ -60,6 +63,8 @@ export default class MotionRegion {
     this.autoplay = root.dataset.autoplay === 'off' ? 'off' : 'policy'
     this.playLabel = root.dataset.playText || 'Play video'
     this.pauseLabel = root.dataset.pauseText || 'Pause video'
+    this.playingStatus = root.dataset.playingText || 'Motion playing'
+    this.pausedStatus = root.dataset.pausedText || 'Motion paused'
 
     this.onSignalChange = this.onSignalChange.bind(this)
     this.onToggle = this.onToggle.bind(this)
@@ -122,6 +127,16 @@ export default class MotionRegion {
     control.addEventListener('click', this.onToggle)
     this.root.prepend(control)
     this.control = control
+
+    // A screenreader does not re-announce a name change on the focused element,
+    // so the aria-label swap alone leaves the toggle silent. This region speaks
+    // the resolved state instead. Starts empty (nothing to announce on load) and
+    // is written only from onToggle — policy changes must stay quiet.
+    const status = document.createElement('span')
+    status.className = 'status'
+    status.setAttribute('role', 'status')
+    this.root.prepend(status)
+    this.statusRegion = status
   }
 
   // Read the live browser signals. Every source is feature-detected, so the
@@ -199,6 +214,12 @@ export default class MotionRegion {
       this.userPaused = false
     }
     this.resolve()
+    // Announce the RESOLVED state, not the intent — if policy keeps motion
+    // paused despite a play press, "paused" is the truth the user needs.
+    if (this.statusRegion) {
+      this.statusRegion.textContent =
+        this.state === 'running' ? this.playingStatus : this.pausedStatus
+    }
   }
 
   onVisibilityChange(entries: IntersectionObserverEntry[]): void {
@@ -219,6 +240,8 @@ export default class MotionRegion {
     this.control?.removeEventListener('click', this.onToggle)
     this.control?.remove()
     this.control = null
+    this.statusRegion?.remove()
+    this.statusRegion = null
     this.iconPath = null
     this.video = null
     this.appliedVideoState = null

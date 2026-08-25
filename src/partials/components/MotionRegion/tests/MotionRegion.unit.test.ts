@@ -118,6 +118,48 @@ describe('MotionRegion — user intent via the control', () => {
   })
 })
 
+/**
+ * A screenreader does not re-announce a name change on the focused element, so
+ * the aria-label swap alone leaves the toggle SILENT — measured with VoiceOver
+ * 2026-08-25: nothing is spoken until focus leaves and returns. A role="status"
+ * region carries the resolved state instead. It is written ONLY on user toggles;
+ * policy changes (scrolling out of view, reduced-motion flips) must stay quiet,
+ * or every viewport exit becomes an announcement.
+ */
+describe('MotionRegion — the toggle is heard, not just relabelled', () => {
+  function status(el: HTMLElement): HTMLElement | null {
+    return el.querySelector<HTMLElement>('[role="status"]')
+  }
+
+  it('injects a status region, empty until the user acts', () => {
+    const el = createRegion({ 'data-autoplay': 'policy' })
+    MotionRegion.attach(document.body)
+    expect(status(el)).not.toBeNull()
+    expect(status(el)!.textContent).toBe('')
+  })
+
+  it('announces the resolved state on toggle, both ways', () => {
+    const el = createRegion({ 'data-autoplay': 'policy' })
+    MotionRegion.attach(document.body)
+    const btn = control(el)!
+    btn.click() // running → paused
+    expect(status(el)!.textContent).toBe('Motion paused')
+    btn.click() // paused → running
+    expect(status(el)!.textContent).toBe('Motion playing')
+  })
+
+  it('takes its wording from data-paused-text / data-playing-text', () => {
+    const el = createRegion({
+      'data-autoplay': 'policy',
+      'data-paused-text': 'Animation pausad',
+      'data-playing-text': 'Animation spelas',
+    })
+    MotionRegion.attach(document.body)
+    control(el)!.click()
+    expect(status(el)!.textContent).toBe('Animation pausad')
+  })
+})
+
 describe('MotionRegion — video adapter', () => {
   let playSpy: ReturnType<typeof vi.spyOn>
   let pauseSpy: ReturnType<typeof vi.spyOn>

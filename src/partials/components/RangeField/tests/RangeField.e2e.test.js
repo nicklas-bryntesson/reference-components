@@ -124,10 +124,17 @@ test('the accessible name comes from the <label>, not aria-label', async ({ page
   expect(name).toBe('Volume')
 })
 
-test('aria-valuetext carries the unit where the number is not the meaning', async ({ page }) => {
-  const input = page.locator('#rf-variant-valuetext')
-  await input.scrollIntoViewIfNeeded()
-  await expect(input).toHaveAttribute('aria-valuetext', '250 kr')
+// A bare RangeField ships no JavaScript, so an authored aria-valuetext freezes on
+// the first arrow key — the value moves, the speech does not (measured with
+// VoiceOver: value at 51, spoken "50 %"). The spoken unit belongs to RangeScale,
+// whose script owns the attribute. Guard every standalone instance on the page.
+test('no bare RangeField authors aria-valuetext — it would freeze', async ({ page }) => {
+  const offenders = await page.evaluate(() =>
+    [...document.querySelectorAll('input[data-component="RangeField"]')]
+      .filter((el) => el.hasAttribute('aria-valuetext'))
+      .map((el) => el.id),
+  )
+  expect(offenders).toEqual([])
 })
 
 test('invalid states pair data-invalid with aria-invalid', async ({ page }) => {

@@ -26,8 +26,8 @@ const attr = (html: string, name: string): string | null => {
 
 describe('RangeField state partials', () => {
   it('generates the expected number of partials', () => {
-    expect(files.length).toBe(22)
-    expect(fieldFiles.length).toBe(20)
+    expect(files.length).toBe(21)
+    expect(fieldFiles.length).toBe(19)
   })
 
   it.each(fieldFiles)('%s — is a native range input', (file) => {
@@ -52,8 +52,16 @@ describe('RangeField state partials', () => {
     expect(read(file)).not.toContain('--_rf-p')
   })
 
-  it.each(fieldFiles)('%s — never authors aria-valuemin/valuemax/valuenow', (file) => {
-    expect(read(file)).not.toMatch(/aria-value(min|max|now)=/)
+  /**
+   * valuetext joins the never-author list for a different reason than the other
+   * three: they are redundant, it is a TRAP. RangeField ships no JavaScript, so
+   * an authored aria-valuetext freezes on the first arrow key — the value moves,
+   * the speech does not (measured with VoiceOver 2026-08-25: value at 51, spoken
+   * "50 %"). A spoken unit belongs to the composing RangeScale, whose JS owns
+   * the attribute.
+   */
+  it.each(fieldFiles)('%s — never authors aria-valuemin/valuemax/valuenow/valuetext', (file) => {
+    expect(read(file)).not.toMatch(/aria-value(min|max|now|text)=/)
   })
 
   it.each(fieldFiles)('%s — has no aria-label competing with the <label>', (file) => {
