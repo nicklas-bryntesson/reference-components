@@ -5,6 +5,7 @@ Custom accessible datetime input wrapping a hidden `input[type="datetime-local"]
 ## Contract
 
 ```html
+<label for="UNIQUE_ID">Date and time</label>
 <div
   class="DateTimeField"
   data-component="DateTimeField"
@@ -15,7 +16,7 @@ Custom accessible datetime input wrapping a hidden `input[type="datetime-local"]
   <input type="datetime-local" class="native" tabindex="-1" aria-hidden="true">
   <div class="overlay">
     <div class="segments" role="group"></div>
-    <button class="trigger" type="button"><!-- calendar icon SVG --></button>
+    <button class="trigger" type="button" aria-label="Open calendar" aria-expanded="false" aria-haspopup="dialog"><!-- calendar icon SVG --></button>
   </div>
   <template class="calendar-template">
     <div class="popup" role="dialog" aria-modal="true">
@@ -82,6 +83,7 @@ not a listbox popup).
 | `data-invalid` | `"true"` | Marks field invalid, adds `aria-invalid` |
 | `data-value` | `YYYY-MM-DDTHH:mm` | Initial value (server-render) |
 | `data-step` | number (seconds) | Shows second segment when < 60 |
+| `data-label-field` | string | Fallback `aria-label` for `.segments` when no matching `<label for>` exists |
 
 ### State attributes (set by JS)
 
@@ -110,9 +112,14 @@ JS also sets two inline custom properties on the root while the popup is open: `
 ## Accessibility notes
 
 - Native input is `aria-hidden="true"` and `tabindex="-1"`
-- `.segments` has `role="group"` with `aria-roledescription`
+- `.segments` has `role="group"` with `aria-roledescription`, and is **named** from the `<label for>`
+  via `aria-labelledby` (JS wires it on mount; `data-label-field` is the fallback when no label
+  element exists). The label targets the native input, so display mode needs no extra wiring
+- The trigger carries `aria-haspopup="dialog"` and `aria-expanded`; its `aria-label` swaps between
+  "Open calendar" and "Close calendar" (localised)
+- Popup is `role="dialog"` with `aria-modal="true"`, named "Choose date and time" (localised) — a
+  title, not the trigger's action label
 - Each spinbutton has `aria-valuemin`, `aria-valuemax`, `aria-valuenow`, `aria-valuetext` — except the AM/PM segment, which gets only `aria-valuenow`/`aria-valuetext` (a 2-state toggle, not a range)
-- Popup is `role="dialog"` with `aria-modal="true"`
 - Time columns are `.Wheel` spinbuttons — the `WheelColumn` primitive sets `role="spinbutton"` with `aria-valuemin`/`aria-valuemax`/`aria-valuenow`/`aria-valuetext` (not `listbox`)
 - `aria-disabled="true"` on all segments when disabled
 - `.announce` (`aria-live="polite"`, `aria-atomic="true"`, last child of the root) announces the selected date and time on each value change

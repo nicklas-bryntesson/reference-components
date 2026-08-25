@@ -60,6 +60,19 @@ describe('RangeGroup state partials', () => {
   })
 
   /**
+   * The readout sits inside the <label>. Un-hidden it would enter the field's
+   * accessible name — a name that mutates on every step, and a value announced
+   * twice, since aria-valuetext already carries it. Hidden, the name is the
+   * stable role word alone.
+   */
+  it.each(files)('%s — readouts are aria-hidden, keeping the value out of the name', (file) => {
+    const html = read(file)
+    const readouts = html.match(/<b[^>]*data-readout[^>]*>/g) ?? []
+    expect(readouts.length).toBe(2)
+    for (const tag of readouts) expect(tag, tag).toContain('aria-hidden="true"')
+  })
+
+  /**
    * Two different scales on one lane would make the drawn span meaningless: the
    * same pixel would mean two different values.
    */
