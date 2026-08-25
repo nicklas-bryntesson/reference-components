@@ -1,8 +1,13 @@
 # ADR 0027: Spoken output is a test tier — assert what the screenreader says, with guidepup
 
-**Status:** Proposed
+**Status:** Superseded by ADR-0028
 **Date:** 2026-08-25
 **Decider:** Nicklas Bryntesson
+
+> Superseded the same day: guidepup's real permission surface (Accessibility, Automation, and
+> depending on use Location Services, Microphone, Screen Recording, Bluetooth; SIP-disabling on
+> the CI path) was judged a worse trade than the tier is worth on a development machine. The
+> three-layer analysis below stands; the runner does not. See ADR-0028.
 
 ## Context
 
