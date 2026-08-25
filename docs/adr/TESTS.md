@@ -180,6 +180,22 @@ swap map nearly-true instead of true.
 > `data-segment`) before this decision; ADR-0019's own worked example mixes both mechanisms in a
 > single rule.
 
+---
+
+## 15 · Which tier does an accessibility assertion belong to?
+
+**If it can be read from the accessibility tree, it belongs in e2e+axe. If it is about what is
+*spoken* — announcement on change, silence, repetition — it belongs in the spoken suite
+(`test:vo`). If it needs human judgment — is this noise, does the order make sense, mobile — it
+stays on the manual checklist** (ADR-0027).
+
+The failure mode this guards: a correct-looking tree that speaks wrongly. Both 2026-08-25 speech
+defects (RangeField's frozen `aria-valuetext`, MotionRegion's silent label swap) passed every tree
+check; and conversely, listening for what the tree already proves wastes the scarce manual pass.
+
+> **Worked:** "the trigger has `aria-haspopup="dialog"`" → tree, e2e. "arrowing announces the new
+> value once" → spoken. "is announcing the placeholder as 'dd' confusing?" → human.
+
 ## Conventions you do not need to re-decide
 
 Not tests — settled rules, listed so they are not re-litigated:
