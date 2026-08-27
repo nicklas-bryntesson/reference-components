@@ -224,6 +224,24 @@ test('Escape from picker does not close calendar', async ({ page }) => {
   await expect(page.locator(`${TARGET} .popup`)).toBeVisible()
 })
 
+test('Escape from picker keeps the wheel-applied date — field and grid stay in sync', async ({ page }) => {
+  await page.locator('[data-id="birthdate"] .trigger').click()
+  const header = page.locator('[data-id="birthdate"] .month-year-trigger')
+  await header.click()
+  await page.locator(`${TARGET} .popup .Wheel[data-picker="year"]`).focus()
+  await page.keyboard.press('ArrowDown')
+  await page.waitForTimeout(600) // snap + commit
+  const native = page.locator('[data-id="birthdate"] .native')
+  const applied = await native.inputValue()
+  expect(applied).not.toBe('') // the wheel applied a date live
+  await page.keyboard.press('Escape')
+  // The wheels edit live (same model as the time wheels) — Escape only closes
+  // the panel. The value must survive AND the calendar heading must show the
+  // applied year: an "undo" that reverts only the view desyncs field and grid.
+  await expect(native).toHaveValue(applied)
+  expect(await header.textContent()).toContain(applied.slice(0, 4))
+})
+
 test('spinning the year wheel updates the underlying field', async ({ page }) => {
   await page.locator('[data-id="birthdate"] .trigger').click()
   await page.locator('[data-id="birthdate"] .month-year-trigger').click()

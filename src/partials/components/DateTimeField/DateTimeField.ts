@@ -130,8 +130,6 @@ export class DateTimeField {
   min: Date | null
   max: Date | null
 
-  private _pickerEntryYear = 0
-  private _pickerEntryMonth = 0
   _syncingFromCustom = false
   _segmentEls: HTMLSpanElement[] = []
   _digitBuffer = ''
@@ -1232,8 +1230,6 @@ export class DateTimeField {
 
   _openPicker(): void {
     if (!this.calendarEl) return
-    this._pickerEntryYear = this.currentYear
-    this._pickerEntryMonth = this.currentMonth
     const pickerGroup = this.calendarEl.querySelector<HTMLElement>('.year-month-picker')!
     pickerGroup.setAttribute('aria-label', this.t.openPicker)
     const monthHost = this.calendarEl.querySelector<HTMLElement>('.Wheel[data-picker="month"]')!
@@ -1313,11 +1309,12 @@ export class DateTimeField {
   }
 
   _handlePickerKeydown(e: KeyboardEvent): void {
-    // Escape cancels — restore the month/year the picker opened on.
+    // Escape closes the panel — it does NOT undo. The wheels apply the date
+    // live on every step (field, native input, segments, announce region), so
+    // there is nothing coherent left to cancel: reverting only the view would
+    // desync the calendar heading from the field's actual value.
     if (e.key === 'Escape') {
       e.preventDefault()
-      this.currentYear = this._pickerEntryYear
-      this.currentMonth = this._pickerEntryMonth
       this._closePicker()
       return
     }
