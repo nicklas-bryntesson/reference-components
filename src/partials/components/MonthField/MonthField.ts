@@ -17,6 +17,8 @@ interface TranslationStrings {
   popupLabel: string
   clearButton: string
   thisMonthButton: string
+  /** Spoken value of an empty segment (aria-valuetext). See _clearSegment. */
+  empty: string
 }
 
 interface SegmentHandlers {
@@ -69,11 +71,13 @@ class MonthField {
       month: 'Month', year: 'Year',
       openMonthPicker: 'Open month picker', popupLabel: 'Choose month',
       clearButton: 'Clear', thisMonthButton: 'This month',
+      empty: 'blank',
     },
     sv: {
       month: 'Månad', year: 'År',
       openMonthPicker: 'Öppna månadsväljare', popupLabel: 'Välj månad',
       clearButton: 'Rensa', thisMonthButton: 'Denna månad',
+      empty: 'tomt',
     },
   }
 
@@ -293,7 +297,10 @@ class MonthField {
     span.setAttribute('aria-valuemin', String(min))
     span.setAttribute('aria-valuemax', String(max))
     span.setAttribute('data-placeholder', 'true')
-    span.setAttribute('aria-valuetext', '--')
+    // Spoken empty value is the localized `empty` word — never the visible
+    // placeholder token and never bare min/max without a valuetext, which trips
+    // VoiceOver's percent fallback (measured on native's empty segments).
+    span.setAttribute('aria-valuetext', this.t.empty)
     span.textContent = type === 'year' ? '----' : '--'
 
     return span
@@ -452,7 +459,7 @@ class MonthField {
     const type = seg.dataset.segment as MonthSegmentType
     seg.setAttribute('data-placeholder', 'true')
     seg.removeAttribute('aria-valuenow')
-    seg.setAttribute('aria-valuetext', '--')
+    seg.setAttribute('aria-valuetext', this.t.empty)
     seg.textContent = type === 'year' ? '----' : '--'
     this._syncToNative()
   }
@@ -720,6 +727,7 @@ class MonthField {
     // Month wheel: loops (Dec↔Jan), shows localized month NAME (O2).
     const monthOpts: WheelColumnOptions = {
       min: 0, max: 11, value: currentMonth, loop: true,
+      emptyText: this.t.empty,
       format: (v) => getMonthName(currentYear ?? new Date().getFullYear(), v, this.localeTag),
       onChange: (m) => this._selectPopupOption('month', m),
     }
@@ -728,6 +736,7 @@ class MonthField {
     // Year wheel: clamps to min..max, shows the plain number.
     const yearOpts: WheelColumnOptions = {
       min: this.minYear, max: this.maxYear, value: currentYear, loop: false,
+      emptyText: this.t.empty,
       format: (v) => String(v),
       onChange: (y) => this._selectPopupOption('year', y),
     }
@@ -855,6 +864,11 @@ class MonthField {
     // cascade above would otherwise fire per segment).
     this.native.dispatchEvent(new Event('input', { bubbles: true }))
     this.native.dispatchEvent(new Event('change', { bubbles: true }))
+
+    // Speak the committed value: closing moves focus to the trigger, whose
+    // label says nothing about WHAT was set — without this, "This month" is
+    // silent in a screenreader. Same live-region write as the segment path.
+    this._announceValue(iso)
 
     // A footer action that completes the value commits and closes (ADR-0029) —
     // spinning the wheels stays live, but This month is done. The clicked button

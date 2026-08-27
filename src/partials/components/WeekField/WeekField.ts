@@ -33,6 +33,8 @@ interface TranslationStrings {
   weekField: string
   selected: string
   notAvailable: string
+  /** Spoken value of an empty segment (aria-valuetext). See _clearSegment. */
+  empty: string
 }
 
 interface SegmentHandlers {
@@ -102,6 +104,7 @@ class WeekField {
       clearButton: 'Clear', thisWeekButton: 'This week',
       weekAbbrev: 'Wk', announceSelected: 'Selected week:', weekField: 'week field',
       selected: 'selected', notAvailable: 'not available',
+      empty: 'blank',
     },
     sv: {
       week: 'Vecka', year: 'År',
@@ -110,6 +113,7 @@ class WeekField {
       clearButton: 'Rensa', thisWeekButton: 'Denna vecka',
       weekAbbrev: 'v.', announceSelected: 'Vald vecka:', weekField: 'veckofält',
       selected: 'vald', notAvailable: 'ej tillgänglig',
+      empty: 'tomt',
     },
   }
 
@@ -352,7 +356,10 @@ class WeekField {
     span.setAttribute('aria-valuemin', String(min))
     span.setAttribute('aria-valuemax', String(max))
     span.setAttribute('data-placeholder', 'true')
-    span.setAttribute('aria-valuetext', '--')
+    // Spoken empty value is the localized `empty` word — never the visible
+    // placeholder token and never bare min/max without a valuetext, which trips
+    // VoiceOver's percent fallback (measured on native's empty segments).
+    span.setAttribute('aria-valuetext', this.t.empty)
     span.textContent = type === 'year' ? '----' : '--'
 
     return span
@@ -522,7 +529,7 @@ class WeekField {
     const type = seg.dataset.segment as WeekSegmentType
     seg.setAttribute('data-placeholder', 'true')
     seg.removeAttribute('aria-valuenow')
-    seg.setAttribute('aria-valuetext', '--')
+    seg.setAttribute('aria-valuetext', this.t.empty)
     seg.textContent = type === 'year' ? '----' : '--'
     this._syncToNative()
   }

@@ -47,7 +47,7 @@ In every mode the value written to the native input is a valid `YYYY-Www` string
 
 Two inline spinbutton segments, in order **week → year** separated by `/`, prefixed with a localized "week" abbreviation (`v.` / `Wk`). The segments group carries a localized `aria-roledescription` so AT announces it as a week field:
 
-- **week** — `role="spinbutton"`, `aria-valuemin="1"`, `aria-valuemax` = **52 or 53** depending on the current year (an ISO year has 53 weeks iff Dec 28 falls in week 53). Displays a zero-padded number ("27"). `aria-valuetext` carries a human label so AT announces e.g. "Vecka 27, 2026" (O1).
+- **week** — `role="spinbutton"`, `aria-valuemin="1"`, `aria-valuemax` = **52 or 53** depending on the current year (an ISO year has 53 weeks iff Dec 28 falls in week 53). Displays a zero-padded number ("27"). `aria-valuetext` carries a human label so AT announces e.g. "Vecka 27, 2026" (O1). Empty segments remove `aria-valuenow` and speak the localized `empty` word ("blank"/"tomt") as `aria-valuetext` — never the visible placeholder, and never no valuetext at all (min/max without valuenow makes VoiceOver announce a computed percentage). Same contract as DateField.
 - **year** — `role="spinbutton"`, bounds from `data-min`/`data-max`, or the current ISO week-year ±100 when unbounded (O3). Displays the plain 4-digit year. Changing the year re-clamps the week segment to that year's valid max.
 
 ## Keyboard

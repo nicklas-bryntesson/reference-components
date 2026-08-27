@@ -26,6 +26,8 @@ State attributes set by JS: `data-initialized="true"`, `data-open="true"`, `data
 - **second** — 00–59, only rendered when `data-step < 60`
 - **ampm** — AM/PM, only rendered for 12h locales (e.g. en-US)
 
+Empty segments remove `aria-valuenow` and speak the localized `empty` word ("blank"/"tomt") as `aria-valuetext` — never the visible placeholder, and never no valuetext at all (min/max without valuenow makes VoiceOver announce a computed percentage). Same contract as DateField.
+
 ## Keyboard
 
 | Key | Action |
@@ -44,7 +46,7 @@ State attributes set by JS: `data-initialized="true"`, `data-open="true"`, `data
 Two footer buttons, both tab stops inside the popup focus trap:
 
 - **Clear** ("Rensa") — disabled (and skipped by Tab) while the field is empty. Clears the segments and the native value, then dispatches `input` + `change` once.
-- **Now** ("Nu") — writes the current time, clamped to `data-min`/`data-max`, then dispatches `input` + `change` once.
+- **Now** ("Nu") — writes the current time, clamped to `data-min`/`data-max`, then dispatches `input` + `change` once and speaks the committed time via the `.announce` live region (closing moves focus to the trigger, which says nothing about *what* was set).
 
 Both buttons close the popup and return focus to the trigger: a footer action
 completes the value, so the task is done. Spinning the wheels never closes —

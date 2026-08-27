@@ -1012,3 +1012,33 @@ describe('DateField — _updateLayout direction', () => {
     el.remove()
   })
 })
+
+// ─── Empty segments speak a localized word ──────────────────────────────────────
+
+describe('DateField — empty segments speak a localized word, never the placeholder', () => {
+  // Measured 2026-08-27: speaking the visible placeholder reads differently per
+  // segment ("dd" ≠ "mm" ≠ "yyyy" in a screenreader's mouth), and omitting the
+  // valuetext entirely trips VoiceOver's percent fallback (native's empty
+  // segments announce "−950 %, År"). One localized word, every segment.
+  it('initial empty segments carry aria-valuetext "tomt" (sv) with visible placeholder intact', () => {
+    // locale 'sv' (not 'sv-SE'): earlier tests in this file register 'sv-SE'
+    // as a custom locale whose unregistered keys spread from `en`.
+    const { el } = makeField({ locale: 'sv' })
+    const day = el.querySelector('[data-segment="day"]')!
+    expect(day.getAttribute('aria-valuetext')).toBe('tomt')
+    expect(day.textContent).toBe('dd')
+    expect(day.hasAttribute('aria-valuenow')).toBe(false)
+    el.remove()
+  })
+
+  it('clearing a filled segment restores the spoken empty word (en → "blank")', () => {
+    const { el, instance } = makeField({ locale: 'en' })
+    const day = instance._getSegmentEl('day')!
+    instance._setSegmentValue(day, 12)
+    expect(day.getAttribute('aria-valuetext')).toBe('12')
+    instance._clearSegment(day)
+    expect(day.getAttribute('aria-valuetext')).toBe('blank')
+    expect(day.textContent).toBe('dd')
+    el.remove()
+  })
+})

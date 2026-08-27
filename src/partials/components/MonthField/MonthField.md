@@ -29,6 +29,8 @@ Two inline spinbutton segments, in order **month → year** separated by `/`:
 
 The popup **month wheel** shows the localized month **name** ("Juni"); the inline month **segment** shows the number ("06"). Both surfaces carry the human label in `aria-valuetext` (O2).
 
+Empty segments remove `aria-valuenow` and speak the localized `empty` word ("blank"/"tomt") as `aria-valuetext` — never the visible placeholder, and never no valuetext at all (min/max without valuenow makes VoiceOver announce a computed percentage). Same contract as DateField.
+
 ## Keyboard
 
 | Key | Action |
@@ -51,7 +53,7 @@ The native `<input type="month">` value is written as `YYYY-MM` only when **both
 
 ## Events
 
-The component dispatches `input` and `change` events on the native `<input>` when a **complete** value is written (both segments filled) and once per popup **Rensa** (Clear) / **Denna månad** (This month) press. Clearing a filled field with `Backspace` empties the native value without dispatching anything.
+The component dispatches `input` and `change` events on the native `<input>` when a **complete** value is written (both segments filled) and once per popup **Rensa** (Clear) / **Denna månad** (This month) press. **Denna månad** also speaks the committed month via the `.announce` live region (closing moves focus to the trigger, which says nothing about *what* was set). Clearing a filled field with `Backspace` empties the native value without dispatching anything.
 
 Both footer buttons close the popup and return focus to the trigger: a footer
 action completes the value, so the task is done. Spinning the wheels never

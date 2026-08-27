@@ -15,7 +15,10 @@ The host element is **authored** by the component and must carry `class="Wheel"`
 
 On construction, WheelColumn:
 - sets `role="spinbutton"`, `aria-valuemin`, `aria-valuemax` on the host;
-- per render, sets `aria-valuenow`, `aria-valuetext` (the formatted display, or `--` when empty) and
+- per render, sets `aria-valuenow`, `aria-valuetext` (the formatted display; when empty, the
+  `emptyText` option — pass the host component's localized "blank"/"tomt" — falling back to `--`.
+  The empty state must always carry a valuetext: a spinbutton with min/max but no valuenow makes
+  VoiceOver fall back to a computed percentage) and
   `aria-activedescendant` pointing at the centred option;
 - injects a `.cylinder` containing nine `.option` slots (`aria-hidden`, the centred one gets
   `aria-selected="true"` + an id), plus one `.band` appended to the host as a **sibling** of
@@ -36,6 +39,7 @@ interface WheelColumnOptions {
   onChange: (value: number) => void
   loop?: boolean                      // true (default) = wrap past the ends; false = clamp
   format?: (value: number) => string  // default: zero-padded number; pass month names etc.
+  emptyText?: string                  // spoken value while empty; pass the localized "blank"/"tomt" (default "--")
   disabled?: (value: number) => boolean  // reserved (declared, not yet consumed)
 }
 

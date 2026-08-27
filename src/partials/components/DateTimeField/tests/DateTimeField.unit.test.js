@@ -257,3 +257,23 @@ describe('_handleDigit() — time segments', () => {
     root.remove()
   })
 })
+
+// ─── Empty segments speak a localized word ──────────────────────────────────────
+
+describe('empty segments speak a localized word, never the placeholder', () => {
+  it('date and time segments all carry aria-valuetext "blank" (en) when empty', async () => {
+    const { DateTimeField } = await import('../DateTimeField.ts')
+    const root = makeRoot()
+    document.body.appendChild(root)
+    DateTimeField.attach(document.body)
+    const segs = root.querySelectorAll('.segment[role="spinbutton"]')
+    for (const seg of segs) {
+      if (seg.dataset.segment === 'ampm') continue
+      // One word for day/month/year AND hour/minute — the placeholder tokens
+      // ("dd"/"mm"/"yyyy" vs "--") read inconsistently across segment types.
+      expect(seg.getAttribute('aria-valuetext')).toBe('blank')
+      expect(seg.hasAttribute('aria-valuenow')).toBe(false)
+    }
+    root.remove()
+  })
+})

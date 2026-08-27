@@ -88,6 +88,7 @@ All observable outcomes are state changes on `data-*` attributes or DOM changes:
 
 - `.segments` has `role="group"` — groups the three segment spans as a logical unit.
 - Each segment span has `role="spinbutton"`, `aria-valuemin`, `aria-valuemax`, `aria-valuenow`, and `aria-label` (e.g. "dag", "månad", "år"). These are injected by JS.
+- An **empty** segment removes `aria-valuenow` and speaks the localized `empty` word ("blank"/"tomt") as `aria-valuetext` — never the visible placeholder ("dd"/"mm"/"yyyy" read inconsistently per segment), and never no valuetext at all (a spinbutton with min/max but no valuenow makes VoiceOver announce a computed percentage — measured on the native reference's empty segments).
 - `.trigger` has `aria-expanded` (toggled by JS) and `aria-haspopup="dialog"`.
 - The calendar dialog has `role="dialog"` and `aria-modal="true"`.
 - `.custom` is authored with `aria-hidden="true"`. In `data-input-mode="custom"` (fine pointer) JS removes it — the segments are the accessible control, and the native input is hidden from everyone (`visibility: hidden`), serving only as the value carrier for form submission. In `data-input-mode="display"` (coarse pointer) the custom layer stays `aria-hidden` and the native input is the accessible control.
