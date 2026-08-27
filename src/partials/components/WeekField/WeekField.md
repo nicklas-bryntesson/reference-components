@@ -86,6 +86,10 @@ The native `<input type="week">` value is written as `YYYY-Www` only when **both
 
 The component dispatches `input` and `change` events on the native `<input>` only when a **complete** value is written: both segments filled, a week selected in the calendar, or **Denna vecka** (This week) pressed. The popup **Rensa** (Clear) button also dispatches both events — the same contract as TimeField/MonthField. Clearing a filled field with `Backspace` empties the native value without dispatching anything.
 
+Both footer buttons close the popup and return focus to the trigger — the
+same commit-and-close a week click performs: a footer action completes the
+value, so the task is done.
+
 ## JS API
 
 `WeekField` is the default export. Statics: `WeekField.attach(parent?)` (instantiate every `.WeekField` root), `WeekField.registerLocale(locale, strings)` and `WeekField.supportsNativeWeek()` (feature detection). Instances expose `destroy()`. The pure helpers `formatSegment`, `wrapValue`, `clampValue`, `weeksInISOYear` and `clampWeekISO` are exported for unit tests.

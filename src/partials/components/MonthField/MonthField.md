@@ -53,6 +53,11 @@ The native `<input type="month">` value is written as `YYYY-MM` only when **both
 
 The component dispatches `input` and `change` events on the native `<input>` when a **complete** value is written (both segments filled) and once per popup **Rensa** (Clear) / **Denna månad** (This month) press. Clearing a filled field with `Backspace` empties the native value without dispatching anything.
 
+Both footer buttons close the popup and return focus to the trigger: a footer
+action completes the value, so the task is done. Spinning the wheels never
+closes — the wheel surface edits live, and is left via the trigger, `Escape`,
+or a click outside.
+
 ## JS API
 
 `MonthField` is the default export. Statics: `MonthField.attach(parent?)` (instantiate every `.MonthField` root) and `MonthField.registerLocale(locale, strings)`. Instances expose `destroy()`. The pure helpers `formatSegment`, `wrapValue`, `clampValue` and `clampMonthISO` are exported for unit tests.

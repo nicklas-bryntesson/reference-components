@@ -46,6 +46,11 @@ Two footer buttons, both tab stops inside the popup focus trap:
 - **Clear** ("Rensa") — disabled (and skipped by Tab) while the field is empty. Clears the segments and the native value, then dispatches `input` + `change` once.
 - **Now** ("Nu") — writes the current time, clamped to `data-min`/`data-max`, then dispatches `input` + `change` once.
 
+Both buttons close the popup and return focus to the trigger: a footer action
+completes the value, so the task is done. Spinning the wheels never closes —
+the wheel surface edits live, and is left via the trigger, `Escape`, or a
+click outside.
+
 ## Value sync
 
 The native `<input type="time">` value is written only when all active segments are filled. Partial state leaves the native input empty (same contract as DateField).

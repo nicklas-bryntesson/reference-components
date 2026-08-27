@@ -272,11 +272,17 @@ test('the wheel column publishes the value it just committed', async ({ page }) 
   await expect(hourCol).not.toHaveAttribute('aria-valuetext', '--')
 })
 
-test('"Now" button syncs the wheel with the current time', async ({ page }) => {
+test('"Now" commits the current time, closes the popup, and refocuses the trigger', async ({ page }) => {
   await page.locator(`${TF} .trigger`).click()
-  const nowBtn = page.locator(`${TF} .footer-now`)
-  await nowBtn.click()
-  // Wheel columns should now have aria-valuenow set
+  await page.locator(`${TF} .footer-now`).click()
+  // A completed value closes the popup (footer shortcuts commit-and-close);
+  // the button it was clicked on is gone, so focus must land on the trigger.
+  await expect(page.locator(`${TF} .popup`)).toHaveCount(0)
+  await expect(page.locator(`${TF} .trigger`)).toBeFocused()
+  const nativeVal = await page.locator(`${TF} .native`).inputValue()
+  expect(nativeVal).toMatch(/^\d{2}:\d{2}/)
+  // Reopening syncs the wheels from the committed value.
+  await page.locator(`${TF} .trigger`).click()
   const hourCol = page.locator(`${TF} .Wheel[data-segment="hour"]`)
   const minuteCol = page.locator(`${TF} .Wheel[data-segment="minute"]`)
   const hourVal = await hourCol.getAttribute('aria-valuenow')
@@ -287,13 +293,14 @@ test('"Now" button syncs the wheel with the current time', async ({ page }) => {
   expect(Number(minVal)).toBeLessThanOrEqual(59)
 })
 
-test('"Clear" button resets the wheel to an empty state', async ({ page }) => {
-  // First set a value via Nu
+test('"Clear" empties the value and closes the popup', async ({ page }) => {
+  // First set a value via Now (which closes), then reopen and clear.
   await page.locator(`${TF} .trigger`).click()
   await page.locator(`${TF} .footer-now`).click()
-  // Then clear
+  await page.locator(`${TF} .trigger`).click()
   await page.locator(`${TF} .footer-clear`).click()
-  // Native value should be empty
+  await expect(page.locator(`${TF} .popup`)).toHaveCount(0)
+  await expect(page.locator(`${TF} .trigger`)).toBeFocused()
   const nativeVal = await page.locator(`${TF} .native`).inputValue()
   expect(nativeVal).toBe('')
 })
@@ -308,6 +315,8 @@ test('"Now" and "Clear" dispatch input + change on the native input', async ({ p
   }, TF)
   await page.locator(`${TF} .footer-now`).click()
   expect(await page.evaluate(() => window.__events)).toEqual(['input', 'change'])
+  // Now closed the popup — reopening dispatches nothing on the native input.
+  await page.locator(`${TF} .trigger`).click()
   await page.locator(`${TF} .footer-clear`).click()
   expect(await page.evaluate(() => window.__events)).toEqual(['input', 'change', 'input', 'change'])
 })

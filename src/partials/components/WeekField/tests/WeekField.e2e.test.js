@@ -222,11 +222,15 @@ test('"This week" button sets the current ISO week', async ({ page }) => {
   await expect(page.locator(`${WF} .native`)).toHaveValue(expected)
 })
 
-test('"Clear" button empties the native value', async ({ page }) => {
+test('"Clear" empties the native value and closes the popup', async ({ page }) => {
   await page.locator(`${WF} .trigger`).click()
   await page.locator(`${WF} .calendar-footer-now`).click()
   await page.locator(`${WF} .trigger`).click()
   await page.locator(`${WF} .calendar-footer-clear`).click()
+  // A completed (empty) value closes the popup, same as "This week";
+  // the button it was clicked on is gone, so focus must land on the trigger.
+  await expect(page.locator(`${WF} .popup`)).toHaveCount(0)
+  await expect(page.locator(`${WF} .trigger`)).toBeFocused()
   await expect(page.locator(`${WF} .native`)).toHaveValue('')
 })
 
