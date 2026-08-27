@@ -65,6 +65,15 @@ describe('WheelColumn — construction & ARIA', () => {
     expect(el.getAttribute('aria-valuetext')).toBe('--')
   })
 
+  it('speaks the emptyText option instead of "--" when value is null', () => {
+    // The empty state must always carry SOME valuetext: min/max with no
+    // valuenow trips VoiceOver's percent fallback ("−950 %" on native's empty
+    // date segments). Components pass their localized "blank"/"tomt" here.
+    const { el } = makeWheel({ value: null, emptyText: 'tomt' })
+    expect(el.hasAttribute('aria-valuenow')).toBe(false)
+    expect(el.getAttribute('aria-valuetext')).toBe('tomt')
+  })
+
   it('sets aria-activedescendant to the centred option', () => {
     const { el } = makeWheel()
     expect(el.getAttribute('aria-activedescendant')).toBe('test-wheel-front')

@@ -20,6 +20,8 @@ interface TranslationStrings {
   popupLabel: string
   clearButton: string
   nowButton: string
+  /** Spoken value of an empty segment (aria-valuetext). See _clearSegment. */
+  empty: string
 }
 
 interface SegmentHandlers {
@@ -74,12 +76,14 @@ class TimeField {
       ampm: 'AM or PM', ampmAm: 'AM', ampmPm: 'PM',
       openTimePicker: 'Open time picker', popupLabel: 'Choose time',
       clearButton: 'Clear', nowButton: 'Now',
+      empty: 'blank',
     },
     sv: {
       hour: 'Timmar', minute: 'Minuter', second: 'Sekunder',
       ampm: 'FM eller EM', ampmAm: 'FM', ampmPm: 'EM',
       openTimePicker: 'Öppna tidsväljare', popupLabel: 'Välj tid',
       clearButton: 'Rensa', nowButton: 'Nu',
+      empty: 'tomt',
     },
   }
 
@@ -302,7 +306,10 @@ class TimeField {
       span.setAttribute('aria-valuemin', String(min))
       span.setAttribute('aria-valuemax', String(max))
       span.setAttribute('data-placeholder', 'true')
-      span.setAttribute('aria-valuetext', '--')
+      // Spoken empty value is the localized `empty` word — never the visible
+      // placeholder token and never bare min/max without a valuetext, which trips
+      // VoiceOver's percent fallback (measured on native's empty segments).
+      span.setAttribute('aria-valuetext', this.t.empty)
       span.textContent = '--'
     }
 
@@ -452,7 +459,7 @@ class TimeField {
   _clearSegment(seg: HTMLSpanElement): void {
     seg.setAttribute('data-placeholder', 'true')
     seg.removeAttribute('aria-valuenow')
-    seg.setAttribute('aria-valuetext', '--')
+    seg.setAttribute('aria-valuetext', this.t.empty)
     seg.textContent = '--'
     this._syncToNative()
   }
@@ -761,6 +768,7 @@ class TimeField {
         min,
         max,
         value: currentValue,
+        emptyText: this.t.empty,
         onChange: (value: number) => {
           this._selectPopupOption(segType, value)
         },
@@ -895,6 +903,11 @@ class TimeField {
     // above would otherwise fire per segment).
     this.native.dispatchEvent(new Event('input', { bubbles: true }))
     this.native.dispatchEvent(new Event('change', { bubbles: true }))
+
+    // Speak the committed value: closing moves focus to the trigger, whose
+    // label says nothing about WHAT was set — without this, "Now" is silent
+    // in a screenreader. Same live-region write as the segment-commit path.
+    this._announceTime(timeStr)
 
     // A footer action that completes the value commits and closes (ADR-0029) —
     // spinning the wheels stays live, but Now is done. The clicked button goes

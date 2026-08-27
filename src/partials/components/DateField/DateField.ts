@@ -35,6 +35,8 @@ interface TranslationStrings {
   todayButton: string
   openPicker: string
   closePicker: string
+  /** Spoken value of an empty segment (aria-valuetext). See _clearSegment. */
+  empty: string
 }
 
 interface SegmentHandlers {
@@ -65,6 +67,7 @@ class DateField {
       announceSelected: 'Selected date:', dateField: 'date field',
       clearButton: 'Clear', todayButton: 'Today',
       openPicker: 'Choose month and year', closePicker: 'Close month and year picker',
+      empty: 'blank',
     },
     sv: {
       day: 'Dag', month: 'Månad', year: 'År',
@@ -74,6 +77,7 @@ class DateField {
       announceSelected: 'Valt datum:', dateField: 'datumfält',
       clearButton: 'Rensa', todayButton: 'I dag',
       openPicker: 'Välj månad och år', closePicker: 'Stäng månads- och årsväljaren',
+      empty: 'tomt',
     },
   }
 
@@ -277,8 +281,13 @@ class DateField {
     span.setAttribute('aria-valuemin', String(limits.min))
     span.setAttribute('aria-valuemax', String(limits.max))
 
+    // The VISIBLE placeholder stays "dd"/"mm"/"yyyy", but the SPOKEN empty value
+    // is the localized `empty` word: placeholder tokens read differently per
+    // segment ("mm" ≠ "dd" in a screenreader's mouth), and omitting valuetext
+    // entirely trips VoiceOver's percent fallback (measured on native's empty
+    // segments: "−950 %, År"). One word, every segment, every field.
     const placeholder = type === 'day' ? 'dd' : type === 'month' ? 'mm' : 'yyyy'
-    span.setAttribute('aria-valuetext', placeholder)
+    span.setAttribute('aria-valuetext', this.t.empty)
     span.textContent = placeholder
 
     return span
@@ -467,8 +476,9 @@ class DateField {
     const type = seg.dataset.segment as DateSegmentType
     seg.setAttribute('data-placeholder', 'true')
     seg.removeAttribute('aria-valuenow')
+    // Visible placeholder, spoken `empty` word — see _createSegment.
     const placeholder = type === 'day' ? 'dd' : type === 'month' ? 'mm' : 'yyyy'
-    seg.setAttribute('aria-valuetext', placeholder)
+    seg.setAttribute('aria-valuetext', this.t.empty)
     seg.textContent = placeholder
   }
 

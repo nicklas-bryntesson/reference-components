@@ -194,8 +194,18 @@ describe('segment construction (sv-SE, no seconds)', () => {
     expect(hour.getAttribute('aria-valuemin')).toBe('0')
     expect(hour.getAttribute('aria-valuemax')).toBe('23')
     expect(hour.hasAttribute('data-placeholder')).toBe(true)
-    expect(hour.getAttribute('aria-valuetext')).toBe('--')
+    // Spoken empty value is the localized word (sv default here), NOT the
+    // visible "--" — placeholder tokens read inconsistently, and a valuetext
+    // must always be present (no-valuetext trips VO's percent fallback).
+    expect(hour.getAttribute('aria-valuetext')).toBe('tomt')
     expect(hour.textContent).toBe('--')
+  })
+
+  it('empty segments speak the en locale word under an en locale', () => {
+    const el = createTimeFieldEl({ locale: 'en-GB' })
+    const tf = new TimeField(el)
+    expect(tf._segmentEls[0].getAttribute('aria-valuetext')).toBe('blank')
+    expect(tf._segmentEls[0].textContent).toBe('--')
   })
 
   it('minute segment has correct aria bounds', () => {
@@ -581,5 +591,20 @@ describe('data-initialized', () => {
     const el = createTimeFieldEl()
     new TimeField(el)
     expect(el.getAttribute('data-initialized')).toBe('true')
+  })
+})
+
+// ─── Footer "Now": the committed value is spoken ───────────────────────────────
+
+describe('"Now" announces the committed time', () => {
+  it('writes the committed time to the live region before closing', () => {
+    // Closing moves focus to the trigger, whose label says nothing about WHAT
+    // was set — the live region is the only thing that speaks the new value.
+    const el = createTimeFieldEl()
+    const tf = new TimeField(el)
+    ;(tf as any)._handleNow() // private — invoked directly; the button lives in the popup
+    const announce = el.querySelector('.announce')!
+    expect(announce.textContent).toMatch(/^\d{2}:\d{2}$/)
+    expect(announce.textContent).toBe(tf.native.value)
   })
 })

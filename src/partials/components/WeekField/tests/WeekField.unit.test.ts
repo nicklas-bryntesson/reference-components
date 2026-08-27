@@ -386,3 +386,16 @@ describe('disabled state', () => {
     expect(week.hasAttribute('data-placeholder')).toBe(true)
   })
 })
+
+// ─── Empty segments speak a localized word ──────────────────────────────────────
+
+describe('empty segments speak a localized word, never the visible placeholder', () => {
+  it('empty segments carry aria-valuetext "tomt" (sv) with visible "--" intact', () => {
+    const el = createWeekFieldEl()
+    const wf = new WeekField(el)
+    const week = wf._getSegmentEl('week')!
+    expect(week.getAttribute('aria-valuetext')).toBe('tomt')
+    expect(week.textContent).toBe('--')
+    expect(week.hasAttribute('aria-valuenow')).toBe(false)
+  })
+})

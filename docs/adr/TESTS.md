@@ -232,4 +232,5 @@ Not tests — settled rules, listed so they are not re-litigated:
 | Popover clipping in overflow ancestors is a documented limitation | ADR-0012 |
 | Appearance is a `color-scheme` switch, not a token system | ADR-0021 |
 | Typography is the consuming project's; we own the mechanics | ADR-0025 |
+| An empty segment speaks the localized `empty` word — never its placeholder, never a bare min/max | ADR-0030 |
 | ADR references never appear in consumer docs — only in `docs/adr/`, `philosophy.md`, `CLAUDE.md` | convention |

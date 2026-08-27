@@ -8,6 +8,14 @@ export interface WheelColumnOptions {
   loop?: boolean
   /** Render a value as display text (e.g. month names). Default: zero-padded number. */
   format?: (value: number) => string
+  /**
+   * Spoken text (aria-valuetext) while the wheel has no value. Pass the host
+   * component's localized "blank"/"tomt" string. Default: "--" — never omit the
+   * valuetext entirely: a spinbutton with min/max but no valuenow falls back to
+   * a computed percentage in VoiceOver (measured on native date segments:
+   * "−950 %, År"), so the empty state must always carry an explicit text.
+   */
+  emptyText?: string
 }
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -66,6 +74,7 @@ class WheelColumn {
   readonly count: number
   private _loop: boolean
   private _format: (value: number) => string
+  private _emptyText: string
 
   private _rafId: number | null = null
   private _velocity: number = 0
@@ -92,6 +101,7 @@ class WheelColumn {
     this.count = opts.max - opts.min + 1
     this._loop = opts.loop ?? true
     this._format = opts.format ?? ((v: number) => String(v).padStart(2, '0'))
+    this._emptyText = opts.emptyText ?? '--'
 
     this.rowH = readRowHeight(el)
     this.radius = (this.rowH / 2) / Math.tan((STEP_DEG / 2) * Math.PI / 180)
@@ -419,7 +429,7 @@ class WheelColumn {
     const base = Math.round(this.pos)
 
     let ariaNow: number | null = null
-    let ariaText = '--'
+    let ariaText = this._emptyText
 
     if (this._currentValue !== null) {
       ariaNow = this._currentValue

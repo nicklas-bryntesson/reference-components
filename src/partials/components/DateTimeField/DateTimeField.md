@@ -124,6 +124,7 @@ JS also sets two inline custom properties on the root while the popup is open: `
 - Popup is `role="dialog"` with `aria-modal="true"`, named "Choose date and time" (localised) — a
   title, not the trigger's action label
 - Each spinbutton has `aria-valuemin`, `aria-valuemax`, `aria-valuenow`, `aria-valuetext` — except the AM/PM segment, which gets only `aria-valuenow`/`aria-valuetext` (a 2-state toggle, not a range)
+- Empty segments remove `aria-valuenow` and speak the localized `empty` word ("blank"/"tomt") as `aria-valuetext` — never the visible placeholder, and never no valuetext at all (min/max without valuenow makes VoiceOver announce a computed percentage). Same contract as DateField.
 - Time columns are `.Wheel` spinbuttons — the `WheelColumn` primitive sets `role="spinbutton"` with `aria-valuemin`/`aria-valuemax`/`aria-valuenow`/`aria-valuetext` (not `listbox`)
 - `aria-disabled="true"` on all segments when disabled
 - `.announce` (`aria-live="polite"`, `aria-atomic="true"`, last child of the root) announces the selected date and time on each value change

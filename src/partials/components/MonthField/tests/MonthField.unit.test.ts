@@ -352,3 +352,31 @@ describe('disabled state', () => {
     expect(month.hasAttribute('data-placeholder')).toBe(true)
   })
 })
+
+// ─── Empty segments speak a localized word ──────────────────────────────────────
+
+describe('empty segments speak a localized word, never the visible placeholder', () => {
+  it('empty segments carry aria-valuetext "tomt" (sv) with visible "--" intact', () => {
+    const el = createMonthFieldEl()
+    const mf = new MonthField(el)
+    const month = mf._getSegmentEl('month')!
+    expect(month.getAttribute('aria-valuetext')).toBe('tomt')
+    expect(month.textContent).toBe('--')
+    expect(month.hasAttribute('aria-valuenow')).toBe(false)
+  })
+})
+
+// ─── Footer "This month": the committed value is spoken ─────────────────────────
+
+describe('"This month" announces the committed month', () => {
+  it('writes the committed month to the live region before closing', () => {
+    // Closing moves focus to the trigger, whose label says nothing about WHAT
+    // was set — the live region is the only thing that speaks the new value.
+    const el = createMonthFieldEl()
+    const mf = new MonthField(el)
+    ;(mf as any)._handleThisMonth() // private — invoked directly; the button lives in the popup
+    const announce = el.querySelector('.announce')!
+    expect(announce.textContent).not.toBe('')
+    expect(announce.textContent).toContain(String(new Date().getFullYear()))
+  })
+})

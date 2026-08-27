@@ -45,6 +45,8 @@ interface TranslationStrings {
   clearButton: string
   todayButton: string
   nowButton: string
+  /** Spoken value of an empty segment (aria-valuetext). See _clearSegment. */
+  empty: string
   openPicker: string
   closePicker: string
   hours: string
@@ -91,6 +93,7 @@ export class DateTimeField {
       clearButton: 'Clear', todayButton: 'Today', nowButton: 'Now',
       openPicker: 'Choose month and year', closePicker: 'Close month and year picker',
       hours: 'Hours', minutes: 'Minutes', seconds: 'Seconds',
+      empty: 'blank',
     },
     sv: {
       day: 'Dag', month: 'Månad', year: 'År',
@@ -106,6 +109,7 @@ export class DateTimeField {
       clearButton: 'Rensa', todayButton: 'I dag', nowButton: 'Nu',
       openPicker: 'Välj månad och år', closePicker: 'Stäng månads- och årsväljare',
       hours: 'Timmar', minutes: 'Minuter', seconds: 'Sekunder',
+      empty: 'tomt',
     },
   }
 
@@ -475,7 +479,11 @@ export class DateTimeField {
     seg.setAttribute('aria-valuemin', String(limits.min))
     seg.setAttribute('aria-valuemax', String(limits.max))
     seg.setAttribute('data-placeholder', 'true')
-    seg.setAttribute('aria-valuetext', SEGMENT_PLACEHOLDERS[type])
+    // The VISIBLE placeholder stays "dd"/"--" etc., but the SPOKEN empty value
+    // is the localized `empty` word: placeholder tokens read differently per
+    // segment, and omitting valuetext entirely trips VoiceOver's percent
+    // fallback (measured on native's empty segments: "−950 %, År").
+    seg.setAttribute('aria-valuetext', this.t.empty)
     seg.textContent = SEGMENT_PLACEHOLDERS[type]
 
     return seg
@@ -521,7 +529,8 @@ export class DateTimeField {
     }
     seg.setAttribute('data-placeholder', 'true')
     seg.removeAttribute('aria-valuenow')
-    seg.setAttribute('aria-valuetext', SEGMENT_PLACEHOLDERS[type] ?? '--')
+    // Visible placeholder, spoken `empty` word — see _createSegment.
+    seg.setAttribute('aria-valuetext', this.t.empty)
     seg.textContent = SEGMENT_PLACEHOLDERS[type] ?? '--'
   }
 
@@ -1355,6 +1364,7 @@ export class DateTimeField {
       const wheel = new WheelColumn(host, {
         min, max,
         value: initial[type],
+        emptyText: this.t.empty,
         onChange: (value: number) => this._onWheelChange(type, value),
       })
       this._wheels.set(type, wheel)
