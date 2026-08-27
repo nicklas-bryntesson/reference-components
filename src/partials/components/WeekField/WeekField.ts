@@ -1127,8 +1127,9 @@ class WeekField {
     // Clearing is a value change — fire both, matching the set path (_syncToNative).
     this.native.dispatchEvent(new Event('input', { bubbles: true }))
     this.native.dispatchEvent(new Event('change', { bubbles: true }))
-    this._updateClearButton()
-    this._renderMonth()
+    // A footer action that completes the value commits and closes (ADR-0029),
+    // same as "This week" — Clear was the one footer action that stayed open.
+    this._closePopup(true)
   }
 
   private _updateClearButton(): void {

@@ -103,6 +103,10 @@ JS also sets two inline custom properties on the root while the popup is open: `
 - "Nu" footer button sets current datetime
 - All segments must be filled before native input is written
 - Form reset clears all segments
+- Footer actions that complete the value close the popup ("Nu" writes the full
+  datetime; "Rensa" empties it) and return focus to the trigger. "Idag" only
+  sets the date part — a **partial** value, so it leaves the popup open with
+  the time still editable, same as a day click in the grid.
 
 ## Events
 

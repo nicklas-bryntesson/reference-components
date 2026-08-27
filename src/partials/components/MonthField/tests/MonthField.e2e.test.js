@@ -164,9 +164,13 @@ test('month wheel loops from December back to January', async ({ page }) => {
   await expect(monthSeg).toHaveAttribute('aria-valuenow', '0')
 })
 
-test('"This month" button sets the current month and year', async ({ page }) => {
+test('"This month" sets the current month and year, closes the popup, and refocuses the trigger', async ({ page }) => {
   await page.locator(`${MF} .trigger`).click()
   await page.locator(`${MF} .footer-now`).click()
+  // A completed value closes the popup (footer shortcuts commit-and-close);
+  // the button it was clicked on is gone, so focus must land on the trigger.
+  await expect(page.locator(`${MF} .popup`)).toHaveCount(0)
+  await expect(page.locator(`${MF} .trigger`)).toBeFocused()
   // Native value should be today's YYYY-MM.
   const expected = await page.evaluate(() => {
     const d = new Date()
@@ -177,10 +181,14 @@ test('"This month" button sets the current month and year', async ({ page }) => 
   await expect(page.locator(`${MF} .segment[data-segment="year"]`)).not.toHaveAttribute('data-placeholder')
 })
 
-test('"Clear" button empties the native value', async ({ page }) => {
+test('"Clear" empties the native value and closes the popup', async ({ page }) => {
+  // First set a value via This month (which closes), then reopen and clear.
   await page.locator(`${MF} .trigger`).click()
   await page.locator(`${MF} .footer-now`).click()
+  await page.locator(`${MF} .trigger`).click()
   await page.locator(`${MF} .footer-clear`).click()
+  await expect(page.locator(`${MF} .popup`)).toHaveCount(0)
+  await expect(page.locator(`${MF} .trigger`)).toBeFocused()
   await expect(page.locator(`${MF} .native`)).toHaveValue('')
 })
 
@@ -194,6 +202,8 @@ test('"This month" and "Clear" dispatch input + change on the native input', asy
   }, MF)
   await page.locator(`${MF} .footer-now`).click()
   expect(await page.evaluate(() => window.__events)).toEqual(['input', 'change'])
+  // This month closed the popup — reopening dispatches nothing on the native input.
+  await page.locator(`${MF} .trigger`).click()
   await page.locator(`${MF} .footer-clear`).click()
   expect(await page.evaluate(() => window.__events)).toEqual(['input', 'change', 'input', 'change'])
 })

@@ -834,8 +834,11 @@ class MonthField {
     // Clearing is a value change — fire both once, matching the set path (_syncToNative).
     this.native.dispatchEvent(new Event('input', { bubbles: true }))
     this.native.dispatchEvent(new Event('change', { bubbles: true }))
-    this._updateClearButton()
-    this._syncWheelsFromSegments(false)
+    // A footer action that completes the value commits and closes (ADR-0029) —
+    // spinning the wheels stays live, but Clear is done. The clicked button goes
+    // with the popup, so focus returns to the trigger (same as the Escape path).
+    this._closePopup()
+    this.trigger.focus()
   }
 
   private _handleThisMonth(): void {
@@ -853,9 +856,11 @@ class MonthField {
     this.native.dispatchEvent(new Event('input', { bubbles: true }))
     this.native.dispatchEvent(new Event('change', { bubbles: true }))
 
-    this._refreshMonthWheelDisplay()
-    this._syncWheelsFromSegments(true)
-    this._updateClearButton()
+    // A footer action that completes the value commits and closes (ADR-0029) —
+    // spinning the wheels stays live, but This month is done. The clicked button
+    // goes with the popup, so focus returns to the trigger (same as Escape).
+    this._closePopup()
+    this.trigger.focus()
   }
 
   private _syncWheelsFromSegments(animate: boolean): void {

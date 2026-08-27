@@ -202,6 +202,20 @@ cause-guard proven failing first, and the checklist gains an item that listens f
 > ("I HEAR each new value, fresh every step"). "is announcing the placeholder as 'dd' confusing?"
 > → human.
 
+## 16 · Should this popup action close the popup?
+
+**Does the action produce a complete value? Yes → commit and close, returning focus to the
+trigger. No → stay open.** The popup body keeps its own gesture model regardless: a calendar
+day/week click is a commit and closes; a wheel spin edits live and never closes (ADR-0029).
+
+The failure mode this guards: footer buttons inheriting the body's model instead of being
+routed through this test. The footers look identical across the family, so a per-body split
+reads as inconsistency at the point of use even when it is internally coherent.
+
+> **Worked:** TimeField "Now" fills the whole value → closes. Clear empties the whole value —
+> a completed (empty) value → closes. DateTimeField "Today" sets only the date part, time
+> still to edit → stays open, like the day click beside it.
+
 ## Conventions you do not need to re-decide
 
 Not tests — settled rules, listed so they are not re-litigated:
