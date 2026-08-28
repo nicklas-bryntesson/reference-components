@@ -5,8 +5,8 @@ description: Apply this repo's established decision tests to a boundary question
 
 # Deciding a boundary question
 
-This repo has thirteen decision tests, established by ADR and spread across twenty-five documents.
-They are collected in **`docs/adr/TESTS.md`**.
+This repo's decision tests, established by ADR and once spread across twenty-five documents,
+are collected in **`docs/adr/TESTS.md`**.
 
 **Read that file before reasoning from first principles.** That instruction is the whole point of
 this skill: the tests already exist, and the failure mode is not disagreeing with them — it is not
@@ -18,10 +18,11 @@ one that separates Picklist from a ButtonGroup.
 ## How to use it
 
 1. **Read `docs/adr/TESTS.md`.** It is short and it names its source ADR for every test.
-2. **Find the test that matches the shape of the question.** The thirteen cover: earning a component,
+2. **Find the test that matches the shape of the question.** They cover: earning a component,
    earning a kernel place, selection vs action, surviving a discriminator, boolean vs enum, forbidden
    combinations, load-bearing selectors, end state vs mechanism, copied vs imported, element choice,
-   semantics vs behaviour, mechanics vs taste, private vs public variables.
+   semantics vs behaviour, mechanics vs taste, private vs public variables, identity vs decoration,
+   a11y assertion tiers, popup-closing actions, browser-withheld behaviour.
 3. **Read the source ADR** if the test's phrasing is doing real work in the answer. The index is a
    pointer; the ADR is authoritative, and where they disagree the ADR wins.
 4. **Answer with the test's own vocabulary.** "It fails all three earning conditions, so it is a

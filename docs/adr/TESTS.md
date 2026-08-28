@@ -216,6 +216,21 @@ reads as inconsistency at the point of use even when it is internally coherent.
 > a completed (empty) value → closes. DateTimeField "Today" sets only the date part, time
 > still to edit → stays open, like the day click beside it.
 
+## 17 · Is the browser withholding the behaviour on purpose?
+
+**When a browser refuses a behaviour as a security measure, the refusal is a documented
+limitation, not a workaround target** (ADR-0031, Proposed).
+
+A workaround tuned to defeat a security heuristic is fragile, adversarial, and
+indistinguishable from the attack the heuristic exists to stop — the next browser
+release is tuned against it.
+
+> **Worked:** Chromium autofill silently skips a `visibility: hidden` native (anti-skimming
+> — filling invisible fields is a data-exfiltration vector), so the date/time fields'
+> desktop mode does not autofill and no hiding recipe is contorted to change that. Compare
+> popover clipping in overflow ancestors (ADR-0012) — same genre, documented instead of
+> fought.
+
 ## Conventions you do not need to re-decide
 
 Not tests — settled rules, listed so they are not re-litigated:

@@ -143,7 +143,7 @@ Direction-level decisions are recorded as numbered, immutable ADRs in `docs/adr/
 An ADR is written once; revisiting a decision means writing a new one that supersedes it.
 
 **The tests those ADRs establish are collected in [`docs/adr/TESTS.md`](docs/adr/TESTS.md)** —
-sixteen questions with their source ADR, from "does this earn its own component" to "should this
+each question with its source ADR, from "does this earn its own component" to "should this
 popup action close the popup". Read it before reasoning a boundary question out from first
 principles; the `decide` skill
 exists to make that reflex. When an ADR introduces a new test, add it there in the same pass.
