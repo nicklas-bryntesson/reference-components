@@ -921,14 +921,18 @@ export class DateTimeField {
     let row = document.createElement('tr')
     let cellCount = 0
 
-    // Leading outside-month cells
+    // Leading outside-month cells — inert, but still in the accessibility
+    // tree, so they carry their full date as an accessible name.
     for (let i = firstDay - 1; i >= 0; i--) {
+      const date = new Date(prevYear, prevMonth, prevDays - i)
       const td = document.createElement('td')
       td.setAttribute('data-outside-month', 'true')
+      td.setAttribute('aria-selected', 'false')
       const btn = document.createElement('button')
       btn.type = 'button'
       btn.setAttribute('tabindex', '-1')
-      btn.textContent = String(prevDays - i)
+      btn.setAttribute('aria-label', date.toLocaleDateString(this.localeTag, { dateStyle: 'long' }))
+      btn.textContent = String(date.getDate())
       td.appendChild(btn)
       row.appendChild(td)
       cellCount++
@@ -947,7 +951,8 @@ export class DateTimeField {
       // neither was ever set, so today was not bold and an out-of-range day
       // looked ordinary. The aria half was already correct, which is why only the
       // sighted rendering was wrong. DateField and WeekField both set them.
-      if (date.toDateString() === today.toDateString()) td.dataset.today = 'true'
+      const isToday = date.toDateString() === today.toDateString()
+      if (isToday) td.dataset.today = 'true'
 
       const disabled = isDayDisabled(date, this.min, this.max)
       if (disabled) {
@@ -959,13 +964,25 @@ export class DateTimeField {
         btn.addEventListener('click', () => this._selectDate(date))
       }
 
-      const isSelected = this.selectedDatetime &&
+      // Selection is grid semantics (aria-selected on the cell), not a toggle
+      // button — aria-pressed made screenreaders present the day as "pressed".
+      const isSelected = this.selectedDatetime != null &&
         formatISO(date) === formatISO(this.selectedDatetime)
       if (isSelected) {
-        btn.setAttribute('aria-pressed', 'true')
+        td.dataset.selected = 'true'
+        td.setAttribute('aria-selected', 'true')
         btn.setAttribute('tabindex', '0')
+      } else {
+        td.setAttribute('aria-selected', 'false')
       }
 
+      const dateLabel = date.toLocaleDateString(this.localeTag, { dateStyle: 'long' })
+      const suffixes = [
+        isToday ? `, ${this.t.today}` : '',
+        isSelected ? `, ${this.t.selected}` : '',
+        disabled ? `, ${this.t.notAvailable}` : '',
+      ].join('')
+      btn.setAttribute('aria-label', `${dateLabel}${suffixes}`)
       btn.textContent = String(d)
       td.appendChild(btn)
       row.appendChild(td)
@@ -979,14 +996,19 @@ export class DateTimeField {
 
     // Trailing outside-month cells
     if (cellCount % 7 !== 0) {
+      const nextMonth = this.currentMonth === 11 ? 0 : this.currentMonth + 1
+      const nextYear = this.currentMonth === 11 ? this.currentYear + 1 : this.currentYear
       let nextDay = 1
       while (cellCount % 7 !== 0) {
+        const date = new Date(nextYear, nextMonth, nextDay++)
         const td = document.createElement('td')
         td.setAttribute('data-outside-month', 'true')
+        td.setAttribute('aria-selected', 'false')
         const btn = document.createElement('button')
         btn.type = 'button'
         btn.setAttribute('tabindex', '-1')
-        btn.textContent = String(nextDay++)
+        btn.setAttribute('aria-label', date.toLocaleDateString(this.localeTag, { dateStyle: 'long' }))
+        btn.textContent = String(date.getDate())
         td.appendChild(btn)
         row.appendChild(td)
         cellCount++
@@ -998,7 +1020,7 @@ export class DateTimeField {
 
     // Ensure one button is focusable when none selected
     const focusable = grid.querySelector<HTMLButtonElement>('td:not([data-outside-month]):not([aria-disabled]) button')
-    if (focusable && !grid.querySelector('[aria-pressed="true"]')) {
+    if (focusable && !grid.querySelector('td[data-selected="true"]')) {
       focusable.setAttribute('tabindex', '0')
     }
   }
