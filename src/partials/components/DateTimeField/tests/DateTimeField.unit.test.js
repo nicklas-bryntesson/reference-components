@@ -260,6 +260,108 @@ describe('_handleDigit() — time segments', () => {
 
 // ─── Empty segments speak a localized word ──────────────────────────────────────
 
+// ─── Calendar day cells are named and marked like DateField's ───────────────────
+
+// _renderMonth only needs a .calendar-grid inside calendarEl — hand it one
+// directly instead of driving the whole popup open.
+function renderMonth(instance, year, month) {
+  const cal = document.createElement('div')
+  cal.innerHTML = '<table class="calendar-grid" role="grid"></table>'
+  instance.calendarEl = cal
+  instance.currentYear = year
+  instance.currentMonth = month
+  instance._renderMonth()
+  return cal.querySelector('.calendar-grid')
+}
+
+describe('calendar day cells follow the family pattern (DateField)', () => {
+  it('every day button carries the full date as its accessible name', async () => {
+    const { DateTimeField } = await import('../DateTimeField.ts')
+    const root = makeRoot()
+    document.body.appendChild(root)
+    DateTimeField.attach(document.body)
+    const instance = root.__dateTimeFieldInstance
+    const grid = renderMonth(instance, 2026, 5) // June 2026
+
+    const btn = grid.querySelector('button[data-date="2026-06-15"]')
+    const expected = new Date(2026, 5, 15).toLocaleDateString(instance.localeTag, { dateStyle: 'long' })
+    expect(btn.getAttribute('aria-label')).toBe(expected)
+
+    // Outside-month buttons are inert but still in the accessibility tree —
+    // a bare digit is not an accessible name.
+    for (const b of grid.querySelectorAll('td button')) {
+      expect(b.getAttribute('aria-label')).toBeTruthy()
+    }
+    root.remove()
+  })
+
+  it('the selected day is aria-selected on the cell with ", selected" in the name — not aria-pressed', async () => {
+    const { DateTimeField } = await import('../DateTimeField.ts')
+    const root = makeRoot()
+    document.body.appendChild(root)
+    DateTimeField.attach(document.body)
+    const instance = root.__dateTimeFieldInstance
+    instance.selectedDatetime = new Date(2026, 5, 15, 9, 30)
+    const grid = renderMonth(instance, 2026, 5)
+
+    const btn = grid.querySelector('button[data-date="2026-06-15"]')
+    const td = btn.closest('td')
+    expect(td.getAttribute('aria-selected')).toBe('true')
+    expect(td.dataset.selected).toBe('true')
+    expect(btn.getAttribute('aria-label')).toMatch(/, selected$/)
+    // aria-pressed presents the day as a toggle button — wrong model for a
+    // calendar choice, and the reason VO said "pressed" instead of "selected".
+    expect(btn.hasAttribute('aria-pressed')).toBe(false)
+
+    const other = grid.querySelector('button[data-date="2026-06-16"]').closest('td')
+    expect(other.getAttribute('aria-selected')).toBe('false')
+    root.remove()
+  })
+
+  it('a day outside min/max speaks ", not available"', async () => {
+    const { DateTimeField } = await import('../DateTimeField.ts')
+    const root = makeRoot('data-min="2026-06-10T00:00"')
+    document.body.appendChild(root)
+    DateTimeField.attach(document.body)
+    const instance = root.__dateTimeFieldInstance
+    const grid = renderMonth(instance, 2026, 5)
+
+    const btn = grid.querySelector('button[data-date="2026-06-05"]')
+    expect(btn.closest('td').getAttribute('aria-disabled')).toBe('true')
+    expect(btn.getAttribute('aria-label')).toMatch(/, not available$/)
+    root.remove()
+  })
+
+  it('today speaks ", today"', async () => {
+    const { DateTimeField } = await import('../DateTimeField.ts')
+    const root = makeRoot()
+    document.body.appendChild(root)
+    DateTimeField.attach(document.body)
+    const instance = root.__dateTimeFieldInstance
+    const now = new Date()
+    const grid = renderMonth(instance, now.getFullYear(), now.getMonth())
+
+    const btn = grid.querySelector('td[data-today="true"] button')
+    expect(btn.getAttribute('aria-label')).toContain(', today')
+    root.remove()
+  })
+
+  it('the selected day is the single roving tab stop', async () => {
+    const { DateTimeField } = await import('../DateTimeField.ts')
+    const root = makeRoot()
+    document.body.appendChild(root)
+    DateTimeField.attach(document.body)
+    const instance = root.__dateTimeFieldInstance
+    instance.selectedDatetime = new Date(2026, 5, 15, 9, 30)
+    const grid = renderMonth(instance, 2026, 5)
+
+    const stops = grid.querySelectorAll('button[tabindex="0"]')
+    expect(stops.length).toBe(1)
+    expect(stops[0].dataset.date).toBe('2026-06-15')
+    root.remove()
+  })
+})
+
 describe('empty segments speak a localized word, never the placeholder', () => {
   it('date and time segments all carry aria-valuetext "blank" (en) when empty', async () => {
     const { DateTimeField } = await import('../DateTimeField.ts')

@@ -169,7 +169,8 @@ Test with a real screenreader before shipping.
 
 **Calendar popup**
 - [ ] Dialog label is announced when popup opens
-- [ ] Selected date is indicated in the calendar grid
+- [ ] Each day cell is announced with day number, month, and year
+- [ ] Day cells express state (today, selected, disabled/dimmed)
 - [ ] ArrowKeys navigate between days with date announcement
 - [ ] PageUp/PageDown announces new month/year
 

@@ -238,7 +238,7 @@
 .DateTimeField .popup .calendar-grid td[data-today="true"] button {
   font-weight: bold;
 }
-.DateTimeField .popup .calendar-grid td button[aria-pressed="true"] {
+.DateTimeField .popup .calendar-grid td[data-selected="true"] button {
   background-color: var(--ui-primary);
   color: var(--ui-primary-foreground);
 }
