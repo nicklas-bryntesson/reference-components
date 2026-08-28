@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="sv">
+  <head>
+    <title>Autofyllnadstest</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
+    <meta name="theme-color" content="Canvas" />
+    <meta name="description" content="Manuellt testformulär för browser-autofyllnad mot referenskomponenterna" />
+
+    <!-- Appearance before first paint — same contract as index.html (see its comment). -->
+    <script>
+      try {
+        var a = localStorage.getItem('appearance-preference')
+        if (a === 'light' || a === 'dark') document.documentElement.setAttribute('data-appearance', a)
+      } catch (e) { /* storage blocked — fall back to following the OS */ }
+    </script>
+
+    <style>
+      /* Page-local test-rig layout — not part of any component contract. */
+      .autofillTest {
+        max-inline-size: 40rem;
+        margin-inline: auto;
+        padding: 1rem 1rem 6rem;
+        font-family: system-ui, sans-serif;
+        color: CanvasText;
+        background: Canvas;
+      }
+      .autofillTest h1 { font-size: 1.5rem; }
+      .autofillTest h2 { font-size: 1.125rem; margin-block-start: 2.5rem; }
+      .autofillTest form {
+        display: grid;
+        gap: 0.75rem;
+        border: 1px solid color-mix(in srgb, CanvasText 25%, transparent);
+        border-radius: 0.5rem;
+        padding: 1rem;
+      }
+      .autofillTest form > div { display: grid; gap: 0.25rem; }
+      .autofillTest input:not([class]) {
+        min-block-size: 2.5rem;
+        padding-inline: 0.75rem;
+        border: 1px solid color-mix(in srgb, CanvasText 25%, transparent);
+        border-radius: 0.375rem;
+        background: Canvas;
+        color: CanvasText;
+        font: inherit;
+      }
+      .autofillTest button[type="submit"] {
+        justify-self: start;
+        min-block-size: 2.5rem;
+        padding-inline: 1rem;
+        font: inherit;
+      }
+      .autofillTest .note {
+        font-size: 0.875rem;
+        color: color-mix(in srgb, CanvasText 70%, transparent);
+      }
+
+      /*
+        Konsument-receptet för brandad autofyllnads-highlight, som sidlokal demo.
+        `background-color` på :autofill ignoreras (browserns interna !important
+        vinner) — inset-box-shadow målar över i stället. Två separata regler så
+        en motor som inte kan parsa den ena selektorn inte fäller den andra.
+      */
+      .brandedAutofill .input:-webkit-autofill {
+        box-shadow: inset 0 0 0 1000px #14532d;
+        -webkit-text-fill-color: #f0fdf4;
+        caret-color: #f0fdf4;
+      }
+      .brandedAutofill .input:autofill {
+        box-shadow: inset 0 0 0 1000px #14532d;
+        color: #f0fdf4;
+        caret-color: #f0fdf4;
+      }
+    </style>
+  </head>
+
+  <body>
+    <main class="autofillTest">
+      <h1>Autofyllnadstest</h1>
+      <p>
+        Manuell testrigg för browser-autofyllnad mot referenskomponenterna. Kör den
+        helst över <strong>https</strong> (Vercel-deployen eller en PR-preview) —
+        kortautofyllnad erbjuds bara i säker kontext (localhost räknas också).
+      </p>
+      <ol class="note">
+        <li><strong>Träna:</strong> fyll i native-referensformuläret för hand och tryck
+          Spara; acceptera browserns "Spara adress?"-erbjudande. Kort läggs till i
+          browserns betalningsinställningar (eller sparas på samma sätt).</li>
+        <li><strong>Ladda om</strong> sidan, klicka i ett fält och välj förslaget.</li>
+        <li><strong>Observera:</strong> highlight-färgen, vilka fält som fylls, och om
+          komponenternas segment uppdateras när deras native fylls.</li>
+      </ol>
+      <p class="note">
+        Formulären skickar med GET till samma sida (värdena syns i URL:en — använd bara
+        testdata). En riktig navigering behövs för att browsern ska erbjuda sig att spara.
+      </p>
+
+      <h2>1 · Adressprofil — native referens</h2>
+      <form method="get" action="">
+        <div>
+          <label for="ref-name">Namn</label>
+          <input id="ref-name" name="ref-name" type="text" autocomplete="name" />
+        </div>
+        <div>
+          <label for="ref-email">E-post</label>
+          <input id="ref-email" name="ref-email" type="email" autocomplete="email" />
+        </div>
+        <div>
+          <label for="ref-tel">Telefon</label>
+          <input id="ref-tel" name="ref-tel" type="tel" autocomplete="tel" />
+        </div>
+        <div>
+          <label for="ref-street">Gatuadress</label>
+          <input id="ref-street" name="ref-street" type="text" autocomplete="street-address" />
+        </div>
+        <div>
+          <label for="ref-zip">Postnummer</label>
+          <input id="ref-zip" name="ref-zip" type="text" autocomplete="postal-code" />
+        </div>
+        <div>
+          <label for="ref-city">Ort</label>
+          <input id="ref-city" name="ref-city" type="text" autocomplete="address-level2" />
+        </div>
+        <button type="submit">Spara</button>
+      </form>
+
+      <h2>2 · Kortformulär — native + MonthField som cc-exp</h2>
+      <p class="note">
+        Kärnfallet för datum-familjen: MonthFields dolda native bär
+        <code>autocomplete="cc-exp"</code> i ett i övrigt native kortformulär.
+        Förväntat på desktop: grannfälten fylls, MonthField hoppas över tyst
+        (browserns anti-skimming — osynliga fält fylls inte). Förväntat på touch
+        (display-läget): nativen fylls och segmenten synkar via change.
+      </p>
+      <form method="get" action="">
+        <div>
+          <label for="cc-name">Kortinnehavare</label>
+          <input id="cc-name" name="cc-name" type="text" autocomplete="cc-name" />
+        </div>
+        <div>
+          <label for="cc-number">Kortnummer</label>
+          <input id="cc-number" name="cc-number" type="text" inputmode="numeric" autocomplete="cc-number" />
+        </div>
+        <div>
+          <label for="kort-utgang">Utgångsmånad</label>
+          <div
+            class="MonthField"
+            data-component="MonthField"
+            data-id="kort-utgang"
+            data-name="kort-utgang"
+            data-locale="sv"
+          >
+            <input class="native" type="month" aria-hidden="true" tabindex="-1" autocomplete="cc-exp" />
+            <div class="overlay" aria-hidden="true">
+              <div class="segments" role="group">
+              </div>
+              <button type="button" class="trigger" aria-label="Öppna månadsväljare" aria-expanded="false" aria-haspopup="dialog">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>
+              </button>
+              <div class="rail">
+                <template data-template="monthfield-popup">
+                  <div class="popup" role="dialog" aria-modal="true">
+                    <div class="year-month-picker WheelColumns">
+                      <div class="Wheel" data-picker="month" role="spinbutton" tabindex="0"></div>
+                      <div class="Wheel" data-picker="year" role="spinbutton" tabindex="-1"></div>
+                    </div>
+                    <div class="footer">
+                      <button type="button" class="footer-clear"></button>
+                      <button type="button" class="footer-now"></button>
+                    </div>
+                    <div class="arrow"></div>
+                  </div>
+                </template>
+              </div>
+            </div>
+            <div class="announce" aria-live="polite" aria-atomic="true"></div>
+          </div>
+        </div>
+        <div>
+          <label for="cc-csc">CVC</label>
+          <input id="cc-csc" name="cc-csc" type="text" inputmode="numeric" autocomplete="cc-csc" />
+        </div>
+        <button type="submit">Betala (test)</button>
+      </form>
+
+      <h2>3 · AffixField — synliga fält</h2>
+      <p class="note">
+        AffixFields input är synlig på riktigt, så här fungerar autofyllnad även på
+        desktop. Observera hur browserns highlight målar under de flytande affixen.
+      </p>
+      <form method="get" action="">
+        <div>
+          <label for="af-tel">Telefon</label>
+          <div class="AffixField" data-component="AffixField" data-id="af-tel-root" data-has-prefix="true">
+            <span class="prefix">+46</span>
+            <input class="input" id="af-tel" name="af-tel" type="tel" autocomplete="tel-national" />
+          </div>
+        </div>
+        <div>
+          <label for="af-zip">Postnummer</label>
+          <div class="AffixField" data-component="AffixField" data-id="af-zip-root" data-has-prefix="true">
+            <span class="prefix">SE–</span>
+            <input class="input" id="af-zip" name="af-zip" type="text" autocomplete="postal-code" />
+          </div>
+        </div>
+        <button type="submit">Spara</button>
+      </form>
+
+      <h2>4 · Brandad highlight — konsument-receptet</h2>
+      <p class="note">
+        Samma AffixField-telefon, men med sidans <code>.brandedAutofill</code>-CSS:
+        inset-box-shadow-receptet målar över browserns blå. Jämför med fält 3 —
+        tillståndet ska synas, bara i egen färg.
+      </p>
+      <form method="get" action="" class="brandedAutofill">
+        <div>
+          <label for="af-tel-brand">Telefon (brandad)</label>
+          <div class="AffixField" data-component="AffixField" data-id="af-tel-brand-root" data-has-prefix="true">
+            <span class="prefix">+46</span>
+            <input class="input" id="af-tel-brand" name="af-tel-brand" type="tel" autocomplete="tel-national" />
+          </div>
+        </div>
+        <button type="submit">Spara</button>
+      </form>
+
+      <h2>5 · Datum-familjen — dold native (desktop: fylls ej)</h2>
+      <p class="note">
+        DateField med <code>autocomplete="bday"</code> bredvid sin native-referens.
+        Chrome desktop har inte födelsedatum i adressprofilen alls; iOS/Safari kan
+        fylla det från kontaktkortet — och där går tappen genom display-lägets
+        transparenta native, så det är mobilfallet som är intressant här.
+      </p>
+      <form method="get" action="">
+        <div>
+          <label for="fodelsedatum">Födelsedatum (DateField)</label>
+          <div
+            class="DateField"
+            data-component="DateField"
+            data-id="fodelsedatum"
+            data-name="fodelsedatum"
+            data-locale="sv"
+            data-min="1900-01-01"
+            data-max="2100-12-31"
+          >
+            <input class="native" type="date" autocomplete="bday" />
+            <div class="custom" aria-hidden="true">
+              <div class="segments" role="group">
+                <button type="button" class="trigger" aria-label="Öppna kalender" aria-expanded="false" aria-haspopup="dialog">
+                  <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                </button>
+              </div>
+              <div class="rail">
+                <template data-template="datefield-calendar">
+                  <div class="popup" role="dialog" aria-modal="true">
+                    <div class="calendar-header">
+                      <button type="button" class="prev-month">&#8249;</button>
+                      <button type="button" class="month-year-trigger" aria-expanded="false"></button>
+                      <button type="button" class="next-month">&#8250;</button>
+                    </div>
+                    <div data-panel="calendar" data-active="true">
+                      <table class="calendar-grid" role="grid">
+                        <thead><tr role="row"><th scope="col"></th><th scope="col"></th><th scope="col"></th><th scope="col"></th><th scope="col"></th><th scope="col"></th><th scope="col"></th></tr></thead>
+                        <tbody></tbody>
+                      </table>
+                    </div>
+                    <div class="year-month-picker WheelColumns" role="group" data-panel="picker" data-active="false">
+                      <div class="Wheel" data-picker="month" tabindex="0"></div>
+                      <div class="Wheel" data-picker="year" tabindex="0"></div>
+                    </div>
+                    <div class="calendar-footer">
+                      <button type="button" class="calendar-footer-clear"></button>
+                      <button type="button" class="calendar-footer-today"></button>
+                    </div>
+                    <div class="arrow"></div>
+                  </div>
+                </template>
+              </div>
+            </div>
+            <div class="announce" aria-live="polite" aria-atomic="true"></div>
+          </div>
+        </div>
+        <div>
+          <label for="bday-ref">Födelsedatum (native referens)</label>
+          <input id="bday-ref" name="bday-ref" type="date" autocomplete="bday" />
+        </div>
+        <button type="submit">Spara</button>
+      </form>
+    </main>
+
+    <script type="module" src="/main.js"></script>
+  </body>
+</html>

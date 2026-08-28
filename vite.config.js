@@ -20,6 +20,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: resolve(__dirname, "index.html"),
+        autofill: resolve(__dirname, "autofill.html"),
       },
     },
   },
