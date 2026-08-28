@@ -33,6 +33,15 @@ triggered programmatically; `cc-exp` conveniently targets `<input type="month">`
    animation declared on `:-webkit-autofill` fires `animationstart` on every autofilled
    field — a reliable JS-visible signal for the state.
 
+4. **The styling premise splits by element type — and that split bounds the loss.**
+   Plain text inputs are fully styleable, which is why AffixField keeps its native
+   visible; the unstyleable surface is the date/time inputs' *internal segment UI*,
+   which is why that family replaces its native. Every data type real-world autofill
+   fills — name, email, tel, address, cc-name, cc-number — is a text input, so
+   AffixField already delivers styling and autofill together. The unreachable cell is
+   date-family × desktop: in practice `cc-exp` alone, since desktop Chrome's profile
+   carries no birthday.
+
 The colour question itself falls to an existing test: remove the declaration and nothing
 measurably breaks — the highlight's colour is taste, and taste is the consuming
 project's (ADR-0025). What *is* mechanics: the state being reachable by a selector that
@@ -64,6 +73,10 @@ that carries it.
   native's styling to smuggle it past anti-skimming heuristics would be fragile,
   adversarial, and indistinguishable from the attack the heuristic exists to stop. It is
   recorded as a documented limitation, in the same genre as popover clipping (ADR-0012).
+  WCAG-wise this satisfies the letter of 1.3.5 (the purpose stays programmatically
+  determinable via the `autocomplete` token on the native) while diverging from its
+  intent — browser assistance — on desktop; the contracts state that divergence rather
+  than hide it.
 
 This establishes the test: **is the browser withholding the behaviour on purpose?** When
 a browser refuses a behaviour as a security measure, the refusal is a documented
@@ -81,12 +94,27 @@ limitation, not a workaround target.
    and a hiding recipe tuned to defeat it is exactly what the heuristic will be tuned
    against next. Display mode already covers the platform (touch) where autofill of
    these field types is most common.
-3. **Do nothing** — rejected: consumers are left styling a pseudo-class whose paint the
+3. **Native-first desktop mode** (author `data-input-mode="display"` on desktop so the
+   native is genuinely the interaction surface and the browser offers its autofill
+   dropdown) — this is *not* forbidden by the anti-skimming test: a field the user
+   really interacts with is legitimate, and the value would still render in our styled
+   presentation (display mode never shows native text). Rejected on the interaction
+   instead: keyboard editing happens inside an invisible native — no caret, no segment
+   highlight, blind typing against a mirror — and clicking opens the browser's own
+   unstyleable picker. That surrenders exactly the experience the family exists to own.
+4. **A hybrid state machine** (empty → native-first, to receive the autofill offer;
+   filled → custom, for editing) — rejected: two interaction models inside one field,
+   a focus handoff mid-interaction (the family's history says focus moves like that
+   always bite), and the desktop gain is a single data type (`cc-exp`). Note also that
+   the *listening* half of such a machine already exists for free — autofill fires
+   `change`, the fields sync from `change` — so the machine adds only the part that
+   hurts.
+5. **Do nothing** — rejected: consumers are left styling a pseudo-class whose paint the
    browser overrides and whose support varies (a load-bearing selector on feature
    detection, ADR-0005), and on touch the filled state is invisible — an autofilled
    display-mode field looks identical to one the user typed, which is the removed-
    affordance state this ADR exists to prevent.
-4. **Surface the state, document the recipe, keep the native default** — chosen, on the
+6. **Surface the state, document the recipe, keep the native default** — chosen, on the
    measurements above.
 
 ## Consequences
@@ -122,6 +150,12 @@ limitation, not a workaround target.
 
 - Probe measurements 2026-08-28 (CDP `Autofill.trigger`, forms matrix + live MonthField/
   AffixField) — protocol in the gitignored `tasks/` working docs
+- Manual test rig: a five-form page (native profile reference to train the browser; a
+  card form with MonthField carrying `cc-exp` among native cc fields; AffixField
+  visible-input fields; the branded-highlight recipe beside an unbranded twin; DateField
+  with `bday` beside a native reference) was built and deliberately closed unmerged as
+  PR #76 — recreate it from that PR when the manual Firefox/Safari/address pass runs;
+  card autofill needs a secure context (https or localhost)
 - ADR-0004 (kernel bar), ADR-0005 (load-bearing selectors), ADR-0006 (native fallback
   modes), ADR-0012 (documented-limitation genre), ADR-0020 (copied vs imported),
   ADR-0025 (mechanics vs taste)
