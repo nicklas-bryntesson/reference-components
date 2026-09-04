@@ -20,6 +20,30 @@ Completes the date family alongside DateField, DateTimeField, and TimeField.
 
 State attributes set by JS: `data-initialized="true"`, `data-open="true"`, `data-has-value="true"` (boolean state always carries the literal value `"true"`, absent when off), `data-direction`, and `aria-expanded` on the trigger.
 
+## Parts
+
+Parts are identified by `data-part`, never by class name. The reference JS, the stylesheet and the
+conformance suite all address them through the attribute, so a consumer may restyle the same DOM
+under any class convention — or none — and the suite still passes. The only class names in the
+markup are the component root (`MonthField`) and the kernel wheel hosts (`Wheel`, `WheelColumns`).
+
+| `data-part` | Element | Role |
+|---|---|---|
+| `native` | `<input type="month">` | The real form control; hidden in `custom` mode, the transparent tap layer in `display` mode |
+| `overlay` | `<div>` | The visible bordered field box |
+| `segments` | `<div role="group">` | Container the JS fills with segment spans |
+| `segment` | `<span role="spinbutton">` | One editable segment; `data-segment` says which (`month` · `year`) |
+| `separator` | `<span aria-hidden>` | The separator between segments |
+| `trigger` | `<button>` | Opens the popup; carries `aria-expanded` / `aria-haspopup="dialog"` |
+| `icon` | `<svg>` | The trigger glyph |
+| `rail` | `<div>` | Zero-height positioning rail; the popup is cloned into it on open |
+| `popup` | `<div role="dialog">` | The wheel picker |
+| `year-month-picker` | `<div class="WheelColumns">` | Row of wheel hosts (`.Wheel[data-picker]`) |
+| `footer` | `<div>` | Popup footer holding the two actions |
+| `footer-clear` · `footer-now` | `<button>` | Clear / This month — both commit and close |
+| `arrow` | `<div>` | The popup pointer, positioned from JS |
+| `announce` | `<div aria-live="polite">` | Visually hidden live region for committed values |
+
 ## Segments
 
 Two inline spinbutton segments, in order **month → year** separated by `/`:
@@ -53,7 +77,7 @@ The native `<input type="month">` value is written as `YYYY-MM` only when **both
 
 ## Events
 
-The component dispatches `input` and `change` events on the native `<input>` when a **complete** value is written (both segments filled) and once per popup **Rensa** (Clear) / **Denna månad** (This month) press. **Denna månad** also speaks the committed month via the `.announce` live region (closing moves focus to the trigger, which says nothing about *what* was set). Clearing a filled field with `Backspace` empties the native value without dispatching anything.
+The component dispatches `input` and `change` events on the native `<input>` when a **complete** value is written (both segments filled) and once per popup **Rensa** (Clear) / **Denna månad** (This month) press. **Denna månad** also speaks the committed month via the `[data-part="announce"]` live region (closing moves focus to the trigger, which says nothing about *what* was set). Clearing a filled field with `Backspace` empties the native value without dispatching anything.
 
 Both footer buttons close the popup and return focus to the trigger: a footer
 action completes the value, so the task is done. Spinning the wheels never

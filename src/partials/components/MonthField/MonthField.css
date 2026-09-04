@@ -1,5 +1,5 @@
-/* Root — tokens + root-level props only. Every part is a flat, fully-qualified
-   `.MonthField .element` rule below (ADR-0019). */
+/* Root — tokens + root-level props only. Parts are identified by `data-part`, never
+   by class; every rule below is a flat, fully-qualified `.MonthField [data-part="…"]` rule. */
 .MonthField {
   position: relative;
   display: inline-block;
@@ -33,10 +33,10 @@
 }
 
 /* ── Native / custom fallback ──────────────────────────────────────────── */
-.MonthField .native {
+.MonthField [data-part="native"] {
   display: block;
 }
-.MonthField .overlay {
+.MonthField [data-part="overlay"] {
   display: none;
 }
 
@@ -45,7 +45,7 @@
   pointer-events: none;
 }
 
-.MonthField[data-input-mode="custom"] .native {
+.MonthField[data-input-mode="custom"] [data-part="native"] {
   position: absolute;
   opacity: 0;
   visibility: hidden;
@@ -54,7 +54,7 @@
   block-size: 1px;
   overflow: hidden;
 }
-.MonthField[data-input-mode="custom"] .overlay {
+.MonthField[data-input-mode="custom"] [data-part="overlay"] {
   display: inline-flex;
   align-items: center;
   box-sizing: border-box;
@@ -66,7 +66,7 @@
   border-radius: 4px;
 }
 
-.MonthField[data-input-mode="display"] .native {
+.MonthField[data-input-mode="display"] [data-part="native"] {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -74,7 +74,7 @@
   opacity: 0;
   cursor: pointer;
 }
-.MonthField[data-input-mode="display"] .overlay {
+.MonthField[data-input-mode="display"] [data-part="overlay"] {
   display: inline-flex;
   align-items: center;
   box-sizing: border-box;
@@ -88,13 +88,13 @@
 }
 
 /* ── Segments ──────────────────────────────────────────────────────────── */
-.MonthField .segments {
+.MonthField [data-part="segments"] {
   display: inline-flex;
   align-items: center;
   gap: 0.125rem;
 }
 
-.MonthField .segment {
+.MonthField [data-part="segment"] {
   font-variant-numeric: tabular-nums;
   min-inline-size: 2ch;
   text-align: center;
@@ -102,40 +102,40 @@
   border-radius: 2px;
   cursor: default;
 }
-.MonthField .segment[data-segment="year"] {
+.MonthField [data-part="segment"][data-segment="year"] {
   min-inline-size: 4ch;
 }
-.MonthField .segment[data-focused="true"] {
+.MonthField [data-part="segment"][data-focused="true"] {
   background-color: var(--ui-primary);
   color: var(--ui-primary-foreground);
 }
-.MonthField .segment[data-placeholder="true"] {
+.MonthField [data-part="segment"][data-placeholder="true"] {
   color: var(--_mf-color-muted);
 }
 
-.MonthField .separator {
+.MonthField [data-part="separator"] {
   user-select: none;
   color: var(--_mf-color-muted);
 }
 
-.MonthField[data-input-mode="custom"] .overlay:hover,
-.MonthField[data-test-state="hover"] .overlay {
+.MonthField[data-input-mode="custom"] [data-part="overlay"]:hover,
+.MonthField[data-test-state="hover"] [data-part="overlay"] {
   border-color: var(--_mf-border-color-hover);
   background-color: var(--_mf-bg-hover);
 }
 
-.MonthField[data-input-mode="custom"] .overlay:focus-within,
-.MonthField[data-test-state="focus"] .overlay {
+.MonthField[data-input-mode="custom"] [data-part="overlay"]:focus-within,
+.MonthField[data-test-state="focus"] [data-part="overlay"] {
   outline: 2px solid;
   outline-offset: 1px;
 }
 
-.MonthField[data-invalid="true"] .overlay {
+.MonthField[data-invalid="true"] [data-part="overlay"] {
   border-color: var(--_mf-border-color-invalid);
 }
 
 /* ── Trigger ───────────────────────────────────────────────────────────── */
-.MonthField .trigger {
+.MonthField [data-part="trigger"] {
   margin-inline-start: 0.25rem;
   background: none;
   border: none;
@@ -144,23 +144,23 @@
   border-radius: 2px;
   vertical-align: middle;
 }
-.MonthField .trigger svg {
+.MonthField [data-part="trigger"] svg {
   /* block — an inline svg reserves baseline descender space below the icon */
   display: block;
 }
-.MonthField .trigger:focus-visible {
+.MonthField [data-part="trigger"]:focus-visible {
   outline: 2px solid;
   outline-offset: 2px;
 }
-.MonthField .trigger:hover {
+.MonthField [data-part="trigger"]:hover {
   background-color: var(--_mf-trigger-bg-hover);
 }
-.MonthField .trigger:active {
+.MonthField [data-part="trigger"]:active {
   background-color: var(--_mf-trigger-bg-active);
 }
 
 /* ── Announce (SR-only) ────────────────────────────────────────────────── */
-.MonthField .announce {
+.MonthField [data-part="announce"] {
   position: absolute;
   inline-size: 1px;
   block-size: 1px;
@@ -175,7 +175,7 @@
 }
 
 /* ── Slide rail ────────────────────────────────────────────────────────── */
-.MonthField .rail {
+.MonthField [data-part="rail"] {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -187,7 +187,7 @@
 }
 
 /* ── Popup bubble ──────────────────────────────────────────────────────── */
-.MonthField .popup {
+.MonthField [data-part="popup"] {
   position: absolute;
   left: var(--_mf-popup-offset, 50%);
   transform: translateX(-50%);
@@ -202,15 +202,15 @@
   padding: var(--ui-surface-padding);
   font-size: 1rem;
 }
-.MonthField[data-direction="bottom"] .popup {
+.MonthField[data-direction="bottom"] [data-part="popup"] {
   top: var(--_mf-popup-gap);
 }
-.MonthField[data-direction="top"] .popup {
+.MonthField[data-direction="top"] [data-part="popup"] {
   bottom: var(--_mf-popup-gap);
 }
 
 /* ── Month/year picker ─────────────────────────────────────────────────── */
-.MonthField .popup .year-month-picker {
+.MonthField [data-part="popup"] [data-part="year-month-picker"] {
   position: relative;
   z-index: 2;
   display: flex;
@@ -221,12 +221,12 @@
 /* The shared .Wheel is 64px — sized for numeric time/year columns. The month
    wheel shows full localized names ("september", "februari"), so it needs to be
    wider or the names clip under the wheel's overflow:hidden. */
-.MonthField .popup .year-month-picker .Wheel[data-picker="month"] {
+.MonthField [data-part="popup"] [data-part="year-month-picker"] .Wheel[data-picker="month"] {
   width: 7rem;
 }
 
 /* ── Popup footer ──────────────────────────────────────────────────────── */
-.MonthField .popup .footer {
+.MonthField [data-part="popup"] [data-part="footer"] {
   position: relative;
   z-index: 2;
   display: flex;
@@ -234,7 +234,7 @@
   margin-block-start: 0.5rem;
   gap: 0.5rem;
 }
-.MonthField .popup .footer button {
+.MonthField [data-part="popup"] [data-part="footer"] button {
   background: none;
   border: none;
   color: var(--ui-primary);
@@ -243,20 +243,20 @@
   border-radius: 2px;
   font: inherit;
 }
-.MonthField .popup .footer button:hover {
+.MonthField [data-part="popup"] [data-part="footer"] button:hover {
   background-color: var(--_mf-bg-hover);
 }
-.MonthField .popup .footer button:focus-visible {
+.MonthField [data-part="popup"] [data-part="footer"] button:focus-visible {
   outline: 2px solid;
   outline-offset: 2px;
 }
-.MonthField .popup .footer button:disabled {
+.MonthField [data-part="popup"] [data-part="footer"] button:disabled {
   color: var(--_mf-color-muted);
   cursor: not-allowed;
 }
 
 /* ── Arrow ─────────────────────────────────────────────────────────────── */
-.MonthField .arrow {
+.MonthField [data-part="arrow"] {
   position: absolute;
   width: var(--_mf-arrow-size);
   height: var(--_mf-arrow-size);
@@ -264,12 +264,12 @@
   left: 50%;
   z-index: 3;
 }
-.MonthField[data-direction="top"] .arrow {
+.MonthField[data-direction="top"] [data-part="arrow"] {
   bottom: calc(var(--_mf-arrow-size) * -0.5);
   transform: translateX(calc(-50% + var(--_mf-arrow-offset, 0px))) rotate(45deg);
   border-end-end-radius: var(--_mf-arrow-corner-radius);
 }
-.MonthField[data-direction="bottom"] .arrow {
+.MonthField[data-direction="bottom"] [data-part="arrow"] {
   top: calc(var(--_mf-arrow-size) * -0.5);
   transform: translateX(calc(-50% + var(--_mf-arrow-offset, 0px))) rotate(45deg);
   border-start-start-radius: var(--_mf-arrow-corner-radius);
