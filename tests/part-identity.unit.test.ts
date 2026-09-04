@@ -17,7 +17,7 @@ import { join } from 'node:path'
  * listed, replace the allowlist with the full directory.
  */
 
-const SWEPT = ['ToggleTip', 'TimeField', 'MonthField']
+const SWEPT = ['ToggleTip', 'TimeField', 'MonthField', 'DateField']
 
 const DIR = 'src/partials/components'
 const read = (p: string): string => (existsSync(p) ? readFileSync(p, 'utf8') : '')
