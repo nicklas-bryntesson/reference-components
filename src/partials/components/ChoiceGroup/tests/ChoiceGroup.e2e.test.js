@@ -34,8 +34,8 @@ test('group error is announced (role=alert) and described', async ({ page }) => 
   const group = page.getByRole('group', { name: 'Terms' })
   await expect(group).toHaveAccessibleDescription(/must accept the terms/i)
   // the error is a Notice inside a persistent live region (the announcer)
-  await expect(page.locator('.ChoiceGroup[data-id="invalid"] .notice-region')).toHaveAttribute('role', 'alert')
-  await expect(page.locator('.ChoiceGroup[data-id="invalid"] .notice-region .Notice')).toHaveAttribute('data-variant', 'error')
+  await expect(page.locator('.ChoiceGroup[data-id="invalid"] [data-part="notice-region"]')).toHaveAttribute('role', 'alert')
+  await expect(page.locator('.ChoiceGroup[data-id="invalid"] [data-part="notice-region"] .Notice')).toHaveAttribute('data-variant', 'error')
 })
 
 // ── Layout: orientation ───────────────────────────────────────────────────────

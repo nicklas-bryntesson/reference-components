@@ -13,13 +13,13 @@
  * Legend layout is the only real cost of <fieldset>, and it is done with ONE
  * mechanism — a floated legend — across all three placements (avoiding the
  * cross-browser quirks of display:grid/flex on a fieldset):
- *   above  (default) — legend floats full width; .content clears it → legend on top
- *   beside           — legend floats auto width; .content (flow-root) fills beside it
- *   hidden           — legend removed from flow (SR-only); .content is the whole box
- * .content is a flow-root so it forms its own block-formatting context.
+ *   above  (default) — legend floats full width; [data-part="content"] clears it → legend on top
+ *   beside           — legend floats auto width; [data-part="content"] (flow-root) fills beside it
+ *   hidden           — legend removed from flow (SR-only); [data-part="content"] is the whole box
+ * [data-part="content"] is a flow-root so it forms its own block-formatting context.
  *
- * Root carries tokens + root props only; every part is a flat, fully-qualified
- * `.ChoiceGroup .element` rule below (ADR-0019).
+ * Root carries tokens + root props only. Parts are identified by `data-part`, never by
+ * class; every rule below is a flat, fully-qualified `.ChoiceGroup [data-part="…"]` rule.
  */
 
 .ChoiceGroup {
@@ -46,14 +46,14 @@
 }
 
 /* Body forms its own formatting context (holds hint + options + error). */
-.ChoiceGroup .content { display: flow-root; }
+.ChoiceGroup [data-part="content"] { display: flow-root; }
 
-.ChoiceGroup .hint {
+.ChoiceGroup [data-part="hint"] {
   margin-block: 0 var(--_cg-gap);
   color: var(--_cg-hint-color);
 }
 
-.ChoiceGroup .options {
+.ChoiceGroup [data-part="options"] {
   display: flex;
   flex-direction: column;
   gap: var(--_cg-gap);
@@ -61,12 +61,12 @@
 
 /* Group-level error is a Notice inside a persistent live region; ChoiceGroup
    only owns the spacing (the announcer + payload are the Notice component). */
-.ChoiceGroup .notice-region {
+.ChoiceGroup [data-part="notice-region"] {
   margin-block-start: var(--_cg-gap);
 }
 
 /* ── Orientation ─────────────────────────────────────────────────────── */
-.ChoiceGroup[data-orientation="horizontal"] .options {
+.ChoiceGroup[data-orientation="horizontal"] [data-part="options"] {
   flex-direction: row;
   flex-wrap: wrap;
   column-gap: var(--_cg-gap-horizontal);
@@ -79,8 +79,8 @@
   inline-size: 100%;
   margin-block-end: var(--_cg-legend-gap);
 }
-.ChoiceGroup[data-legend="above"] > .content,
-.ChoiceGroup:not([data-legend]) > .content {
+.ChoiceGroup[data-legend="above"] > [data-part="content"],
+.ChoiceGroup:not([data-legend]) > [data-part="content"] {
   clear: both;                 /* drop the whole body below the full-width legend */
 }
 
@@ -90,7 +90,7 @@
   inline-size: auto;
   margin-inline-end: var(--_cg-gap-horizontal);
 }
-/* .content stays flow-root (not cleared) → shrinks to the room right of the float */
+/* [data-part="content"] stays flow-root (not cleared) → shrinks to the room right of the float */
 
 /* ── Legend: hidden — removed visually, kept as the SR group name ────── */
 .ChoiceGroup[data-legend="hidden"] > legend {

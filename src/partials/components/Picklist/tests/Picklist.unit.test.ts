@@ -33,12 +33,12 @@ describe('Picklist reference markup contract', () => {
     }
   })
 
-  it('each list has a .content wrapper and an .options wrapper holding chips', () => {
+  it('each list has a content wrapper and an options wrapper holding chips', () => {
     for (const l of lists()) {
-      expect(l.querySelector('.content'), 'missing .content wrapper').not.toBeNull()
-      const options = l.querySelector('.options')
-      expect(options, 'missing .options wrapper').not.toBeNull()
-      expect(options!.querySelectorAll('.option input').length).toBeGreaterThan(0)
+      expect(l.querySelector('[data-part="content"]'), 'missing content wrapper').not.toBeNull()
+      const options = l.querySelector('[data-part="options"]')
+      expect(options, 'missing options wrapper').not.toBeNull()
+      expect(options!.querySelectorAll('[data-part="option"] input').length).toBeGreaterThan(0)
     }
   })
 
@@ -46,7 +46,7 @@ describe('Picklist reference markup contract', () => {
     // The whole visual model rests on `input + label`: the chip surface is the
     // adjacent label, so selected/focus states are plain sibling selectors and
     // never need :has(). Any element between them silently breaks the styling.
-    const chips = [...document.querySelectorAll('.Picklist .option')]
+    const chips = [...document.querySelectorAll('.Picklist [data-part="option"]')]
     expect(chips.length).toBeGreaterThan(0)
     for (const chip of chips) {
       const input = chip.querySelector('input')
@@ -58,7 +58,7 @@ describe('Picklist reference markup contract', () => {
   })
 
   it('for/id integrity and unique ids across all chips', () => {
-    const inputs = [...document.querySelectorAll<HTMLInputElement>('.Picklist .option input')]
+    const inputs = [...document.querySelectorAll<HTMLInputElement>('.Picklist [data-part="option"] input')]
     for (const input of inputs) {
       expect(input.id).toBeTruthy()
       expect(document.querySelector(`label[for="${input.id}"]`), `no label for ${input.id}`).not.toBeNull()
@@ -68,8 +68,8 @@ describe('Picklist reference markup contract', () => {
   })
 
   it('exercises both cardinalities — radio (single) and checkbox (multi) cores', () => {
-    expect(document.querySelectorAll('.Picklist .option input[type="radio"]').length).toBeGreaterThan(0)
-    expect(document.querySelectorAll('.Picklist .option input[type="checkbox"]').length).toBeGreaterThan(0)
+    expect(document.querySelectorAll('.Picklist [data-part="option"] input[type="radio"]').length).toBeGreaterThan(0)
+    expect(document.querySelectorAll('.Picklist [data-part="option"] input[type="checkbox"]').length).toBeGreaterThan(0)
   })
 
   it('radios within a list share exactly one name, with at most one checked', () => {
@@ -135,19 +135,19 @@ describe('Picklist reference markup contract', () => {
   // label, and it only stays out of the accessible name if it is aria-hidden.
 
   it('has at least one removable chip in the kitchensink', () => {
-    expect(document.querySelectorAll('.Picklist .deselect').length).toBeGreaterThan(0)
+    expect(document.querySelectorAll('.Picklist [data-part="deselect"]').length).toBeGreaterThan(0)
   })
 
-  it('every .deselect glyph is aria-hidden and sits inside the chip label', () => {
-    for (const glyph of document.querySelectorAll('.Picklist .deselect')) {
+  it('every deselect glyph is aria-hidden and sits inside the chip label', () => {
+    for (const glyph of document.querySelectorAll('.Picklist [data-part="deselect"]')) {
       expect(glyph.getAttribute('aria-hidden'), 'the × must not reach the accessible name').toBe('true')
       expect(glyph.closest('label'), 'the × must be inside the label to toggle the input').not.toBeNull()
     }
   })
 
-  it('no .deselect glyph appears in a radio chip (a radio cannot be deselected)', () => {
-    for (const glyph of document.querySelectorAll('.Picklist .deselect')) {
-      const input = glyph.closest('.option')?.querySelector('input')
+  it('no deselect glyph appears in a radio chip (a radio cannot be deselected)', () => {
+    for (const glyph of document.querySelectorAll('.Picklist [data-part="deselect"]')) {
+      const input = glyph.closest('[data-part="option"]')?.querySelector('input')
       expect(input?.getAttribute('type'), 'a × on a radio chip would be a lie').toBe('checkbox')
     }
   })
@@ -155,7 +155,7 @@ describe('Picklist reference markup contract', () => {
   it('a removable chip label has no whitespace before the glyph', () => {
     // A text node "Wi-Fi " leaves a trailing space in the accessible name
     // (measured in Chrome), so the markup must read `>Text<svg`.
-    for (const glyph of document.querySelectorAll('.Picklist .deselect')) {
+    for (const glyph of document.querySelectorAll('.Picklist [data-part="deselect"]')) {
       const prev = glyph.previousSibling
       if (prev?.nodeType !== 3 /* Node.TEXT_NODE */) continue
       const text = prev.textContent ?? ''

@@ -15,19 +15,32 @@ a thick leading accent bar, the richest look). Severity is always carried by the
 
 ```html
 <div class="Notice" data-variant="error">
-  <div class="icon" aria-hidden="true">
+  <div data-part="icon" aria-hidden="true">
     <svg viewBox="0 0 24 24"><!-- variant icon, stroke=currentColor --></svg>
   </div>
-  <div class="content">
-    <strong class="title">Optional title</strong>   <!-- omit for a title-less message -->
+  <div data-part="content">
+    <strong data-part="title">Optional title</strong>   <!-- omit for a title-less message -->
     <p>Message body. May contain inline markup like a <a href="#">link</a>.</p>
   </div>
 </div>
 ```
 
 - The **icon is decorative** (`aria-hidden="true"`) — the text carries the meaning.
-- `.content` holds an optional `.title` (`<strong>`) and the body.
+- `[data-part="content"]` holds an optional `[data-part="title"]` (`<strong>`) and the body.
 - Notice has **no margin** — spacing is the layout context's job.
+
+## Parts
+
+Parts are identified by `data-part`, never by class name. The stylesheet and the conformance suite
+address them through the attribute, so a consumer may restyle the same DOM under any class
+convention — or none — and the suite still passes. The only class name in the markup is the component root (`Notice`).
+
+| `data-part` | Element | Role |
+|---|---|---|
+| `icon` | `<div>` | The variant glyph, coloured by `data-variant` |
+| `title` | `<strong>` | Optional heading line |
+| `content` | `<div>` | The message body |
+| `notice-region` | `<div>` | The separate, persistent live region a Notice is rendered into by its host |
 
 ## HTML Authoring API (`data-*`)
 
@@ -60,7 +73,7 @@ and the tint derives from it; adjust the rest globally.
 
 ### Icons: inline SVG + currentColor
 
-Icons are authored inline as stroke SVGs; the CSS points `.icon { color: var(--_nt-accent) }`
+Icons are authored inline as stroke SVGs; the CSS points `[data-part="icon"] { color: var(--_nt-accent) }`
 and the SVG uses `stroke: currentColor`, so the mark re-tints with the variant and needs no
 sprite sheet. Deliberately **not** a CSS `mask`/`background` icon — this keeps the icon
 colour bound to the accent via `currentColor` and the component fully self-contained.
@@ -74,7 +87,7 @@ empty from load — and you swap Notice content into it:
 
 ```html
 <!-- present and empty at load; the announcer -->
-<div class="notice-region" role="alert" aria-live="assertive"></div>
+<div data-part="notice-region" role="alert" aria-live="assertive"></div>
 ```
 
 ```js
@@ -121,8 +134,8 @@ room and the measure grows.
 
 ## Testing strategy
 
-- **Unit (jsdom):** contract invariants — Notice never carries a live role, `.notice-region`
-  always does; every Notice has a known `data-variant` and a `.content`; icons are
+- **Unit (jsdom):** contract invariants — Notice never carries a live role, `[data-part="notice-region"]`
+  always does; every Notice has a known `data-variant` and a `[data-part="content"]`; icons are
   `aria-hidden` and omitted when `data-icon="false"`.
 - **E2E (Playwright + axe):** Notice has no `role` while the region has `role="alert"` +
   `aria-live`; variants paint distinct accent borders; `data-icon="false"` renders no icon and

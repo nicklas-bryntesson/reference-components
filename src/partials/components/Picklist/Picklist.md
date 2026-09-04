@@ -20,10 +20,10 @@ Single-select — radios sharing one `name`:
 ```html
 <fieldset class="Picklist" data-legend="above">
   <legend>Cuisine</legend>
-  <div class="content">
-    <div class="options">
-      <span class="option"><input type="radio" id="pl-thai" name="cuisine" checked><label for="pl-thai">Thai</label></span>
-      <span class="option"><input type="radio" id="pl-ital" name="cuisine"><label for="pl-ital">Italian</label></span>
+  <div data-part="content">
+    <div data-part="options">
+      <span data-part="option"><input type="radio" id="pl-thai" name="cuisine" checked><label for="pl-thai">Thai</label></span>
+      <span data-part="option"><input type="radio" id="pl-ital" name="cuisine"><label for="pl-ital">Italian</label></span>
     </div>
   </div>
 </fieldset>
@@ -34,9 +34,9 @@ Multi-select is the **same markup with `type="checkbox"`** and independent `name
 Removable chips — the `×` is a decorative glyph **inside the chip's own label**:
 
 ```html
-<span class="option">
+<span data-part="option">
   <input type="checkbox" id="pl-f1" name="pl-f1" checked>
-  <label for="pl-f1">Under 500 kr<svg class="deselect" viewBox="0 0 12 12" aria-hidden="true" focusable="false">
+  <label for="pl-f1">Under 500 kr<svg data-part="deselect" viewBox="0 0 12 12" aria-hidden="true" focusable="false">
     <path d="M2 2 L10 10 M10 2 L2 10" stroke="currentColor" stroke-width="2" fill="none"/></svg></label>
 </span>
 ```
@@ -45,7 +45,7 @@ Contract rules (enforced by the unit test):
 
 - **`<legend>` is the first child of `<fieldset>`** — a spec requirement, and the only
   *intrinsic* group label (no id plumbing, no document-outline dependency).
-- **The `.content` wrapper holds hint + options + error;** `.options` holds the chips and wraps.
+- **The `[data-part="content"]` wrapper holds hint + options + error;** `[data-part="options"]` holds the chips and wraps.
 - **The label must directly follow its input** (`input + label`). The whole visual model rests
   on that adjacency — see *The chip mechanism*. An element between them silently kills the
   selected and focus styling.
@@ -61,6 +61,21 @@ Single-vs-multiple selection is a property of the **children's `type`**: radios 
 are single-select, checkboxes are multi-select. Picklist encodes no cardinality — native already
 carries it.
 
+## Parts
+
+Parts are identified by `data-part`, never by class name. The stylesheet and the conformance suite
+address them through the attribute, so a consumer may restyle the same DOM under any class
+convention — or none — and the suite still passes. The class names in the markup are the component roots only (`Picklist`, and the composed `ChoiceField` / `Notice`).
+
+| `data-part` | Element | Role |
+|---|---|---|
+| `content` | `<div>` | Everything below the legend: options, hint, notice region |
+| `options` | `<div>` | The row (or column) of chips |
+| `option` | `<span>` | One chip: the clipped input and its label; the containing block for the input |
+| `deselect` | `<span aria-hidden>` | The `×` glyph inside a removable chip's label |
+| `hint` | `<p>` | Optional helper text the group points at via `aria-describedby` |
+| `notice-region` | `<div>` | Persistent live region a Notice is rendered into (see Notice) |
+
 ## HTML Authoring API (`data-*`)
 
 | Attribute | Values | Default | Effect |
@@ -69,7 +84,7 @@ carries it.
 | `data-segmented` | `"true"` | — | The set becomes **one control with N positions**: gaps collapse, borders join, the outer radius moves to the two ends, and the row no longer wraps |
 | `data-legend` | `above` · `beside` · `hidden` | `above` | Legend placement recipe (see below) |
 | `data-invalid` | `"true"` | — | Group-level invalid; tints unselected chip borders. Pair with an error Notice in a live region + `aria-describedby` |
-| `aria-describedby` | id ref list | — | Points at the `.hint` and/or the error Notice's text id so SRs read them after the group name |
+| `aria-describedby` | id ref list | — | Points at the `[data-part="hint"]` and/or the error Notice's text id so SRs read them after the group name |
 | `data-test-state` | `hover` · `focus` · `active` on the root | — | **Kitchensink only** — simulated pseudo-class, projected down to the chips |
 
 ### The two axes
@@ -91,15 +106,15 @@ Two consequences worth knowing when porting:
 A vertical Picklist is **not** a ChoiceGroup. What separates them is the item **skin** — a pill
 versus a box with a mark — not the direction the items run in.
 
-There is no `data-removable` — a chip is removable exactly when its label contains a `.deselect`
+There is no `data-removable` — a chip is removable exactly when its label contains a `[data-part="deselect"]`
 glyph, so a second source of truth would only be a way to disagree with the markup.
 
 ### Legend placement recipes
 
 | `data-legend` | Recipe | Notes |
 |---|---|---|
-| `above` | `legend { float: left; inline-size: 100% }`; `.content` (flow-root) clears it | Legend sits on its own line above the chips |
-| `beside` | legend floats at auto width; `.content` fills the room beside it | |
+| `above` | `legend { float: left; inline-size: 100% }`; `[data-part="content"]` (flow-root) clears it | Legend sits on its own line above the chips |
+| `beside` | legend floats at auto width; `[data-part="content"]` fills the room beside it | |
 | `hidden` | legend clipped to 1px (SR-only) | Still the group's accessible name — verified by e2e |
 
 ## The chip mechanism
@@ -108,9 +123,9 @@ The input is **sr-clipped to 1px but still focusable**, and the adjacent label i
 surface. That makes every state a plain sibling selector:
 
 ```css
-.Picklist .option input + label               { /* the chip */ }
-.Picklist .option input:checked + label       { /* selected */ }
-.Picklist .option input:focus-visible + label { /* focus ring */ }
+.Picklist [data-part="option"] input + label               { /* the chip */ }
+.Picklist [data-part="option"] input:checked + label       { /* selected */ }
+.Picklist [data-part="option"] input:focus-visible + label { /* focus ring */ }
 ```
 
 Two consequences worth keeping when porting:
@@ -153,7 +168,7 @@ Two consequences when porting:
 
 ### Vertical segments need `flex: 1` on the label
 
-`align-items: stretch` stretches the `.option` wrapper, but the label is a flex item inside that
+`align-items: stretch` stretches the `[data-part="option"]` wrapper, but the label is a flex item inside that
 wrapper's own row context and stays at content width — and the label is what the user sees as the
 segment. Without it the bar renders ragged.
 
@@ -221,10 +236,10 @@ reachable by that name even when the legend is visually clipped.
 
 ### Hint and error
 
-The `.hint` and the error text are referenced from the fieldset's `aria-describedby`, so screen
+The `[data-part="hint"]` and the error text are referenced from the fieldset's `aria-describedby`, so screen
 readers read them **after** the group name. The error uses the **Notice** component inside a
 persistent live region, giving two complementary behaviours — *announce on appear* (the
-`.notice-region` is mounted from the start, so swapping content in is announced) and *describe
+`[data-part="notice-region"]` is mounted from the start, so swapping content in is announced) and *describe
 on focus* (`aria-describedby` points at the Notice's text id).
 
 ### Forced colors (Windows High Contrast) — required
@@ -304,7 +319,7 @@ a failure is specific.
 Because behaviour is native, the centre of gravity sits in e2e:
 
 - **Unit (jsdom):** markup-contract invariants parsed from this file's own kitchensink — legend
-  first and non-empty, `.content`/`.options` present, `input + label` adjacency and `for`/`id`
+  first and non-empty, `[data-part="content"]`/`[data-part="options"]` present, `input + label` adjacency and `for`/`id`
   wiring, unique ids, both `type`s exercised, one shared `name` per radio group with at most one
   preselected, every `aria-describedby` target resolves, known `data-legend` values, and the
   removable-chip rules (`aria-hidden`, inside the label, never on a radio, no trailing space).

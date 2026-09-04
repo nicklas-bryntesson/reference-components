@@ -27,8 +27,8 @@ describe('Notice reference markup contract', () => {
     }
   })
 
-  it('the announcer (.notice-region) carries the live role + aria-live', () => {
-    const regions = [...document.querySelectorAll('.notice-region')]
+  it('the announcer (notice-region) carries the live role + aria-live', () => {
+    const regions = [...document.querySelectorAll('[data-part="notice-region"]')]
     expect(regions.length).toBeGreaterThan(0)
     for (const r of regions) {
       expect(['alert', 'status']).toContain(r.getAttribute('role'))
@@ -47,7 +47,7 @@ describe('Notice reference markup contract', () => {
       if (n.getAttribute('data-icon') === 'false') {
         expect(n.querySelector('svg'), 'no-icon Notice should render no svg').toBeNull()
       } else {
-        const svg = n.querySelector('.icon svg')
+        const svg = n.querySelector('[data-part="icon"] svg')
         if (svg) expect(svg.getAttribute('aria-hidden')).toBe('true')
       }
     }
@@ -55,7 +55,7 @@ describe('Notice reference markup contract', () => {
 
   it('every Notice has a content region', () => {
     for (const n of notices()) {
-      expect(n.querySelector('.content')).not.toBeNull()
+      expect(n.querySelector('[data-part="content"]')).not.toBeNull()
     }
   })
 })

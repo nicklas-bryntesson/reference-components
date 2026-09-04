@@ -7,8 +7,8 @@ import { targetPath } from '../../../../e2e-helpers/target.js'
 // mechanism (sr-clipped input + adjacent label as the surface) does not cost
 // any of the semantics or the visible focus ring.
 //
-// NOTE: every locator is scoped to the component root. `.option`, `.content`
-// and `.options` are page-global words shared across components.
+// NOTE: every locator is scoped to the component root. `option`, `content`
+// and `options` are page-global part names shared across components.
 
 test.beforeEach(async ({ page }) => {
   await page.goto(targetPath())
@@ -101,7 +101,7 @@ test('activating the × glyph deselects the chip', async ({ page }) => {
   const input = page.locator('#pl-r-1')
   await input.scrollIntoViewIfNeeded()
   await expect(input).toBeChecked()
-  await page.locator('.Picklist[data-id="removable"] label[for="pl-r-1"] .deselect').click()
+  await page.locator('.Picklist[data-id="removable"] label[for="pl-r-1"] [data-part="deselect"]').click()
   await expect(input, 'the × lives inside the label, so it toggles the input').not.toBeChecked()
 })
 
@@ -113,7 +113,7 @@ test('the × glyph contributes nothing to the accessible name', async ({ page })
 // ── Layout: chips flow in a row and wrap ──────────────────────────────────────
 
 test('chips flow in a row', async ({ page }) => {
-  const chips = page.locator('.Picklist[data-id="single"] .option')
+  const chips = page.locator('.Picklist[data-id="single"] [data-part="option"]')
   await chips.first().scrollIntoViewIfNeeded()
   const first = await chips.nth(0).boundingBox()
   const second = await chips.nth(1).boundingBox()
@@ -123,7 +123,7 @@ test('chips flow in a row', async ({ page }) => {
 
 test('a long set wraps to multiple rows without clipping', async ({ page }) => {
   await page.setViewportSize({ width: 420, height: 900 })
-  const chips = page.locator('.Picklist[data-id="wrap"] .option')
+  const chips = page.locator('.Picklist[data-id="wrap"] [data-part="option"]')
   await chips.first().scrollIntoViewIfNeeded()
   const boxes = []
   for (let i = 0; i < await chips.count(); i++) boxes.push(await chips.nth(i).boundingBox())
@@ -140,7 +140,7 @@ test('a long set wraps to multiple rows without clipping', async ({ page }) => {
 // ── The two axes: orientation and segmented ───────────────────────────────────
 
 test('segmented collapses the seam to a single border', async ({ page }) => {
-  const labels = page.locator('.Picklist[data-id="segmented"] .option label')
+  const labels = page.locator('.Picklist[data-id="segmented"] [data-part="option"] label')
   await labels.first().scrollIntoViewIfNeeded()
   const a = await labels.nth(0).boundingBox()
   const b = await labels.nth(1).boundingBox()
@@ -148,14 +148,14 @@ test('segmented collapses the seam to a single border', async ({ page }) => {
   expect(Math.abs(b.x - (a.x + a.width))).toBeLessThan(0.5)
   // …and the seam is one border, not two stacked
   const seam = await labels.nth(1).evaluate((el) => {
-    const prev = el.closest('.option').previousElementSibling.querySelector('label')
+    const prev = el.closest('[data-part="option"]').previousElementSibling.querySelector('label')
     return parseFloat(getComputedStyle(prev).borderRightWidth) + parseFloat(getComputedStyle(el).borderLeftWidth)
   })
   expect(seam, 'a doubled seam reads as a 2px line between segments').toBeLessThanOrEqual(1)
 })
 
 test('segmented puts the outer radius only on the two ends', async ({ page }) => {
-  const labels = page.locator('.Picklist[data-id="segmented"] .option label')
+  const labels = page.locator('.Picklist[data-id="segmented"] [data-part="option"] label')
   await labels.first().scrollIntoViewIfNeeded()
   const radii = (l) => l.evaluate((el) => {
     const s = getComputedStyle(el)
@@ -174,7 +174,7 @@ test('segmented puts the outer radius only on the two ends', async ({ page }) =>
 
 test('the radius token drives the segmented ends too', async ({ page }) => {
   // pill vs rectangle is a design value, not an attribute
-  const first = page.locator('.Picklist[data-id="segmented-rect"] .option label').first()
+  const first = page.locator('.Picklist[data-id="segmented-rect"] [data-part="option"] label').first()
   await first.scrollIntoViewIfNeeded()
   const r = await first.evaluate((el) => parseFloat(getComputedStyle(el).borderTopLeftRadius))
   expect(r).toBeCloseTo(4, 0)   // 0.25rem
@@ -182,7 +182,7 @@ test('the radius token drives the segmented ends too', async ({ page }) => {
 
 test('segmented does not wrap, even when narrow', async ({ page }) => {
   await page.setViewportSize({ width: 420, height: 900 })
-  const labels = page.locator('.Picklist[data-id="segmented"] .option label')
+  const labels = page.locator('.Picklist[data-id="segmented"] [data-part="option"] label')
   await labels.first().scrollIntoViewIfNeeded()
   const ys = []
   for (let i = 0; i < await labels.count(); i++) ys.push(Math.round((await labels.nth(i).boundingBox()).y))
@@ -190,7 +190,7 @@ test('segmented does not wrap, even when narrow', async ({ page }) => {
 })
 
 test('vertical stacks, and gapped chips hug their own text', async ({ page }) => {
-  const labels = page.locator('.Picklist[data-id="vertical"] .option label')
+  const labels = page.locator('.Picklist[data-id="vertical"] [data-part="option"] label')
   await labels.first().scrollIntoViewIfNeeded()
   const a = await labels.nth(0).boundingBox()
   const b = await labels.nth(1).boundingBox()
@@ -201,7 +201,7 @@ test('vertical stacks, and gapped chips hug their own text', async ({ page }) =>
 })
 
 test('vertical + segmented fills the bar (labels, not just wrappers)', async ({ page }) => {
-  const labels = page.locator('.Picklist[data-id="vertical-segmented"] .option label')
+  const labels = page.locator('.Picklist[data-id="vertical-segmented"] [data-part="option"] label')
   await labels.first().scrollIntoViewIfNeeded()
   const widths = []
   for (let i = 0; i < await labels.count(); i++) widths.push(Math.round((await labels.nth(i).boundingBox()).width))
@@ -279,7 +279,7 @@ test('an inset ring needs no z-index raise, because it never reaches a neighbour
 })
 
 test('the height contract holds in segmented mode', async ({ page }) => {
-  const label = page.locator('.Picklist[data-id="segmented"] .option label').first()
+  const label = page.locator('.Picklist[data-id="segmented"] [data-part="option"] label').first()
   await label.scrollIntoViewIfNeeded()
   const box = await label.boundingBox()
   expect(box.height).toBe(40)
@@ -295,8 +295,8 @@ test('hint is exposed as the group accessible description', async ({ page }) => 
 test('group error is announced (role=alert) and described', async ({ page }) => {
   await expect(page.getByRole('group', { name: 'Dietary needs' }))
     .toHaveAccessibleDescription(/at least one option/i)
-  await expect(page.locator('.Picklist[data-id="invalid"] .notice-region')).toHaveAttribute('role', 'alert')
-  await expect(page.locator('.Picklist[data-id="invalid"] .notice-region .Notice')).toHaveAttribute('data-variant', 'error')
+  await expect(page.locator('.Picklist[data-id="invalid"] [data-part="notice-region"]')).toHaveAttribute('role', 'alert')
+  await expect(page.locator('.Picklist[data-id="invalid"] [data-part="notice-region"] .Notice')).toHaveAttribute('data-variant', 'error')
 })
 
 // ── Disabled ──────────────────────────────────────────────────────────────────

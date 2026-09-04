@@ -13,7 +13,7 @@ test('Notice carries no live role; the region does', async ({ page }) => {
   await notice.scrollIntoViewIfNeeded()
   expect(await notice.getAttribute('role')).toBeNull()
 
-  const region = page.locator('#Notice .notice-region[data-id="region"]')
+  const region = page.locator('#Notice [data-part="notice-region"][data-id="region"]')
   await expect(region).toHaveAttribute('role', 'alert')
   await expect(region).toHaveAttribute('aria-live', 'assertive')
 })
@@ -22,7 +22,7 @@ test('Notice carries no live role; the region does', async ({ page }) => {
 
 test('variants tint the icon with distinct accents', async ({ page }) => {
   const iconColor = (variant) =>
-    page.locator(`#Notice .Notice[data-variant="${variant}"] .icon`).first()
+    page.locator(`#Notice .Notice[data-variant="${variant}"] [data-part="icon"]`).first()
       .evaluate((el) => getComputedStyle(el).color)
 
   const [error, success, info] = await Promise.all([iconColor('error'), iconColor('success'), iconColor('info')])
@@ -58,7 +58,7 @@ test('data-icon="false" renders no icon and collapses to one column', async ({ p
 })
 
 test('icons are decorative (aria-hidden)', async ({ page }) => {
-  const icons = page.locator('#Notice .Notice .icon svg')
+  const icons = page.locator('#Notice .Notice [data-part="icon"] svg')
   const n = await icons.count()
   expect(n).toBeGreaterThan(0)
   for (let i = 0; i < n; i++) {

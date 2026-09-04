@@ -44,6 +44,11 @@ Contract rules (enforced by the unit test against this file's kitchensink):
   server may render it, our reference authors it — the contract is the finished DOM).
 - **Checkbox: independent** — no shared `name`.
 
+## Parts
+
+ChoiceField has no parts. The root `<span class="ChoiceField">` wraps a native `<input>` and its
+`<label>`, and both are addressed by element — there is nothing for a class or a `data-part` to name.
+
 ## HTML Authoring API
 
 | Attribute | Values | Notes |

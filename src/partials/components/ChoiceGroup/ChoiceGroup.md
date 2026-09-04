@@ -14,8 +14,8 @@ keyboard behaviour. ChoiceGroup is markup + CSS.
 ```html
 <fieldset class="ChoiceGroup" data-orientation="vertical" data-legend="above">
   <legend>Shipping speed</legend>
-  <div class="content">
-    <div class="options">
+  <div data-part="content">
+    <div data-part="options">
       <span class="ChoiceField"><input type="radio" id="ship-std" name="shipping" checked><label for="ship-std">Standard</label></span>
       <span class="ChoiceField"><input type="radio" id="ship-exp" name="shipping"><label for="ship-exp">Express</label></span>
     </div>
@@ -28,14 +28,14 @@ With a hint (and an error when invalid):
 ```html
 <fieldset class="ChoiceGroup" data-legend="above" data-invalid="true" aria-describedby="acct-hint acct-err">
   <legend>Account type</legend>
-  <div class="content">
-    <p class="hint" id="acct-hint">Choose the plan that fits your team.</p>
-    <div class="options"> …fields… </div>
+  <div data-part="content">
+    <p data-part="hint" id="acct-hint">Choose the plan that fits your team.</p>
+    <div data-part="options"> …fields… </div>
     <!-- error = a Notice inside a persistent live region (the announcer) -->
-    <div class="notice-region" role="alert" aria-live="assertive">
+    <div data-part="notice-region" role="alert" aria-live="assertive">
       <div class="Notice" data-variant="error">
-        <div class="icon"><svg aria-hidden="true"><!-- … --></svg></div>
-        <div class="content"><p id="acct-err">Pick an account type to continue.</p></div>
+        <div data-part="icon"><svg aria-hidden="true"><!-- … --></svg></div>
+        <div data-part="content"><p id="acct-err">Pick an account type to continue.</p></div>
       </div>
     </div>
   </div>
@@ -46,20 +46,33 @@ Contract rules (enforced by the unit test):
 
 - **`<legend>` is the first child of `<fieldset>`** — a spec requirement, and the only
   *intrinsic* group label (no id plumbing, no document-outline dependency).
-- **The `.content` wrapper holds hint + options + error.** It establishes a formatting
+- **The `[data-part="content"]` wrapper holds hint + options + error.** It establishes a formatting
   context that clears the floated legend in the `above` recipe, and stacks the parts.
-- **`.options` holds the fields.** Its layout follows `data-orientation`.
+- **`[data-part="options"]` holds the fields.** Its layout follows `data-orientation`.
 - **One unique `name` per radio group.** Shared `name` = mutually exclusive.
 - **Every `aria-describedby` target must exist** — a dangling reference is a silent no-op.
+
+## Parts
+
+Parts are identified by `data-part`, never by class name. The stylesheet and the conformance suite
+address them through the attribute, so a consumer may restyle the same DOM under any class
+convention — or none — and the suite still passes. The class names in the markup are the component roots only (`ChoiceGroup`, and the composed `ChoiceField` / `Notice`).
+
+| `data-part` | Element | Role |
+|---|---|---|
+| `content` | `<div>` | Everything below the legend: options, hint, notice region |
+| `options` | `<div>` | The list of ChoiceFields, laid out by `data-orientation` |
+| `hint` | `<p>` | Optional helper text the group points at via `aria-describedby` |
+| `notice-region` | `<div>` | Persistent live region a Notice is rendered into (see Notice) |
 
 ## HTML Authoring API (`data-*`)
 
 | Attribute | Values | Default | Effect |
 |---|---|---|---|
-| `data-orientation` | `vertical` · `horizontal` | `vertical` | `.options` stacks (column) or flows + wraps (row) |
+| `data-orientation` | `vertical` · `horizontal` | `vertical` | `[data-part="options"]` stacks (column) or flows + wraps (row) |
 | `data-legend` | `above` · `beside` · `hidden` | `above` | Legend placement recipe (see below) |
 | `data-invalid` | `"true"` | — | Group-level invalid; pair with an error Notice in a live region + `aria-describedby` |
-| `aria-describedby` | id ref list | — | Points at the `.hint` and/or the error Notice's text id so SRs read them after the group name |
+| `aria-describedby` | id ref list | — | Points at the `[data-part="hint"]` and/or the error Notice's text id so SRs read them after the group name |
 
 ### Cardinality is implicit, not an attribute
 
@@ -72,8 +85,8 @@ cardinality — native already carries it. (This is why the item is `ChoiceField
 
 | `data-legend` | Recipe | Notes |
 |---|---|---|
-| `above` | `legend { float: left; inline-size: 100% }`; `.content` (flow-root) clears it | The documented `<fieldset>` cost. Legend sits on its own line above the fields |
-| `beside` | fieldset becomes `display: grid` (`auto minmax(0,1fr)`); legend left, `.content` right | Legend `float: none` here |
+| `above` | `legend { float: left; inline-size: 100% }`; `[data-part="content"]` (flow-root) clears it | The documented `<fieldset>` cost. Legend sits on its own line above the fields |
+| `beside` | fieldset becomes `display: grid` (`auto minmax(0,1fr)`); legend left, `[data-part="content"]` right | Legend `float: none` here |
 | `hidden` | legend clipped to 1px (SR-only) | Still the group's accessible name — verified by e2e |
 
 ## CSS Variable API
@@ -98,7 +111,7 @@ group is reachable by that name even when the legend is visually clipped.
 
 ### Hint and error
 
-The `.hint` and the error text are referenced from the fieldset's `aria-describedby`, so
+The `[data-part="hint"]` and the error text are referenced from the fieldset's `aria-describedby`, so
 screen readers read them **after** the group name (atomica11y radio/checkbox §2). Support
 note: description on a grouping element is well-supported in current NVDA/JAWS/VoiceOver; if
 you must support an older stack, mirror the description onto each field's `aria-describedby`.
@@ -106,7 +119,7 @@ you must support an older stack, mirror the description onto each field's `aria-
 The error uses the **Notice** component inside a persistent live region, giving two
 complementary behaviours:
 
-- **Announce on appear** — `.notice-region` (`role="alert"`) is mounted from the start; when
+- **Announce on appear** — `[data-part="notice-region"]` (`role="alert"`) is mounted from the start; when
   the error content is swapped in, screen readers announce it. (A pre-filled alert injected
   as one node, or present at page load, is not reliably announced — hence the persistent,
   initially-empty region.)
@@ -131,7 +144,7 @@ tabindex and no key handlers.
 ## Testing strategy
 
 - **Unit (jsdom):** wrapper-contract invariants — legend is the first child and non-empty,
-  `.options` present, for/id integrity, unique ids, one shared `name` per radio group,
+  `[data-part="options"]` present, for/id integrity, unique ids, one shared `name` per radio group,
   every `aria-describedby` target resolves, `data-legend` is a known value.
 - **E2E (Playwright + axe):** the group is reachable by its legend name (including hidden),
   hint/error surface as the accessible description, orientation lays fields row vs column,
