@@ -131,11 +131,11 @@ class TimeField {
     this.root = el
     this.instanceId = ++TimeField.instanceCount
 
-    this.native = el.querySelector<HTMLInputElement>('.native')!
-    this.overlay = el.querySelector<HTMLElement>('.overlay')!
-    this.segments = el.querySelector<HTMLElement>('.segments')!
-    this.trigger = el.querySelector<HTMLButtonElement>('.trigger')!
-    this.announce = el.querySelector<HTMLElement>('.announce')!
+    this.native = el.querySelector<HTMLInputElement>('[data-part="native"]')!
+    this.overlay = el.querySelector<HTMLElement>('[data-part="overlay"]')!
+    this.segments = el.querySelector<HTMLElement>('[data-part="segments"]')!
+    this.trigger = el.querySelector<HTMLButtonElement>('[data-part="trigger"]')!
+    this.announce = el.querySelector<HTMLElement>('[data-part="announce"]')!
 
     this.fieldId = el.dataset.id ?? `timefield-${this.instanceId}`
     // The translation key collapses region variants to a base language ('en-GB'
@@ -152,7 +152,7 @@ class TimeField {
     this._digitBuffer = ''
     this._digitTimer = null
 
-    this._rail = el.querySelector<HTMLElement>('.rail')!
+    this._rail = el.querySelector<HTMLElement>('[data-part="rail"]')!
     this._popupTemplate = el.querySelector<HTMLTemplateElement>('[data-template="timefield-popup"]')
 
     this._init()
@@ -249,7 +249,7 @@ class TimeField {
 
   _buildSegments(): void {
     // Clear existing
-    this.segments.querySelectorAll('.segment, .separator').forEach(el => el.remove())
+    this.segments.querySelectorAll('[data-part="segment"], [data-part="separator"]').forEach(el => el.remove())
 
     const segmentTypes: TimeSegmentType[] = ['hour', 'minute']
     if (this.showSeconds) segmentTypes.push('second')
@@ -283,7 +283,7 @@ class TimeField {
 
   _createSep(text: string): HTMLSpanElement {
     const sep = document.createElement('span')
-    sep.className = 'separator'
+    sep.setAttribute('data-part', 'separator')
     sep.setAttribute('aria-hidden', 'true')
     sep.textContent = text
     return sep
@@ -291,7 +291,7 @@ class TimeField {
 
   _createSegmentEl(type: TimeSegmentType): HTMLSpanElement {
     const span = document.createElement('span')
-    span.className = 'segment'
+    span.setAttribute('data-part', 'segment')
     span.setAttribute('role', 'spinbutton')
     span.setAttribute('data-segment', type)
     span.setAttribute('tabindex', '-1')
@@ -720,7 +720,7 @@ class TimeField {
   private _openPopup(): void {
     if (!this._popupTemplate) return
     const clone = this._popupTemplate.content.cloneNode(true) as DocumentFragment
-    this.popupEl = clone.querySelector<HTMLElement>('.popup')!
+    this.popupEl = clone.querySelector<HTMLElement>('[data-part="popup"]')!
 
     // Localised labels (popup, wheel columns)
     this.popupEl.setAttribute('aria-label', this.t.popupLabel)
@@ -733,8 +733,8 @@ class TimeField {
     this._updateClearButton()
 
     // Wire footer
-    const clearBtn = this.popupEl.querySelector<HTMLButtonElement>('.footer-clear')!
-    const nowBtn = this.popupEl.querySelector<HTMLButtonElement>('.footer-now')!
+    const clearBtn = this.popupEl.querySelector<HTMLButtonElement>('[data-part="footer-clear"]')!
+    const nowBtn = this.popupEl.querySelector<HTMLButtonElement>('[data-part="footer-now"]')!
     clearBtn.textContent = this.t.clearButton
     nowBtn.textContent = this.t.nowButton
     clearBtn.addEventListener('click', () => this._handleClear())
@@ -812,8 +812,8 @@ class TimeField {
   private _popupTabStops(): HTMLElement[] {
     if (!this.popupEl) return []
     const wheels = [...this.popupEl.querySelectorAll<HTMLElement>('[role="spinbutton"]')]
-    const clearBtn = this.popupEl.querySelector<HTMLButtonElement>('.footer-clear')
-    const nowBtn = this.popupEl.querySelector<HTMLButtonElement>('.footer-now')
+    const clearBtn = this.popupEl.querySelector<HTMLButtonElement>('[data-part="footer-clear"]')
+    const nowBtn = this.popupEl.querySelector<HTMLButtonElement>('[data-part="footer-now"]')
     const buttons = [clearBtn, nowBtn].filter(
       (b): b is HTMLButtonElement => Boolean(b) && !b!.disabled,
     )
@@ -853,7 +853,7 @@ class TimeField {
 
   private _updateClearButton(): void {
     if (!this.popupEl) return
-    const clearBtn = this.popupEl.querySelector<HTMLButtonElement>('.footer-clear')
+    const clearBtn = this.popupEl.querySelector<HTMLButtonElement>('[data-part="footer-clear"]')
     if (clearBtn) {
       const hasValue = this.native.value !== ''
       clearBtn.disabled = !hasValue

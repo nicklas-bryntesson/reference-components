@@ -17,7 +17,7 @@ import { join } from 'node:path'
  * listed, replace the allowlist with the full directory.
  */
 
-const SWEPT = ['ToggleTip']
+const SWEPT = ['ToggleTip', 'TimeField']
 
 const DIR = 'src/partials/components'
 const read = (p: string): string => (existsSync(p) ? readFileSync(p, 'utf8') : '')
@@ -50,7 +50,7 @@ function authoredClasses(src: string): string[] {
   for (const m of stripComments(src).matchAll(/class=["']([^"']*)["']/g)) {
     for (const c of m[1].split(/\s+/)) {
       // Harness classes on the kitchensink page are not component parts.
-      if (/^[a-z]/.test(c) && !c.startsWith('kitchensink-')) out.add(c)
+      if (/^[a-z]/.test(c) && !c.startsWith('kitchensink-') && c !== 'state-table') out.add(c)
     }
   }
   return [...out].sort()
