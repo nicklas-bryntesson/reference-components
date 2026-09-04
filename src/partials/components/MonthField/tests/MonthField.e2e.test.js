@@ -338,7 +338,7 @@ test('de-DE renders German month names, not English ones', async ({ page }) => {
     new Intl.DateTimeFormat('de-DE', { month: 'long' }).format(new Date(2026, 9, 1)))
   expect(expected).not.toBe('October')   // guard: the probe itself must be meaningful
 
-  const names = await page.locator(`${MF} .Wheel[data-picker="month"] .option`)
+  const names = await page.locator(`${MF} .Wheel[data-picker="month"] [data-part="option"]`)
     .evaluateAll((els) => els.map((e) => e.textContent.trim()))
   expect(names).toContain(expected)
 })

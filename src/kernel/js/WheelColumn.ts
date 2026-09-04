@@ -135,20 +135,20 @@ class WheelColumn {
     }
 
     this.cylinder = document.createElement('div')
-    this.cylinder.className = 'cylinder'
+    this.cylinder.setAttribute('data-part', 'cylinder')
     this.cylinder.style.transformStyle = 'preserve-3d'
     this.cylinder.style.transform = `translateZ(${-this.radius}px)`
 
     for (let o = -HALF; o <= HALF; o++) {
       const slotEl = document.createElement('div')
-      slotEl.className = 'option'
+      slotEl.setAttribute('data-part', 'option')
       slotEl.setAttribute('aria-hidden', 'true')
       this.cylinder.appendChild(slotEl)
       this.slots.push({ el: slotEl, o })
     }
 
     const band = document.createElement('div')
-    band.className = 'band'
+    band.setAttribute('data-part', 'band')
 
     this.el.appendChild(this.cylinder)
     this.el.appendChild(band)
@@ -174,10 +174,10 @@ class WheelColumn {
     // Which option the press landed on has to be read HERE. The next line
     // captures the pointer, and capture retargets the compatibility mouse
     // events that follow — mousedown, mouseup and click all arrive with
-    // `.Wheel` as their target, so a click handler asking `closest('.option')`
+    // `.Wheel` as their target, so a click handler asking `closest('[data-part="option"]')`
     // finds nothing and silently never selects. This is why tapping a number
     // worked on touch (no compatibility events) and never with a mouse.
-    this._downOption = (e.target as HTMLElement | null)?.closest<HTMLElement>('.option') ?? null
+    this._downOption = (e.target as HTMLElement | null)?.closest<HTMLElement>('[data-part="option"]') ?? null
     this._dragTravel = 0
     this._dragLastY = e.clientY
     this._dragLastTime = performance.now()

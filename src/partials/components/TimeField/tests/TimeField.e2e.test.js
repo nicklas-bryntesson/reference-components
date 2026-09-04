@@ -130,7 +130,7 @@ test('popup minute column has role=spinbutton', async ({ page }) => {
 
 test('popup column contains 9 aria-hidden option elements', async ({ page }) => {
   await page.locator(`${TF} .trigger`).click()
-  const options = page.locator(`${TF} .Wheel[data-segment="hour"] .option`)
+  const options = page.locator(`${TF} .Wheel[data-segment="hour"] [data-part="option"]`)
   await expect(options).toHaveCount(9)
   for (let i = 0; i < 9; i++) {
     await expect(options.nth(i)).toHaveAttribute('aria-hidden', 'true')
@@ -247,7 +247,7 @@ test('tapping a wheel option with a mouse selects it', async ({ page }) => {
   const hourCol = page.locator(`${TF} .Wheel[data-segment="hour"]`)
   await expect(hourCol).toBeVisible()
 
-  const option = hourCol.locator('.option[data-value]').nth(1)
+  const option = hourCol.locator('[data-part="option"][data-value]').nth(1)
   const wanted = await option.getAttribute('data-value')  // slots recycle on render
   await option.click()
   await page.waitForTimeout(500)
@@ -262,7 +262,7 @@ test('the wheel column publishes the value it just committed', async ({ page }) 
   // gesture from an empty field. Visible only to a screenreader.
   await page.locator(`${TF} .trigger`).click()
   const hourCol = page.locator(`${TF} .Wheel[data-segment="hour"]`)
-  const option = hourCol.locator('.option[data-value]').nth(1)
+  const option = hourCol.locator('[data-part="option"][data-value]').nth(1)
   const wanted = await option.getAttribute('data-value')
 
   await option.click()

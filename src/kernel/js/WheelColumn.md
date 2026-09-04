@@ -20,12 +20,12 @@ On construction, WheelColumn:
   The empty state must always carry a valuetext: a spinbutton with min/max but no valuenow makes
   VoiceOver fall back to a computed percentage) and
   `aria-activedescendant` pointing at the centred option;
-- injects a `.cylinder` containing nine `.option` slots (`aria-hidden`, the centred one gets
-  `aria-selected="true"` + an id), plus one `.band` appended to the host as a **sibling** of
+- injects a `[data-part="cylinder"]` containing nine `[data-part="option"]` slots (`aria-hidden`, the centred one gets
+  `aria-selected="true"` + an id), plus one `[data-part="band"]` appended to the host as a **sibling** of
   the ring. Per [`Wheel.css`](../css/Wheel.md) the band is currently hidden — the visible centre
   band and fade are drawn by the component-authored `.WheelColumns` wrapper.
 
-Do not author `.cylinder` / `.option` / `.band` — they are generated.
+Do not author `[data-part="cylinder"]` / `[data-part="option"]` / `[data-part="band"]` — they are generated.
 
 ## Public API
 
