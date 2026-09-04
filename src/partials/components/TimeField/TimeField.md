@@ -19,6 +19,30 @@ An accessible time input wrapping `<input type="time">`. Custom spinbutton segme
 
 State attributes set by JS: `data-initialized="true"`, `data-open="true"`, `data-has-value="true"` (boolean state always carries the literal value `"true"`, absent when off), `data-direction`, and `aria-expanded` on the trigger. All are styling hooks in `TimeField.css`.
 
+## Parts
+
+Parts are identified by `data-part`, never by class name. The reference JS, the stylesheet and the
+conformance suite all address them through the attribute, so a consumer may restyle the same DOM
+under any class convention — or none — and the suite still passes. The only class names in the
+markup are the component root (`TimeField`) and the kernel wheel hosts (`Wheel`, `WheelColumns`).
+
+| `data-part` | Element | Role |
+|---|---|---|
+| `native` | `<input type="time">` | The real form control; hidden in `custom` mode, the transparent tap layer in `display` mode |
+| `overlay` | `<div>` | The visible bordered field box |
+| `segments` | `<div role="group">` | Container the JS fills with segment spans |
+| `segment` | `<span role="spinbutton">` | One editable segment; `data-segment` says which (`hour` · `minute` · `second` · `ampm`) |
+| `separator` | `<span aria-hidden>` | The `:` between segments |
+| `trigger` | `<button>` | Opens the popup; carries `aria-expanded` / `aria-haspopup="dialog"` |
+| `icon` | `<svg>` | The trigger glyph |
+| `rail` | `<div>` | Zero-height positioning rail; the popup is cloned into it on open |
+| `popup` | `<div role="dialog">` | The wheel picker |
+| `time-columns` | `<div class="WheelColumns">` | Row of wheel hosts (`.Wheel[data-segment]`) |
+| `footer` | `<div>` | Popup footer holding the two actions |
+| `footer-clear` · `footer-now` | `<button>` | Clear / Now — both commit and close |
+| `arrow` | `<div>` | The popup pointer, positioned from JS |
+| `announce` | `<div aria-live="polite">` | Visually hidden live region for committed values |
+
 ## Segments
 
 - **hour** — 00–23 (24h) or 01–12 (12h)
@@ -46,7 +70,7 @@ Empty segments remove `aria-valuenow` and speak the localized `empty` word ("bla
 Two footer buttons, both tab stops inside the popup focus trap:
 
 - **Clear** ("Rensa") — disabled (and skipped by Tab) while the field is empty. Clears the segments and the native value, then dispatches `input` + `change` once.
-- **Now** ("Nu") — writes the current time, clamped to `data-min`/`data-max`, then dispatches `input` + `change` once and speaks the committed time via the `.announce` live region (closing moves focus to the trigger, which says nothing about *what* was set).
+- **Now** ("Nu") — writes the current time, clamped to `data-min`/`data-max`, then dispatches `input` + `change` once and speaks the committed time via the `[data-part="announce"]` live region (closing moves focus to the trigger, which says nothing about *what* was set).
 
 Both buttons close the popup and return focus to the trigger: a footer action
 completes the value, so the task is done. Spinning the wheels never closes —

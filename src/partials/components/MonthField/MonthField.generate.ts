@@ -39,30 +39,30 @@ function canonical(id: string, label: string, rootAttrs: string, inputAttrs: str
   data-name="${id}"
   data-locale="${locale}"${rootExtra}
 >
-  <input class="native" type="month" aria-hidden="true" tabindex="-1"${inputAttrs} />
-  <div class="overlay" aria-hidden="true">
-    <div class="segments" role="group">
+  <input data-part="native" type="month" aria-hidden="true" tabindex="-1"${inputAttrs} />
+  <div data-part="overlay" aria-hidden="true">
+    <div data-part="segments" role="group">
     </div>
-    <button type="button" class="trigger" aria-label="Open month picker" aria-expanded="false" aria-haspopup="dialog"${triggerAttrs}>
-      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar-icon lucide-calendar"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>
+    <button type="button" data-part="trigger" aria-label="Open month picker" aria-expanded="false" aria-haspopup="dialog"${triggerAttrs}>
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-part="icon"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>
     </button>
-    <div class="rail">
+    <div data-part="rail">
       <template data-template="monthfield-popup">
-        <div class="popup" role="dialog" aria-modal="true">
-          <div class="year-month-picker WheelColumns">
+        <div data-part="popup" role="dialog" aria-modal="true">
+          <div data-part="year-month-picker" class="WheelColumns">
             <div class="Wheel" data-picker="month" role="spinbutton" tabindex="0"></div>
             <div class="Wheel" data-picker="year" role="spinbutton" tabindex="-1"></div>
           </div>
-          <div class="footer">
-            <button type="button" class="footer-clear"></button>
-            <button type="button" class="footer-now"></button>
+          <div data-part="footer">
+            <button type="button" data-part="footer-clear"></button>
+            <button type="button" data-part="footer-now"></button>
           </div>
-          <div class="arrow"></div>
+          <div data-part="arrow"></div>
         </div>
       </template>
     </div>
   </div>
-  <div class="announce" aria-live="polite" aria-atomic="true"></div>
+  <div data-part="announce" aria-live="polite" aria-atomic="true"></div>
 </div>
 `
 }

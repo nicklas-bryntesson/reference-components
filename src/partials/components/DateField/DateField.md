@@ -15,17 +15,17 @@ An accessible date input that renders editable day, month, and year segments wit
   data-min="1900-01-01"
   data-max="2100-12-31"
 >
-  <input class="native" type="date" />
-  <div class="custom" aria-hidden="true">
-    <div class="segments" role="group">
+  <input data-part="native" type="date" />
+  <div data-part="custom" aria-hidden="true">
+    <div data-part="segments" role="group">
       <button
         type="button"
-        class="trigger"
+        data-part="trigger"
         aria-label="Open calendar"
         aria-expanded="false"
         aria-haspopup="dialog"
       >
-        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+        <svg data-part="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
           <rect x="3" y="4" width="18" height="18" rx="2"/>
           <line x1="16" y1="2" x2="16" y2="6"/>
           <line x1="8" y1="2" x2="8" y2="6"/>
@@ -33,16 +33,16 @@ An accessible date input that renders editable day, month, and year segments wit
         </svg>
       </button>
     </div>
-    <div class="rail">
+    <div data-part="rail">
       <template data-template="datefield-calendar">
-        <div class="popup" role="dialog" aria-modal="true">
-          <div class="calendar-header">
-            <button type="button" class="prev-month">&#8249;</button>
-            <button type="button" class="month-year-trigger" aria-expanded="false"></button>
-            <button type="button" class="next-month">&#8250;</button>
+        <div data-part="popup" role="dialog" aria-modal="true">
+          <div data-part="calendar-header">
+            <button type="button" data-part="prev-month">&#8249;</button>
+            <button type="button" data-part="month-year-trigger" aria-expanded="false"></button>
+            <button type="button" data-part="next-month">&#8250;</button>
           </div>
-          <div class="panel" data-panel="calendar" data-active="true">
-            <table class="calendar-grid" role="grid">
+          <div data-panel="calendar" data-active="true">
+            <table data-part="calendar-grid" role="grid">
               <thead><tr role="row">
                 <th scope="col"></th><th scope="col"></th><th scope="col"></th>
                 <th scope="col"></th><th scope="col"></th><th scope="col"></th><th scope="col"></th>
@@ -50,49 +50,77 @@ An accessible date input that renders editable day, month, and year segments wit
               <tbody></tbody>
             </table>
           </div>
-          <div class="panel year-month-picker WheelColumns" role="group" data-panel="picker" data-active="false">
+          <div data-part="year-month-picker" class="WheelColumns" role="group" data-panel="picker" data-active="false">
             <div class="Wheel" data-picker="month" tabindex="0"></div>
             <div class="Wheel" data-picker="year" tabindex="0"></div>
           </div>
-          <div class="calendar-footer">
-            <button type="button" class="calendar-footer-clear"></button>
-            <button type="button" class="calendar-footer-today"></button>
+          <div data-part="calendar-footer">
+            <button type="button" data-part="calendar-footer-clear"></button>
+            <button type="button" data-part="calendar-footer-today"></button>
           </div>
-          <div class="arrow"></div>
+          <div data-part="arrow"></div>
         </div>
       </template>
     </div>
   </div>
-  <div class="announce" aria-live="polite" aria-atomic="true"></div>
+  <div data-part="announce" aria-live="polite" aria-atomic="true"></div>
 </div>
 ```
 
-`FIELD_ID` must be unique on the page and must match both `data-id` and the `<label for>`. `data-locale` controls segment labels and calendar month/weekday names. `data-min` and `data-max` define the selectable date range (ISO 8601). JS injects the segment spans into `.segments` and clones the calendar dialog from the `<template>` into `.rail` on open — do not author the segment spans or the cloned calendar outside the template. The `WheelColumns` class on the picker panel is required — the kernel `Wheel.css` styles the wheel band and fade on it. JS gives `.month-year-trigger` an `aria-controls` pointing at the picker panel and toggles its `aria-expanded`; it deliberately carries no `aria-haspopup` (the trigger swaps an in-dialog panel of spinbutton wheels, not a listbox popup). The SVG icon, the `<template>` structure, and its contents are all authored markup. The `aria-label` on `.trigger` is a placeholder; JS overwrites it with a localised string derived from `data-locale` — port it to your translation system rather than hardcoding a value.
+`FIELD_ID` must be unique on the page and must match both `data-id` and the `<label for>`. `data-locale` controls segment labels and calendar month/weekday names. `data-min` and `data-max` define the selectable date range (ISO 8601). JS injects the segment spans into `[data-part="segments"]` and clones the calendar dialog from the `<template>` into `[data-part="rail"]` on open — do not author the segment spans or the cloned calendar outside the template. The `WheelColumns` class on the picker panel is required — the kernel `Wheel.css` styles the wheel band and fade on it. JS gives `[data-part="month-year-trigger"]` an `aria-controls` pointing at the picker panel and toggles its `aria-expanded`; it deliberately carries no `aria-haspopup` (the trigger swaps an in-dialog panel of spinbutton wheels, not a listbox popup). The SVG icon, the `<template>` structure, and its contents are all authored markup. The `aria-label` on `[data-part="trigger"]` is a placeholder; JS overwrites it with a localised string derived from `data-locale` — port it to your translation system rather than hardcoding a value.
+
+## Parts
+
+Parts are identified by `data-part`, never by class name. The reference JS, the stylesheet and the
+conformance suite all address them through the attribute, so a consumer may restyle the same DOM
+under any class convention — or none — and the suite still passes. The only class names in the
+markup are the component root (`DateField`) and the kernel wheel hosts (`Wheel`, `WheelColumns`).
+
+| `data-part` | Element | Role |
+|---|---|---|
+| `native` | `<input type="date">` | The real form control; hidden in `custom` mode, the transparent tap layer in `display` mode |
+| `custom` | `<div>` | The custom control wrapper (segments + trigger + rail); authored `aria-hidden`, lifted by JS in `custom` mode |
+| `segments` | `<div role="group">` | Container the JS fills with segment spans |
+| `segment` | `<span role="spinbutton">` | One editable segment; `data-segment` says which (`day` · `month` · `year`) |
+| `separator` | `<span aria-hidden>` | The separator between segments |
+| `trigger` | `<button>` | Opens the calendar; carries `aria-expanded` / `aria-haspopup="dialog"` |
+| `icon` | `<svg>` | The trigger glyph |
+| `rail` | `<div>` | Zero-height positioning rail; the calendar is cloned into it on open |
+| `popup` | `<div role="dialog">` | The calendar dialog |
+| `calendar-header` | `<div>` | Month navigation row |
+| `prev-month` · `next-month` | `<button>` | Step the displayed month |
+| `month-year-trigger` | `<button>` | Swaps the calendar panel for the wheel picker panel (`data-panel` / `data-active`) |
+| `calendar-grid` | `<table role="grid">` | The month grid; day cells carry `data-date`, `data-today`, `data-selected`, `data-outside-month` |
+| `year-month-picker` | `<div class="WheelColumns" role="group">` | Row of wheel hosts (`.Wheel[data-picker]`) |
+| `calendar-footer` | `<div>` | Footer holding the two actions |
+| `calendar-footer-clear` · `calendar-footer-today` | `<button>` | Clear / Today |
+| `arrow` | `<div>` | The popup pointer, positioned from JS |
+| `announce` | `<div aria-live="polite">` | Visually hidden live region for committed dates |
 
 ## Behaviour
 
 All observable outcomes are state changes on `data-*` attributes or DOM changes:
 
-- **Init:** JS reads `data-id`, `data-name`, `data-locale`, `data-min`, `data-max` from the root and injects three editable segment spans (day, month, year) into `.segments`. The calendar dialog is cloned fresh from the `<template>` into `.rail` on every open and removed from the DOM on close.
+- **Init:** JS reads `data-id`, `data-name`, `data-locale`, `data-min`, `data-max` from the root and injects three editable segment spans (day, month, year) into `[data-part="segments"]`. The calendar dialog is cloned fresh from the `<template>` into `[data-part="rail"]` on every open and removed from the DOM on close.
 - **segment editing (keyboard):** Arrow Up/Down increments/decrements the focused segment value. Left/Right moves focus between segments. Digit keys fill the segment; when the segment is complete it advances focus to the next. Backspace clears the segment.
 - **segment editing (commit):** When all three segments are valid, JS writes the ISO date to the native input (`input.value = "YYYY-MM-DD"`) and fires a native `change` event.
-- **Calendar open:** Clicking `.trigger` sets `aria-expanded="true"` on the trigger and makes the calendar dialog visible. The calendar renders the month grid for the current or selected date.
-- **Calendar navigation:** `.prev-month` / `.next-month` step the displayed month. `.month-year-trigger` toggles between the two panels: `.panel[data-panel="calendar"]` (the grid) and `.panel[data-panel="picker"]` (the month/year wheels). Only one panel has `data-active="true"` at a time. The two `.Wheel` elements (`data-picker="month"` / `"year"`) are upgraded by the `WheelColumn` kernel primitive to `role="spinbutton"` — see [`src/kernel/js/WheelColumn.md`](../../../kernel/js/WheelColumn.md).
+- **Calendar open:** Clicking `[data-part="trigger"]` sets `aria-expanded="true"` on the trigger and makes the calendar dialog visible. The calendar renders the month grid for the current or selected date.
+- **Calendar navigation:** `[data-part="prev-month"]` / `[data-part="next-month"]` step the displayed month. `[data-part="month-year-trigger"]` toggles between the two panels: `[data-panel="calendar"]` (the grid) and `[data-panel="picker"]` (the month/year wheels). Only one panel has `data-active="true"` at a time. The two `.Wheel` elements (`data-picker="month"` / `"year"`) are upgraded by the `WheelColumn` kernel primitive to `role="spinbutton"` — see [`src/kernel/js/WheelColumn.md`](../../../kernel/js/WheelColumn.md).
 - **Calendar date selection:** Clicking a day cell commits the date, closes the calendar (`aria-expanded="false"`), and focuses the trigger.
 - **Calendar close (Escape):** Escape is two-step. When the month/year picker panel is open, Escape closes only the picker (back to the calendar panel) — it does not undo: the wheels apply the date live on every step, so the field already holds the spun-to value and the calendar shows the same month. A second Escape closes the calendar.
 - **Disabled:** When `data-disabled="true"` is present on the root, all interaction is blocked (`pointer-events: none` via CSS). The server renders it, and JS also mirrors it onto the root at init when the native input has the `disabled` attribute.
 - **Invalid:** When `data-invalid="true"` is present, CSS applies error styling. JS does not set this attribute — the server renders it.
-- **Announcement:** After a date is committed, JS writes a human-readable string to `.announce` (e.g. "15 juni 1990") so screen readers announce the selection.
+- **Announcement:** After a date is committed, JS writes a human-readable string to `[data-part="announce"]` (e.g. "15 juni 1990") so screen readers announce the selection.
 
 ## Accessibility
 
-- `.segments` has `role="group"` — groups the three segment spans as a logical unit.
+- `[data-part="segments"]` has `role="group"` — groups the three segment spans as a logical unit.
 - Each segment span has `role="spinbutton"`, `aria-valuemin`, `aria-valuemax`, `aria-valuenow`, and `aria-label` (e.g. "dag", "månad", "år"). These are injected by JS.
 - An **empty** segment removes `aria-valuenow` and speaks the localized `empty` word ("blank"/"tomt") as `aria-valuetext` — never the visible placeholder ("dd"/"mm"/"yyyy" read inconsistently per segment), and never no valuetext at all (a spinbutton with min/max but no valuenow makes VoiceOver announce a computed percentage — measured on the native reference's empty segments).
-- `.trigger` has `aria-expanded` (toggled by JS) and `aria-haspopup="dialog"`.
+- `[data-part="trigger"]` has `aria-expanded` (toggled by JS) and `aria-haspopup="dialog"`.
 - The calendar dialog has `role="dialog"` and `aria-modal="true"`.
-- `.custom` is authored with `aria-hidden="true"`. In `data-input-mode="custom"` (fine pointer) JS removes it — the segments are the accessible control, and the native input is hidden from everyone (`visibility: hidden`), serving only as the value carrier for form submission. In `data-input-mode="display"` (coarse pointer) the custom layer stays `aria-hidden` and the native input is the accessible control.
-- `.announce` has `aria-live="polite"` and `aria-atomic="true"` — date confirmations are announced synchronously on commit.
+- `[data-part="custom"]` is authored with `aria-hidden="true"`. In `data-input-mode="custom"` (fine pointer) JS removes it — the segments are the accessible control, and the native input is hidden from everyone (`visibility: hidden`), serving only as the value carrier for form submission. In `data-input-mode="display"` (coarse pointer) the custom layer stays `aria-hidden` and the native input is the accessible control.
+- `[data-part="announce"]` has `aria-live="polite"` and `aria-atomic="true"` — date confirmations are announced synchronously on commit.
 - The native `input[type=date]` receives the committed value in both modes and carries it for form submission.
 
 ## Attributes
@@ -106,7 +134,7 @@ All observable outcomes are state changes on `data-*` attributes or DOM changes:
 | `data-locale` | BCP 47 tag | no | Locale for segment labels and calendar formatting (e.g. `"sv-SE"`). Falls back to `<html lang>`, then `"en"` |
 | `data-min` | ISO 8601 date | no | Earliest selectable date (`YYYY-MM-DD`). Defaults to none — year segment/wheel then spans 1900–2100 |
 | `data-max` | ISO 8601 date | no | Latest selectable date (`YYYY-MM-DD`). Defaults to none — year segment/wheel then spans 1900–2100 |
-| `data-label-field` | string | no | Fallback `aria-label` for `.segments` when no matching `<label for>` exists |
+| `data-label-field` | string | no | Fallback `aria-label` for `[data-part="segments"]` when no matching `<label for>` exists |
 | `data-disabled` | `"true"` | no | Disables all interaction; renders CSS disabled state |
 | `data-invalid` | `"true"` | no | Renders CSS error state; does not block interaction |
 | `data-test-state` | `"hover"` / `"focus"` / `"active"` | no | Kitchensink / visual-test only — simulates CSS pseudo-state without user interaction |

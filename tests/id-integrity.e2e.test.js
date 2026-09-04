@@ -67,7 +67,7 @@ test('every id reference resolves to an element that exists', async ({ page }) =
 for (const component of ['DateField', 'DateTimeField', 'TimeField', 'MonthField', 'WeekField']) {
   test(`${component}: references inside the open popup resolve`, async ({ page }) => {
     const root = page.locator(`[data-component="${component}"]`).first()
-    await root.locator('.trigger').first().click()
+    await root.locator('[data-part="trigger"]').first().click()
     await expect(root.locator('[role="dialog"]')).toBeVisible()
 
     const result = await page.evaluate((name) => {

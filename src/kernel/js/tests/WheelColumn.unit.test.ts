@@ -269,7 +269,7 @@ describe('WheelColumn — tapping an option', () => {
   }
 
   function optionOtherThan(el: HTMLElement, value: number | null): HTMLElement {
-    const options = [...el.querySelectorAll<HTMLElement>('.option')]
+    const options = [...el.querySelectorAll<HTMLElement>('[data-part="option"]')]
     const other = options.find((o) => o.dataset.value && Number(o.dataset.value) !== value)
     if (!other) throw new Error('no other option rendered')
     return other
@@ -346,7 +346,7 @@ describe('WheelColumn — the spinbutton cannot lag its own value', () => {
     const { el, wheel } = makeWheel({ min: 0, max: 11, value: null })
     expect(el.hasAttribute('aria-valuenow')).toBe(false)
 
-    const option = [...el.querySelectorAll<HTMLElement>('.option')].find((o) => o.dataset.value)!
+    const option = [...el.querySelectorAll<HTMLElement>('[data-part="option"]')].find((o) => o.dataset.value)!
     // Read it now: the slots are recycled, so this element carries a different
     // value once the gesture has re-rendered the column.
     const expected = option.dataset.value
@@ -359,7 +359,7 @@ describe('WheelColumn — the spinbutton cannot lag its own value', () => {
 
   it('agrees with its own value after a gesture, not with the one before', () => {
     const { el, wheel } = makeWheel({ min: 0, max: 11, value: 0 })
-    const options = [...el.querySelectorAll<HTMLElement>('.option')].filter((o) => o.dataset.value)
+    const options = [...el.querySelectorAll<HTMLElement>('[data-part="option"]')].filter((o) => o.dataset.value)
     for (const option of options.slice(0, 3)) {
       tap(el, option)
       expect(el.getAttribute('aria-valuenow')).toBe(String(wheel.value))

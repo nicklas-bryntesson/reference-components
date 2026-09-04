@@ -39,40 +39,40 @@ function canonical(id: string, label: string, rootAttrs: string, inputAttrs: str
   data-name="${id}"
   data-locale="${locale}"${rootExtra}
 >
-  <input class="native" type="week" aria-hidden="true" tabindex="-1"${inputAttrs} />
-  <div class="overlay" aria-hidden="true">
-    <div class="segments" role="group">
+  <input data-part="native" type="week" aria-hidden="true" tabindex="-1"${inputAttrs} />
+  <div data-part="overlay" aria-hidden="true">
+    <div data-part="segments" role="group">
     </div>
-    <button type="button" class="trigger" aria-label="Open week picker" aria-expanded="false" aria-haspopup="dialog"${triggerAttrs}>
-      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar-icon lucide-calendar"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>
+    <button type="button" data-part="trigger" aria-label="Open week picker" aria-expanded="false" aria-haspopup="dialog"${triggerAttrs}>
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-part="icon"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>
     </button>
-    <div class="rail">
+    <div data-part="rail">
       <template data-template="weekfield-popup">
-        <div class="popup" role="dialog" aria-modal="true">
-          <div class="calendar-header">
-            <button type="button" class="prev-month">&#8249;</button>
-            <span class="calendar-month-year"></span>
-            <button type="button" class="next-month">&#8250;</button>
+        <div data-part="popup" role="dialog" aria-modal="true">
+          <div data-part="calendar-header">
+            <button type="button" data-part="prev-month">&#8249;</button>
+            <span data-part="calendar-month-year"></span>
+            <button type="button" data-part="next-month">&#8250;</button>
           </div>
-          <table class="calendar-grid" role="grid">
+          <table data-part="calendar-grid" role="grid">
             <thead>
               <tr role="row">
-                <th scope="col" class="week-number-head"></th>
+                <th scope="col" data-part="week-number-head"></th>
                 <th scope="col"></th><th scope="col"></th><th scope="col"></th><th scope="col"></th><th scope="col"></th><th scope="col"></th><th scope="col"></th>
               </tr>
             </thead>
             <tbody></tbody>
           </table>
-          <div class="calendar-footer">
-            <button type="button" class="calendar-footer-clear"></button>
-            <button type="button" class="calendar-footer-now"></button>
+          <div data-part="calendar-footer">
+            <button type="button" data-part="calendar-footer-clear"></button>
+            <button type="button" data-part="calendar-footer-now"></button>
           </div>
-          <div class="arrow"></div>
+          <div data-part="arrow"></div>
         </div>
       </template>
     </div>
   </div>
-  <div class="announce" aria-live="polite" aria-atomic="true"></div>
+  <div data-part="announce" aria-live="polite" aria-atomic="true"></div>
 </div>
 `
 }

@@ -133,11 +133,11 @@ class MonthField {
     this.root = el
     this.instanceId = ++MonthField.instanceCount
 
-    this.native = el.querySelector<HTMLInputElement>('.native')!
-    this.overlay = el.querySelector<HTMLElement>('.overlay')!
-    this.segments = el.querySelector<HTMLElement>('.segments')!
-    this.trigger = el.querySelector<HTMLButtonElement>('.trigger')!
-    this.announce = el.querySelector<HTMLElement>('.announce')!
+    this.native = el.querySelector<HTMLInputElement>('[data-part="native"]')!
+    this.overlay = el.querySelector<HTMLElement>('[data-part="overlay"]')!
+    this.segments = el.querySelector<HTMLElement>('[data-part="segments"]')!
+    this.trigger = el.querySelector<HTMLButtonElement>('[data-part="trigger"]')!
+    this.announce = el.querySelector<HTMLElement>('[data-part="announce"]')!
 
     this.fieldId = el.dataset.id ?? `monthfield-${this.instanceId}`
     this.localeTag = readLocale(el)
@@ -157,7 +157,7 @@ class MonthField {
     this.minYear = parsedMin ? parsedMin.year : currentYear - MonthField.YEAR_SPAN
     this.maxYear = parsedMax ? parsedMax.year : currentYear + MonthField.YEAR_SPAN
 
-    this._rail = el.querySelector<HTMLElement>('.rail')!
+    this._rail = el.querySelector<HTMLElement>('[data-part="rail"]')!
     this._popupTemplate = el.querySelector<HTMLTemplateElement>('[data-template="monthfield-popup"]')
 
     this._init()
@@ -251,7 +251,7 @@ class MonthField {
   // ─── Segment construction ─────────────────────────────────────────────────
 
   _buildSegments(): void {
-    this.segments.querySelectorAll('.segment, .separator').forEach(el => el.remove())
+    this.segments.querySelectorAll('[data-part="segment"], [data-part="separator"]').forEach(el => el.remove())
 
     const segmentTypes: MonthSegmentType[] = ['month', 'year']
 
@@ -279,7 +279,7 @@ class MonthField {
 
   _createSep(text: string): HTMLSpanElement {
     const sep = document.createElement('span')
-    sep.className = 'separator'
+    sep.setAttribute('data-part', 'separator')
     sep.setAttribute('aria-hidden', 'true')
     sep.textContent = text
     return sep
@@ -287,7 +287,7 @@ class MonthField {
 
   _createSegmentEl(type: MonthSegmentType): HTMLSpanElement {
     const span = document.createElement('span')
-    span.className = 'segment'
+    span.setAttribute('data-part', 'segment')
     span.setAttribute('role', 'spinbutton')
     span.setAttribute('data-segment', type)
     span.setAttribute('tabindex', '-1')
@@ -691,7 +691,7 @@ class MonthField {
   private _openPopup(): void {
     if (!this._popupTemplate) return
     const clone = this._popupTemplate.content.cloneNode(true) as DocumentFragment
-    this.popupEl = clone.querySelector<HTMLElement>('.popup')!
+    this.popupEl = clone.querySelector<HTMLElement>('[data-part="popup"]')!
 
     // Localised labels
     this.popupEl.setAttribute('aria-label', this.t.popupLabel)
@@ -701,8 +701,8 @@ class MonthField {
     yearHost.setAttribute('aria-label', this.t.year)
 
     // Footer button labels
-    const clearBtn = this.popupEl.querySelector<HTMLButtonElement>('.footer-clear')!
-    const nowBtn = this.popupEl.querySelector<HTMLButtonElement>('.footer-now')!
+    const clearBtn = this.popupEl.querySelector<HTMLButtonElement>('[data-part="footer-clear"]')!
+    const nowBtn = this.popupEl.querySelector<HTMLButtonElement>('[data-part="footer-now"]')!
     clearBtn.textContent = this.t.clearButton
     nowBtn.textContent = this.t.thisMonthButton
     clearBtn.addEventListener('click', () => this._handleClear())
@@ -777,8 +777,8 @@ class MonthField {
   private _popupTabStops(): HTMLElement[] {
     if (!this.popupEl) return []
     const wheels = [...this.popupEl.querySelectorAll<HTMLElement>('.Wheel[role="spinbutton"]')]
-    const clearBtn = this.popupEl.querySelector<HTMLButtonElement>('.footer-clear')
-    const nowBtn = this.popupEl.querySelector<HTMLButtonElement>('.footer-now')
+    const clearBtn = this.popupEl.querySelector<HTMLButtonElement>('[data-part="footer-clear"]')
+    const nowBtn = this.popupEl.querySelector<HTMLButtonElement>('[data-part="footer-now"]')
     const buttons = [clearBtn, nowBtn].filter(
       (b): b is HTMLButtonElement => Boolean(b) && !b!.disabled,
     )
@@ -828,7 +828,7 @@ class MonthField {
 
   private _updateClearButton(): void {
     if (!this.popupEl) return
-    const clearBtn = this.popupEl.querySelector<HTMLButtonElement>('.footer-clear')
+    const clearBtn = this.popupEl.querySelector<HTMLButtonElement>('[data-part="footer-clear"]')
     if (clearBtn) {
       clearBtn.disabled = this.native.value === ''
     }
