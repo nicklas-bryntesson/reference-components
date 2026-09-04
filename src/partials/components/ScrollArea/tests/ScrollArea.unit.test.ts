@@ -125,10 +125,10 @@ describe('attach / destroy', () => {
   function mount(): HTMLElement {
     document.body.innerHTML = `
       <div class="ScrollArea" data-component="ScrollArea">
-        <div class="viewport" data-scroll-viewport>
-          <div class="content">content</div>
+        <div data-part="viewport" data-scroll-viewport>
+          <div data-part="content">content</div>
         </div>
-        <div class="fades" aria-hidden="true"></div>
+        <div data-part="fades" aria-hidden="true"></div>
       </div>`
     return document.querySelector<HTMLElement>('[data-component="ScrollArea"]')!
   }
@@ -137,7 +137,7 @@ describe('attach / destroy', () => {
     const root = mount()
     ScrollArea.attach()
     const vp = root.querySelector('[data-scroll-viewport]')!
-    const bar = root.querySelector('.scrollbar')!
+    const bar = root.querySelector('[data-part="scrollbar"]')!
     expect(root.getAttribute('data-scrollbar')).toBe('true')
     // the region carries the a11y: role + gap-filled accessible name
     expect(vp.getAttribute('role')).toBe('region')
@@ -145,14 +145,14 @@ describe('attach / destroy', () => {
     // the bar is a pointer/visual affordance only
     expect(bar.getAttribute('aria-hidden')).toBe('true')
     expect(bar.getAttribute('role')).toBeNull()
-    expect(bar.querySelector('.thumb')).not.toBeNull()
+    expect(bar.querySelector('[data-part="thumb"]')).not.toBeNull()
   })
 
   it('does not override an authored region label', () => {
     document.body.innerHTML = `
       <div class="ScrollArea" data-component="ScrollArea">
-        <div class="viewport" data-scroll-viewport aria-label="Members table">
-          <div class="content">content</div>
+        <div data-part="viewport" data-scroll-viewport aria-label="Members table">
+          <div data-part="content">content</div>
         </div>
       </div>`
     ScrollArea.attach()
@@ -165,14 +165,14 @@ describe('attach / destroy', () => {
     const root = mount()
     ScrollArea.attach()
     ScrollArea.attach()
-    expect(root.querySelectorAll('.scrollbar')).toHaveLength(1)
+    expect(root.querySelectorAll('[data-part="scrollbar"]')).toHaveLength(1)
   })
 
   it('destroy removes the generated bar, the instance, and the flag', () => {
     const root = mount()
     ScrollArea.attach()
     root.__scrollAreaInstance!.destroy()
-    expect(root.querySelector('.scrollbar')).toBeNull()
+    expect(root.querySelector('[data-part="scrollbar"]')).toBeNull()
     expect(root.__scrollAreaInstance).toBeUndefined()
     expect(root.hasAttribute('data-scrollbar')).toBe(false)
   })

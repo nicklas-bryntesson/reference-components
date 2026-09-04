@@ -67,7 +67,7 @@ test('root has role=group with aria-labelledby', async ({ page }) => {
 })
 
 test('native input is aria-hidden', async ({ page }) => {
-  const input = page.locator('[data-component="FileUpload"][data-initialized="true"] .input').last()
+  const input = page.locator('[data-component="FileUpload"][data-initialized="true"] [data-part="input"]').last()
   await expect(input).toHaveAttribute('aria-hidden', 'true')
   await expect(input).toHaveAttribute('tabindex', '-1')
 })
@@ -75,7 +75,7 @@ test('native input is aria-hidden', async ({ page }) => {
 // ─── Trigger button ───────────────────────────────────────────────────────────
 
 test('trigger button has accessible name', async ({ page }) => {
-  const trigger = page.locator('[data-component="FileUpload"][data-initialized="true"] .trigger').last()
+  const trigger = page.locator('[data-component="FileUpload"][data-initialized="true"] [data-part="trigger"]').last()
   const label = await trigger.textContent()
   expect(label.trim().length).toBeGreaterThan(0)
 })
@@ -86,43 +86,43 @@ test('selecting a file adds it to the list', async ({ page }) => {
   const tmpFile = path.join(__dir, 'fixtures', 'test.pdf')
 
   const liveRoot = page.locator('[data-component="FileUpload"][data-initialized="true"]').last()
-  const input = liveRoot.locator('.input')
+  const input = liveRoot.locator('[data-part="input"]')
   await input.setInputFiles(tmpFile)
 
-  await expect(liveRoot.locator('.item')).toHaveCount(1)
+  await expect(liveRoot.locator('[data-part="item"]')).toHaveCount(1)
   await expect(liveRoot).toHaveAttribute('data-has-files')
 })
 
 test('remove button removes the file from the list', async ({ page }) => {
   const tmpFile = path.join(__dir, 'fixtures', 'test.pdf')
   const liveRoot = page.locator('[data-component="FileUpload"][data-initialized="true"]').last()
-  const input = liveRoot.locator('.input')
+  const input = liveRoot.locator('[data-part="input"]')
   await input.setInputFiles(tmpFile)
 
-  await liveRoot.locator('.item-remove').click()
+  await liveRoot.locator('[data-part="item-remove"]').click()
 
-  await expect(liveRoot.locator('.item')).toHaveCount(0)
+  await expect(liveRoot.locator('[data-part="item"]')).toHaveCount(0)
   await expect(liveRoot).not.toHaveAttribute('data-has-files')
 })
 
 test('focus moves to trigger after removing the only file', async ({ page }) => {
   const tmpFile = path.join(__dir, 'fixtures', 'test.pdf')
   const liveRoot = page.locator('[data-component="FileUpload"][data-initialized="true"]').last()
-  const input = liveRoot.locator('.input')
+  const input = liveRoot.locator('[data-part="input"]')
   await input.setInputFiles(tmpFile)
 
-  const removeBtn = liveRoot.locator('.item-remove')
+  const removeBtn = liveRoot.locator('[data-part="item-remove"]')
   await removeBtn.focus()
   await removeBtn.click()
 
-  await expect(liveRoot.locator('.trigger')).toBeFocused()
+  await expect(liveRoot.locator('[data-part="trigger"]')).toBeFocused()
 })
 
 // ─── Keyboard navigation ──────────────────────────────────────────────────────
 
 test('trigger is reachable via Tab', async ({ page }) => {
   const liveRoot = page.locator('[data-component="FileUpload"][data-initialized="true"]').last()
-  const trigger = liveRoot.locator('.trigger')
+  const trigger = liveRoot.locator('[data-part="trigger"]')
   await trigger.focus()
   await expect(trigger).toBeFocused()
 })
@@ -130,16 +130,16 @@ test('trigger is reachable via Tab', async ({ page }) => {
 test('remove button is reachable via Shift+Tab from trigger', async ({ page }) => {
   const tmpFile = path.join(__dir, 'fixtures', 'test.pdf')
   const liveRoot = page.locator('[data-component="FileUpload"][data-initialized="true"]').last()
-  const input = liveRoot.locator('.input')
+  const input = liveRoot.locator('[data-part="input"]')
   await input.setInputFiles(tmpFile)
 
   // The remove button precedes the trigger in DOM order (list → trigger).
   // Shift+Tab from the trigger moves focus backwards to the remove button.
-  const trigger = liveRoot.locator('.trigger')
+  const trigger = liveRoot.locator('[data-part="trigger"]')
   await trigger.focus()
   await page.keyboard.press('Shift+Tab')
 
-  const removeBtn = liveRoot.locator('.item-remove')
+  const removeBtn = liveRoot.locator('[data-part="item-remove"]')
   await expect(removeBtn).toBeFocused()
 })
 
@@ -166,7 +166,7 @@ test('file not matching accept shows invalid-type error', async ({ page }) => {
   await page.evaluate(() => {
     const roots = document.querySelectorAll('[data-component="FileUpload"][data-initialized="true"]')
     const liveEl = roots[roots.length - 1]
-    const inputEl = liveEl.querySelector('.input')
+    const inputEl = liveEl.querySelector('[data-part="input"]')
     inputEl.setAttribute('accept', '.pdf')
   })
 
@@ -174,16 +174,16 @@ test('file not matching accept shows invalid-type error', async ({ page }) => {
   const tmpFile = path.join(__dir, 'fixtures', 'test.pdf')
 
   // Rename to .txt via Playwright's setInputFiles with mimeType override
-  await liveRoot.locator('.input').setInputFiles({
+  await liveRoot.locator('[data-part="input"]').setInputFiles({
     name: 'document.txt',
     mimeType: 'text/plain',
     buffer: Buffer.from('hello'),
   })
 
-  const invalidItem = liveRoot.locator('.item[data-status="invalid-type"]')
+  const invalidItem = liveRoot.locator('[data-part="item"][data-status="invalid-type"]')
   await expect(invalidItem).toHaveCount(1)
-  await expect(invalidItem.locator('.item-error')).toBeVisible()
-  await expect(invalidItem.locator('.item-error')).toHaveAttribute('role', 'alert')
+  await expect(invalidItem.locator('[data-part="item-error"]')).toBeVisible()
+  await expect(invalidItem.locator('[data-part="item-error"]')).toHaveAttribute('role', 'alert')
 })
 
 test('file exceeding max size shows invalid-size error', async ({ page }) => {
@@ -196,23 +196,23 @@ test('file exceeding max size shows invalid-size error', async ({ page }) => {
     liveEl.setAttribute('data-max-size', '1')
   })
 
-  await liveRoot.locator('.input').setInputFiles({
+  await liveRoot.locator('[data-part="input"]').setInputFiles({
     name: 'big.pdf',
     mimeType: 'application/pdf',
     buffer: Buffer.from('this file is definitely more than 1 byte'),
   })
 
-  const invalidItem = liveRoot.locator('.item[data-status="invalid-size"]')
+  const invalidItem = liveRoot.locator('[data-part="item"][data-status="invalid-size"]')
   await expect(invalidItem).toHaveCount(1)
-  await expect(invalidItem.locator('.item-error')).toBeVisible()
-  await expect(invalidItem.locator('.item-error')).toHaveAttribute('role', 'alert')
+  await expect(invalidItem.locator('[data-part="item-error"]')).toBeVisible()
+  await expect(invalidItem.locator('[data-part="item-error"]')).toHaveAttribute('role', 'alert')
 })
 
 // ── atomica11y: button + alert-notification + text-input §1 ──────────────────
 
 test('file list has aria-live="polite" and aria-relevant="additions removals"', async ({ page }) => {
   const liveRoot = page.locator('[data-component="FileUpload"][data-initialized="true"]').last()
-  const list = liveRoot.locator('.list')
+  const list = liveRoot.locator('[data-part="list"]')
   await expect(list).toHaveAttribute('aria-live', 'polite')
   await expect(list).toHaveAttribute('aria-relevant', 'additions removals')
 })
@@ -220,9 +220,9 @@ test('file list has aria-live="polite" and aria-relevant="additions removals"', 
 test('remove button has aria-label containing the filename', async ({ page }) => {
   const tmpFile = path.join(__dir, 'fixtures', 'test.pdf')
   const liveRoot = page.locator('[data-component="FileUpload"][data-initialized="true"]').last()
-  await liveRoot.locator('.input').setInputFiles(tmpFile)
+  await liveRoot.locator('[data-part="input"]').setInputFiles(tmpFile)
 
-  const removeBtn = liveRoot.locator('.item-remove')
+  const removeBtn = liveRoot.locator('[data-part="item-remove"]')
   const label = await removeBtn.getAttribute('aria-label')
   expect(label).toContain('test.pdf')
 })
@@ -230,46 +230,46 @@ test('remove button has aria-label containing the filename', async ({ page }) =>
 test('Enter on remove button removes the file', async ({ page }) => {
   const tmpFile = path.join(__dir, 'fixtures', 'test.pdf')
   const liveRoot = page.locator('[data-component="FileUpload"][data-initialized="true"]').last()
-  await liveRoot.locator('.input').setInputFiles(tmpFile)
+  await liveRoot.locator('[data-part="input"]').setInputFiles(tmpFile)
 
-  const removeBtn = liveRoot.locator('.item-remove')
+  const removeBtn = liveRoot.locator('[data-part="item-remove"]')
   await removeBtn.focus()
   await page.keyboard.press('Enter')
 
-  await expect(liveRoot.locator('.item')).toHaveCount(0)
+  await expect(liveRoot.locator('[data-part="item"]')).toHaveCount(0)
 })
 
 test('Space on remove button removes the file', async ({ page }) => {
   const tmpFile = path.join(__dir, 'fixtures', 'test.pdf')
   const liveRoot = page.locator('[data-component="FileUpload"][data-initialized="true"]').last()
-  await liveRoot.locator('.input').setInputFiles(tmpFile)
+  await liveRoot.locator('[data-part="input"]').setInputFiles(tmpFile)
 
-  const removeBtn = liveRoot.locator('.item-remove')
+  const removeBtn = liveRoot.locator('[data-part="item-remove"]')
   await removeBtn.focus()
   await page.keyboard.press('Space')
 
-  await expect(liveRoot.locator('.item')).toHaveCount(0)
+  await expect(liveRoot.locator('[data-part="item"]')).toHaveCount(0)
 })
 
 test('error alert does not steal focus when invalid file is added', async ({ page }) => {
   const liveRoot = page.locator('[data-component="FileUpload"][data-initialized="true"]').last()
 
   // Focus trigger first so we have a known focus position
-  await liveRoot.locator('.trigger').focus()
+  await liveRoot.locator('[data-part="trigger"]').focus()
 
   await page.evaluate(() => {
     const el = Array.from(document.querySelectorAll('[data-component="FileUpload"][data-initialized="true"]')).at(-1)
-    el.querySelector('.input').setAttribute('accept', '.pdf')
+    el.querySelector('[data-part="input"]').setAttribute('accept', '.pdf')
   })
 
-  await liveRoot.locator('.input').setInputFiles({
+  await liveRoot.locator('[data-part="input"]').setInputFiles({
     name: 'document.txt',
     mimeType: 'text/plain',
     buffer: Buffer.from('hello'),
   })
 
   // Error alert should be present
-  await expect(liveRoot.locator('.item-error[role="alert"]')).toBeVisible()
+  await expect(liveRoot.locator('[data-part="item-error"][role="alert"]')).toBeVisible()
 
   // Focus must NOT be on the error span — it should remain on trigger or move naturally
   const focused = await page.evaluate(() => document.activeElement?.getAttribute('role'))
@@ -282,23 +282,23 @@ test('focus moves to next sibling remove button when removing first of multiple 
   // Enable multiple
   await page.evaluate(() => {
     const el = Array.from(document.querySelectorAll('[data-component="FileUpload"][data-initialized="true"]')).at(-1)
-    el.querySelector('.input').setAttribute('multiple', '')
+    el.querySelector('[data-part="input"]').setAttribute('multiple', '')
   })
 
-  await liveRoot.locator('.input').setInputFiles([
+  await liveRoot.locator('[data-part="input"]').setInputFiles([
     { name: 'first.pdf', mimeType: 'application/pdf', buffer: Buffer.from('a') },
     { name: 'second.pdf', mimeType: 'application/pdf', buffer: Buffer.from('b') },
   ])
 
-  await expect(liveRoot.locator('.item')).toHaveCount(2)
+  await expect(liveRoot.locator('[data-part="item"]')).toHaveCount(2)
 
   // Focus and remove the first item
-  const firstRemove = liveRoot.locator('.item-remove').first()
+  const firstRemove = liveRoot.locator('[data-part="item-remove"]').first()
   await firstRemove.focus()
   await firstRemove.click()
 
   // Focus should move to the remaining item's remove button
-  await expect(liveRoot.locator('.item-remove')).toBeFocused()
+  await expect(liveRoot.locator('[data-part="item-remove"]')).toBeFocused()
 })
 
 test('data-has-errors on root when invalid file type is added', async ({ page }) => {
@@ -306,10 +306,10 @@ test('data-has-errors on root when invalid file type is added', async ({ page })
 
   await page.evaluate(() => {
     const el = Array.from(document.querySelectorAll('[data-component="FileUpload"][data-initialized="true"]')).at(-1)
-    el.querySelector('.input').setAttribute('accept', '.pdf')
+    el.querySelector('[data-part="input"]').setAttribute('accept', '.pdf')
   })
 
-  await liveRoot.locator('.input').setInputFiles({
+  await liveRoot.locator('[data-part="input"]').setInputFiles({
     name: 'document.txt',
     mimeType: 'text/plain',
     buffer: Buffer.from('hello'),
@@ -324,19 +324,19 @@ test('drop-zone remove button removes the file instead of reopening the picker',
   const dropZone = page.locator('[data-component="FileUpload"][data-drop-zone="true"][data-initialized="true"]').first()
   await dropZone.scrollIntoViewIfNeeded()
 
-  await dropZone.locator('.input').setInputFiles({
+  await dropZone.locator('[data-part="input"]').setInputFiles({
     name: 'dropped.pdf',
     mimeType: 'application/pdf',
     buffer: Buffer.from('x'),
   })
-  await expect(dropZone.locator('.item-name')).toHaveText('dropped.pdf')
+  await expect(dropZone.locator('[data-part="item-name"]')).toHaveText('dropped.pdf')
 
   // The drop-zone stretches the native input over the whole area. The remove
   // button must sit above it (z-index) so this click hits the button — if the
   // input intercepted it the file picker would open and the file would remain.
-  await dropZone.locator('.item-remove').click()
+  await dropZone.locator('[data-part="item-remove"]').click()
 
-  await expect(dropZone.locator('.item-name')).toHaveCount(0)
+  await expect(dropZone.locator('[data-part="item-name"]')).toHaveCount(0)
   await expect(dropZone).not.toHaveAttribute('data-has-files')
 })
 
@@ -347,7 +347,7 @@ test('server files state has data-source=server and hidden input', async ({ page
   // Several states now seed data-initial-files, so target the server fixture by its ref.
   const serverRoot = page.locator('[data-initial-files*="abc123"]').first()
   await expect(serverRoot).toHaveAttribute('data-initialized')
-  const serverItem = serverRoot.locator('.item[data-source="server"]')
+  const serverItem = serverRoot.locator('[data-part="item"][data-source="server"]')
   await expect(serverItem).toHaveCount(1)
   await expect(serverItem.locator('input[type="hidden"]')).toHaveCount(1)
   await expect(serverItem.locator('input[type="hidden"]')).toHaveAttribute('value', 'abc123')

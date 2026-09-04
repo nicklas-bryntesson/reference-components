@@ -11,8 +11,8 @@
  * server-side from the same string length. The formulas below own all the
  * math; nothing is ever measured.
  *
- * Root carries tokens + root props only; every part is a flat, fully-qualified
- * `.AffixField .element` rule below (ADR-0019).
+ Parts are identified by `data-part`, never by class; every rule below is a flat,
+ fully-qualified `.AffixField [data-part="…"]` rule.
  */
 
 .AffixField {
@@ -53,8 +53,8 @@
 }
 
 /* ── Affixes ──────────────────────────────────────────────────────────────── */
-.AffixField .prefix,
-.AffixField .suffix {
+.AffixField [data-part="prefix"],
+.AffixField [data-part="suffix"] {
   white-space: nowrap;
   line-height: 1;
   color: var(--_af-affix-color);
@@ -64,18 +64,18 @@
   z-index: 1;
 }
 
-.AffixField .prefix {
+.AffixField [data-part="prefix"] {
   justify-self: start;
   margin-inline-start: var(--_af-inline-padding);
 }
 
-.AffixField .suffix {
+.AffixField [data-part="suffix"] {
   justify-self: end;
   margin-inline-end: var(--_af-inline-padding);
 }
 
 /* ── Input ────────────────────────────────────────────────────────────────── */
-.AffixField .input {
+.AffixField [data-part="input"] {
   box-sizing: border-box;
   min-inline-size: 0; /* allow the sized variant to shrink below the input's UA minimum */
   min-block-size: var(--_af-field-min-block-size);
@@ -128,7 +128,7 @@
 
 /* ── Alignment ─────────────────────────────────────────────────────────────
    Opt-in end-alignment of the value (amounts). Default is the UA's start. */
-.AffixField[data-align="end"] .input {
+.AffixField[data-align="end"] [data-part="input"] {
   text-align: end;
 }
 
@@ -136,30 +136,30 @@
    type="number" is a primary use case and the WebKit spinner physically
    collides with a suffix at inline-end — the contract hides it. Arrow-key
    stepping still works; this is deliberate and a11y-safe (see AffixField.md). */
-.AffixField .input[type="number"] {
+.AffixField [data-part="input"][type="number"] {
   appearance: textfield; /* Firefox */
 }
-.AffixField .input[type="number"]::-webkit-inner-spin-button,
-.AffixField .input[type="number"]::-webkit-outer-spin-button {
+.AffixField [data-part="input"][type="number"]::-webkit-inner-spin-button,
+.AffixField [data-part="input"][type="number"]::-webkit-outer-spin-button {
   appearance: none;
   display: none;
 }
 
 /* ── Interaction states (real pseudo-class + data-test-state pairs) ──────── */
-.AffixField .input:hover,
-.AffixField[data-test-state="hover"] .input {
+.AffixField [data-part="input"]:hover,
+.AffixField[data-test-state="hover"] [data-part="input"] {
   border-color: var(--_af-border-color-hover);
   background-color: var(--_af-bg-hover);
 }
 
-.AffixField .input:focus-visible,
-.AffixField[data-test-state="focus"] .input {
+.AffixField [data-part="input"]:focus-visible,
+.AffixField[data-test-state="focus"] [data-part="input"] {
   outline: 2px solid;
   outline-offset: 1px;
 }
 
-.AffixField .input:active,
-.AffixField[data-test-state="active"] .input {
+.AffixField [data-part="input"]:active,
+.AffixField[data-test-state="active"] [data-part="input"] {
   border-color: var(--_af-border-color-hover);
   background-color: var(--_af-bg-active);
 }
@@ -171,6 +171,6 @@
 }
 
 /* ── Invalid ──────────────────────────────────────────────────────────────── */
-.AffixField[data-invalid="true"] .input {
+.AffixField[data-invalid="true"] [data-part="input"] {
   border-color: var(--_af-border-color-invalid);
 }

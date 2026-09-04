@@ -12,8 +12,8 @@
   <!-- Primary use: a wide table that overflows on smaller screens -->
   <h3>Wide table</h3>
   <div class="ScrollArea" data-component="ScrollArea" data-id="scrollarea-live">
-    <div class="viewport" data-scroll-viewport role="region" aria-label="Members table">
-      <div class="content">
+    <div data-part="viewport" data-scroll-viewport role="region" aria-label="Members table">
+      <div data-part="content">
         <table class="state-table" style="white-space: nowrap; margin: 0;">
           <thead>
             <tr>
@@ -62,7 +62,7 @@
         </table>
       </div>
     </div>
-    <div class="fades" aria-hidden="true"></div>
+    <div data-part="fades" aria-hidden="true"></div>
   </div>
 
   <!-- Deliberate clipping demo: a horizontal scroller forces overflow-y to a
@@ -76,15 +76,15 @@
     clipped. This is why popover-bearing demos are not wrapped in a ScrollArea.
   </p>
   <div class="ScrollArea" data-component="ScrollArea" data-id="scrollarea-clip-demo" style="max-inline-size: 22rem;">
-    <div class="viewport" data-scroll-viewport role="region" aria-label="Clipping example">
-      <div class="content" style="display: flex; gap: 0.5rem; align-items: center; white-space: nowrap;">
+    <div data-part="viewport" data-scroll-viewport role="region" aria-label="Clipping example">
+      <div data-part="content" style="display: flex; gap: 0.5rem; align-items: center; white-space: nowrap;">
         <toggle-tip data-id="scrollarea-clip" title="Clipped inside a scroller">
           <p>This bubble is clipped by the scroller's overflow.</p>
         </toggle-tip>
         <span>Open me — the bubble is clipped by the scroll container.</span>
       </div>
     </div>
-    <div class="fades" aria-hidden="true"></div>
+    <div data-part="fades" aria-hidden="true"></div>
   </div>
 
   <!-- Native reference: a plain overflow-x scroller with the native bar -->

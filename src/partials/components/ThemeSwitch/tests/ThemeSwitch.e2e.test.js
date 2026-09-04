@@ -177,7 +177,7 @@ test('the indicator lands on the selected segment', async ({ page }) => {
   for (const value of ['system', 'light', 'dark']) {
     await page.locator(`${TS} label[for="ts-${value}"]`).click()
     const segment = await page.locator(`${TS} label[for="ts-${value}"]`).boundingBox()
-    const indicator = await page.locator(`${TS} .indicator`).boundingBox()
+    const indicator = await page.locator(`${TS} [data-part="indicator"]`).boundingBox()
     expect(Math.abs(indicator.x - segment.x), `${value}: indicator off by ${indicator.x - segment.x}px`).toBeLessThan(1.5)
     expect(Math.abs(indicator.width - segment.width)).toBeLessThan(1.5)
   }
@@ -227,7 +227,7 @@ test('the focus ring on the selected segment has real contrast', async ({ page }
   expect(info.offset, 'the ring must be inset so it lands on the fill beneath it').toBeLessThan(0)
 
   const ring = await colorOf(page, sel, 'outlineColor')
-  const beneath = await colorOf(page, `${TS} .indicator`, 'backgroundColor')
+  const beneath = await colorOf(page, `${TS} [data-part="indicator"]`, 'backgroundColor')
   const [a, b] = [luminance(ring), luminance(beneath)].sort((x, y) => y - x)
   const ratio = (a + 0.05) / (b + 0.05)
   expect(ratio, `ring on the indicator is only ${ratio.toFixed(2)}:1`).toBeGreaterThanOrEqual(3)

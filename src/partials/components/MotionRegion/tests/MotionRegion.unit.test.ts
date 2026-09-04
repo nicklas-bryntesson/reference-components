@@ -18,7 +18,7 @@ function createRegion(attrs: Record<string, string> = {}, withVideo = false): HT
   el.setAttribute('data-component', 'MotionRegion')
   for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v)
   const media = document.createElement('div')
-  media.className = 'media-container'
+  media.className = 'demo-media'
   if (withVideo) media.appendChild(document.createElement('video'))
   el.appendChild(media)
   document.body.appendChild(el)
@@ -30,7 +30,7 @@ function video(el: HTMLElement): HTMLVideoElement {
 }
 
 function control(el: HTMLElement): HTMLButtonElement | null {
-  return el.querySelector<HTMLButtonElement>('button.control')
+  return el.querySelector<HTMLButtonElement>('button[data-part="control"]')
 }
 
 afterEach(() => {
@@ -75,7 +75,7 @@ describe('MotionRegion.attach — init', () => {
     createRegion()
     MotionRegion.attach(document.body)
     MotionRegion.attach(document.body)
-    expect(document.querySelectorAll('button.control').length).toBe(1)
+    expect(document.querySelectorAll('button[data-part="control"]').length).toBe(1)
   })
 })
 
@@ -191,7 +191,7 @@ describe('MotionRegion — video adapter', () => {
   it('pauses the video when the user pauses', () => {
     const el = createRegion({ 'data-autoplay': 'policy' }, true)
     MotionRegion.attach(document.body)
-    el.querySelector<HTMLButtonElement>('button.control')!.click()
+    el.querySelector<HTMLButtonElement>('button[data-part="control"]')!.click()
     expect(pauseSpy).toHaveBeenCalled()
   })
 
@@ -207,7 +207,7 @@ describe('MotionRegion — video adapter', () => {
     MotionRegion.attach(document.body)
     const v = video(el)
     expect(v.id).toBeTruthy()
-    expect(el.querySelector('button.control')!.getAttribute('aria-controls')).toBe(v.id)
+    expect(el.querySelector('button[data-part="control"]')!.getAttribute('aria-controls')).toBe(v.id)
   })
 })
 

@@ -58,13 +58,13 @@ describe('ThemeSwitch reference markup contract', () => {
     }
   })
 
-  it('the indicator is the last child of .options and aria-hidden', () => {
+  it('the indicator is the last child of the options row and aria-hidden', () => {
     // It must be a FOLLOWING sibling of every input, or the nth-of-type rules
     // cannot reach it.
     for (const g of groups()) {
-      const options = g.querySelector('.options')!
+      const options = g.querySelector('[data-part="options"]')!
       const indicator = options.lastElementChild!
-      expect(indicator.classList.contains('indicator')).toBe(true)
+      expect(indicator.getAttribute('data-part')).toBe('indicator')
       expect(indicator.getAttribute('aria-hidden')).toBe('true')
     }
   })

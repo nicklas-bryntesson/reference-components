@@ -24,17 +24,17 @@ test('autostarts under a clean policy and the CSS backend runs', async ({ page }
 })
 
 test('injects an accessible pause control (WCAG 2.2.2)', async ({ page }) => {
-  const control = page.locator(`${MR} .control`)
+  const control = page.locator(`${MR} [data-part="control"]`)
   await expect(control).toBeVisible()
   await expect(control).toHaveAttribute('aria-label', /pause/i)
 })
 
 test('the control pauses motion and the CSS gate stops the animation', async ({ page }) => {
   const region = page.locator(MR)
-  await region.locator('.control').click()
+  await region.locator('[data-part="control"]').click()
   await expect(region).toHaveAttribute('data-motion', 'paused')
   await expect(region.locator('.demo-animation')).toHaveCSS('animation-play-state', 'paused')
-  await expect(region.locator('.control')).toHaveAttribute('aria-label', /play/i)
+  await expect(region.locator('[data-part="control"]')).toHaveAttribute('aria-label', /play/i)
 })
 
 // A screenreader does not re-announce a name change on the focused element, so
@@ -44,9 +44,9 @@ test('a user toggle writes the status region; load leaves it empty', async ({ pa
   const region = page.locator(MR)
   const status = region.locator('[role="status"]')
   await expect(status).toHaveText('')
-  await region.locator('.control').click()
+  await region.locator('[data-part="control"]').click()
   await expect(status).toHaveText('Background animation paused')
-  await region.locator('.control').click()
+  await region.locator('[data-part="control"]').click()
   await expect(status).toHaveText('Background animation playing')
 })
 

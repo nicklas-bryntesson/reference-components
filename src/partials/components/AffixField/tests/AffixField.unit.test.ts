@@ -44,14 +44,14 @@ function createAffixFieldEl(options: FixtureOptions = {}): HTMLElement {
   const affix = (kind: 'prefix' | 'suffix', spec: FixtureOptions['prefix']) => {
     if (!spec) return null
     const span = document.createElement('span')
-    span.className = kind
+    span.setAttribute('data-part', kind)
     span.textContent = spec.text
     for (const [k, v] of Object.entries(spec.attrs ?? {})) span.setAttribute(k, v)
     return span
   }
 
   const input = document.createElement('input')
-  input.className = 'input'
+  input.setAttribute('data-part', 'input')
   input.type = 'text'
   for (const [k, v] of Object.entries(options.inputAttrs ?? {})) {
     input.setAttribute(k, v)
@@ -73,9 +73,9 @@ afterEach(() => {
   document.body.innerHTML = ''
 })
 
-const input = (el: HTMLElement) => el.querySelector<HTMLInputElement>('.input')!
-const prefixOf = (el: HTMLElement) => el.querySelector<HTMLElement>('.prefix')
-const suffixOf = (el: HTMLElement) => el.querySelector<HTMLElement>('.suffix')
+const input = (el: HTMLElement) => el.querySelector<HTMLInputElement>('[data-part="input"]')!
+const prefixOf = (el: HTMLElement) => el.querySelector<HTMLElement>('[data-part="prefix"]')
+const suffixOf = (el: HTMLElement) => el.querySelector<HTMLElement>('[data-part="suffix"]')
 
 // ─── Id generation ───────────────────────────────────────────────────────────
 

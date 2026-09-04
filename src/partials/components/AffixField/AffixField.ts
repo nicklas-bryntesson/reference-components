@@ -70,9 +70,9 @@ class AffixField {
 
   constructor(el: HTMLElement) {
     this.root = el
-    this.input = el.querySelector<HTMLInputElement>('.input')
-    this.prefix = el.querySelector<HTMLElement>('.prefix')
-    this.suffix = el.querySelector<HTMLElement>('.suffix')
+    this.input = el.querySelector<HTMLInputElement>('[data-part="input"]')
+    this.prefix = el.querySelector<HTMLElement>('[data-part="prefix"]')
+    this.suffix = el.querySelector<HTMLElement>('[data-part="suffix"]')
     this._init()
   }
 

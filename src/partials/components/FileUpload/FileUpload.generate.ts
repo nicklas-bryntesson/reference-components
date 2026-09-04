@@ -28,46 +28,46 @@ interface StateDefinition {
 // ─── Item HTML helpers — multiple mode (<li>) ─────────────────────────────────
 
 const validItem = (name: string, size: string, id = 'static-1') =>
-  `\n    <li class="item" data-status="valid" data-entry-id="${id}">
-      <span class="item-name">${name}</span>
-      <span class="item-size">${size}</span>
-      <button type="button" class="item-remove" aria-label="Remove ${name}">&#215;</button>
+  `\n    <li data-part="item" data-status="valid" data-entry-id="${id}">
+      <span data-part="item-name">${name}</span>
+      <span data-part="item-size">${size}</span>
+      <button type="button" data-part="item-remove" aria-label="Remove ${name}">&#215;</button>
     </li>`
 
 const invalidTypeItem = (name: string, size: string) =>
-  `\n    <li class="item" data-status="invalid-type" data-entry-id="static-2">
-      <span class="item-name">${name}</span>
-      <span class="item-size">${size}</span>
-      <span class="item-error" role="alert">File type not allowed</span>
-      <button type="button" class="item-remove" aria-label="Remove ${name}">&#215;</button>
+  `\n    <li data-part="item" data-status="invalid-type" data-entry-id="static-2">
+      <span data-part="item-name">${name}</span>
+      <span data-part="item-size">${size}</span>
+      <span data-part="item-error" role="alert">File type not allowed</span>
+      <button type="button" data-part="item-remove" aria-label="Remove ${name}">&#215;</button>
     </li>`
 
 const serverItem = (name: string, size: string, ref: string) =>
-  `\n    <li class="item" data-status="valid" data-source="server" data-entry-id="static-server">
-      <span class="item-name">${name}</span>
-      <span class="item-size">${size}</span>
-      <button type="button" class="item-remove" aria-label="Remove ${name}">&#215;</button>
+  `\n    <li data-part="item" data-status="valid" data-source="server" data-entry-id="static-server">
+      <span data-part="item-name">${name}</span>
+      <span data-part="item-size">${size}</span>
+      <button type="button" data-part="item-remove" aria-label="Remove ${name}">&#215;</button>
       <input type="hidden" name="uploaded-ref" value="${ref}">
     </li>`
 
 // ─── Item HTML helpers — single mode (inline spans in selected) ───
 
 const validSingleFile = (name: string, size: string) =>
-  `\n    <span class="item-name">${name}</span>
-    <span class="item-size">${size}</span>
-    <button type="button" class="item-remove" aria-label="Remove ${name}">&#215;</button>`
+  `\n    <span data-part="item-name">${name}</span>
+    <span data-part="item-size">${size}</span>
+    <button type="button" data-part="item-remove" aria-label="Remove ${name}">&#215;</button>`
 
 const invalidTypeSingleFile = (name: string, size: string) =>
-  `\n    <span class="item-name">${name}</span>
-    <span class="item-size">${size}</span>
-    <span class="item-error" role="alert">File type not allowed</span>
-    <button type="button" class="item-remove" aria-label="Remove ${name}">&#215;</button>`
+  `\n    <span data-part="item-name">${name}</span>
+    <span data-part="item-size">${size}</span>
+    <span data-part="item-error" role="alert">File type not allowed</span>
+    <button type="button" data-part="item-remove" aria-label="Remove ${name}">&#215;</button>`
 
 const invalidSizeSingleFile = (name: string, size: string) =>
-  `\n    <span class="item-name">${name}</span>
-    <span class="item-size">${size}</span>
-    <span class="item-error" role="alert">File exceeds maximum size</span>
-    <button type="button" class="item-remove" aria-label="Remove ${name}">&#215;</button>`
+  `\n    <span data-part="item-name">${name}</span>
+    <span data-part="item-size">${size}</span>
+    <span data-part="item-error" role="alert">File exceeds maximum size</span>
+    <button type="button" data-part="item-remove" aria-label="Remove ${name}">&#215;</button>`
 
 // ─── Canonical markup ─────────────────────────────────────────────────────────
 
@@ -85,14 +85,14 @@ function canonical(
   const triggerDisabledAttr = triggerDisabled ? ' disabled' : ''
   const fileContainer = isMultiple
     ? `<ul
-    class="list"
+    data-part="list"
     aria-live="polite"
     aria-relevant="additions removals"
     aria-label="Selected files"
   >${items}
   </ul>`
     : `<div
-    class="selected"
+    data-part="selected"
     aria-live="polite"
     aria-atomic="true"
   >${items}
@@ -103,15 +103,15 @@ function canonical(
   role="group"
   aria-labelledby="${id}-label"${rootAttrs}${initialFilesAttr}
 >
-  <span id="${id}-label" class="label">${label}</span>
+  <span id="${id}-label" data-part="label">${label}</span>
   <input
-    class="input"
+    data-part="input"
     type="file"
     aria-hidden="true"
     tabindex="-1"${inputAttrs}
   >
   ${fileContainer}
-  <button type="button" class="trigger"${triggerDisabledAttr}>${triggerText}</button>
+  <button type="button" data-part="trigger"${triggerDisabledAttr}>${triggerText}</button>
 </div>
 `
 }

@@ -104,12 +104,12 @@ class FileUpload {
 
   constructor(el: HTMLElement) {
     this.root = el
-    this.input = el.querySelector<HTMLInputElement>('.input')!
+    this.input = el.querySelector<HTMLInputElement>('[data-part="input"]')!
     this.isMultiple = this.input.hasAttribute('multiple')
     this.fileContainer = el.querySelector<HTMLElement>(
-      this.isMultiple ? '.list' : '.selected'
+      this.isMultiple ? '[data-part="list"]' : '[data-part="selected"]'
     )!
-    this.trigger = el.querySelector<HTMLButtonElement>('.trigger')!
+    this.trigger = el.querySelector<HTMLButtonElement>('[data-part="trigger"]')!
     this._entries = []
     this._t = this._readTranslations()
     this._init()
@@ -147,9 +147,9 @@ class FileUpload {
   // the accessible action.
   private _renderDropLabel(): void {
     if (!this.root.hasAttribute('data-drop-zone')) return
-    if (this.root.querySelector('.drop-label')) return
+    if (this.root.querySelector('[data-part="drop-label"]')) return
     const label = document.createElement('span')
-    label.className = 'drop-label'
+    label.setAttribute('data-part', 'drop-label')
     label.setAttribute('aria-hidden', 'true')
     label.textContent = this._t.labelDropZone
     this.input.insertAdjacentElement('afterend', label)
@@ -233,11 +233,11 @@ class FileUpload {
     this.fileContainer.setAttribute('data-status', entry.status)
 
     const nameSpan = document.createElement('span')
-    nameSpan.className = 'item-name'
+    nameSpan.setAttribute('data-part', 'item-name')
     nameSpan.textContent = entry.name
 
     const sizeSpan = document.createElement('span')
-    sizeSpan.className = 'item-size'
+    sizeSpan.setAttribute('data-part', 'item-size')
     sizeSpan.textContent = formatFileSize(entry.size)
 
     this.fileContainer.appendChild(nameSpan)
@@ -245,7 +245,7 @@ class FileUpload {
 
     if (entry.status !== 'valid') {
       const errorSpan = document.createElement('span')
-      errorSpan.className = 'item-error'
+      errorSpan.setAttribute('data-part', 'item-error')
       errorSpan.setAttribute('role', 'alert')
       errorSpan.textContent =
         entry.status === 'invalid-type' ? this._t.errorAccept : this._t.errorSize
@@ -254,7 +254,7 @@ class FileUpload {
 
     const removeBtn = document.createElement('button')
     removeBtn.type = 'button'
-    removeBtn.className = 'item-remove'
+    removeBtn.setAttribute('data-part', 'item-remove')
     removeBtn.setAttribute('aria-label', interpolate(this._t.labelRemove, { name: entry.name }))
     removeBtn.textContent = '×'
     this.fileContainer.appendChild(removeBtn)
@@ -270,17 +270,17 @@ class FileUpload {
 
   private _renderItem(entry: FileEntry): HTMLLIElement {
     const li = document.createElement('li')
-    li.className = 'item'
+    li.setAttribute('data-part', 'item')
     li.setAttribute('data-status', entry.status)
     li.dataset.entryId = entry.id
     if (entry.source === 'server') li.setAttribute('data-source', 'server')
 
     const nameSpan = document.createElement('span')
-    nameSpan.className = 'item-name'
+    nameSpan.setAttribute('data-part', 'item-name')
     nameSpan.textContent = entry.name
 
     const sizeSpan = document.createElement('span')
-    sizeSpan.className = 'item-size'
+    sizeSpan.setAttribute('data-part', 'item-size')
     sizeSpan.textContent = formatFileSize(entry.size)
 
     li.appendChild(nameSpan)
@@ -288,7 +288,7 @@ class FileUpload {
 
     if (entry.status !== 'valid') {
       const errorSpan = document.createElement('span')
-      errorSpan.className = 'item-error'
+      errorSpan.setAttribute('data-part', 'item-error')
       errorSpan.setAttribute('role', 'alert')
       errorSpan.textContent =
         entry.status === 'invalid-type' ? this._t.errorAccept : this._t.errorSize
@@ -297,7 +297,7 @@ class FileUpload {
 
     const removeBtn = document.createElement('button')
     removeBtn.type = 'button'
-    removeBtn.className = 'item-remove'
+    removeBtn.setAttribute('data-part', 'item-remove')
     removeBtn.setAttribute(
       'aria-label',
       interpolate(this._t.labelRemove, { name: entry.name }),
@@ -361,7 +361,7 @@ class FileUpload {
   }
 
   private _handleListClick = (e: MouseEvent): void => {
-    const btn = (e.target as HTMLElement).closest<HTMLButtonElement>('.item-remove')
+    const btn = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-part="item-remove"]')
     if (!btn) return
     if (!this.isMultiple) {
       const entryId = this._entries[0]?.id
@@ -409,7 +409,7 @@ class FileUpload {
 
   private _moveFocusAfterRemoval(removedLi: HTMLElement): void {
     const nextLi = removedLi.nextElementSibling ?? removedLi.previousElementSibling
-    const nextBtn = nextLi?.querySelector<HTMLButtonElement>('.item-remove')
+    const nextBtn = nextLi?.querySelector<HTMLButtonElement>('[data-part="item-remove"]')
     if (nextBtn) {
       nextBtn.focus()
     } else {

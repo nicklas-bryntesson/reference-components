@@ -12,15 +12,15 @@ project's business.
 ```html
 <fieldset class="ThemeSwitch" data-component="ThemeSwitch">
   <legend>Colour theme</legend>              <!-- clipped, but the group's only intrinsic name -->
-  <div class="options">
+  <div data-part="options">
     <input type="radio" id="ts-system" name="ts-appearance" value="system" checked>
     <label for="ts-system">
-      <span class="visually-hidden">Follow system setting</span>
-      <svg class="icon" aria-hidden="true" focusable="false">…</svg>
+      <span data-part="text">Follow system setting</span>
+      <svg data-part="icon" aria-hidden="true" focusable="false">…</svg>
     </label>
     …light…
     …dark…
-    <span class="indicator" aria-hidden="true"></span>
+    <span data-part="indicator" aria-hidden="true"></span>
   </div>
 </fieldset>
 ```
@@ -31,9 +31,9 @@ Contract rules (enforced by the unit test):
   one that needs no id plumbing. It is visually clipped, not absent.
 - **Exactly three options**, one shared `name`, exactly one `checked`, values `system|light|dark`.
   The arity is fixed by the contract — see *The indicator*.
-- **The label directly follows its input** (`input + label`), and the **`.indicator` is the last
-  child of `.options`**. Both are load-bearing: selection styling is `input:checked + label`, and
-  the indicator is reached with `input:nth-of-type(N):checked ~ .indicator`. Neither can cross a
+- **The label directly follows its input** (`input + label`), and the **`[data-part="indicator"]` is the last
+  child of `[data-part="options"]`**. Both are load-bearing: selection styling is `input:checked + label`, and
+  the indicator is reached with `input:nth-of-type(N):checked ~ [data-part="indicator"]`. Neither can cross a
   wrapper.
 - **Every icon is `aria-hidden="true" focusable="false"`, and every label carries text.** An
   icon-only label with no text alternative is the failure this guards.
@@ -45,9 +45,22 @@ Contract rules (enforced by the unit test):
 ThemeSwitch composes Picklist's chip mechanism — an sr-clipped radio whose adjacent label is the
 visible surface — but **without the per-item wrapper**. Picklist wraps each pair in `.option` to
 give the absolutely-positioned input a containing block. A wrapper breaks the sibling chain, and the
-indicator depends on it: `input ~ .indicator` can only reach a *following sibling* of the input.
-`.options` provides the containing block instead. Nothing is lost — the input is 1px and clipped, so
+indicator depends on it: `input ~ [data-part="indicator"]` can only reach a *following sibling* of the input.
+`[data-part="options"]` provides the containing block instead. Nothing is lost — the input is 1px and clipped, so
 where it sits is irrelevant as long as it stays focusable and out of layout.
+
+## Parts
+
+Parts are identified by `data-part`, never by class name. The reference JS, the stylesheet and the
+conformance suite address them through the attribute, so a consumer may restyle the same DOM under
+any class convention — or none — and the suite still passes.
+
+| `data-part` | Element | Role |
+|---|---|---|
+| `options` | `<div>` | The track: positioning context for the clipped inputs and the indicator; the three `input + label` pairs are its direct children |
+| `text` | `<span>` | Visually hidden label text (the icon carries no name) |
+| `icon` | `<svg aria-hidden>` | The option glyph |
+| `indicator` | `<span aria-hidden>` | The sliding highlight, last child of `options`, reached with `input:nth-of-type(N):checked ~ [data-part="indicator"]` |
 
 ## HTML Authoring API (`data-*`)
 
@@ -148,8 +161,8 @@ The hook for anything the CSS cannot reach on its own — a chart's palette, a m
 A single sliding element behind the segments, moved with one CSS rule per segment index:
 
 ```css
-.ThemeSwitch .options input:nth-of-type(2):checked ~ .indicator { translate: 100%; }
-.ThemeSwitch .options input:nth-of-type(3):checked ~ .indicator { translate: 200%; }
+.ThemeSwitch [data-part="options"] input:nth-of-type(2):checked ~ [data-part="indicator"] { translate: 100%; }
+.ThemeSwitch [data-part="options"] input:nth-of-type(3):checked ~ [data-part="indicator"] { translate: 200%; }
 ```
 
 This is the technique **Picklist explicitly refuses**, and it is legitimate here: one rule per index
@@ -166,7 +179,7 @@ which mean anything for a 40 px indicator. Every other micro-transition in the l
 media query:
 
 ```css
-@media (prefers-reduced-motion: reduce) { .ThemeSwitch .options .indicator { transition: none } }
+@media (prefers-reduced-motion: reduce) { .ThemeSwitch [data-part="options"] [data-part="indicator"] { transition: none } }
 ```
 
 ## CSS Variable API

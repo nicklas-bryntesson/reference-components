@@ -213,12 +213,12 @@ class ScrollArea {
   #buildDom(): void {
     // The bar is a pointer/visual affordance only — the region carries the a11y.
     const bar = document.createElement('div')
-    bar.className = 'scrollbar'
+    bar.setAttribute('data-part', 'scrollbar')
     bar.hidden = true
     bar.setAttribute('aria-hidden', 'true')
 
     const thumb = document.createElement('div')
-    thumb.className = 'thumb'
+    thumb.setAttribute('data-part', 'thumb')
     bar.appendChild(thumb)
     this.#root.appendChild(bar)
 
