@@ -17,7 +17,7 @@ import { join } from 'node:path'
  * listed, replace the allowlist with the full directory.
  */
 
-const SWEPT = ['ToggleTip', 'TimeField', 'MonthField', 'DateField', 'WeekField', 'DateTimeField']
+const SWEPT = ['ToggleTip', 'TimeField', 'MonthField', 'DateField', 'WeekField', 'DateTimeField', 'RangeField', 'RangeScale', 'RangeGroup']
 
 const DIR = 'src/partials/components'
 const read = (p: string): string => (existsSync(p) ? readFileSync(p, 'utf8') : '')
@@ -40,6 +40,33 @@ function queryClassSelectors(src: string): string[] {
   const calls = /(?:querySelector(?:All)?|closest|matches|locator|\$\$?)\(\s*(['"`])([^'"`]*)\1/g
   for (const m of stripComments(src).matchAll(calls)) {
     for (const c of m[2].matchAll(/\.([a-z][a-z0-9-]*)/g)) out.add(c[1])
+  }
+  return [...out].sort()
+}
+
+/** The part vocabulary a component actually mints: every data-part value in its sources. */
+function partVocabulary(src: string): string[] {
+  return [...new Set([...src.matchAll(/data-part[=:]\s*["']([a-z][a-z0-9-]*)["']|['"]data-part['"],\s*['"]([a-z][a-z0-9-]*)['"]/g)].map((m) => m[1] ?? m[2]))]
+}
+
+/**
+ * `.part` for a KNOWN part inside ANY string literal — not just the ones handed to a
+ * query call. An array of selectors mapped over later, or a CDP `selector:` option,
+ * is a class-era selector all the same; the call-site scan above cannot see it, and
+ * both shapes shipped green once before this check existed.
+ */
+function stringClassSelectors(src: string, parts: string[]): string[] {
+  if (parts.length === 0) return []
+  const out = new Set<string>()
+  const re = new RegExp(`\\.(${parts.join('|')})(?![\\w-])`, 'g')
+  for (const lit of stripComments(src).matchAll(/(['"`])((?:\\.|(?!\1)[^\\])*)\1/g)) {
+    // No tokenizer here, so two guards keep this honest: a `${…}` expression is
+    // property access (`${this.native.id}`), not a selector, and is dropped; and a
+    // "literal" spanning lines is a mis-paired quote swallowing code, and is skipped.
+    // A real selector string is one line, and every miss this caught was.
+    const body = lit[2].replace(/\$\{[^}]*\}/g, '')
+    if (body.includes('\n')) continue
+    for (const m of body.matchAll(re)) out.add(m[1])
   }
   return [...out].sort()
 }
@@ -68,6 +95,8 @@ describe('part identity is data-part, not a class (swept components)', () => {
     const testFiles = existsSync(testsDir) ? readdirSync(testsDir).map((f) => join(testsDir, f)) : []
     const logic = [`${base}.ts`, `${base}.js`, `${base}.generate.ts`].map(read).join('\n')
     const markup = [`${base}.ts`, `${base}.js`, `${base}.generate.ts`, `${base}.html`].map(read).join('\n')
+    const tests = testFiles.map(read).join('\n')
+    const parts = partVocabulary(markup)
 
     describe(name, () => {
       it('stylesheet selects no lowercase class', () => {
@@ -77,7 +106,10 @@ describe('part identity is data-part, not a class (swept components)', () => {
         expect(queryClassSelectors(logic)).toEqual([])
       })
       it('tests locate no part by class', () => {
-        expect(queryClassSelectors(testFiles.map(read).join('\n'))).toEqual([])
+        expect(queryClassSelectors(tests)).toEqual([])
+      })
+      it('no string literal in JS or tests names a part by class', () => {
+        expect(stringClassSelectors(logic + '\n' + tests, parts)).toEqual([])
       })
       it('authored markup mints no lowercase class', () => {
         expect(authoredClasses(markup)).toEqual([])
