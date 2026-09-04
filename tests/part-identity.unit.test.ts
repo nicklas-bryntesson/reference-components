@@ -21,7 +21,10 @@ const SWEPT = ['ToggleTip', 'TimeField', 'MonthField', 'DateField', 'WeekField',
 
 const DIR = 'src/partials/components'
 const read = (p: string): string => (existsSync(p) ? readFileSync(p, 'utf8') : '')
-const stripComments = (s: string): string => s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '')
+// Block comments, line comments, and trailing ` // …` comments — the last because a
+// quote inside one (`// "$"`) mis-pairs the string scan below.
+const stripComments = (s: string): string =>
+  s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '').replace(/\s\/\/\s.*$/gm, '')
 
 /** Lowercase class selectors in a stylesheet, outside comments. */
 function cssClassSelectors(css: string): string[] {
