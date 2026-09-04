@@ -112,7 +112,7 @@ export default class MotionRegion {
   setupControl(): void {
     const control = document.createElement('button')
     control.type = 'button'
-    control.className = 'control'
+    control.setAttribute('data-part', 'control')
     if (this.video?.id) control.setAttribute('aria-controls', this.video.id)
 
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
@@ -133,7 +133,7 @@ export default class MotionRegion {
     // the resolved state instead. Starts empty (nothing to announce on load) and
     // is written only from onToggle — policy changes must stay quiet.
     const status = document.createElement('span')
-    status.className = 'status'
+    status.setAttribute('data-part', 'status')
     status.setAttribute('role', 'status')
     this.root.prepend(status)
     this.statusRegion = status

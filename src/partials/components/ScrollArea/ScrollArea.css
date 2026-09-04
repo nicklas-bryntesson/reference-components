@@ -36,7 +36,7 @@
   margin-inline: calc(var(--_sc-offset) * -1);
 }
 
-.ScrollArea .viewport {
+.ScrollArea [data-part="viewport"] {
   grid-area: stack;
   /* flex makes the trailing padding-inline-end survive the scroll end; in plain
      block layout the end padding is eaten by overflowing content. */
@@ -50,16 +50,16 @@
 
 /* Native bar hidden only once JS has mounted the custom bar (progressive
    enhancement — without JS the native bar stays as the scroll affordance). */
-.ScrollArea[data-scrollbar="true"] .viewport {
+.ScrollArea[data-scrollbar="true"] [data-part="viewport"] {
   scrollbar-width: none;
 }
-.ScrollArea[data-scrollbar="true"] .viewport::-webkit-scrollbar {
+.ScrollArea[data-scrollbar="true"] [data-part="viewport"]::-webkit-scrollbar {
   display: none;
 }
 
 /* Custom horizontal scrollbar: absolute under the content, inset in line with
    it, no layout space. A native bar cannot be inset — hence a custom one. */
-.ScrollArea .scrollbar {
+.ScrollArea [data-part="scrollbar"] {
   position: absolute;
   inset-block-start: calc(100% + var(--_sb-gap));
   inset-inline: var(--_sc-offset);
@@ -71,20 +71,20 @@
   opacity: 0;
   transition: opacity 160ms ease;
 }
-.ScrollArea .scrollbar[data-visible="true"] {
+.ScrollArea [data-part="scrollbar"][data-visible="true"] {
   opacity: 1;
 }
-.ScrollArea .scrollbar[hidden] {
+.ScrollArea [data-part="scrollbar"][hidden] {
   display: none;
 }
 
 /* The viewport is the focusable scroll region (keyboard/screen-reader surface). */
-.ScrollArea .viewport:focus-visible {
+.ScrollArea [data-part="viewport"]:focus-visible {
   outline: 2px solid var(--_sb-thumb);
   outline-offset: -2px;
 }
 
-.ScrollArea .thumb {
+.ScrollArea [data-part="thumb"] {
   position: absolute;
   inset-block: 0;
   inset-inline-start: 0;
@@ -94,7 +94,7 @@
   cursor: grab;
   touch-action: none;
 }
-.ScrollArea .thumb:active {
+.ScrollArea [data-part="thumb"]:active {
   cursor: grabbing;
 }
 
@@ -102,29 +102,29 @@
    over the gutter at the ends but tone out content mid-scroll. Must sit after
    the scroller in the DOM for correct stacking; pointer-events off so they
    never intercept scroll/drag. */
-.ScrollArea .fades {
+.ScrollArea [data-part="fades"] {
   grid-area: stack;
   position: relative;
   pointer-events: none;
 }
-.ScrollArea .fades::before,
-.ScrollArea .fades::after {
+.ScrollArea [data-part="fades"]::before,
+.ScrollArea [data-part="fades"]::after {
   content: "";
   position: absolute;
   inset-block: 0;
   inline-size: var(--_sc-fade-size);
 }
-.ScrollArea .fades::before {
+.ScrollArea [data-part="fades"]::before {
   inset-inline-start: 0;
   background: linear-gradient(to right, var(--_sc-fade-color), transparent);
 }
-.ScrollArea .fades::after {
+.ScrollArea [data-part="fades"]::after {
   inset-inline-end: 0;
   background: linear-gradient(to left, var(--_sc-fade-color), transparent);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ScrollArea .scrollbar {
+  .ScrollArea [data-part="scrollbar"] {
     transition: none;
   }
 }

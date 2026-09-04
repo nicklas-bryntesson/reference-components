@@ -17,11 +17,14 @@ import { join } from 'node:path'
  * listed, replace the allowlist with the full directory.
  */
 
-const SWEPT = ['ToggleTip', 'TimeField', 'MonthField', 'DateField', 'WeekField', 'DateTimeField', 'RangeField', 'RangeScale', 'RangeGroup', 'Picklist', 'ChoiceGroup', 'ChoiceField', 'Notice']
+const SWEPT = ['ToggleTip', 'TimeField', 'MonthField', 'DateField', 'WeekField', 'DateTimeField', 'RangeField', 'RangeScale', 'RangeGroup', 'Picklist', 'ChoiceGroup', 'ChoiceField', 'Notice', 'FileUpload', 'AffixField', 'MotionRegion', 'ScrollArea', 'ThemeSwitch']
 
 const DIR = 'src/partials/components'
 const read = (p: string): string => (existsSync(p) ? readFileSync(p, 'utf8') : '')
-const stripComments = (s: string): string => s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '')
+// Block comments, line comments, and trailing ` // …` comments — the last because a
+// quote inside one (`// "$"`) mis-pairs the string scan below.
+const stripComments = (s: string): string =>
+  s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '').replace(/\s\/\/\s.*$/gm, '')
 
 /** Lowercase class selectors in a stylesheet, outside comments. */
 function cssClassSelectors(css: string): string[] {
@@ -39,7 +42,8 @@ function queryClassSelectors(src: string): string[] {
   const out = new Set<string>()
   const calls = /(?:querySelector(?:All)?|closest|matches|locator|\$\$?)\(\s*(['"`])([^'"`]*)\1/g
   for (const m of stripComments(src).matchAll(calls)) {
-    for (const c of m[2].matchAll(/\.([a-z][a-z0-9-]*)/g)) out.add(c[1])
+    // `demo-*` is demo CONTENT a region wraps, not a part — see authoredClasses.
+    for (const c of m[2].matchAll(/\.([a-z][a-z0-9-]*)/g)) if (!c[1].startsWith('demo-')) out.add(c[1])
   }
   return [...out].sort()
 }
@@ -76,8 +80,9 @@ function authoredClasses(src: string): string[] {
   const out = new Set<string>()
   for (const m of stripComments(src).matchAll(/class=["']([^"']*)["']/g)) {
     for (const c of m[1].split(/\s+/)) {
-      // Harness classes on the kitchensink page are not component parts.
-      if (/^[a-z]/.test(c) && !c.startsWith('kitchensink-') && c !== 'state-table') out.add(c)
+      // Harness classes on the kitchensink page are not component parts, and neither is
+      // demo CONTENT a region wraps (`demo-*`) — a consumer's own markup stands in there.
+      if (/^[a-z]/.test(c) && !c.startsWith('kitchensink-') && !c.startsWith('demo-') && c !== 'state-table' && c !== 'prose') out.add(c)
     }
   }
   return [...out].sort()
@@ -92,7 +97,9 @@ describe('part identity is data-part, not a class (swept components)', () => {
   for (const name of SWEPT) {
     const base = join(DIR, name, name)
     const testsDir = join(DIR, name, 'tests')
-    const testFiles = existsSync(testsDir) ? readdirSync(testsDir).map((f) => join(testsDir, f)) : []
+    const testFiles = existsSync(testsDir)
+      ? readdirSync(testsDir, { withFileTypes: true }).filter((e) => e.isFile()).map((e) => join(testsDir, e.name))
+      : []
     const logic = [`${base}.ts`, `${base}.js`, `${base}.generate.ts`].map(read).join('\n')
     const markup = [`${base}.ts`, `${base}.js`, `${base}.generate.ts`, `${base}.html`].map(read).join('\n')
     const tests = testFiles.map(read).join('\n')

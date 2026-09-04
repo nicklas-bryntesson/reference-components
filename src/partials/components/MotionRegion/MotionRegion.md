@@ -79,6 +79,20 @@ setting change doesn't revoke an active choice) → otherwise motion autostarts 
 with no cost blocker. There is deliberately **no** `"force"` mode that autostarts through
 reduced-motion — that is an accessibility footgun (WCAG 2.3.3), and a non-goal.
 
+## Parts
+
+Parts are identified by `data-part`, never by class name. The reference JS, the stylesheet and the
+conformance suite address them through the attribute, so a consumer may restyle the same DOM under
+any class convention — or none — and the suite still passes.
+
+| `data-part` | Element | Role |
+|---|---|---|
+| `control` | `<button>` | The play/pause toggle, injected by JS; swaps its `aria-label` |
+| `status` | `<div role="status">` | Live region that speaks the resolved state on a user toggle |
+
+The animated content inside the region is the consumer's own markup, not a part — the kitchensink's
+`demo-*` classes stand in for it.
+
 ## Accessibility
 
 - **Decorative, always.** The region is `role="presentation"`; the animated media carries no
