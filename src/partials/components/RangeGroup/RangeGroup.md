@@ -14,14 +14,14 @@ The lane draws. This component owns only the rules that are about the **pair**.
 ```html
 <fieldset class="RangeGroup" data-component="RangeGroup">
   <legend>Price</legend>
-  <div class="roles">
+  <div data-part="roles">
     <label for="price-lower">Lowest <b data-readout="lower" aria-hidden="true" data-suffix="tkr">200 tkr</b></label>
     <label for="price-upper">Highest <b data-readout="upper" aria-hidden="true" data-suffix="tkr">700 tkr</b></label>
   </div>
   <div class="RangeScale" data-component="RangeScale" data-fields="2"
        style="--_rs-a: 0.2; --_rs-b: 0.7">
-    <span class="track"></span>
-    <span class="fill"></span>
+    <span data-part="track"></span>
+    <span data-part="fill"></span>
     <input class="RangeField" type="range" id="price-lower" name="price-lower" data-role="lower"
            min="0" max="1000" step="10" value="200">
     <input class="RangeField" type="range" id="price-upper" name="price-upper" data-role="upper"
@@ -50,6 +50,17 @@ Contract rules (enforced by the unit test):
 - **`aria-valuemin`, `aria-valuemax` and `aria-valuetext` are NOT authored.** They are statements
   about the pair at a moment in time; the class writes them on mount. Authoring them would be a
   second source of truth that goes stale on the first drag.
+
+## Parts
+
+Parts are identified by `data-part`, never by class name. The only part RangeGroup adds is `roles`; the lane
+it composes is a RangeScale, whose parts (`track`, `fill`, `digits`, …) are documented in
+[`RangeScale.md`](../RangeScale/RangeScale.md#parts). The readouts are `<b data-readout="lower|upper">`,
+identified by that attribute.
+
+| `data-part` | Element | Role |
+|---|---|---|
+| `roles` | `<div>` | Row holding the two labelled readouts above the lane |
 
 ## HTML Authoring API
 

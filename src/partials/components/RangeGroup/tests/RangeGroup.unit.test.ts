@@ -38,7 +38,7 @@ describe('RangeGroup state partials', () => {
     expect(html).toContain('<fieldset')
     // The legend must precede everything else inside the fieldset.
     const legend = html.indexOf('<legend>')
-    const roles = html.indexOf('class="roles"')
+    const roles = html.indexOf('data-part="roles"')
     expect(legend).toBeGreaterThan(-1)
     expect(legend).toBeLessThan(roles)
   })

@@ -43,7 +43,7 @@ export default class RangeScale {
 
     this.#root = root
     this.#fields = fields
-    this.#output = root.querySelector<HTMLOutputElement>('output.value')
+    this.#output = root.querySelector<HTMLOutputElement>('output[data-part="value"]')
 
     this.#reserveReadoutWidth()
 
@@ -90,7 +90,7 @@ export default class RangeScale {
     // to guess.
     if (this.#fields.length === 1) {
       // Only the number is written; the unit is markup and stays put.
-      this.#output?.querySelector('.digits')?.replaceChildren(this.#field.value)
+      this.#output?.querySelector('[data-part="digits"]')?.replaceChildren(this.#field.value)
 
       // Own `aria-valuetext` whenever the unit is knowable — from a visible
       // readout, or from `data-suffix` on the lane itself. A lane with no readout

@@ -90,12 +90,12 @@ function canonical(state: StateDefinition): string {
   // One element per stop, each carrying its own --p. The shared expression reads
   // it, so ticks and the fill are positioned by the same single formula.
   const ticksLine = state.ticks
-    ? `\n  <span class="ticks" aria-hidden="true">${state.ticks
+    ? `\n  <span data-part="ticks" aria-hidden="true">${state.ticks
         .map(([p, label]) => `\n    <i style="--p: ${p}"><span>${label}</span></i>`)
         .join('')}\n  </span>`
     : ''
 
-  const referenceLine = state.reference ? '\n  <span class="reference"></span>' : ''
+  const referenceLine = state.reference ? '\n  <span data-part="reference"></span>' : ''
 
   // The digits sit in their own element so width can be reserved for them alone,
   // and the unit is static markup — reserving the whole string in `ch` over-reserves
@@ -106,9 +106,9 @@ function canonical(state: StateDefinition): string {
   // announces its own value through aria-valuetext, so leaving the output live
   // says everything twice, and during a drag it says it at every step.
   const outputLine = state.output
-    ? `\n  <output class="value" aria-live="off" for="${state.id}"${
+    ? `\n  <output data-part="value" aria-live="off" for="${state.id}"${
         state.output.suffix ? ` data-suffix="${state.output.suffix}"` : ''
-      }><span class="digits">${state.input?.value ?? '0'}</span>${
+      }><span data-part="digits">${state.input?.value ?? '0'}</span>${
         state.output.suffix ? ` ${state.output.suffix}` : ''
       }</output>`
     : ''
@@ -118,16 +118,16 @@ function canonical(state: StateDefinition): string {
   // must match the reference layer's colour, and inheriting --_rs-ref-ink is the
   // only way to guarantee that without the author repeating the variant by hand.
   const hintLine = state.hint
-    ? `\n  <p class="hint" id="${hintId}">` +
-      `<span class="swatch" aria-hidden="true"></span>${state.hint}</p>`
+    ? `\n  <p data-part="hint" id="${hintId}">` +
+      `<span data-part="swatch" aria-hidden="true"></span>${state.hint}</p>`
     : ''
 
   return `<label for="${state.id}">${state.label}</label>
 <div
   class="RangeScale"${scaleAttrs}
 >
-  <span class="track"></span>
-  <span class="fill"></span>${referenceLine}
+  <span data-part="track"></span>
+  <span data-part="fill"></span>${referenceLine}
   <input class="RangeField" type="range" id="${state.id}" name="${state.id}"${attrs({
     ...(state.hint ? { 'aria-describedby': hintId } : {}),
     ...(state.input ?? {}),

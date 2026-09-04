@@ -21,10 +21,10 @@ const laneMetrics = (page, selector) =>
     return {
       p: cs.getPropertyValue('--_rs-p').trim(),
       inset: cs.getPropertyValue('--_rs-inset').trim(),
-      track: r(lane.querySelector('.track')),
-      fill: r(lane.querySelector('.fill')),
+      track: r(lane.querySelector('[data-part="track"]')),
+      fill: r(lane.querySelector('[data-part="fill"]')),
       field: r(lane.querySelector('.RangeField')),
-      output: lane.querySelector('output.value')?.textContent ?? null,
+      output: lane.querySelector('output[data-part="value"]')?.textContent ?? null,
       valuetext: lane.querySelector('.RangeField').getAttribute('aria-valuetext'),
     }
   })
@@ -52,7 +52,7 @@ test('dragging syncs the fill, the readout and the announced value together', as
 })
 
 test('the readout is an <output> and suppresses its implicit live region', async ({ page }) => {
-  const out = page.locator(`${LANE} output.value`)
+  const out = page.locator(`${LANE} output[data-part="value"]`)
   await out.scrollIntoViewIfNeeded()
   await expect(out).toHaveAttribute('for', 'rs-live')
   // Absence is not silence: a bare <output> computes to live="polite". This
@@ -139,8 +139,8 @@ test('vertical: the fill is anchored in the same end as the slider min', async (
     const lane = document.querySelector(`[data-id="${laneId}"]`)
     const field = lane.querySelector('.RangeField')
     field.value = '20'; field.dispatchEvent(new Event('input', { bubbles: true }))
-    const t = lane.querySelector('.track').getBoundingClientRect()
-    const f = lane.querySelector('.fill').getBoundingClientRect()
+    const t = lane.querySelector('[data-part="track"]').getBoundingClientRect()
+    const f = lane.querySelector('[data-part="fill"]').getBoundingClientRect()
     return { anchoredBottom: Math.abs(f.bottom - t.bottom) < 1,
              anchoredTop: Math.abs(f.top - t.top) < 1,
              fillH: f.height, trackH: t.height }
@@ -167,14 +167,14 @@ test('vertical: the lane owns the length and the field stretches to it', async (
 
 test('the layers are pointer-events: none, so the whole lane hits the input', async ({ page }) => {
   const events = await page.locator(LANE).evaluate((lane) =>
-    ['.track', '.fill'].map((sel) => getComputedStyle(lane.querySelector(sel)).pointerEvents))
+    ['[data-part="track"]', '[data-part="fill"]'].map((sel) => getComputedStyle(lane.querySelector(sel)).pointerEvents))
   expect(events).toEqual(['none', 'none'])
 
   // A click in the middle of the lane reaches the input and moves the value.
   const field = page.locator(FIELD)
   await field.scrollIntoViewIfNeeded()
   const before = await field.inputValue()
-  const box = await page.locator(`${LANE} .track`).boundingBox()
+  const box = await page.locator(`${LANE} [data-part="track"]`).boundingBox()
   await page.mouse.click(box.x + box.width * 0.75, box.y + box.height / 2)
   expect(await field.inputValue()).not.toBe(before)
 })
@@ -219,8 +219,8 @@ test('no axe violations across RangeScale states', async ({ page }) => {
 const tickGeometry = (page, id) =>
   page.evaluate((laneId) => {
     const lane = document.querySelector(`[data-id="${laneId}"]`)
-    const track = lane.querySelector('.track').getBoundingClientRect()
-    const items = [...lane.querySelectorAll('.ticks > i')]
+    const track = lane.querySelector('[data-part="track"]').getBoundingClientRect()
+    const items = [...lane.querySelectorAll('[data-part="ticks"] > i')]
     const centre = (el) => {
       const r = el.getBoundingClientRect()
       return r.left + r.width / 2 - track.left
@@ -243,7 +243,7 @@ const tickGeometry = (page, id) =>
       itemFontSize: parseFloat(getComputedStyle(items[0]).fontSize),
       laneFontSize: parseFloat(getComputedStyle(lane).fontSize),
       labelHidden: getComputedStyle(items[0].querySelector('span')).display === 'none',
-      ariaHidden: lane.querySelector('.ticks').getAttribute('aria-hidden'),
+      ariaHidden: lane.querySelector('[data-part="ticks"]').getAttribute('aria-hidden'),
     }
   }, id)
 
@@ -311,8 +311,8 @@ test('ticks are aria-hidden, because step already carries them to the keyboard',
 test('the label row reserves its own height and does not collide with the readout', async ({ page }) => {
   const clash = await page.evaluate(() => {
     const lane = document.querySelector('[data-id="rangescale-ticks-labels"]')
-    const last = [...lane.querySelectorAll('.ticks > i')].pop().getBoundingClientRect()
-    const out = lane.querySelector('output.value').getBoundingClientRect()
+    const last = [...lane.querySelectorAll('[data-part="ticks"] > i')].pop().getBoundingClientRect()
+    const out = lane.querySelector('output[data-part="value"]').getBoundingClientRect()
     return last.bottom > out.top + 1
   })
   expect(clash).toBe(false)
@@ -323,11 +323,11 @@ test('the label row reserves its own height and does not collide with the readou
 const referenceGeometry = (page, id) =>
   page.evaluate((laneId) => {
     const lane = document.querySelector(`[data-id="${laneId}"]`)
-    const track = lane.querySelector('.track').getBoundingClientRect()
-    const ref = lane.querySelector('.reference')
+    const track = lane.querySelector('[data-part="track"]').getBoundingClientRect()
+    const ref = lane.querySelector('[data-part="reference"]')
     const box = ref.getBoundingClientRect()
     const cs = getComputedStyle(ref)
-    const fill = lane.querySelector('.fill')
+    const fill = lane.querySelector('[data-part="fill"]')
     return {
       form: lane.dataset.reference,
       from: Number(getComputedStyle(lane).getPropertyValue('--_rs-ref-from')),
@@ -343,7 +343,7 @@ const referenceGeometry = (page, id) =>
       fillDisplay: fill ? getComputedStyle(fill).display : null,
       thumbZ: Number(getComputedStyle(lane.querySelector('.RangeField')).zIndex),
       swatchInk: (() => {
-        const sw = lane.querySelector('.swatch')
+        const sw = lane.querySelector('[data-part="swatch"]')
         return sw ? getComputedStyle(sw).backgroundColor : null
       })(),
     }
@@ -378,7 +378,7 @@ test('a region is clamped to the fill, without JavaScript', async ({ page }) => 
       const f = l.querySelector('.RangeField')
       f.value = String(v)
       f.dispatchEvent(new Event('input', { bubbles: true }))
-      return l.querySelector('.reference').getBoundingClientRect().width
+      return l.querySelector('[data-part="reference"]').getBoundingClientRect().width
     }, [lane, value])
 
   const free = await widthAt(90)     // limit well above consumption
@@ -399,7 +399,7 @@ test('without a fill there is nothing to clamp against', async ({ page }) => {
   const widths = await page.evaluate(() => {
     const l = document.querySelector('[data-id="rangescale-ref-region-nofill"]')
     const f = l.querySelector('.RangeField')
-    const w = () => l.querySelector('.reference').getBoundingClientRect().width
+    const w = () => l.querySelector('[data-part="reference"]').getBoundingClientRect().width
     f.value = '5'; f.dispatchEvent(new Event('input', { bubbles: true }))
     const low = w()
     f.value = '95'; f.dispatchEvent(new Event('input', { bubbles: true }))
@@ -471,13 +471,13 @@ test('the swatch matches the layer it explains, without restating the variant', 
 test('the hint is inside the lane and the field points at it', async ({ page }) => {
   const wired = await page.evaluate(() => {
     const lane = document.querySelector('[data-id="rangescale-ref-band-variant"]')
-    const hint = lane.querySelector('.hint')
+    const hint = lane.querySelector('[data-part="hint"]')
     const field = lane.querySelector('.RangeField')
     return {
       inside: !!hint,
       describedBy: field.getAttribute('aria-describedby'),
       hintId: hint.id,
-      swatchHidden: hint.querySelector('.swatch').getAttribute('aria-hidden'),
+      swatchHidden: hint.querySelector('[data-part="swatch"]').getAttribute('aria-hidden'),
     }
   })
   expect(wired.inside).toBe(true)
@@ -512,8 +512,8 @@ test('crossing a digit boundary does not resize the lane', async ({ page }) => {
       out.push({
         value: field.value,
         lane: lane.getBoundingClientRect().width,
-        track: lane.querySelector('.track').getBoundingClientRect().width,
-        readout: lane.querySelector('output.value').getBoundingClientRect().width,
+        track: lane.querySelector('[data-part="track"]').getBoundingClientRect().width,
+        readout: lane.querySelector('output[data-part="value"]').getBoundingClientRect().width,
       })
     }
     return out
@@ -536,7 +536,7 @@ test('crossing a digit boundary does not resize the lane', async ({ page }) => {
 // what we wrote; the computed `live` property is what a screenreader acts on, and
 // only the second one is the claim worth testing.
 test('the readout is not a live region', async ({ page }) => {
-  const output = page.locator(`${LANE} output.value`)
+  const output = page.locator(`${LANE} output[data-part="value"]`)
   await expect(output).toBeVisible()
 
   const cdp = await page.context().newCDPSession(page)
@@ -544,7 +544,7 @@ test('the readout is not a live region', async ({ page }) => {
   const doc = await cdp.send('DOM.getDocument')
   const { nodeId } = await cdp.send('DOM.querySelector', {
     nodeId: doc.root.nodeId,
-    selector: `${LANE} output.value`,
+    selector: `${LANE} output[data-part="value"]`,
   })
   const { nodes } = await cdp.send('Accessibility.getPartialAXTree', {
     nodeId,
