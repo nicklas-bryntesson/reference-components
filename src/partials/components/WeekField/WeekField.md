@@ -29,6 +29,36 @@ Completes the date family alongside DateField, DateTimeField, TimeField, and Mon
 
 State attributes set by JS: `data-initialized="true"`, `data-open="true"`, `data-has-value="true"` (boolean state always carries the literal value `"true"`, absent when off), `data-direction`, and `aria-expanded` on the trigger.
 
+## Parts
+
+Parts are identified by `data-part`, never by class name. The reference JS, the stylesheet and the
+conformance suite all address them through the attribute, so a consumer may restyle the same DOM
+under any class convention — or none — and the suite still passes. The only class name in the
+markup is the component root (`WeekField`).
+
+| `data-part` | Element | Role |
+|---|---|---|
+| `native` | `<input type="week">` | The real form control; hidden in `custom` mode, the transparent tap layer in `display` mode |
+| `overlay` | `<div>` | The visible bordered field box |
+| `segments` | `<div role="group">` | Container the JS fills with the prefix and segment spans |
+| `prefix` | `<span aria-hidden>` | The localized week prefix (e.g. "v.") |
+| `segment` | `<span role="spinbutton">` | One editable segment; `data-segment` says which (`week` · `year`) |
+| `separator` | `<span aria-hidden>` | The separator between segments |
+| `trigger` | `<button>` | Opens the calendar; carries `aria-expanded` / `aria-haspopup="dialog"` |
+| `icon` | `<svg>` | The trigger glyph |
+| `rail` | `<div>` | Zero-height positioning rail; the calendar is cloned into it on open |
+| `popup` | `<div role="dialog">` | The calendar dialog |
+| `calendar-header` | `<div>` | Month navigation row |
+| `prev-month` · `next-month` | `<button>` | Step the displayed month |
+| `calendar-month-year` | `<span>` | The displayed month and year |
+| `calendar-grid` | `<table role="grid">` | The month grid; rows are the selectable weeks |
+| `week-number-head` | `<th>` | Header of the week-number column |
+| `week-number-cell` | `<td>` | Week number at the start of each row |
+| `calendar-footer` | `<div>` | Footer holding the two actions |
+| `calendar-footer-clear` · `calendar-footer-now` | `<button>` | Clear / This week — both commit and close |
+| `arrow` | `<div>` | The popup pointer, positioned from JS |
+| `announce` | `<div aria-live="polite">` | Visually hidden live region for committed weeks |
+
 ## Native fallback (feature detection)
 
 `<input type="week">` is supported by Chrome/Edge/Chrome-Android/Samsung and iOS Safari 18.2+, but **not** Firefox (any platform) or desktop Safari. The component detects support:

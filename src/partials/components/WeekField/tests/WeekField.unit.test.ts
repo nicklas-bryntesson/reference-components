@@ -49,40 +49,40 @@ function createWeekFieldEl(options: {
       ${options.min ? `data-min="${options.min}"` : ''}
       ${options.max ? `data-max="${options.max}"` : ''}
     >
-      <input class="native" type="week" aria-hidden="true" tabindex="-1"
+      <input data-part="native" type="week" aria-hidden="true" tabindex="-1"
         ${options.value ? `value="${options.value}"` : ''}
         ${options.disabled ? 'disabled' : ''}
       />
-      <div class="overlay" aria-hidden="true">
-        <div class="segments" role="group"></div>
-        <button type="button" class="trigger" aria-label="Öppna veckoväljare" aria-expanded="false" aria-haspopup="dialog"></button>
-        <div class="rail">
+      <div data-part="overlay" aria-hidden="true">
+        <div data-part="segments" role="group"></div>
+        <button type="button" data-part="trigger" aria-label="Öppna veckoväljare" aria-expanded="false" aria-haspopup="dialog"></button>
+        <div data-part="rail">
           <template data-template="weekfield-popup">
-            <div class="popup" role="dialog" aria-modal="true">
-              <div class="calendar-header">
-                <button type="button" class="prev-month">&#8249;</button>
-                <span class="calendar-month-year"></span>
-                <button type="button" class="next-month">&#8250;</button>
+            <div data-part="popup" role="dialog" aria-modal="true">
+              <div data-part="calendar-header">
+                <button type="button" data-part="prev-month">&#8249;</button>
+                <span data-part="calendar-month-year"></span>
+                <button type="button" data-part="next-month">&#8250;</button>
               </div>
-              <table class="calendar-grid" role="grid">
+              <table data-part="calendar-grid" role="grid">
                 <thead>
                   <tr role="row">
-                    <th scope="col" class="week-number-head"></th>
+                    <th scope="col" data-part="week-number-head"></th>
                     <th scope="col"></th><th scope="col"></th><th scope="col"></th><th scope="col"></th><th scope="col"></th><th scope="col"></th><th scope="col"></th>
                   </tr>
                 </thead>
                 <tbody></tbody>
               </table>
-              <div class="calendar-footer">
-                <button type="button" class="calendar-footer-clear"></button>
-                <button type="button" class="calendar-footer-now"></button>
+              <div data-part="calendar-footer">
+                <button type="button" data-part="calendar-footer-clear"></button>
+                <button type="button" data-part="calendar-footer-now"></button>
               </div>
-              <div class="arrow"></div>
+              <div data-part="arrow"></div>
             </div>
           </template>
         </div>
       </div>
-      <div class="announce" aria-live="polite" aria-atomic="true"></div>
+      <div data-part="announce" aria-live="polite" aria-atomic="true"></div>
     </div>
   `
   document.body.appendChild(div)
