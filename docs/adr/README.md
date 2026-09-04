@@ -85,3 +85,9 @@ holds the *why-we-built-it*; the `.md` holds the *how-it-works*.
 | [0023](0023-the-range-family-splits-three-ways.md) | The range family splits three ways — RangeField, RangeScale, RangeGroup | Component | Accepted |
 | [0024](0024-a-scale-of-words-is-its-own-component.md) | A scale of words is its own component, not a RangeScale variant | Component | Proposed |
 | [0025](0025-typography-is-the-consuming-project-s.md) | Typography belongs to the consuming project; this repo owns the mechanics | Convention | Accepted |
+| [0026](0026-part-identity-is-a-data-attribute-not-a-class.md) | Part identity is a `data-part` attribute; class names carry only styling | Convention | Accepted |
+| [0027](0027-spoken-output-is-a-test-tier.md) | Spoken output is a test tier — assert what the screenreader says, with guidepup | Process | Superseded by ADR-0028 |
+| [0028](0028-spoken-defects-are-guarded-by-their-causes.md) | Spoken defects are guarded by their mechanical causes; listening stays manual | Process | Accepted |
+| [0029](0029-footer-actions-that-complete-the-value-close-the-popup.md) | A footer action that completes the value closes the popup | Architecture | Accepted |
+| [0030](0030-empty-segments-speak-a-localized-word.md) | An empty segment speaks a localized word, never its placeholder | Architecture | Accepted |
+| [0031](0031-autofill-is-a-surfaced-state-its-colour-is-the-consumers.md) | Autofill is a surfaced state; its colour is the consumer's | Architecture | Proposed |

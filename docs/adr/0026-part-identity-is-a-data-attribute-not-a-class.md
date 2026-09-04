@@ -1,6 +1,6 @@
 # ADR 0026: Part identity is a `data-part` attribute; class names carry only styling
 
-**Status:** Proposed
+**Status:** Accepted
 **Date:** 2026-08-21
 **Decider:** Nicklas Bryntesson
 **Supersedes in part:** ADR-0019 (its `lowercase-kebab` element-class half; the

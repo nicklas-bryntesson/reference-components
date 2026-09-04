@@ -18,18 +18,33 @@ All attributes are optional — `icon` defaults to `"info"` (see `## Attributes`
 
 ```html
 <toggle-tip icon="info" initialized data-direction="top">
-  <button aria-label="More information" aria-expanded="false" aria-controls="tt-ID">
+  <button data-part="trigger" aria-label="More information" aria-expanded="false" aria-controls="tt-ID">
     <!-- icon SVG -->
   </button>
-  <div class="rail">
-    <div class="popup" id="tt-ID" role="tooltip" aria-hidden="true">
-      <span class="title" role="heading" aria-level="3">Optional heading</span> <!-- only when title is set -->
+  <div data-part="rail">
+    <div data-part="popup" id="tt-ID" role="tooltip" aria-hidden="true">
+      <span data-part="title" role="heading" aria-level="3">Optional heading</span> <!-- only when title is set -->
       Content shown inside the bubble.
-      <div class="arrow"></div>
+      <div data-part="arrow"></div>
     </div>
   </div>
 </toggle-tip>
 ```
+
+### Parts
+
+Parts are identified by `data-part`, never by class name. Tests, the reference JS and the
+stylesheet all address them through the attribute, so a consumer may restyle the same DOM with
+any class convention — or none — and the conformance suite still passes.
+
+| `data-part` | Element | Role |
+|---|---|---|
+| `trigger` | `<button>` | The disclosure button; carries `aria-expanded` / `aria-controls` |
+| `icon` | `<svg>` | The trigger glyph (`info` or `question`) |
+| `rail` | `<div>` | Zero-height positioning rail centred on the trigger |
+| `popup` | `<div role="tooltip">` | The bubble; `aria-hidden` toggles visibility |
+| `title` | `<span role="heading">` | Optional heading, only when `title` is set |
+| `arrow` | `<div>` | The bubble's pointer, positioned from JS via `--_tt-arrow-offset` |
 
 ## Dependencies
 

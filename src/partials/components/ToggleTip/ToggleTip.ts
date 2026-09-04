@@ -10,13 +10,13 @@ function randomId(): string {
 
 function generateIconSVG(iconType: string): string {
   if (iconType === 'question') {
-    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon">
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-part="icon">
       <circle cx="12" cy="12" r="10"/>
       <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
       <path d="M12 17h.01"/>
     </svg>`
   }
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon">
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-part="icon">
     <circle cx="12" cy="12" r="10"/>
     <path d="M12 16v-4"/>
     <path d="M12 8h.01"/>
@@ -47,8 +47,8 @@ class ToggleTip {
 
   private _init(): void {
     this._buildDOM()
-    this.button = this.element.querySelector('button') as HTMLButtonElement
-    this.popup = this.element.querySelector('.popup') as HTMLElement
+    this.button = this.element.querySelector('[data-part="trigger"]') as HTMLButtonElement
+    this.popup = this.element.querySelector('[data-part="popup"]') as HTMLElement
     this._updateDirection()
     this.element.setAttribute('initialized', '')
     this.button.addEventListener('click', this._toggle)
@@ -60,21 +60,21 @@ class ToggleTip {
   private _buildDOM(): void {
     const id = `tt-${randomId()}`
     const titleHTML = this.title
-      ? `<span class="title" role="heading" aria-level="${this.headingLevel}">${this.title}</span>`
+      ? `<span data-part="title" role="heading" aria-level="${this.headingLevel}">${this.title}</span>`
       : ''
     const content = Array.from(this.element.childNodes)
       .map(n => (n as Element).outerHTML ?? n.textContent ?? '')
       .join('')
 
     this.element.innerHTML = `
-      <button aria-label="${this.icon === 'question' ? 'Learn more' : 'More information'}" aria-expanded="false" aria-controls="${id}">
+      <button data-part="trigger" aria-label="${this.icon === 'question' ? 'Learn more' : 'More information'}" aria-expanded="false" aria-controls="${id}">
         ${generateIconSVG(this.icon)}
       </button>
-      <div class="rail">
-        <div class="popup" id="${id}" role="tooltip" aria-hidden="true">
+      <div data-part="rail">
+        <div data-part="popup" id="${id}" role="tooltip" aria-hidden="true">
           ${titleHTML}
           ${content}
-          <div class="arrow"></div>
+          <div data-part="arrow"></div>
         </div>
       </div>
     `
@@ -89,7 +89,7 @@ class ToggleTip {
   }
 
   private _updateLayout(): void {
-    const container = this.element.querySelector('.rail') as HTMLElement
+    const container = this.element.querySelector('[data-part="rail"]') as HTMLElement
     const containerRect = container.getBoundingClientRect()
     const popupRect = this.popup.getBoundingClientRect()
     if (!containerRect.width || !popupRect.width) return

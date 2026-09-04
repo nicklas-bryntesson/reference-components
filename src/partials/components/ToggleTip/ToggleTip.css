@@ -2,8 +2,9 @@
    ToggleTip — fully self-contained
    No Tailwind, no framework reset, no external dependencies
 
-   The component root is the custom element `toggle-tip`, so every part is a
-   flat, fully-qualified `toggle-tip .element` rule (ADR-0019).
+   The component root is the custom element `toggle-tip`. Parts are addressed by
+   `data-part`, never by class, so every rule is a flat, fully-qualified
+   `toggle-tip [data-part="…"]` rule and a consumer may restyle on the same DOM.
    ================================================================ */
 
 /* ── Public API (theme layer) ──────────────────────────────────── */
@@ -67,7 +68,7 @@ toggle-tip[initialized] > * {
 }
 
 /* ── Button ────────────────────────────────────────────────────── */
-toggle-tip button {
+toggle-tip [data-part="trigger"] {
   all: unset;
   box-sizing: border-box;
   display: inline-block;
@@ -80,7 +81,7 @@ toggle-tip button {
 }
 
 /* Enlarged hit area */
-toggle-tip button::after {
+toggle-tip [data-part="trigger"]::after {
   --_click-area: 2rem;
   --_offset: calc((var(--_tt-button-width) - var(--_click-area)) / 2);
   position: absolute;
@@ -90,7 +91,7 @@ toggle-tip button::after {
   inset: var(--_offset);
 }
 
-toggle-tip button .icon {
+toggle-tip [data-part="trigger"] [data-part="icon"] {
   display: block;
   width: var(--_tt-button-width);
   height: var(--_tt-button-width);
@@ -107,7 +108,7 @@ toggle-tip button .icon {
  * Note: physical properties (left, top, bottom) are used intentionally here.
  * The slider-rail model is left-to-right by design; RTL is not in scope.
  */
-toggle-tip .rail {
+toggle-tip [data-part="rail"] {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -119,7 +120,7 @@ toggle-tip .rail {
 }
 
 /* ── Bubble ────────────────────────────────────────────────────── */
-toggle-tip .popup {
+toggle-tip [data-part="popup"] {
   position: absolute;
   left: var(--_tt-popup-offset);
   transform: translateX(-50%);
@@ -140,15 +141,15 @@ toggle-tip .popup {
 }
 
 /* Force all descendant text to use the bubble's colour, not the page default */
-toggle-tip .popup * {
+toggle-tip [data-part="popup"] * {
   color: inherit;
 }
 
-toggle-tip .popup[aria-hidden="true"] {
+toggle-tip [data-part="popup"][aria-hidden="true"] {
   display: none;
 }
 
-toggle-tip .popup[aria-hidden="false"] {
+toggle-tip [data-part="popup"][aria-hidden="false"] {
   display: block;
   transition: opacity 0.15s;
 
@@ -158,7 +159,7 @@ toggle-tip .popup[aria-hidden="false"] {
 }
 
 /* ── Title ─────────────────────────────────────────────────────── */
-toggle-tip .title {
+toggle-tip [data-part="title"] {
   display: block;
   font-weight: bold;
   margin-block-end: 1rem;
@@ -167,7 +168,7 @@ toggle-tip .title {
 }
 
 /* ── Arrow ─────────────────────────────────────────────────────── */
-toggle-tip .arrow {
+toggle-tip [data-part="arrow"] {
   position: absolute;
   width: var(--_tt-arrow-size);
   height: var(--_tt-arrow-size);
@@ -176,22 +177,22 @@ toggle-tip .arrow {
 }
 
 /* ── Direction: top (bubble above trigger) ─────────────────────── */
-toggle-tip[data-direction="top"] .popup {
+toggle-tip[data-direction="top"] [data-part="popup"] {
   bottom: var(--_tt-gap);
 }
 
-toggle-tip[data-direction="top"] .arrow {
+toggle-tip[data-direction="top"] [data-part="arrow"] {
   bottom: calc(var(--_tt-arrow-size) * -0.5);
   transform: translateX(calc(-50% + var(--_tt-arrow-offset))) rotate(45deg);
   border-end-end-radius: var(--_tt-arrow-corner-radius);
 }
 
 /* ── Direction: bottom (bubble below trigger) ──────────────────── */
-toggle-tip[data-direction="bottom"] .popup {
+toggle-tip[data-direction="bottom"] [data-part="popup"] {
   top: var(--_tt-gap);
 }
 
-toggle-tip[data-direction="bottom"] .arrow {
+toggle-tip[data-direction="bottom"] [data-part="arrow"] {
   top: calc(var(--_tt-arrow-size) * -0.5);
   transform: translateX(calc(-50% + var(--_tt-arrow-offset))) rotate(45deg);
   border-start-start-radius: var(--_tt-arrow-corner-radius);
