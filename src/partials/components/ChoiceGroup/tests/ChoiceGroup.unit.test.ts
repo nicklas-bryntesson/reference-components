@@ -33,7 +33,7 @@ describe('ChoiceGroup reference markup contract', () => {
 
   it('each group has an .options wrapper holding its fields', () => {
     for (const g of groups()) {
-      const options = g.querySelector('.options')
+      const options = g.querySelector('[data-part="options"]')
       expect(options, 'missing .options wrapper').not.toBeNull()
       expect(options!.querySelectorAll('.ChoiceField input').length).toBeGreaterThan(0)
     }

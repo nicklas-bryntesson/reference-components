@@ -21,8 +21,8 @@
  * No :has() anywhere: a focus ring is load-bearing, and :has() is progressive
  * enhancement only (ADR-0005).
  *
- * Root carries tokens + root props only; every part is a flat, fully-qualified
- * `.Picklist <part>` rule below (ADR-0019).
+ * Root carries tokens + root props only. Parts are identified by `data-part`, never by
+ * class; every rule below is a flat, fully-qualified `.Picklist [data-part="…"]` rule.
  */
 
 .Picklist {
@@ -65,15 +65,15 @@
 }
 
 /* Body forms its own formatting context (holds hint + options + error). */
-.Picklist .content { display: flow-root; }
+.Picklist [data-part="content"] { display: flow-root; }
 
-.Picklist .hint {
+.Picklist [data-part="hint"] {
   margin-block: 0 var(--_pl-gap);
   color: var(--_pl-hint-color);
 }
 
 /* Chips wrap — that is the shape of a picklist (ADR-0014). */
-.Picklist .options {
+.Picklist [data-part="options"] {
   display: flex;
   flex-wrap: wrap;
   gap: var(--_pl-gap);
@@ -81,19 +81,19 @@
 
 /* Group-level error is a Notice inside a persistent live region; Picklist only
    owns the spacing (announcer + payload are the Notice component, ADR-0016). */
-.Picklist .notice-region {
+.Picklist [data-part="notice-region"] {
   margin-block-start: var(--_pl-gap);
 }
 
 /* ── The chip ────────────────────────────────────────────────────────────
-   .option positions the clipped input; the label is the visible surface. */
-.Picklist .option {
+   [data-part="option"] positions the clipped input; the label is the visible surface. */
+.Picklist [data-part="option"] {
   position: relative;
   display: inline-flex;
 }
 
 /* sr-clipped but STILL FOCUSABLE — never display:none / visibility:hidden. */
-.Picklist .option input {
+.Picklist [data-part="option"] input {
   position: absolute;
   inline-size: 1px;
   block-size: 1px;
@@ -105,7 +105,7 @@
   border: 0;
 }
 
-.Picklist .option input + label {
+.Picklist [data-part="option"] input + label {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -126,7 +126,7 @@
 }
 
 /* Selected — a plain adjacent-sibling selector, no :has(). */
-.Picklist .option input:checked + label {
+.Picklist [data-part="option"] input:checked + label {
   border-color: var(--_pl-chip-selected-bg);
   background-color: var(--_pl-chip-selected-bg);
   color: var(--_pl-chip-selected-fg);
@@ -134,7 +134,7 @@
 
 /* The × glyph: decorative, lives INSIDE the label, so clicking it activates the
    label and toggles the input — deselection with no JS and no second label. */
-.Picklist .option .deselect {
+.Picklist [data-part="option"] [data-part="deselect"] {
   flex-shrink: 0;
   inline-size: var(--_pl-deselect-size);
   block-size: var(--_pl-deselect-size);
@@ -145,18 +145,18 @@
    it with visibility, not display, so the slot keeps its width: toggling must
    not resize the chip and reflow the wrapped rows around it. Still a plain
    sibling selector — no :has(). */
-.Picklist .option input:not(:checked) + label .deselect {
+.Picklist [data-part="option"] input:not(:checked) + label [data-part="deselect"] {
   visibility: hidden;
 }
 
 /* ── Interaction states (real pseudo-class + data-test-state pairs) ────── */
-.Picklist .option input:not(:checked):hover + label,
-.Picklist[data-test-state="hover"] .option input:not(:checked) + label {
+.Picklist [data-part="option"] input:not(:checked):hover + label,
+.Picklist[data-test-state="hover"] [data-part="option"] input:not(:checked) + label {
   border-color: var(--_pl-chip-border-color-hover);
   background-color: var(--_pl-chip-bg-hover);
 }
-.Picklist .option input:checked:hover + label,
-.Picklist[data-test-state="hover"] .option input:checked + label {
+.Picklist [data-part="option"] input:checked:hover + label,
+.Picklist[data-test-state="hover"] [data-part="option"] input:checked + label {
   border-color: var(--_pl-chip-border-color-hover);
 }
 
@@ -171,30 +171,30 @@
    where currentColor contrasts by construction: white on a black chip, black on
    a white one. This also works unchanged in forced-colors, where the pair
    becomes HighlightText on Highlight. */
-.Picklist .option input:focus-visible + label,
-.Picklist[data-test-state="focus"] .option input + label {
+.Picklist [data-part="option"] input:focus-visible + label,
+.Picklist[data-test-state="focus"] [data-part="option"] input + label {
   outline: 2px solid;
   outline-offset: -3px;
 }
 
-.Picklist .option input:not(:checked):active + label,
-.Picklist[data-test-state="active"] .option input:not(:checked) + label {
+.Picklist [data-part="option"] input:not(:checked):active + label,
+.Picklist[data-test-state="active"] [data-part="option"] input:not(:checked) + label {
   border-color: var(--_pl-chip-border-color-hover);
   background-color: var(--_pl-chip-bg-hover);
 }
-.Picklist .option input:checked:active + label,
-.Picklist[data-test-state="active"] .option input:checked + label {
+.Picklist [data-part="option"] input:checked:active + label,
+.Picklist[data-test-state="active"] [data-part="option"] input:checked + label {
   border-color: var(--_pl-chip-border-color-hover);
 }
 
 /* invalid — group-level; data-* on the root is the API (ADR-0002) */
-.Picklist[data-invalid="true"] .option input:not(:checked) + label {
+.Picklist[data-invalid="true"] [data-part="option"] input:not(:checked) + label {
   border-color: var(--_pl-chip-border-color-invalid);
 }
 
 /* disabled — family convention: dim, don't recolour. Covers both a single
    disabled input and the <fieldset disabled> cascade. */
-.Picklist .option input:disabled + label {
+.Picklist [data-part="option"] input:disabled + label {
   cursor: not-allowed;
   opacity: 0.5;
 }
@@ -203,7 +203,7 @@
    Horizontal (default) wraps; vertical stacks. Vertical is NOT the same as a
    ChoiceGroup: what separates the two is the item SKIN — a pill vs a box with
    a mark — not the direction the items run in. */
-.Picklist[data-orientation="vertical"] .options {
+.Picklist[data-orientation="vertical"] [data-part="options"] {
   flex-direction: column;
   /* A flex column stretches its children by default; chips should hug their
      own text instead, so each pill is as wide as its label. Segmented mode
@@ -216,47 +216,47 @@
    The radius is derived from the SAME token as the chip shape, via logical
    properties, so a host that sets --_pl-chip-radius: 0.25rem gets a rounded
    rectangle in either orientation (and RTL) for free. */
-.Picklist[data-segmented="true"] .options {
+.Picklist[data-segmented="true"] [data-part="options"] {
   flex-wrap: nowrap;
   gap: 0;
 }
-.Picklist[data-segmented="true"] .option input + label {
+.Picklist[data-segmented="true"] [data-part="option"] input + label {
   border-radius: 0;
 }
 
 /* Segmented · horizontal — one border per seam, radius on the inline ends. */
-.Picklist[data-segmented="true"]:not([data-orientation="vertical"]) .option + .option input + label {
+.Picklist[data-segmented="true"]:not([data-orientation="vertical"]) [data-part="option"] + [data-part="option"] input + label {
   border-inline-start: 0;
 }
-.Picklist[data-segmented="true"]:not([data-orientation="vertical"]) .option:first-child input + label {
+.Picklist[data-segmented="true"]:not([data-orientation="vertical"]) [data-part="option"]:first-child input + label {
   border-start-start-radius: var(--_pl-chip-radius);
   border-end-start-radius: var(--_pl-chip-radius);
 }
-.Picklist[data-segmented="true"]:not([data-orientation="vertical"]) .option:last-child input + label {
+.Picklist[data-segmented="true"]:not([data-orientation="vertical"]) [data-part="option"]:last-child input + label {
   border-start-end-radius: var(--_pl-chip-radius);
   border-end-end-radius: var(--_pl-chip-radius);
 }
 
 /* Segmented · vertical — seams and radii move to the block axis, and the
    segments line up as one bar.
-   GOTCHA: `align-items: stretch` stretches the .option wrapper but NOT the
+   GOTCHA: `align-items: stretch` stretches the [data-part="option"] wrapper but NOT the
    label, which is a flex item in the wrapper's own row context — and the label
    is what the user sees as the chip. Without `flex: 1` the bar renders ragged
    (measured: 54/75/64/74px labels inside 480px wrappers). */
-.Picklist[data-orientation="vertical"][data-segmented="true"] .options {
+.Picklist[data-orientation="vertical"][data-segmented="true"] [data-part="options"] {
   align-items: stretch;
 }
-.Picklist[data-orientation="vertical"][data-segmented="true"] .option input + label {
+.Picklist[data-orientation="vertical"][data-segmented="true"] [data-part="option"] input + label {
   flex: 1;
 }
-.Picklist[data-orientation="vertical"][data-segmented="true"] .option + .option input + label {
+.Picklist[data-orientation="vertical"][data-segmented="true"] [data-part="option"] + [data-part="option"] input + label {
   border-block-start: 0;
 }
-.Picklist[data-orientation="vertical"][data-segmented="true"] .option:first-child input + label {
+.Picklist[data-orientation="vertical"][data-segmented="true"] [data-part="option"]:first-child input + label {
   border-start-start-radius: var(--_pl-chip-radius);
   border-start-end-radius: var(--_pl-chip-radius);
 }
-.Picklist[data-orientation="vertical"][data-segmented="true"] .option:last-child input + label {
+.Picklist[data-orientation="vertical"][data-segmented="true"] [data-part="option"]:last-child input + label {
   border-end-start-radius: var(--_pl-chip-radius);
   border-end-end-radius: var(--_pl-chip-radius);
 }
@@ -275,8 +275,8 @@
   inline-size: 100%;
   margin-block-end: var(--_pl-legend-gap);
 }
-.Picklist[data-legend="above"] > .content,
-.Picklist:not([data-legend]) > .content {
+.Picklist[data-legend="above"] > [data-part="content"],
+.Picklist:not([data-legend]) > [data-part="content"] {
   clear: both;                 /* drop the whole body below the full-width legend */
 }
 
@@ -286,7 +286,7 @@
   inline-size: auto;
   margin-inline-end: var(--_pl-legend-gap-inline);
 }
-/* .content stays flow-root (not cleared) → shrinks to the room right of the float */
+/* [data-part="content"] stays flow-root (not cleared) → shrinks to the room right of the float */
 
 /* ── Legend: hidden — removed visually, kept as the SR group name ────── */
 .Picklist[data-legend="hidden"] > legend {
@@ -308,12 +308,12 @@
    unselected one — contrasting in both cases without naming a colour.
    Do not delete this block when porting. */
 @media (forced-colors: active) {
-  .Picklist .option input:checked + label {
+  .Picklist [data-part="option"] input:checked + label {
     border-color: Highlight;
     background-color: Highlight;
     color: HighlightText;
   }
-  .Picklist .option input:disabled + label {
+  .Picklist [data-part="option"] input:disabled + label {
     color: GrayText;
     border-color: GrayText;
     opacity: 1;                /* opacity is not a forced-colors signal */
@@ -321,5 +321,5 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .Picklist .option input + label { transition: none; }
+  .Picklist [data-part="option"] input + label { transition: none; }
 }
