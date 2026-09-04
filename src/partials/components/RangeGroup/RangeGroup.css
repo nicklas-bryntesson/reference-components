@@ -42,7 +42,7 @@
 
 /* The two ends are named, because "lowest" and "highest" is what each control
    actually is — a span is not one value with two handles. */
-.RangeGroup .roles {
+.RangeGroup [data-part="roles"] {
   display: flex;
   justify-content: space-between;
   gap: var(--_rg-gap);
@@ -50,12 +50,12 @@
   color: var(--_rg-role-color);
 }
 
-.RangeGroup .roles label {
+.RangeGroup [data-part="roles"] label {
   display: flex;
   gap: 0.35em;
 }
 
-.RangeGroup .roles [data-readout] {
+.RangeGroup [data-part="roles"] [data-readout] {
   font-variant-numeric: tabular-nums;
   font-weight: 600;
   color: var(--_rg-readout-color);
@@ -72,14 +72,14 @@
    width. The unit sits outside this element and costs its natural width, because
    reserving the whole string over-reserved by a quarter. Set by RangeGroup.ts from
    min/max; override --_rg-readout-digits by hand for an unusual format. */
-.RangeGroup .roles [data-readout] .digits {
+.RangeGroup [data-part="roles"] [data-readout] [data-part="digits"] {
   display: inline-block;
   min-inline-size: calc(var(--_rg-readout-digits, 0) * 1ch);
   text-align: end;
 }
 
 /* The end labels mirror the lane's ends, so in RTL they swap with it. */
-.RangeGroup .roles label:last-child {
+.RangeGroup [data-part="roles"] label:last-child {
   text-align: end;
 }
 

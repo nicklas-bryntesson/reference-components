@@ -94,9 +94,9 @@
 /* ── The lane ─────────────────────────────────────────────────────────────
    All three share one grid area, so the whole surface stays the input's hit
    target and the layers are stacked, not laid out. */
-.RangeScale .track,
-.RangeScale .fill,
-.RangeScale .reference,
+.RangeScale [data-part="track"],
+.RangeScale [data-part="fill"],
+.RangeScale [data-part="reference"],
 .RangeScale .RangeField {
   grid-area: lane;
 }
@@ -111,9 +111,9 @@
    that the lane keeps, and it is the whole difference between the lane models.
    The error from ignoring it is up to half a thumb and CHANGES SIGN along the
    track, which is exactly why there is only one copy. */
-.RangeScale .fill,
-.RangeScale .ticks > i,
-.RangeScale .reference {
+.RangeScale [data-part="fill"],
+.RangeScale [data-part="ticks"] > i,
+.RangeScale [data-part="reference"] {
   /* The travel is factored out so a LENGTH along the lane (a band's width) can be
      expressed without a second copy of the position formula. A band has two ends,
      so it needs a position for one of them and a length for the span between. */
@@ -121,15 +121,15 @@
   --_rs-pos: calc(var(--_rs-inset) + var(--p, 0) * var(--_rs-travel));
 }
 
-.RangeScale .track,
-.RangeScale .fill {
+.RangeScale [data-part="track"],
+.RangeScale [data-part="fill"] {
   pointer-events: none;              /* the input keeps the whole surface */
   block-size: var(--_rs-track);
   border-radius: var(--_rs-radius);
   justify-self: start;
 }
 
-.RangeScale .track {
+.RangeScale [data-part="track"] {
   inline-size: 100%;
   background: var(--_rs-track-color);
   z-index: -3;
@@ -139,7 +139,7 @@
    and `inline-size` are LOGICAL, so in RTL the fill anchors to the right edge
    on its own — verified in the browser. The vertical anchor is not free; see
    data-min below. */
-.RangeScale .fill {
+.RangeScale [data-part="fill"] {
   --p: var(--_rs-p);                 /* the live position feeds the shared expression */
   inline-size: var(--_rs-pos);
   background: var(--_rs-fill-color);
@@ -150,7 +150,7 @@
    positions the thumb, and the track alone can be the whole visual. The element
    stays in the markup and is switched off, so the state is one attribute rather
    than two shapes of DOM. */
-.RangeScale[data-fill="none"] .fill {
+.RangeScale[data-fill="none"] [data-part="fill"] {
   display: none;
 }
 
@@ -160,7 +160,7 @@
 
    The start uses the shared expression; the width uses the travel directly,
    exactly as a reference band does. */
-.RangeScale[data-fields="2"] .fill {
+.RangeScale[data-fields="2"] [data-part="fill"] {
   --p: var(--_rs-a);
   margin-inline-start: var(--_rs-pos);
   inline-size: calc((var(--_rs-b) - var(--_rs-a)) * var(--_rs-travel));
@@ -188,7 +188,7 @@
    Labels here are NUMERIC by definition. A scale of words (off/low/mid) is an
    ordered set, which is a radio group and not a range at all — so there is
    nothing to mirror into aria-valuetext, and this axis costs only DOM. */
-.RangeScale .ticks {
+.RangeScale [data-part="ticks"] {
   grid-area: ticks;
   position: relative;
   inline-size: 100%;                 /* the same width the expression's 100% means */
@@ -203,7 +203,7 @@
    fraction. Measured, when it was: a 6px mark came out 4.5px and a −12px offset
    came out −9px, and the stops drifted with it. The label's typography lives on
    the child instead. */
-.RangeScale .ticks > i {
+.RangeScale [data-part="ticks"] > i {
   position: absolute;
   inset-inline-start: var(--_rs-pos);   /* --p comes from the markup */
   inset-block-start: 0;
@@ -216,7 +216,7 @@
 }
 
 /* The mark, pulled up so it sits ON the track rather than under it. */
-.RangeScale .ticks > i::before {
+.RangeScale [data-part="ticks"] > i::before {
   content: "";
   inline-size: var(--_rs-tick-width);
   block-size: var(--_rs-tick-size);
@@ -224,18 +224,18 @@
   background: var(--_rs-tick-color);
 }
 
-.RangeScale .ticks > i > span {
+.RangeScale [data-part="ticks"] > i > span {
   font-size: var(--_rs-tick-label-size);
   color: var(--_rs-tick-label-color);
 }
 
 /* marks: the stop is drawn, the label is not rendered — the text stays in the
    markup so switching axis is one attribute, never a markup change. */
-.RangeScale[data-ticks="marks"] .ticks > i > span { display: none; }
+.RangeScale[data-ticks="marks"] [data-part="ticks"] > i > span { display: none; }
 
 /* labels: the row has to reserve room for the text, or it overflows into the
    value row and the two collide. */
-.RangeScale[data-ticks="labels"] .ticks {
+.RangeScale[data-ticks="labels"] [data-part="ticks"] {
   block-size: calc(var(--_rs-tick-size) + var(--_rs-gap) + 1lh);
 }
 
@@ -279,7 +279,7 @@
    One layer, three forms. `region` is the special case of `band` whose start is
    min, plus a clamp; `marker` is a band of no width. The numbers are static CSS
    custom properties from the server, so the layer costs ZERO JavaScript. */
-.RangeScale .reference {
+.RangeScale [data-part="reference"] {
   --p: var(--_rs-ref-from);
   /* border-box, so a bracket's OUTER edges mark the zone. With content-box the
      border sat outside the computed width and the bracket read 4px wide. */
@@ -298,20 +298,20 @@
 
 /* REGION — one number, always from min: consumption, a spent budget.
    min() replaces a JS branch: the region is never drawn past the fill. */
-.RangeScale[data-reference="region"] .reference {
+.RangeScale[data-reference="region"] [data-part="reference"] {
   --p: 0;
   inset-inline-start: 0;
   inline-size: calc(var(--_rs-inset) + min(var(--_rs-ref-to), var(--_rs-p-live)) * var(--_rs-travel));
 }
 
 /* Nothing to clamp against without a fill — then the region is only itself. */
-.RangeScale[data-fill="none"][data-reference="region"] .reference {
+.RangeScale[data-fill="none"][data-reference="region"] [data-part="reference"] {
   inline-size: calc(var(--_rs-inset) + var(--_rs-ref-to) * var(--_rs-travel));
 }
 
 /* MARKER — a band of no width. A hairline needs a minimum, so it is a length
    rather than zero, centred on its own position. */
-.RangeScale[data-reference="marker"] .reference {
+.RangeScale[data-reference="marker"] [data-part="reference"] {
   inline-size: var(--_rs-ref-marker-width);
   margin-inline-start: calc(var(--_rs-ref-marker-width) / -2);
   border-radius: 0;
@@ -345,14 +345,14 @@
    composed field), and always pointer-events: none.
 
    `under` is only ever an explicit choice — it is the reading that hides a band. */
-.RangeScale[data-reference-layer="under"] .reference {
+.RangeScale[data-reference-layer="under"] [data-part="reference"] {
   z-index: -2;
 }
 
 /* over — on the fill. Needs a variant to be visible in a monochrome skeleton,
    which is also why a variant on its own resolves here. */
-.RangeScale[data-reference-layer="over"] .reference,
-.RangeScale[data-reference-variant]:not([data-reference-layer]) .reference {
+.RangeScale[data-reference-layer="over"] [data-part="reference"],
+.RangeScale[data-reference-variant]:not([data-reference-layer]) [data-part="reference"] {
   z-index: 0;
 }
 
@@ -366,9 +366,9 @@
   padding-block-start: var(--_rs-ref-outside-size);
 }
 
-.RangeScale[data-reference-layer="outside"] .reference,
-.RangeScale[data-reference="band"]:not([data-reference-layer]):not([data-reference-variant]) .reference,
-.RangeScale[data-reference="marker"]:not([data-reference-layer]):not([data-reference-variant]) .reference {
+.RangeScale[data-reference-layer="outside"] [data-part="reference"],
+.RangeScale[data-reference="band"]:not([data-reference-layer]):not([data-reference-variant]) [data-part="reference"],
+.RangeScale[data-reference="marker"]:not([data-reference-layer]):not([data-reference-variant]) [data-part="reference"] {
   align-self: start;
   margin-block-start: calc(-1 * var(--_rs-ref-outside-size));
   block-size: calc(var(--_rs-ref-outside-size) / 2);
@@ -380,19 +380,19 @@
 }
 
 /* A marker has no width to bracket, so outside it is a tick rather than a frame. */
-.RangeScale[data-reference-layer="outside"][data-reference="marker"] .reference,
-.RangeScale[data-reference="marker"]:not([data-reference-layer]):not([data-reference-variant]) .reference {
+.RangeScale[data-reference-layer="outside"][data-reference="marker"] [data-part="reference"],
+.RangeScale[data-reference="marker"]:not([data-reference-layer]):not([data-reference-variant]) [data-part="reference"] {
   inline-size: var(--_rs-ref-marker-width);
   background: var(--_rs-ref-ink);
   border: 0;
 }
 
 /* ── Optional value readout ───────────────────────────────────────────────
-   `<output class="value" for="…">` — the right element, and `for` points at what
+   `<output data-part="value" for="…">` — the right element, and `for` points at what
    contributed. NEVER aria-live: the slider already announces on every change, so
    a live region would say the value twice. Its presence is the switch; there is
    no attribute, because a state that cannot be authored cannot be wrong. */
-.RangeScale .value {
+.RangeScale [data-part="value"] {
   grid-area: value;
   justify-self: end;
   text-align: end;
@@ -414,7 +414,7 @@
 
    Write what the zone MEANS, not where it is — "above 500 000 kr the rate
    increases", never "the band is at 30–50 %". */
-.RangeScale .hint {
+.RangeScale [data-part="hint"] {
   grid-area: hint;
   display: flex;
   align-items: baseline;
@@ -424,7 +424,7 @@
   color: var(--_rs-hint-color);
 }
 
-.RangeScale .hint .swatch {
+.RangeScale [data-part="hint"] [data-part="swatch"] {
   flex: none;
   inline-size: var(--_rs-swatch-size);
   block-size: var(--_rs-swatch-size);
@@ -437,14 +437,14 @@
    content: a value crossing into another digit otherwise widens the lane in a
    shrink-to-fit container, which recomputes every position and makes the thumb jump.
    Digits only, in `ch`; the unit sits outside and costs its natural width. */
-.RangeScale .value .digits {
+.RangeScale [data-part="value"] [data-part="digits"] {
   display: inline-block;
   min-inline-size: calc(var(--_rs-value-digits, 0) * 1ch);
   text-align: end;
 }
 
 /* Without a reference layer there is nothing for a swatch to key to. */
-.RangeScale:not([data-reference]) .hint .swatch { display: none; }
+.RangeScale:not([data-reference]) [data-part="hint"] [data-part="swatch"] { display: none; }
 
 /* ── Lane model ───────────────────────────────────────────────────────────
    `flush` widens the input by one thumb and pulls it back half a thumb, so the
@@ -477,14 +477,14 @@
   height: 100%;
 }
 
-.RangeScale[data-orientation="vertical"] .track,
-.RangeScale[data-orientation="vertical"] .fill,
-.RangeScale[data-orientation="vertical"] .reference {
+.RangeScale[data-orientation="vertical"] [data-part="track"],
+.RangeScale[data-orientation="vertical"] [data-part="fill"],
+.RangeScale[data-orientation="vertical"] [data-part="reference"] {
   inline-size: var(--_rs-track);
   justify-self: center;
 }
 
-.RangeScale[data-orientation="vertical"] .track {
+.RangeScale[data-orientation="vertical"] [data-part="track"] {
   block-size: 100%;
   align-self: start;
 }
@@ -493,13 +493,13 @@
    and the fill point in opposite directions. Horizontally that follows
    `direction` for free; vertically it has to be told, and data-min is what
    tells it. RangeField's default is min at the bottom. */
-.RangeScale[data-orientation="vertical"] .fill {
+.RangeScale[data-orientation="vertical"] [data-part="fill"] {
   --p: var(--_rs-p);
   block-size: var(--_rs-pos);
   align-self: end;
 }
 
-.RangeScale[data-orientation="vertical"][data-min="top"] .fill {
+.RangeScale[data-orientation="vertical"][data-min="top"] [data-part="fill"] {
   align-self: start;
 }
 
@@ -520,14 +520,14 @@
    The lane draws its own layers, so it owes forced-colors the same debt the
    field does: system colours, or the track disappears. */
 @media (forced-colors: active) {
-  .RangeScale .track,
-  .RangeScale .fill {
+  .RangeScale [data-part="track"],
+  .RangeScale [data-part="fill"] {
     forced-color-adjust: none;
   }
-  .RangeScale .track { background: ButtonFace; border: 1px solid ButtonText; }
-  .RangeScale .fill { background: Highlight; }
+  .RangeScale [data-part="track"] { background: ButtonFace; border: 1px solid ButtonText; }
+  .RangeScale [data-part="fill"] { background: Highlight; }
   /* A reference layer's meaning is carried by its colour, which forced-colors
      discards — so it falls back to a distinguishable system colour, and the hint
      text beside it is what actually carries the meaning either way. */
-  .RangeScale .reference { forced-color-adjust: none; --_rs-ref-ink: GrayText; }
+  .RangeScale [data-part="reference"] { forced-color-adjust: none; --_rs-ref-ink: GrayText; }
 }

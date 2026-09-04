@@ -15,21 +15,21 @@ Custom properties only flow downward, so a field can never publish its own posit
 ```html
 <label for="volume">Volume</label>
 <div class="RangeScale" data-component="RangeScale" style="--_rs-p: 0.5">
-  <span class="track"></span>
-  <span class="fill"></span>
+  <span data-part="track"></span>
+  <span data-part="fill"></span>
   <input class="RangeField" type="range" id="volume" name="volume" min="0" max="100" value="50">
-  <span class="ticks" aria-hidden="true">
+  <span data-part="ticks" aria-hidden="true">
     <i style="--p: 0"><span>0</span></i>
     <i style="--p: 0.5"><span>50</span></i>
     <i style="--p: 1"><span>100</span></i>
   </span>
-  <output class="value" aria-live="off" for="volume" data-suffix="%">50 %</output>
+  <output data-part="value" aria-live="off" for="volume" data-suffix="%">50 %</output>
 </div>
 ```
 
 Contract rules (enforced by the unit test):
 
-- **`.track`, `.fill` and the field share one grid area.** That is what keeps the whole lane
+- **`[data-part="track"]`, `[data-part="fill"]` and the field share one grid area.** That is what keeps the whole lane
   surface as the input's hit target; the layers carry `pointer-events: none`.
 - **`--_rs-p` is authored in the `style` attribute** so the first paint is correct without
   JavaScript, and it must agree with `value`, `min` and `max`. It is the **only** place a position
@@ -42,6 +42,24 @@ Contract rules (enforced by the unit test):
 - **`data-invalid` goes on both** the lane (it draws the track) and the field (it draws the thumb);
   `aria-invalid` goes on the control, which is the field.
 - **Orientation is authored on both** the lane and the field, and they must agree.
+
+## Parts
+
+Parts are identified by `data-part`, never by class name. The reference JS, the stylesheet and the
+conformance suite all address them through the attribute, so a consumer may restyle the same DOM
+under any class convention — or none — and the suite still passes. The only class names in the
+markup are the component roots (`RangeScale`, and the composed `RangeField` input).
+
+| `data-part` | Element | Role |
+|---|---|---|
+| `track` | `<span>` | The full-length lane background |
+| `fill` | `<span>` | The filled portion, sized from `--_rs-p` |
+| `reference` | `<span>` | Optional reference layer (marker / band / region), positioned from `data-reference-*` |
+| `ticks` | `<span aria-hidden>` | Optional tick marks; each `<i style="--p">` holds a `<span>` label |
+| `value` | `<output aria-live="off">` | The live readout, pointed at the field via `for` |
+| `digits` | `<span>` | The number inside the readout, kept apart from the suffix |
+| `hint` | `<p>` | Optional explanation of a colour-coded reference; the field points at it via `aria-describedby` |
+| `swatch` | `<span aria-hidden>` | Colour sample inside the hint, mirrors the reference colour |
 
 ## HTML Authoring API (`data-*`)
 
@@ -331,7 +349,7 @@ position is already published, so moving it to the thumb is placement:
 ```css
 /* The bubble is the same <output>, moved onto the lane. --p feeds the shared
    expression, exactly as the fill and every tick do. */
-.my-slider .RangeScale .value {
+.my-slider .RangeScale [data-part="value"] {
   --p: var(--_rs-p);
   grid-area: lane;
   justify-self: start;

@@ -48,8 +48,8 @@ describe('RangeScale state partials', () => {
 
   it.each(files)('%s — has exactly one track and one fill', (file) => {
     const html = read(file)
-    expect(html.match(/class="track"/g)?.length).toBe(1)
-    expect(html.match(/class="fill"/g)?.length).toBe(1)
+    expect(html.match(/data-part="track"/g)?.length).toBe(1)
+    expect(html.match(/data-part="fill"/g)?.length).toBe(1)
   })
 
   it.each(files)('%s — label `for` matches the input `id`', (file) => {
@@ -157,7 +157,7 @@ describe('RangeScale state partials', () => {
    * land on every authored stop. This is the rule that makes ticks safe to draw.
    */
   it('every tick stop is reachable in whole steps', () => {
-    const withTicks = files.filter((f) => read(f).includes('class="ticks"'))
+    const withTicks = files.filter((f) => read(f).includes('data-part="ticks"'))
     expect(withTicks.length).toBeGreaterThan(0)
 
     for (const f of withTicks) {
@@ -176,10 +176,10 @@ describe('RangeScale state partials', () => {
   })
 
   it('tick containers are aria-hidden, and their labels are numeric', () => {
-    const withTicks = files.filter((f) => read(f).includes('class="ticks"'))
+    const withTicks = files.filter((f) => read(f).includes('data-part="ticks"'))
     for (const f of withTicks) {
       const html = read(f)
-      expect(html, f).toContain('<span class="ticks" aria-hidden="true">')
+      expect(html, f).toContain('<span data-part="ticks" aria-hidden="true">')
       const labels = [...html.matchAll(/<i style="--p: [\d.]+"><span>([^<]*)<\/span><\/i>/g)].map((m) => m[1])
       expect(labels.length, f).toBeGreaterThan(1)
       for (const label of labels) expect(label, `${f}: "${label}"`).toMatch(/^-?[\d.\s]+$/)
@@ -187,7 +187,7 @@ describe('RangeScale state partials', () => {
   })
 
   it('the first and last stop are the ends of the range', () => {
-    const withTicks = files.filter((f) => read(f).includes('class="ticks"'))
+    const withTicks = files.filter((f) => read(f).includes('data-part="ticks"'))
     for (const f of withTicks) {
       const stops = [...read(f).matchAll(/--p:\s*([\d.]+)/g)].map((m) => Number(m[1]))
       expect(Math.min(...stops), f).toBe(0)
@@ -204,7 +204,7 @@ describe('RangeScale state partials', () => {
   // ── Reference layer ─────────────────────────────────────────────────────────
 
   it('a reference layer authors both of its numbers', () => {
-    const withRef = files.filter((f) => read(f).includes('class="reference"'))
+    const withRef = files.filter((f) => read(f).includes('data-part="reference"'))
     expect(withRef.length).toBeGreaterThan(0)
     for (const f of withRef) {
       const html = read(f)
@@ -255,22 +255,22 @@ describe('RangeScale state partials', () => {
     expect(coloured.length).toBeGreaterThan(0)
     for (const f of coloured) {
       const html = read(f)
-      expect(html, f).toContain('class="hint"')
-      const hintId = html.match(/class="hint" id="([^"]+)"/)?.[1]
+      expect(html, f).toContain('data-part="hint"')
+      const hintId = html.match(/data-part="hint" id="([^"]+)"/)?.[1]
       expect(hintId, f).toBeTruthy()
       expect(html, f).toContain(`aria-describedby="${hintId}"`)
     }
   })
 
   it('the swatch is decoration, and the hint lives inside the lane', () => {
-    const withHint = files.filter((f) => read(f).includes('class="hint"'))
+    const withHint = files.filter((f) => read(f).includes('data-part="hint"'))
     expect(withHint.length).toBeGreaterThan(0)
     for (const f of withHint) {
       const html = read(f)
-      expect(html, f).toContain('<span class="swatch" aria-hidden="true"></span>')
+      expect(html, f).toContain('<span data-part="swatch" aria-hidden="true"></span>')
       // inside the component, or the swatch cannot inherit the layer's colour
       const laneEnd = html.lastIndexOf('</div>')
-      expect(html.indexOf('class="hint"'), f).toBeLessThan(laneEnd)
+      expect(html.indexOf('data-part="hint"'), f).toBeLessThan(laneEnd)
     }
   })
 

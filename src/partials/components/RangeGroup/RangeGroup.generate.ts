@@ -100,7 +100,7 @@ function canonical(state: StateDefinition): string {
   // input already announces it through aria-valuetext. Hidden, the name is the
   // stable role word alone and the valuetext carries value, unit and span.
   const readout = (side: 'lower' | 'upper', value: number) =>
-    `<b data-readout="${side}" aria-hidden="true"${suffix}><span class="digits">${value}</span>` +
+    `<b data-readout="${side}" aria-hidden="true"${suffix}><span data-part="digits">${value}</span>` +
     `${state.suffix ? ` ${state.suffix}` : ''}</b>`
 
   const field = (side: 'lower' | 'upper', id: string, value: number) =>
@@ -117,13 +117,13 @@ function canonical(state: StateDefinition): string {
   class="RangeGroup"${groupAttrs}
 >
   <legend>${state.legend}</legend>
-  <div class="roles">
+  <div data-part="roles">
     <label for="${idLower}">${state.lowerLabel} ${readout('lower', state.lower)}</label>
     <label for="${idUpper}">${state.upperLabel} ${readout('upper', state.upper)}</label>
   </div>
   <div class="RangeScale"${scaleAttrs}>
-    <span class="track"></span>
-    <span class="fill"></span>
+    <span data-part="track"></span>
+    <span data-part="fill"></span>
     ${field('lower', idLower, state.lower)}
     ${field('upper', idUpper, state.upper)}
   </div>

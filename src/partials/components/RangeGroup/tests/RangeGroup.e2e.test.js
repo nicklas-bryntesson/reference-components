@@ -15,8 +15,8 @@ const state = (page, group = GROUP) =>
     const scale = g.querySelector('.RangeScale')
     const lo = g.querySelector('[data-role="lower"]')
     const hi = g.querySelector('[data-role="upper"]')
-    const track = scale.querySelector('.track').getBoundingClientRect()
-    const fill = scale.querySelector('.fill').getBoundingClientRect()
+    const track = scale.querySelector('[data-part="track"]').getBoundingClientRect()
+    const fill = scale.querySelector('[data-part="fill"]').getBoundingClientRect()
     const cs = getComputedStyle(scale)
     return {
       lower: lo.value,
@@ -267,7 +267,7 @@ test('crossing a digit boundary does not resize the group or the lane', async ({
     const g = document.querySelector('[data-id="rangegroup-flush"]')
     const upper = g.querySelector('[data-role="upper"]')
     const lane = g.querySelector('.RangeScale')
-    const track = lane.querySelector('.track')
+    const track = lane.querySelector('[data-part="track"]')
     const out = []
     for (const v of [200, 700, 990, 1000]) {
       upper.value = String(v)
@@ -296,7 +296,7 @@ test('only the digits are reserved, so the unit costs its natural width', async 
   const measured = await page.evaluate(() => {
     const g = document.querySelector('[data-id="rangegroup-flush"]')
     const readout = g.querySelector('[data-readout="upper"]')
-    const digits = readout.querySelector('.digits')
+    const digits = readout.querySelector('[data-part="digits"]')
     return {
       reserved: Number(getComputedStyle(g).getPropertyValue('--_rg-readout-digits')),
       digitsText: digits.textContent,

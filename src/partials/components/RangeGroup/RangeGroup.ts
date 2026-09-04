@@ -208,7 +208,7 @@ export default class RangeGroup {
   }
 
   #digits(side: 'lower' | 'upper'): HTMLElement | null {
-    return this.#outputs[side]?.querySelector<HTMLElement>('.digits') ?? null
+    return this.#outputs[side]?.querySelector<HTMLElement>('[data-part="digits"]') ?? null
   }
 
   /** Both readouts carry the same unit; the lower one is the canonical source. */
