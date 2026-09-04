@@ -33,11 +33,11 @@ describe('Picklist reference markup contract', () => {
     }
   })
 
-  it('each list has a .content wrapper and an .options wrapper holding chips', () => {
+  it('each list has a content wrapper and an options wrapper holding chips', () => {
     for (const l of lists()) {
-      expect(l.querySelector('[data-part="content"]'), 'missing .content wrapper').not.toBeNull()
+      expect(l.querySelector('[data-part="content"]'), 'missing content wrapper').not.toBeNull()
       const options = l.querySelector('[data-part="options"]')
-      expect(options, 'missing .options wrapper').not.toBeNull()
+      expect(options, 'missing options wrapper').not.toBeNull()
       expect(options!.querySelectorAll('[data-part="option"] input').length).toBeGreaterThan(0)
     }
   })
@@ -138,14 +138,14 @@ describe('Picklist reference markup contract', () => {
     expect(document.querySelectorAll('.Picklist [data-part="deselect"]').length).toBeGreaterThan(0)
   })
 
-  it('every .deselect glyph is aria-hidden and sits inside the chip label', () => {
+  it('every deselect glyph is aria-hidden and sits inside the chip label', () => {
     for (const glyph of document.querySelectorAll('.Picklist [data-part="deselect"]')) {
       expect(glyph.getAttribute('aria-hidden'), 'the × must not reach the accessible name').toBe('true')
       expect(glyph.closest('label'), 'the × must be inside the label to toggle the input').not.toBeNull()
     }
   })
 
-  it('no .deselect glyph appears in a radio chip (a radio cannot be deselected)', () => {
+  it('no deselect glyph appears in a radio chip (a radio cannot be deselected)', () => {
     for (const glyph of document.querySelectorAll('.Picklist [data-part="deselect"]')) {
       const input = glyph.closest('[data-part="option"]')?.querySelector('input')
       expect(input?.getAttribute('type'), 'a × on a radio chip would be a lie').toBe('checkbox')

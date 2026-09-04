@@ -7,8 +7,8 @@ import { targetPath } from '../../../../e2e-helpers/target.js'
 // mechanism (sr-clipped input + adjacent label as the surface) does not cost
 // any of the semantics or the visible focus ring.
 //
-// NOTE: every locator is scoped to the component root. `.option`, `.content`
-// and `.options` are page-global words shared across components.
+// NOTE: every locator is scoped to the component root. `option`, `content`
+// and `options` are page-global part names shared across components.
 
 test.beforeEach(async ({ page }) => {
   await page.goto(targetPath())

@@ -27,7 +27,7 @@ describe('Notice reference markup contract', () => {
     }
   })
 
-  it('the announcer (.notice-region) carries the live role + aria-live', () => {
+  it('the announcer (notice-region) carries the live role + aria-live', () => {
     const regions = [...document.querySelectorAll('[data-part="notice-region"]')]
     expect(regions.length).toBeGreaterThan(0)
     for (const r of regions) {
