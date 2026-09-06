@@ -13,45 +13,45 @@ Custom accessible datetime input wrapping a hidden `input[type="datetime-local"]
   data-name="INPUT_NAME"
   data-locale="sv-SE"
 >
-  <input type="datetime-local" data-part="native" tabindex="-1" aria-hidden="true">
-  <div data-part="overlay">
-    <div data-part="segments" role="group"></div>
-    <button data-part="trigger" type="button" aria-label="Open calendar" aria-expanded="false" aria-haspopup="dialog"><!-- calendar icon SVG --></button>
+  <input class="native" data-part="native" type="datetime-local" tabindex="-1" aria-hidden="true">
+  <div class="overlay" data-part="overlay">
+    <div class="segments" data-part="segments" role="group"></div>
+    <button class="trigger" data-part="trigger" type="button" aria-label="Open calendar" aria-expanded="false" aria-haspopup="dialog"><!-- calendar icon SVG --></button>
   </div>
-  <template data-part="calendar-template">
-    <div data-part="popup" role="dialog" aria-modal="true">
-      <div data-part="calendar-inner">
-        <div data-part="calendar-left">
-          <div data-part="calendar-header">
-            <button data-part="prev-month" type="button">&#8249;</button>
-            <button data-part="month-year-trigger" type="button" aria-expanded="false"><span data-part="calendar-month-year"></span></button>
-            <button data-part="next-month" type="button">&#8250;</button>
+  <template class="calendar-template" data-part="calendar-template">
+    <div class="popup" data-part="popup" role="dialog" aria-modal="true">
+      <div class="calendar-inner">
+        <div class="calendar-left">
+          <div class="calendar-header">
+            <button class="prev-month" data-part="prev-month" type="button">&#8249;</button>
+            <button class="month-year-trigger" data-part="month-year-trigger" type="button" aria-expanded="false"><span class="calendar-month-year" data-part="calendar-month-year"></span></button>
+            <button class="next-month" data-part="next-month" type="button">&#8250;</button>
           </div>
           <div data-panel="calendar" data-active="true">
-            <table data-part="calendar-grid" role="grid"></table>
+            <table class="calendar-grid" data-part="calendar-grid" role="grid"></table>
           </div>
-          <div data-part="year-month-picker" class="WheelColumns" role="group" data-panel="picker" data-active="false">
+          <div class="year-month-picker WheelColumns" data-part="year-month-picker" role="group" data-panel="picker" data-active="false">
             <div class="Wheel" data-picker="month" tabindex="0"></div>
             <div class="Wheel" data-picker="year" tabindex="0"></div>
           </div>
         </div>
-        <div data-part="time-columns" class="WheelColumns">
+        <div class="time-columns WheelColumns">
           <div class="Wheel" data-segment="hour" tabindex="0"></div>
           <div class="Wheel" data-segment="minute" tabindex="0"></div>
           <div class="Wheel" data-segment="second" tabindex="0" style="display:none"></div>
-          <div data-part="ampm" role="group" hidden></div>
+          <div class="ampm" data-part="ampm" role="group" hidden></div>
         </div>
       </div>
-      <div data-part="calendar-footer">
-        <button type="button" data-part="calendar-footer-clear"></button>
-        <button type="button" data-part="calendar-footer-today"></button>
-        <button type="button" data-part="calendar-footer-now"></button>
+      <div class="calendar-footer">
+        <button class="calendar-footer-clear" data-part="calendar-footer-clear" type="button"></button>
+        <button class="calendar-footer-today" data-part="calendar-footer-today" type="button"></button>
+        <button class="calendar-footer-now" data-part="calendar-footer-now" type="button"></button>
       </div>
-      <div data-part="arrow"></div>
+      <div class="arrow"></div>
     </div>
   </template>
-  <div data-part="rail"></div>
-  <div data-part="announce" aria-live="polite" aria-atomic="true"></div>
+  <div class="rail" data-part="rail"></div>
+  <div class="announce" data-part="announce" aria-live="polite" aria-atomic="true"></div>
 </div>
 ```
 
@@ -70,38 +70,39 @@ not a listbox popup).
 
 ## Parts
 
-Parts are identified by `data-part`, never by class name. The reference JS, the stylesheet and the
-conformance suite all address them through the attribute, so a consumer may restyle the same DOM
-under any class convention — or none — and the suite still passes. The only class names in the
-markup are the component root (`DateTimeField`) and the kernel wheel hosts (`Wheel`, `WheelColumns`).
+Every part carries a lowercase class **for styling only** — rename, hash or delete them all and the
+suite still passes. A part also carries `data-part` when the suite, the reference JS or a composing
+component has to *find* it; that attribute is the contract, and the stylesheet never reads it.
+The **Bound by** column says who holds on to each part.
 
-| `data-part` | Element | Role |
-|---|---|---|
-| `native` | `<input type="datetime-local">` | The real form control; hidden in `custom` mode, the transparent tap layer in `display` mode |
-| `overlay` | `<div>` | The visible bordered field box |
-| `segments` | `<div role="group">` | Container the JS fills with segment spans |
-| `segment` | `<span role="spinbutton">` | One editable segment; `data-segment` says which (`day` · `month` · `year` · `hour` · `minute` · `second` · `ampm`) |
-| `separator` | `<span aria-hidden>` | Separators between segments |
-| `trigger` | `<button>` | Opens the popup; carries `aria-expanded` / `aria-haspopup="dialog"` |
-| `icon` | `<svg>` | The trigger glyph |
-| `calendar-template` | `<template>` | Authored popup markup, cloned into the rail on open |
-| `rail` | `<div>` | Zero-height positioning rail |
-| `popup` | `<div role="dialog">` | The combined calendar + time picker |
-| `calendar-inner` | `<div>` | Two-column layout: calendar on the left, wheels on the right |
-| `calendar-left` | `<div>` | The calendar column (header, grid, month/year picker) |
-| `calendar-header` | `<div>` | Month navigation row |
-| `prev-month` · `next-month` | `<button>` | Step the displayed month |
-| `month-year-trigger` | `<button>` | Swaps the calendar panel for the wheel picker panel (`data-panel` / `data-active`) |
-| `calendar-month-year` | `<span>` | The displayed month and year, inside the trigger |
-| `calendar-grid` | `<table role="grid">` | The month grid; day cells carry `data-date`, `data-today`, `data-selected`, `data-outside-month` |
-| `year-month-picker` | `<div class="WheelColumns" role="group">` | Row of wheel hosts (`.Wheel[data-picker]`) |
-| `time-columns` | `<div class="WheelColumns">` | Row of time wheel hosts (`.Wheel[data-segment]`) plus the AM/PM toggle |
-| `ampm` | `<div role="group">` | AM/PM toggle group, shown for 12-hour locales |
-| `ampm-option` | `<button aria-pressed>` | One AM/PM option, built by JS |
-| `calendar-footer` | `<div>` | Footer holding the three actions |
-| `calendar-footer-clear` · `calendar-footer-today` · `calendar-footer-now` | `<button>` | Clear / Today / Now |
-| `arrow` | `<div>` | The popup pointer, positioned from JS |
-| `announce` | `<div aria-live="polite">` | Visually hidden live region for committed values |
+
+| Part | Element | Role | Bound by |
+|---|---|---|---|
+| `native` | `<input type="datetime-local">` | The real form control; hidden in `custom` mode, the transparent tap layer in `display` mode | suite + JS |
+| `overlay` | `<div>` | The visible bordered field box | suite + JS |
+| `segments` | `<div role="group">` | Container the JS fills with segment spans | suite + JS |
+| `segment` | `<span role="spinbutton">` | One editable segment; `data-segment` says which (`day` · `month` · `year` · `hour` · `minute` · `second` · `ampm`) | suite |
+| `separator` | `<span aria-hidden>` | Separators between segments | styled only |
+| `trigger` | `<button>` | Opens the popup; carries `aria-expanded` / `aria-haspopup="dialog"` | suite + JS |
+| `icon` | `<svg>` | The trigger glyph | styled only |
+| `calendar-template` | `<template>` | Authored popup markup, cloned into the rail on open | suite + JS |
+| `rail` | `<div>` | Zero-height positioning rail | JS |
+| `popup` | `<div role="dialog">` | The combined calendar + time picker | suite + JS |
+| `calendar-inner` | `<div>` | Two-column layout: calendar on the left, wheels on the right | styled only |
+| `calendar-left` | `<div>` | The calendar column (header, grid, month/year picker) | styled only |
+| `calendar-header` | `<div>` | Month navigation row | styled only |
+| `prev-month` · `next-month` | `<button>` | Step the displayed month | suite + JS / JS |
+| `month-year-trigger` | `<button>` | Swaps the calendar panel for the wheel picker panel (`data-panel` / `data-active`) | suite + JS |
+| `calendar-month-year` | `<span>` | The displayed month and year, inside the trigger | suite + JS |
+| `calendar-grid` | `<table role="grid">` | The month grid; day cells carry `data-date`, `data-today`, `data-selected`, `data-outside-month` | suite + JS |
+| `year-month-picker` | `<div class="WheelColumns" role="group">` | Row of wheel hosts (`.Wheel[data-picker]`) | JS |
+| `time-columns` | `<div class="WheelColumns">` | Row of time wheel hosts (`.Wheel[data-segment]`) plus the AM/PM toggle | styled only |
+| `ampm` | `<div role="group">` | AM/PM toggle group, shown for 12-hour locales | suite + JS |
+| `ampm-option` | `<button aria-pressed>` | One AM/PM option, built by JS | suite + JS |
+| `calendar-footer` | `<div>` | Footer holding the three actions | styled only |
+| `calendar-footer-clear` · `calendar-footer-today` · `calendar-footer-now` | `<button>` | Clear / Today / Now | suite + JS |
+| `arrow` | `<div>` | The popup pointer, positioned from JS | styled only |
+| `announce` | `<div aria-live="polite">` | Visually hidden live region for committed values | suite + JS |
 
 ## Attributes
 

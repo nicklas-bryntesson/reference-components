@@ -15,15 +15,15 @@ Custom properties only flow downward, so a field can never publish its own posit
 ```html
 <label for="volume">Volume</label>
 <div class="RangeScale" data-component="RangeScale" style="--_rs-p: 0.5">
-  <span data-part="track"></span>
-  <span data-part="fill"></span>
+  <span class="track" data-part="track"></span>
+  <span class="fill" data-part="fill"></span>
   <input class="RangeField" type="range" id="volume" name="volume" min="0" max="100" value="50">
-  <span data-part="ticks" aria-hidden="true">
+  <span class="ticks" data-part="ticks" aria-hidden="true">
     <i style="--p: 0"><span>0</span></i>
     <i style="--p: 0.5"><span>50</span></i>
     <i style="--p: 1"><span>100</span></i>
   </span>
-  <output data-part="value" aria-live="off" for="volume" data-suffix="%">50 %</output>
+  <output class="value" data-part="value" aria-live="off" for="volume" data-suffix="%">50 %</output>
 </div>
 ```
 
@@ -45,21 +45,22 @@ Contract rules (enforced by the unit test):
 
 ## Parts
 
-Parts are identified by `data-part`, never by class name. The reference JS, the stylesheet and the
-conformance suite all address them through the attribute, so a consumer may restyle the same DOM
-under any class convention — or none — and the suite still passes. The only class names in the
-markup are the component roots (`RangeScale`, and the composed `RangeField` input).
+Every part carries a lowercase class **for styling only** — rename, hash or delete them all and the
+suite still passes. A part also carries `data-part` when the suite, the reference JS or a composing
+component has to *find* it; that attribute is the contract, and the stylesheet never reads it.
+The **Bound by** column says who holds on to each part.
 
-| `data-part` | Element | Role |
-|---|---|---|
-| `track` | `<span>` | The full-length lane background |
-| `fill` | `<span>` | The filled portion, sized from `--_rs-p` |
-| `reference` | `<span>` | Optional reference layer (marker / band / region), positioned from `data-reference-*` |
-| `ticks` | `<span aria-hidden>` | Optional tick marks; each `<i style="--p">` holds a `<span>` label |
-| `value` | `<output aria-live="off">` | The live readout, pointed at the field via `for` |
-| `digits` | `<span>` | The number inside the readout, kept apart from the suffix |
-| `hint` | `<p>` | Optional explanation of a colour-coded reference; the field points at it via `aria-describedby` |
-| `swatch` | `<span aria-hidden>` | Colour sample inside the hint, mirrors the reference colour |
+
+| Part | Element | Role | Bound by |
+|---|---|---|---|
+| `track` | `<span>` | The full-length lane background | suite |
+| `fill` | `<span>` | The filled portion, sized from `--_rs-p` | suite |
+| `reference` | `<span>` | Optional reference layer (marker / band / region), positioned from `data-reference-*` | suite |
+| `ticks` | `<span aria-hidden>` | Optional tick marks; each `<i style="--p">` holds a `<span>` label | suite |
+| `value` | `<output aria-live="off">` | The live readout, pointed at the field via `for` | suite + JS |
+| `digits` | `<span>` | The number inside the readout, kept apart from the suffix | suite + JS |
+| `hint` | `<p>` | Optional explanation of a colour-coded reference; the field points at it via `aria-describedby` | suite |
+| `swatch` | `<span aria-hidden>` | Colour sample inside the hint, mirrors the reference colour | suite |
 
 ## HTML Authoring API (`data-*`)
 

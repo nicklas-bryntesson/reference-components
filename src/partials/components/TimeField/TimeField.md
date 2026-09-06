@@ -21,27 +21,28 @@ State attributes set by JS: `data-initialized="true"`, `data-open="true"`, `data
 
 ## Parts
 
-Parts are identified by `data-part`, never by class name. The reference JS, the stylesheet and the
-conformance suite all address them through the attribute, so a consumer may restyle the same DOM
-under any class convention — or none — and the suite still passes. The only class names in the
-markup are the component root (`TimeField`) and the kernel wheel hosts (`Wheel`, `WheelColumns`).
+Every part carries a lowercase class **for styling only** — rename, hash or delete them all and the
+suite still passes. A part also carries `data-part` when the suite, the reference JS or a composing
+component has to *find* it; that attribute is the contract, and the stylesheet never reads it.
+The **Bound by** column says who holds on to each part.
 
-| `data-part` | Element | Role |
-|---|---|---|
-| `native` | `<input type="time">` | The real form control; hidden in `custom` mode, the transparent tap layer in `display` mode |
-| `overlay` | `<div>` | The visible bordered field box |
-| `segments` | `<div role="group">` | Container the JS fills with segment spans |
-| `segment` | `<span role="spinbutton">` | One editable segment; `data-segment` says which (`hour` · `minute` · `second` · `ampm`) |
-| `separator` | `<span aria-hidden>` | The `:` between segments |
-| `trigger` | `<button>` | Opens the popup; carries `aria-expanded` / `aria-haspopup="dialog"` |
-| `icon` | `<svg>` | The trigger glyph |
-| `rail` | `<div>` | Zero-height positioning rail; the popup is cloned into it on open |
-| `popup` | `<div role="dialog">` | The wheel picker |
-| `time-columns` | `<div class="WheelColumns">` | Row of wheel hosts (`.Wheel[data-segment]`) |
-| `footer` | `<div>` | Popup footer holding the two actions |
-| `footer-clear` · `footer-now` | `<button>` | Clear / Now — both commit and close |
-| `arrow` | `<div>` | The popup pointer, positioned from JS |
-| `announce` | `<div aria-live="polite">` | Visually hidden live region for committed values |
+
+| Part | Element | Role | Bound by |
+|---|---|---|---|
+| `native` | `<input type="time">` | The real form control; hidden in `custom` mode, the transparent tap layer in `display` mode | suite + JS |
+| `overlay` | `<div>` | The visible bordered field box | suite + JS |
+| `segments` | `<div role="group">` | Container the JS fills with segment spans | suite + JS |
+| `segment` | `<span role="spinbutton">` | One editable segment; `data-segment` says which (`hour` · `minute` · `second` · `ampm`) | suite + JS |
+| `separator` | `<span aria-hidden>` | The `:` between segments | suite + JS |
+| `trigger` | `<button>` | Opens the popup; carries `aria-expanded` / `aria-haspopup="dialog"` | suite + JS |
+| `icon` | `<svg>` | The trigger glyph | styled only |
+| `rail` | `<div>` | Zero-height positioning rail; the popup is cloned into it on open | suite + JS |
+| `popup` | `<div role="dialog">` | The wheel picker | suite + JS |
+| `time-columns` | `<div class="WheelColumns">` | Row of wheel hosts (`.Wheel[data-segment]`) | suite |
+| `footer` | `<div>` | Popup footer holding the two actions | suite |
+| `footer-clear` · `footer-now` | `<button>` | Clear / Now — both commit and close | suite + JS |
+| `arrow` | `<div>` | The popup pointer, positioned from JS | suite |
+| `announce` | `<div aria-live="polite">` | Visually hidden live region for committed values | suite + JS |
 
 ## Segments
 

@@ -179,7 +179,7 @@ describe('RangeScale state partials', () => {
     const withTicks = files.filter((f) => read(f).includes('data-part="ticks"'))
     for (const f of withTicks) {
       const html = read(f)
-      expect(html, f).toContain('<span data-part="ticks" aria-hidden="true">')
+      expect(html, f).toContain('<span class="ticks" data-part="ticks" aria-hidden="true">')
       const labels = [...html.matchAll(/<i style="--p: [\d.]+"><span>([^<]*)<\/span><\/i>/g)].map((m) => m[1])
       expect(labels.length, f).toBeGreaterThan(1)
       for (const label of labels) expect(label, `${f}: "${label}"`).toMatch(/^-?[\d.\s]+$/)
@@ -267,7 +267,7 @@ describe('RangeScale state partials', () => {
     expect(withHint.length).toBeGreaterThan(0)
     for (const f of withHint) {
       const html = read(f)
-      expect(html, f).toContain('<span data-part="swatch" aria-hidden="true"></span>')
+      expect(html, f).toContain('<span class="swatch" data-part="swatch" aria-hidden="true"></span>')
       // inside the component, or the swatch cannot inherit the layer's colour
       const laneEnd = html.lastIndexOf('</div>')
       expect(html.indexOf('data-part="hint"'), f).toBeLessThan(laneEnd)

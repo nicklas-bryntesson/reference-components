@@ -309,7 +309,7 @@ class WeekField {
 
     // Prefix "v." / "Wk" so the field reads as a week, not a date.
     const prefix = document.createElement('span')
-    prefix.setAttribute('data-part', 'prefix')
+    prefix.className = 'prefix'
     prefix.setAttribute('aria-hidden', 'true')
     prefix.textContent = this.t.weekAbbrev
     this.segments.appendChild(prefix)
@@ -338,6 +338,7 @@ class WeekField {
 
   _createSep(text: string): HTMLSpanElement {
     const sep = document.createElement('span')
+    sep.className = 'separator'
     sep.setAttribute('data-part', 'separator')
     sep.setAttribute('aria-hidden', 'true')
     sep.textContent = text
@@ -346,6 +347,7 @@ class WeekField {
 
   _createSegmentEl(type: WeekSegmentType): HTMLSpanElement {
     const span = document.createElement('span')
+    span.className = 'segment'
     span.setAttribute('data-part', 'segment')
     span.setAttribute('role', 'spinbutton')
     span.setAttribute('data-segment', type)
@@ -945,6 +947,7 @@ class WeekField {
     // Week-number cell (leading column). Clicking it selects the week too.
     const weekCell = document.createElement('td')
     weekCell.setAttribute('role', 'rowheader')
+    weekCell.className = 'week-number-cell'
     weekCell.setAttribute('data-part', 'week-number-cell')
     weekCell.textContent = String(week)
     weekCell.dataset.weeknum = String(week)

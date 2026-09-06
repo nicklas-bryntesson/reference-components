@@ -41,41 +41,41 @@ function canonical(id: string, label: string, rootAttrs: string, inputAttrs: str
   data-min="1900-01-01"
   data-max="2100-12-31"${rootExtra}
 >
-  <input data-part="native" type="date"${inputAttrs} />
-  <div data-part="custom" aria-hidden="true">
-    <div data-part="segments" role="group">
-      <button type="button" data-part="trigger" aria-label="Open calendar" aria-expanded="false" aria-haspopup="dialog"${triggerAttrs}>
-        <svg data-part="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+  <input class="native" data-part="native" type="date"${inputAttrs} />
+  <div class="custom" data-part="custom" aria-hidden="true">
+    <div class="segments" data-part="segments" role="group">
+      <button class="trigger" data-part="trigger" type="button" aria-label="Open calendar" aria-expanded="false" aria-haspopup="dialog"${triggerAttrs}>
+        <svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
       </button>
     </div>
-    <div data-part="rail">
+    <div class="rail" data-part="rail">
       <template data-template="datefield-calendar">
-        <div data-part="popup" role="dialog" aria-modal="true">
-          <div data-part="calendar-header">
-            <button type="button" data-part="prev-month">&#8249;</button>
-            <button type="button" data-part="month-year-trigger" aria-expanded="false"></button>
-            <button type="button" data-part="next-month">&#8250;</button>
+        <div class="popup" data-part="popup" role="dialog" aria-modal="true">
+          <div class="calendar-header" data-part="calendar-header">
+            <button class="prev-month" data-part="prev-month" type="button">&#8249;</button>
+            <button class="month-year-trigger" data-part="month-year-trigger" type="button" aria-expanded="false"></button>
+            <button class="next-month" data-part="next-month" type="button">&#8250;</button>
           </div>
           <div data-panel="calendar" data-active="true">
-            <table data-part="calendar-grid" role="grid">
+            <table class="calendar-grid" data-part="calendar-grid" role="grid">
               <thead><tr role="row"><th scope="col"></th><th scope="col"></th><th scope="col"></th><th scope="col"></th><th scope="col"></th><th scope="col"></th><th scope="col"></th></tr></thead>
               <tbody></tbody>
             </table>
           </div>
-          <div data-part="year-month-picker" class="WheelColumns" role="group" data-panel="picker" data-active="false">
+          <div class="year-month-picker WheelColumns" data-part="year-month-picker" role="group" data-panel="picker" data-active="false">
             <div class="Wheel" data-picker="month" tabindex="0"></div>
             <div class="Wheel" data-picker="year" tabindex="0"></div>
           </div>
-          <div data-part="calendar-footer">
-            <button type="button" data-part="calendar-footer-clear"></button>
-            <button type="button" data-part="calendar-footer-today"></button>
+          <div class="calendar-footer" data-part="calendar-footer">
+            <button class="calendar-footer-clear" data-part="calendar-footer-clear" type="button"></button>
+            <button class="calendar-footer-today" data-part="calendar-footer-today" type="button"></button>
           </div>
-          <div data-part="arrow"></div>
+          <div class="arrow" data-part="arrow"></div>
         </div>
       </template>
     </div>
   </div>
-  <div data-part="announce" aria-live="polite" aria-atomic="true"></div>
+  <div class="announce" data-part="announce" aria-live="polite" aria-atomic="true"></div>
 </div>
 `
 }

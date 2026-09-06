@@ -39,31 +39,31 @@ function canonical(id: string, label: string, rootAttrs: string, inputAttrs: str
   data-name="${id}"
   data-locale="${locale}"${rootExtra}
 >
-  <input data-part="native" type="time" aria-hidden="true" tabindex="-1"${inputAttrs} />
-  <div data-part="overlay" aria-hidden="true">
-    <div data-part="segments" role="group">
+  <input class="native" data-part="native" type="time" aria-hidden="true" tabindex="-1"${inputAttrs} />
+  <div class="overlay" data-part="overlay" aria-hidden="true">
+    <div class="segments" data-part="segments" role="group">
     </div>
-    <button type="button" data-part="trigger" aria-label="Open time picker" aria-expanded="false" aria-haspopup="dialog"${triggerAttrs}>
-      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-part="icon"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+    <button class="trigger" data-part="trigger" type="button" aria-label="Open time picker" aria-expanded="false" aria-haspopup="dialog"${triggerAttrs}>
+      <svg class="icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
     </button>
-    <div data-part="rail">
+    <div class="rail" data-part="rail">
       <template data-template="timefield-popup">
-        <div data-part="popup" role="dialog" aria-modal="true">
-          <div data-part="time-columns" class="WheelColumns">
+        <div class="popup" data-part="popup" role="dialog" aria-modal="true">
+          <div class="time-columns WheelColumns" data-part="time-columns">
             <div class="Wheel" data-segment="hour" role="spinbutton" tabindex="0"></div>
             <div class="Wheel" data-segment="minute" role="spinbutton" tabindex="-1"></div>
             <div class="Wheel" data-segment="second" role="spinbutton" tabindex="-1"></div>
           </div>
-          <div data-part="footer">
-            <button type="button" data-part="footer-clear"></button>
-            <button type="button" data-part="footer-now"></button>
+          <div class="footer" data-part="footer">
+            <button class="footer-clear" data-part="footer-clear" type="button"></button>
+            <button class="footer-now" data-part="footer-now" type="button"></button>
           </div>
-          <div data-part="arrow"></div>
+          <div class="arrow" data-part="arrow"></div>
         </div>
       </template>
     </div>
   </div>
-  <div data-part="announce" aria-live="polite" aria-atomic="true"></div>
+  <div class="announce" data-part="announce" aria-live="polite" aria-atomic="true"></div>
 </div>
 `
 }

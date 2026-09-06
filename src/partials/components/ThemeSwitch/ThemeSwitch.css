@@ -9,11 +9,11 @@
  * selectors and no :has() appears anywhere.
  *
  * MARKUP DEVIATION from Picklist, and the reason for it: the inputs and labels
- * are DIRECT children of [data-part="options"], with no per-item wrapper. Picklist wraps each
+ * are DIRECT children of .options, with no per-item wrapper. Picklist wraps each
  * pair in `.option` to give the absolutely-positioned input a containing block,
  * but a wrapper breaks the sibling chain, and the sliding indicator depends on
- * it: `input:nth-of-type(N):checked ~ [data-part="indicator"]` can only reach an element that
- * is a following sibling of the input. `[data-part="options"]` provides the containing block
+ * it: `input:nth-of-type(N):checked ~ .indicator` can only reach an element that
+ * is a following sibling of the input. `.options` provides the containing block
  * instead. Nothing is lost — the input is 1px and clipped, so where it sits is
  * irrelevant as long as it stays focusable and out of layout.
  *
@@ -23,8 +23,8 @@
  * control whose arity is fixed at three by its own contract. The equal 40px
  * segments are what make `translate: 100%` exact rather than approximate.
  *
- Parts are identified by `data-part`, never by class; every rule below is a flat,
- fully-qualified `.ThemeSwitch [data-part="…"]` rule.
+ Parts are styled by class and never by `data-part` (that attribute is the
+ suite's and the JS's); every rule below is a flat, fully-qualified `.ThemeSwitch .part` rule.
  */
 
 .ThemeSwitch {
@@ -52,7 +52,7 @@
 /* The group's only intrinsic name, kept for screen readers and clipped visually:
    three icons need a name, and a <legend> is the one that needs no id plumbing. */
 .ThemeSwitch > legend,
-.ThemeSwitch [data-part="text"] {
+.ThemeSwitch .text {
   position: absolute;
   inline-size: 1px;
   block-size: 1px;
@@ -64,9 +64,9 @@
   border: 0;
 }
 
-/* [data-part="options"] is the track: the positioning context for both the clipped inputs and
+/* .options is the track: the positioning context for both the clipped inputs and
    the sliding indicator, and the flex row the segments sit in. */
-.ThemeSwitch [data-part="options"] {
+.ThemeSwitch .options {
   position: relative;
   display: flex;
   gap: 0;                                          /* segmented: the segments touch */
@@ -78,7 +78,7 @@
 }
 
 /* sr-clipped but STILL FOCUSABLE — never display:none / visibility:hidden. */
-.ThemeSwitch [data-part="options"] input {
+.ThemeSwitch .options input {
   position: absolute;
   inline-size: 1px;
   block-size: 1px;
@@ -92,7 +92,7 @@
 
 /* The label is the segment. Equal, square and icon-only, which is what makes the
    indicator's translate steps exact. */
-.ThemeSwitch [data-part="options"] input + label {
+.ThemeSwitch .options input + label {
   position: relative;
   z-index: 1;                                      /* above the indicator */
   display: grid;
@@ -106,14 +106,14 @@
   transition: color var(--_ts-transition);
 }
 
-.ThemeSwitch [data-part="options"] [data-part="icon"] {
+.ThemeSwitch .options .icon {
   inline-size: var(--_ts-icon-size);
   block-size: var(--_ts-icon-size);
   display: block;                                  /* kill the inline descender gap */
 }
 
 /* Selected — the label only carries the foreground; the fill is the indicator. */
-.ThemeSwitch [data-part="options"] input:checked + label {
+.ThemeSwitch .options input:checked + label {
   color: var(--_ts-selected-fg);
 }
 
@@ -122,7 +122,7 @@
    contract rather than a limitation. `translate` (not `transform`) so the
    property that animates is the property that is set — mixing the two leaves the
    initial position outside the transition. */
-.ThemeSwitch [data-part="options"] [data-part="indicator"] {
+.ThemeSwitch .options .indicator {
   position: absolute;
   z-index: 0;
   inset-block-start: var(--_ts-padding);
@@ -136,19 +136,19 @@
   pointer-events: none;
 }
 
-.ThemeSwitch [data-part="options"] input:nth-of-type(2):checked ~ [data-part="indicator"] { translate: 100%; }
-.ThemeSwitch [data-part="options"] input:nth-of-type(3):checked ~ [data-part="indicator"] { translate: 200%; }
+.ThemeSwitch .options input:nth-of-type(2):checked ~ .indicator { translate: 100%; }
+.ThemeSwitch .options input:nth-of-type(3):checked ~ .indicator { translate: 200%; }
 
 /* A moving indicator is decorative motion. The reference implementation this is
    modelled on had no reduced-motion guard at all on its 250ms slide. */
 @media (prefers-reduced-motion: reduce) {
-  .ThemeSwitch [data-part="options"] [data-part="indicator"],
-  .ThemeSwitch [data-part="options"] input + label { transition: none; }
+  .ThemeSwitch .options .indicator,
+  .ThemeSwitch .options input + label { transition: none; }
 }
 
 /* ── Interaction states (real pseudo-class + data-test-state pairs) ────── */
-.ThemeSwitch [data-part="options"] input:not(:checked):hover + label,
-.ThemeSwitch[data-test-state="hover"] [data-part="options"] input:not(:checked) + label {
+.ThemeSwitch .options input:not(:checked):hover + label,
+.ThemeSwitch[data-test-state="hover"] .options input:not(:checked) + label {
   background-color: var(--_ts-bg-hover);
 }
 
@@ -156,20 +156,20 @@
    indicator's fill and flips `color`, so an outward currentColor ring would be
    drawn on the page behind the control, where it can vanish. Inset, the ring
    always lands on the surface directly beneath it. */
-.ThemeSwitch [data-part="options"] input:focus-visible + label,
-.ThemeSwitch[data-test-state="focus"] [data-part="options"] input + label {
+.ThemeSwitch .options input:focus-visible + label,
+.ThemeSwitch[data-test-state="focus"] .options input + label {
   outline: 2px solid;
   outline-offset: -3px;
 }
 
-.ThemeSwitch [data-part="options"] input:not(:checked):active + label,
-.ThemeSwitch[data-test-state="active"] [data-part="options"] input:not(:checked) + label {
+.ThemeSwitch .options input:not(:checked):active + label,
+.ThemeSwitch[data-test-state="active"] .options input:not(:checked) + label {
   background-color: var(--_ts-bg-hover);
 }
 
 /* disabled — family convention: dim, don't recolour. Covers the <fieldset
    disabled> cascade too. */
-.ThemeSwitch [data-part="options"] input:disabled + label {
+.ThemeSwitch .options input:disabled + label {
   cursor: not-allowed;
   opacity: 0.5;
 }
@@ -180,10 +180,10 @@
    HighlightText on a selected segment and CanvasText on an unselected one.
    Do not delete this block when porting. */
 @media (forced-colors: active) {
-  .ThemeSwitch [data-part="options"] [data-part="indicator"] {
+  .ThemeSwitch .options .indicator {
     background-color: Highlight;
     forced-color-adjust: none;
   }
-  .ThemeSwitch [data-part="options"] input:checked + label { color: HighlightText; }
-  .ThemeSwitch [data-part="options"] input:disabled + label { color: GrayText; opacity: 1; }
+  .ThemeSwitch .options input:checked + label { color: HighlightText; }
+  .ThemeSwitch .options input:disabled + label { color: GrayText; opacity: 1; }
 }
