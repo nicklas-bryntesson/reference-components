@@ -231,6 +231,22 @@ release is tuned against it.
 > popover clipping in overflow ancestors (ADR-0012) — same genre, documented instead of
 > fought.
 
+## 18 · Who reads this name?
+
+**If a stylesheet reads it, it is a class. If a test, the reference JS or another component reads
+it, it is `data-part`. A part that both paint and find carries both — the same word twice — and the
+stylesheet still reads only the class. A `data-part` nothing finds is dead** (ADR-0033).
+
+This is test 14 made literal, after a sweep implemented ADR-0026's decision text instead of its test
+and gave appearance and behaviour one shared name again.
+
+> **Worked:** `popup` is painted and found → `class="popup" data-part="popup"`, and the stylesheet
+> writes `.DateField .popup`. DateTimeField's `calendar-inner` is only painted → `class="calendar-inner"`,
+> no attribute. Measured on `main` at #83: 133 of 159 `data-part` values were found by something,
+> 19 only painted, 7 by nothing.
+
+---
+
 ## Conventions you do not need to re-decide
 
 Not tests — settled rules, listed so they are not re-litigated:
@@ -240,7 +256,7 @@ Not tests — settled rules, listed so they are not re-litigated:
 | `data-*` attributes are the component's public API | ADR-0002 |
 | Bounded CSS: gate selectors over the mobile-first cascade | ADR-0003 |
 | Boolean state carries the explicit literal `"true"` | `philosophy.md` |
-| Class naming: PascalCase = component; part identity is `data-part` | ADR-0019, ADR-0026 |
+| Class naming: PascalCase = component; a part is a lowercase class for styling plus `data-part` when something finds it; CSS never reads `data-part` | ADR-0019, ADR-0026, ADR-0033 |
 | Demos default to English | ADR-0011 |
 | Custom controls fall back to native on coarse pointers | ADR-0006 |
 | Popover light-dismiss never refocuses the trigger | ADR-0007 |

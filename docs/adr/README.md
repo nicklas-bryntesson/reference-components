@@ -91,3 +91,5 @@ holds the *why-we-built-it*; the `.md` holds the *how-it-works*.
 | [0029](0029-footer-actions-that-complete-the-value-close-the-popup.md) | A footer action that completes the value closes the popup | Architecture | Accepted |
 | [0030](0030-empty-segments-speak-a-localized-word.md) | An empty segment speaks a localized word, never its placeholder | Architecture | Accepted |
 | [0031](0031-autofill-is-a-surfaced-state-its-colour-is-the-consumers.md) | Autofill is a surfaced state; its colour is the consumer's | Architecture | Proposed |
+| [0032](0032-themepicker-a-collapsed-appearance-picker.md) | ThemePicker — a collapsed appearance picker | Component | Proposed |
+| [0033](0033-a-part-has-two-names-class-for-styling-data-part-for-identity.md) | A part has two names — a class for styling, `data-part` for identity; CSS never reads `data-part` | Convention | Accepted |
