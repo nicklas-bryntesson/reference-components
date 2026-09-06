@@ -14,8 +14,8 @@ keyboard behaviour. ChoiceGroup is markup + CSS.
 ```html
 <fieldset class="ChoiceGroup" data-orientation="vertical" data-legend="above">
   <legend>Shipping speed</legend>
-  <div data-part="content">
-    <div data-part="options">
+  <div class="content">
+    <div class="options" data-part="options">
       <span class="ChoiceField"><input type="radio" id="ship-std" name="shipping" checked><label for="ship-std">Standard</label></span>
       <span class="ChoiceField"><input type="radio" id="ship-exp" name="shipping"><label for="ship-exp">Express</label></span>
     </div>
@@ -28,14 +28,14 @@ With a hint (and an error when invalid):
 ```html
 <fieldset class="ChoiceGroup" data-legend="above" data-invalid="true" aria-describedby="acct-hint acct-err">
   <legend>Account type</legend>
-  <div data-part="content">
-    <p data-part="hint" id="acct-hint">Choose the plan that fits your team.</p>
-    <div data-part="options"> …fields… </div>
+  <div class="content">
+    <p class="hint" id="acct-hint">Choose the plan that fits your team.</p>
+    <div class="options" data-part="options"> …fields… </div>
     <!-- error = a Notice inside a persistent live region (the announcer) -->
-    <div data-part="notice-region" role="alert" aria-live="assertive">
+    <div class="notice-region" data-part="notice-region" role="alert" aria-live="assertive">
       <div class="Notice" data-variant="error">
-        <div data-part="icon"><svg aria-hidden="true"><!-- … --></svg></div>
-        <div data-part="content"><p id="acct-err">Pick an account type to continue.</p></div>
+        <div class="icon"><svg aria-hidden="true"><!-- … --></svg></div>
+        <div class="content"><p id="acct-err">Pick an account type to continue.</p></div>
       </div>
     </div>
   </div>
@@ -54,16 +54,18 @@ Contract rules (enforced by the unit test):
 
 ## Parts
 
-Parts are identified by `data-part`, never by class name. The stylesheet and the conformance suite
-address them through the attribute, so a consumer may restyle the same DOM under any class
-convention — or none — and the suite still passes. The class names in the markup are the component roots only (`ChoiceGroup`, and the composed `ChoiceField` / `Notice`).
+Every part carries a lowercase class **for styling only** — rename, hash or delete them all and the
+suite still passes. A part also carries `data-part` when the suite, the reference JS or a composing
+component has to *find* it; that attribute is the contract, and the stylesheet never reads it.
+The **Bound by** column says who holds on to each part.
 
-| `data-part` | Element | Role |
-|---|---|---|
-| `content` | `<div>` | Everything below the legend: options, hint, notice region |
-| `options` | `<div>` | The list of ChoiceFields, laid out by `data-orientation` |
-| `hint` | `<p>` | Optional helper text the group points at via `aria-describedby` |
-| `notice-region` | `<div>` | Persistent live region a Notice is rendered into (see Notice) |
+
+| Part | Element | Role | Bound by |
+|---|---|---|---|
+| `content` | `<div>` | Everything below the legend: options, hint, notice region | styled only |
+| `options` | `<div>` | The list of ChoiceFields, laid out by `data-orientation` | suite |
+| `hint` | `<p>` | Optional helper text the group points at via `aria-describedby` | styled only |
+| `notice-region` | `<div>` | Persistent live region a Notice is rendered into (see Notice) | suite |
 
 ## HTML Authoring API (`data-*`)
 

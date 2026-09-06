@@ -16,8 +16,9 @@
  * override --_cf-selected to paint the selection in an accent; everything else
  * reads currentColor / Canvas / CanvasText.
  *
- * Root carries tokens + root props only. Parts are identified by `data-part`, never by
- * class; every rule below is a flat, fully-qualified `.ChoiceField [data-part="…"]` rule.
+ * Root carries tokens + root props only. Parts are styled by class and never by
+ * `data-part` (that attribute is the suite's and the JS's); every rule below is a flat,
+ * fully-qualified `.ChoiceField .part` rule.
  */
 
 .ChoiceField {

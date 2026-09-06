@@ -20,10 +20,10 @@ Single-select — radios sharing one `name`:
 ```html
 <fieldset class="Picklist" data-legend="above">
   <legend>Cuisine</legend>
-  <div data-part="content">
-    <div data-part="options">
-      <span data-part="option"><input type="radio" id="pl-thai" name="cuisine" checked><label for="pl-thai">Thai</label></span>
-      <span data-part="option"><input type="radio" id="pl-ital" name="cuisine"><label for="pl-ital">Italian</label></span>
+  <div class="content" data-part="content">
+    <div class="options" data-part="options">
+      <span class="option" data-part="option"><input type="radio" id="pl-thai" name="cuisine" checked><label for="pl-thai">Thai</label></span>
+      <span class="option" data-part="option"><input type="radio" id="pl-ital" name="cuisine"><label for="pl-ital">Italian</label></span>
     </div>
   </div>
 </fieldset>
@@ -34,9 +34,9 @@ Multi-select is the **same markup with `type="checkbox"`** and independent `name
 Removable chips — the `×` is a decorative glyph **inside the chip's own label**:
 
 ```html
-<span data-part="option">
+<span class="option" data-part="option">
   <input type="checkbox" id="pl-f1" name="pl-f1" checked>
-  <label for="pl-f1">Under 500 kr<svg data-part="deselect" viewBox="0 0 12 12" aria-hidden="true" focusable="false">
+  <label for="pl-f1">Under 500 kr<svg class="deselect" data-part="deselect" viewBox="0 0 12 12" aria-hidden="true" focusable="false">
     <path d="M2 2 L10 10 M10 2 L2 10" stroke="currentColor" stroke-width="2" fill="none"/></svg></label>
 </span>
 ```
@@ -63,18 +63,20 @@ carries it.
 
 ## Parts
 
-Parts are identified by `data-part`, never by class name. The stylesheet and the conformance suite
-address them through the attribute, so a consumer may restyle the same DOM under any class
-convention — or none — and the suite still passes. The class names in the markup are the component roots only (`Picklist`, and the composed `ChoiceField` / `Notice`).
+Every part carries a lowercase class **for styling only** — rename, hash or delete them all and the
+suite still passes. A part also carries `data-part` when the suite, the reference JS or a composing
+component has to *find* it; that attribute is the contract, and the stylesheet never reads it.
+The **Bound by** column says who holds on to each part.
 
-| `data-part` | Element | Role |
-|---|---|---|
-| `content` | `<div>` | Everything below the legend: options, hint, notice region |
-| `options` | `<div>` | The row (or column) of chips |
-| `option` | `<span>` | One chip: the clipped input and its label; the containing block for the input |
-| `deselect` | `<span aria-hidden>` | The `×` glyph inside a removable chip's label |
-| `hint` | `<p>` | Optional helper text the group points at via `aria-describedby` |
-| `notice-region` | `<div>` | Persistent live region a Notice is rendered into (see Notice) |
+
+| Part | Element | Role | Bound by |
+|---|---|---|---|
+| `content` | `<div>` | Everything below the legend: options, hint, notice region | suite |
+| `options` | `<div>` | The row (or column) of chips | suite |
+| `option` | `<span>` | One chip: the clipped input and its label; the containing block for the input | suite |
+| `deselect` | `<span aria-hidden>` | The `×` glyph inside a removable chip's label | suite |
+| `hint` | `<p>` | Optional helper text the group points at via `aria-describedby` | styled only |
+| `notice-region` | `<div>` | Persistent live region a Notice is rendered into (see Notice) | suite |
 
 ## HTML Authoring API (`data-*`)
 

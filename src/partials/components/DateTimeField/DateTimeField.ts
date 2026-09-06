@@ -325,6 +325,7 @@ export class DateTimeField {
     let container = this.root.querySelector<HTMLElement>('[data-part="rail"]')
     if (!container) {
       container = document.createElement('div')
+      container.className = 'rail'
       container.setAttribute('data-part', 'rail')
       this.root.appendChild(container)
     }
@@ -449,7 +450,7 @@ export class DateTimeField {
 
   _appendSep(text: string): void {
     const sep = document.createElement('span')
-    sep.setAttribute('data-part', 'separator')
+    sep.className = 'separator'
     sep.setAttribute('aria-hidden', 'true')
     sep.textContent = text
     this.segments.appendChild(sep)
@@ -457,6 +458,7 @@ export class DateTimeField {
 
   _createSegment(type: SegmentType): HTMLSpanElement {
     const seg = document.createElement('span')
+    seg.className = 'segment'
     seg.setAttribute('data-part', 'segment')
     seg.setAttribute('role', 'spinbutton')
     seg.dataset.segment = type
@@ -1434,6 +1436,7 @@ export class DateTimeField {
     ;[{ v: 0, label: this.t.am }, { v: 1, label: this.t.pm }].forEach(({ v, label }) => {
       const btn = document.createElement('button')
       btn.type = 'button'
+      btn.className = 'ampm-option'
       btn.setAttribute('data-part', 'ampm-option')
       btn.dataset.ampm = String(v)
       btn.textContent = label

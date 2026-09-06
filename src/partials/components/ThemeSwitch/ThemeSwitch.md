@@ -12,15 +12,15 @@ project's business.
 ```html
 <fieldset class="ThemeSwitch" data-component="ThemeSwitch">
   <legend>Colour theme</legend>              <!-- clipped, but the group's only intrinsic name -->
-  <div data-part="options">
+  <div class="options" data-part="options">
     <input type="radio" id="ts-system" name="ts-appearance" value="system" checked>
     <label for="ts-system">
-      <span data-part="text">Follow system setting</span>
-      <svg data-part="icon" aria-hidden="true" focusable="false">…</svg>
+      <span class="text">Follow system setting</span>
+      <svg class="icon" aria-hidden="true" focusable="false">…</svg>
     </label>
     …light…
     …dark…
-    <span data-part="indicator" aria-hidden="true"></span>
+    <span class="indicator" data-part="indicator" aria-hidden="true"></span>
   </div>
 </fieldset>
 ```
@@ -51,16 +51,18 @@ where it sits is irrelevant as long as it stays focusable and out of layout.
 
 ## Parts
 
-Parts are identified by `data-part`, never by class name. The reference JS, the stylesheet and the
-conformance suite address them through the attribute, so a consumer may restyle the same DOM under
-any class convention — or none — and the suite still passes.
+Every part carries a lowercase class **for styling only** — rename, hash or delete them all and the
+suite still passes. A part also carries `data-part` when the suite, the reference JS or a composing
+component has to *find* it; that attribute is the contract, and the stylesheet never reads it.
+The **Bound by** column says who holds on to each part.
 
-| `data-part` | Element | Role |
-|---|---|---|
-| `options` | `<div>` | The track: positioning context for the clipped inputs and the indicator; the three `input + label` pairs are its direct children |
-| `text` | `<span>` | Visually hidden label text (the icon carries no name) |
-| `icon` | `<svg aria-hidden>` | The option glyph |
-| `indicator` | `<span aria-hidden>` | The sliding highlight, last child of `options`, reached with `input:nth-of-type(N):checked ~ [data-part="indicator"]` |
+
+| Part | Element | Role | Bound by |
+|---|---|---|---|
+| `options` | `<div>` | The track: positioning context for the clipped inputs and the indicator; the three `input + label` pairs are its direct children | suite |
+| `text` | `<span>` | Visually hidden label text (the icon carries no name) | styled only |
+| `icon` | `<svg aria-hidden>` | The option glyph | styled only |
+| `indicator` | `<span aria-hidden>` | The sliding highlight, last child of `options`, reached with `input:nth-of-type(N):checked ~ [data-part="indicator"]` | suite |
 
 ## HTML Authoring API (`data-*`)
 

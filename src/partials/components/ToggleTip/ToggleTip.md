@@ -18,14 +18,14 @@ All attributes are optional — `icon` defaults to `"info"` (see `## Attributes`
 
 ```html
 <toggle-tip icon="info" initialized data-direction="top">
-  <button data-part="trigger" aria-label="More information" aria-expanded="false" aria-controls="tt-ID">
+  <button class="trigger" data-part="trigger" aria-label="More information" aria-expanded="false" aria-controls="tt-ID">
     <!-- icon SVG -->
   </button>
-  <div data-part="rail">
-    <div data-part="popup" id="tt-ID" role="tooltip" aria-hidden="true">
-      <span data-part="title" role="heading" aria-level="3">Optional heading</span> <!-- only when title is set -->
+  <div class="rail" data-part="rail">
+    <div class="popup" data-part="popup" id="tt-ID" role="tooltip" aria-hidden="true">
+      <span class="title" data-part="title" role="heading" aria-level="3">Optional heading</span> <!-- only when title is set -->
       Content shown inside the bubble.
-      <div data-part="arrow"></div>
+      <div class="arrow" data-part="arrow"></div>
     </div>
   </div>
 </toggle-tip>
@@ -33,18 +33,20 @@ All attributes are optional — `icon` defaults to `"info"` (see `## Attributes`
 
 ### Parts
 
-Parts are identified by `data-part`, never by class name. Tests, the reference JS and the
-stylesheet all address them through the attribute, so a consumer may restyle the same DOM with
-any class convention — or none — and the conformance suite still passes.
+Every part carries a lowercase class **for styling only** — rename, hash or delete them all and the
+suite still passes. A part also carries `data-part` when the suite, the reference JS or a composing
+component has to *find* it; that attribute is the contract, and the stylesheet never reads it.
+The **Bound by** column says who holds on to each part.
 
-| `data-part` | Element | Role |
-|---|---|---|
-| `trigger` | `<button>` | The disclosure button; carries `aria-expanded` / `aria-controls` |
-| `icon` | `<svg>` | The trigger glyph (`info` or `question`) |
-| `rail` | `<div>` | Zero-height positioning rail centred on the trigger |
-| `popup` | `<div role="tooltip">` | The bubble; `aria-hidden` toggles visibility |
-| `title` | `<span role="heading">` | Optional heading, only when `title` is set |
-| `arrow` | `<div>` | The bubble's pointer, positioned from JS via `--_tt-arrow-offset` |
+
+| Part | Element | Role | Bound by |
+|---|---|---|---|
+| `trigger` | `<button>` | The disclosure button; carries `aria-expanded` / `aria-controls` | suite + JS |
+| `icon` | `<svg>` | The trigger glyph (`info` or `question`) | JS |
+| `rail` | `<div>` | Zero-height positioning rail centred on the trigger | JS |
+| `popup` | `<div role="tooltip">` | The bubble; `aria-hidden` toggles visibility | suite + JS |
+| `title` | `<span role="heading">` | Optional heading, only when `title` is set | JS |
+| `arrow` | `<div>` | The bubble's pointer, positioned from JS via `--_tt-arrow-offset` | JS |
 
 ## Dependencies
 

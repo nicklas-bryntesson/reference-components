@@ -1,5 +1,6 @@
-/* Root — tokens + root-level props only. Parts are identified by `data-part`, never
-   by class; every rule below is a flat, fully-qualified `.TimeField [data-part="…"]` rule. */
+/* Root — tokens + root-level props only. Parts are styled by class and never by
+   `data-part` (that attribute is the suite's and the JS's); every rule below is a flat,
+   fully-qualified `.TimeField .part` rule. */
 .TimeField {
   position: relative;
   display: inline-block;
@@ -26,17 +27,17 @@
   --_tf-popup-shadow: var(--ui-shadow);
   --_tf-option-bg-selected: var(--ui-primary);
   --_tf-option-color-selected: var(--ui-primary-foreground);
-  /* Wheel visuals live in the shared src/kernel/css/Wheel.css (.Wheel [data-part="option"]) */
+  /* Wheel visuals live in the shared src/kernel/css/Wheel.css (.Wheel .option) */
   /* Internal */
   --_tf-arrow-size: 0.75rem;
   --_tf-arrow-corner-radius: 0.25rem;
 }
 
 /* ── Native / custom fallback ──────────────────────────────────────────── */
-.TimeField [data-part="native"] {
+.TimeField .native {
   display: block;
 }
-.TimeField [data-part="overlay"] {
+.TimeField .overlay {
   display: none;
 }
 
@@ -45,7 +46,7 @@
   pointer-events: none;
 }
 
-.TimeField[data-input-mode="custom"] [data-part="native"] {
+.TimeField[data-input-mode="custom"] .native {
   position: absolute;
   opacity: 0;
   visibility: hidden;
@@ -54,7 +55,7 @@
   block-size: 1px;
   overflow: hidden;
 }
-.TimeField[data-input-mode="custom"] [data-part="overlay"] {
+.TimeField[data-input-mode="custom"] .overlay {
   display: inline-flex;
   align-items: center;
   box-sizing: border-box;
@@ -66,7 +67,7 @@
   border-radius: 4px;
 }
 
-.TimeField[data-input-mode="display"] [data-part="native"] {
+.TimeField[data-input-mode="display"] .native {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -74,7 +75,7 @@
   opacity: 0;
   cursor: pointer;
 }
-.TimeField[data-input-mode="display"] [data-part="overlay"] {
+.TimeField[data-input-mode="display"] .overlay {
   display: inline-flex;
   align-items: center;
   box-sizing: border-box;
@@ -88,13 +89,13 @@
 }
 
 /* ── Segments ──────────────────────────────────────────────────────────── */
-.TimeField [data-part="segments"] {
+.TimeField .segments {
   display: inline-flex;
   align-items: center;
   gap: 0.125rem;
 }
 
-.TimeField [data-part="segment"] {
+.TimeField .segment {
   font-variant-numeric: tabular-nums;
   min-inline-size: 2ch;
   text-align: center;
@@ -102,37 +103,37 @@
   border-radius: 2px;
   cursor: default;
 }
-.TimeField [data-part="segment"][data-focused="true"] {
+.TimeField .segment[data-focused="true"] {
   background-color: var(--ui-primary);
   color: var(--ui-primary-foreground);
 }
-.TimeField [data-part="segment"][data-placeholder="true"] {
+.TimeField .segment[data-placeholder="true"] {
   color: var(--_tf-color-muted);
 }
 
-.TimeField [data-part="separator"] {
+.TimeField .separator {
   user-select: none;
   color: var(--_tf-color-muted);
 }
 
-.TimeField[data-input-mode="custom"] [data-part="overlay"]:hover,
-.TimeField[data-test-state="hover"] [data-part="overlay"] {
+.TimeField[data-input-mode="custom"] .overlay:hover,
+.TimeField[data-test-state="hover"] .overlay {
   border-color: var(--_tf-border-color-hover);
   background-color: var(--_tf-bg-hover);
 }
 
-.TimeField[data-input-mode="custom"] [data-part="overlay"]:focus-within,
-.TimeField[data-test-state="focus"] [data-part="overlay"] {
+.TimeField[data-input-mode="custom"] .overlay:focus-within,
+.TimeField[data-test-state="focus"] .overlay {
   outline: 2px solid;
   outline-offset: 1px;
 }
 
-.TimeField[data-invalid="true"] [data-part="overlay"] {
+.TimeField[data-invalid="true"] .overlay {
   border-color: var(--_tf-border-color-invalid);
 }
 
 /* ── Trigger ───────────────────────────────────────────────────────────── */
-.TimeField [data-part="trigger"] {
+.TimeField .trigger {
   margin-inline-start: 0.25rem;
   background: none;
   border: none;
@@ -141,23 +142,23 @@
   border-radius: 2px;
   vertical-align: middle;
 }
-.TimeField [data-part="trigger"] svg {
+.TimeField .trigger svg {
   /* block — an inline svg reserves baseline descender space below the icon */
   display: block;
 }
-.TimeField [data-part="trigger"]:focus-visible {
+.TimeField .trigger:focus-visible {
   outline: 2px solid;
   outline-offset: 2px;
 }
-.TimeField [data-part="trigger"]:hover {
+.TimeField .trigger:hover {
   background-color: var(--_tf-trigger-bg-hover);
 }
-.TimeField [data-part="trigger"]:active {
+.TimeField .trigger:active {
   background-color: var(--_tf-trigger-bg-active);
 }
 
 /* ── Announce (SR-only) ────────────────────────────────────────────────── */
-.TimeField [data-part="announce"] {
+.TimeField .announce {
   position: absolute;
   inline-size: 1px;
   block-size: 1px;
@@ -172,7 +173,7 @@
 }
 
 /* ── Slide rail ────────────────────────────────────────────────────────── */
-.TimeField [data-part="rail"] {
+.TimeField .rail {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -184,7 +185,7 @@
 }
 
 /* ── Popup bubble ──────────────────────────────────────────────────────── */
-.TimeField [data-part="popup"] {
+.TimeField .popup {
   position: absolute;
   left: var(--_tf-popup-offset, 50%);
   transform: translateX(-50%);
@@ -199,15 +200,15 @@
   padding: var(--ui-surface-padding);
   font-size: 1rem;
 }
-.TimeField[data-direction="bottom"] [data-part="popup"] {
+.TimeField[data-direction="bottom"] .popup {
   top: var(--_tf-popup-gap);
 }
-.TimeField[data-direction="top"] [data-part="popup"] {
+.TimeField[data-direction="top"] .popup {
   bottom: var(--_tf-popup-gap);
 }
 
 /* ── Popup columns ─────────────────────────────────────────────────────── */
-.TimeField [data-part="popup"] [data-part="time-columns"] {
+.TimeField .popup .time-columns {
   position: relative;
   z-index: 2;
   display: flex;
@@ -216,7 +217,7 @@
 }
 
 /* ── Popup footer ──────────────────────────────────────────────────────── */
-.TimeField [data-part="popup"] [data-part="footer"] {
+.TimeField .popup .footer {
   position: relative;
   z-index: 2;
   display: flex;
@@ -224,7 +225,7 @@
   margin-block-start: 0.5rem;
   gap: 0.5rem;
 }
-.TimeField [data-part="popup"] [data-part="footer"] button {
+.TimeField .popup .footer button {
   background: none;
   border: none;
   color: var(--ui-primary);
@@ -233,20 +234,20 @@
   border-radius: 2px;
   font: inherit;
 }
-.TimeField [data-part="popup"] [data-part="footer"] button:hover {
+.TimeField .popup .footer button:hover {
   background-color: var(--_tf-bg-hover);
 }
-.TimeField [data-part="popup"] [data-part="footer"] button:focus-visible {
+.TimeField .popup .footer button:focus-visible {
   outline: 2px solid;
   outline-offset: 2px;
 }
-.TimeField [data-part="popup"] [data-part="footer"] button:disabled {
+.TimeField .popup .footer button:disabled {
   color: var(--_tf-color-muted);
   cursor: not-allowed;
 }
 
 /* ── Arrow ─────────────────────────────────────────────────────────────── */
-.TimeField [data-part="arrow"] {
+.TimeField .arrow {
   position: absolute;
   width: var(--_tf-arrow-size);
   height: var(--_tf-arrow-size);
@@ -254,12 +255,12 @@
   left: 50%;
   z-index: 3;
 }
-.TimeField[data-direction="top"] [data-part="arrow"] {
+.TimeField[data-direction="top"] .arrow {
   bottom: calc(var(--_tf-arrow-size) * -0.5);
   transform: translateX(calc(-50% + var(--_tf-arrow-offset, 0px))) rotate(45deg);
   border-end-end-radius: var(--_tf-arrow-corner-radius);
 }
-.TimeField[data-direction="bottom"] [data-part="arrow"] {
+.TimeField[data-direction="bottom"] .arrow {
   top: calc(var(--_tf-arrow-size) * -0.5);
   transform: translateX(calc(-50% + var(--_tf-arrow-offset, 0px))) rotate(45deg);
   border-start-start-radius: var(--_tf-arrow-corner-radius);

@@ -30,9 +30,9 @@ Authored (minimum):
 ```html
 <label for="af-1">Belopp</label>
 <div class="AffixField" data-component="AffixField">
-  <span data-part="prefix">$</span>
-  <input data-part="input" id="af-1" name="af-1" type="text" inputmode="decimal">
-  <span data-part="suffix">USD</span>
+  <span class="prefix" data-part="prefix">$</span>
+  <input class="input" data-part="input" id="af-1" name="af-1" type="text" inputmode="decimal">
+  <span class="suffix" data-part="suffix">USD</span>
 </div>
 ```
 
@@ -43,10 +43,10 @@ End-state (after JS gap-fill *or* fully server-rendered — identical):
 <div class="AffixField" data-component="AffixField" data-initialized="true"
      data-has-prefix="true" data-has-suffix="true"
      style="--_af-prefix-chars: 1; --_af-suffix-chars: 3">
-  <span data-part="prefix" id="af-1-prefix">$</span>
-  <input data-part="input" id="af-1" name="af-1" type="text" inputmode="decimal"
+  <span class="prefix" data-part="prefix" id="af-1-prefix">$</span>
+  <input class="input" data-part="input" id="af-1" name="af-1" type="text" inputmode="decimal"
          aria-describedby="af-1-prefix af-1-suffix">
-  <span data-part="suffix" id="af-1-suffix">USD</span>
+  <span class="suffix" data-part="suffix" id="af-1-suffix">USD</span>
 </div>
 ```
 
@@ -73,14 +73,16 @@ One caveat: custom properties inherit, so a `--_af-prefix-chars` set on an *ance
 
 ## Parts
 
-Parts are identified by `data-part`, never by class name. The reference JS, the stylesheet and the
-conformance suite address them through the attribute, so a consumer may restyle the same DOM under
-any class convention — or none — and the suite still passes.
+Every part carries a lowercase class **for styling only** — rename, hash or delete them all and the
+suite still passes. A part also carries `data-part` when the suite, the reference JS or a composing
+component has to *find* it; that attribute is the contract, and the stylesheet never reads it.
+The **Bound by** column says who holds on to each part.
 
-| `data-part` | Element | Role |
-|---|---|---|
-| `input` | `<input>` | The real form control |
-| `prefix` · `suffix` | `<span>` | The affixes; JS gives each an id and appends it to the input's `aria-describedby` unless `aria-hidden` |
+
+| Part | Element | Role | Bound by |
+|---|---|---|---|
+| `input` | `<input>` | The real form control | suite + JS |
+| `prefix` · `suffix` | `<span>` | The affixes; JS gives each an id and appends it to the input's `aria-describedby` unless `aria-hidden` | suite + JS |
 
 ## Attributes (on root)
 
@@ -104,7 +106,7 @@ any class convention — or none — and the suite still passes.
 | `number` | ✅ **primary use case** | Hours / kronor / days. The WebKit spinner physically collides with a suffix at inline-end → **the contract hides it** (`appearance` + the `::-webkit-*-spin-button` pseudo-elements). Arrow-key stepping still works — hiding the spinner removes a redundant pointer affordance, not the keyboard behaviour, so it is deliberate and a11y-safe. |
 | `tel` | ✅ | Prefix `+46` — the classic. |
 | `url` | ✅ | Prefix `https://`, suffix `.example.se`. |
-| `email` | ✅ | Suffix `@company.se` for locked domains — **honesty note:** the submitted value then isn't a full address, so the more-correct variant is usually `<input data-part="input" type="text">` + `<span data-part="suffix">@company.se</span>` and the server appends the domain. |
+| `email` | ✅ | Suffix `@company.se` for locked domains — **honesty note:** the submitted value then isn't a full address, so the more-correct variant is usually `<input class="input" data-part="input" type="text">` + `<span class="suffix" data-part="suffix">@company.se</span>` and the server appends the domain. |
 | `search` | ✅ | Harmless; rarely useful. |
 | `password` | ❌ non-goal | The suffix slot becomes show/hide-button territory — an *interactive* affix, i.e. a different component. |
 | `date`/`time`/`month`/`week`/`datetime-local` | ❌ non-goal | The family has dedicated fields; native picker internals clash with the overlay. |

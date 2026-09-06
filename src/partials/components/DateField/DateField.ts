@@ -270,6 +270,7 @@ class DateField {
 
   _createSegmentEl(type: DateSegmentType): HTMLSpanElement {
     const span = document.createElement('span')
+    span.className = 'segment'
     span.setAttribute('data-part', 'segment')
     span.setAttribute('role', 'spinbutton')
     span.setAttribute('aria-label', this.t[type] || type)
@@ -302,6 +303,7 @@ class DateField {
       this.trigger.before(this._createSegmentEl(type))
       if (i < order.length - 1) {
         const sep = document.createElement('span')
+        sep.className = 'separator'
         sep.setAttribute('data-part', 'separator')
         sep.setAttribute('aria-hidden', 'true')
         sep.textContent = separator
