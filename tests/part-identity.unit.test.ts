@@ -12,14 +12,23 @@ import { join } from 'node:path'
  * upstream and fails on the first CSS-Modules or shadow-DOM port, where class
  * names are hashed or invisible.
  *
- * The sweep runs one component per PR. Add a component here in the PR that
- * sweeps it; the list is the migration's progress bar. When every component is
- * listed, replace the allowlist with the full directory.
+ * Every active component is covered — the directory is the list, so a new
+ * component is guarded the day its folder appears. Parked legacy references are
+ * excluded as in ADR-0019. The kernel's WheelColumn injects parts too, and is
+ * checked alongside.
  */
 
-const SWEPT = ['ToggleTip', 'TimeField', 'MonthField', 'DateField', 'WeekField', 'DateTimeField', 'RangeField', 'RangeScale', 'RangeGroup', 'Picklist', 'ChoiceGroup', 'ChoiceField', 'Notice', 'FileUpload', 'AffixField', 'MotionRegion', 'ScrollArea', 'ThemeSwitch']
-
 const DIR = 'src/partials/components'
+const PARKED = new Set(['TabAccordion', 'Combobox'])
+const SWEPT = readdirSync(DIR, { withFileTypes: true })
+  .filter((e) => e.isDirectory() && !PARKED.has(e.name))
+  .map((e) => e.name)
+  .sort()
+
+/** Kernel modules that mint parts: [label, stylesheet, logic, tests dir]. */
+const KERNEL: [string, string, string, string][] = [
+  ['kernel/Wheel', 'src/kernel/css/Wheel.css', 'src/kernel/js/WheelColumn.ts', 'src/kernel/js/tests'],
+]
 const read = (p: string): string => (existsSync(p) ? readFileSync(p, 'utf8') : '')
 // Block comments, line comments, and trailing ` // …` comments — the last because a
 // quote inside one (`// "$"`) mis-pairs the string scan below.
@@ -89,10 +98,24 @@ function authoredClasses(src: string): string[] {
 }
 
 describe('part identity is data-part, not a class (swept components)', () => {
-  it('lists swept components', () => {
-    expect(SWEPT.length).toBeGreaterThan(0)
+  it('covers the whole component directory', () => {
+    expect(SWEPT.length).toBeGreaterThan(15)
     for (const name of SWEPT) expect(existsSync(join(DIR, name))).toBe(true)
   })
+
+  for (const [label, cssPath, logicPath, testsDir] of KERNEL) {
+    const testFiles = readdirSync(testsDir, { withFileTypes: true }).filter((e) => e.isFile()).map((e) => join(testsDir, e.name))
+    const logic = read(logicPath)
+    const tests = testFiles.map(read).join('\n')
+    const parts = partVocabulary(logic)
+    describe(label, () => {
+      it('stylesheet selects no lowercase class', () => expect(cssClassSelectors(read(cssPath))).toEqual([]))
+      it('kernel JS finds no part by class', () => expect(queryClassSelectors(logic)).toEqual([]))
+      it('kernel tests locate no part by class', () => expect(queryClassSelectors(tests)).toEqual([]))
+      it('no string literal in JS or tests names a part by class', () =>
+        expect(stringClassSelectors(logic + '\n' + tests, parts)).toEqual([]))
+    })
+  }
 
   for (const name of SWEPT) {
     const base = join(DIR, name, name)
