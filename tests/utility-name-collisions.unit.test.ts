@@ -55,6 +55,9 @@ function partClasses(css: string): Set<string> {
     const selector = chunk.split('}').pop() ?? ''
     if (!selector.trim() || selector.trim().startsWith('@')) continue
     for (const m of selector.matchAll(/\.([a-z][a-z0-9-]*)/g)) out.add(m[1])
+    // Parts are `data-part` values now (ADR-0026); the collision rule outlives the
+    // mechanism, because a port may well project the value back onto a class.
+    for (const m of selector.matchAll(/\[data-part=["']([a-z][a-z0-9-]*)["']\]/g)) out.add(m[1])
   }
   return out
 }
@@ -75,7 +78,7 @@ describe('no element class collides with a utility-framework class', () => {
       const collisions = [...partClasses(read(file))].filter((c) => BARE_UTILITIES.has(c)).sort()
       expect(collisions, [
         `${file} names ${collisions.length} part(s) after a utility class:`,
-        ...collisions.map((c) => `  .${c}`),
+        ...collisions.map((c) => `  ${c}`),
         'A utility only has to set a property this stylesheet does not mention —',
         'specificity does not protect against that. Rename the part.',
       ].join('\n')).toEqual([])

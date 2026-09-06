@@ -175,39 +175,31 @@ Every real pseudo-class has a `data-test-state` counterpart on the component roo
 &[data-test-state="focus"] .Segments { outline: 2px solid; }
 ```
 
-### Class naming — case marks component vs element
+### Class naming — a class names a component; a part is `data-part`
 
-Case carries meaning:
+Two mechanisms, two jobs:
 
-- **A component is `PascalCase`, no dash** (`.DateField`, `.Wheel`, `.ChoiceField`) — the root *and* any nested/composed sub-component. Litmus: *it has its own `.md` contract* (or is a kernel primitive with one).
-- **An internal element is `lowercase-kebab`** (`.calendar-header`, `.content`, `.options`, `.arrow`) — a presentational part with no standalone contract. **No `Component-` prefix** — it's redundant once nested under the root, and it bloats the footprint.
-  - **…and it may not be a bare utility-class name.** `.grid` and `.ring` both shipped, and both
-    broke in a Tailwind port — not as a specificity fight, but because **the cascade resolves per
-    declaration**. `.DateField .popup .grid` sets `width` and `border-collapse` and no `display`, so
-    Tailwind's `.grid { display: grid }` met nothing and turned the calendar `<table>` into a
-    one-column grid. `.Wheel .ring` sets no `box-shadow`, so `.ring { box-shadow: … }` drew a grey
-    ring around every wheel column. Our higher specificity protected nothing, because it never named
-    the hijacked property. The test is simple: **is the name a part, or a CSS behaviour?** `grid`,
-    `ring`, `container`, `table`, `hidden`, `absolute`, `truncate` are behaviours. `calendar-grid`
-    and `cylinder` are parts. Guarded by `tests/utility-name-collisions.unit.test.ts`.
+- **A component is a `PascalCase` class, no dash** (`.DateField`, `.Wheel`, `.ChoiceField`) — the root *and* any nested/composed sub-component. Litmus: *it has its own `.md` contract* (or is a kernel primitive with one). The class is the stylesheet's entry point and is greppable as a set.
+- **A part is a `data-part` attribute** (`[data-part="popup"]`, `[data-part="calendar-header"]`, `[data-part="option"]`) — a presentational piece of a component with no standalone contract. **There are no lowercase element classes.** Identity that a test, a `querySelector` or another component has to *find* lives in the attribute, and the stylesheet keys on the same attribute, so nothing in the library depends on a class a consumer might rename, hash (CSS Modules) or hide (shadow DOM). Guarded by `tests/part-identity.unit.test.ts`.
+  - **A part name may not be a bare utility-class name**, even as an attribute value — the rule outlived the mechanism. `.grid` and `.ring` both shipped as classes and both broke in a Tailwind port, not as a specificity fight but because **the cascade resolves per declaration**: `.DateField .popup .grid` set `width` and no `display`, so Tailwind's `.grid { display: grid }` met nothing and turned the calendar `<table>` into a one-column grid. The test is simple: **is the name a part, or a CSS behaviour?** `grid`, `ring`, `container`, `hidden`, `truncate` are behaviours; `calendar-grid` and `cylinder` are parts. Guarded by `tests/utility-name-collisions.unit.test.ts`.
 
-**Every rule is fully qualified from the root** — `.Component .element`, never a bare `.element` and never `&`-nested. The `.Component { }` block holds only the tokens and the properties applied to the root itself; every part is its own flat, rooted rule:
+**Every rule is fully qualified from the root** — `.Component [data-part="…"]`, never a bare `[data-part="popup"]` at column 0 and never `&`-nested. The `.Component { }` block holds only the tokens and the properties applied to the root itself; every part is its own flat, rooted rule:
 
 ```css
 .DateField { /* tokens + root-level props only */ }
-.DateField .segments {}
-.DateField[data-invalid="true"] .segments {}
-.DateField .popup [data-panel="picker"][data-active="true"] {}
-.DateField .Wheel {}   /* sub-component — still PascalCase */
+.DateField [data-part="segments"] {}
+.DateField[data-invalid="true"] [data-part="segments"] {}
+.DateField [data-part="popup"] [data-panel="picker"][data-active="true"] {}
+.DateField .Wheel {}   /* sub-component — still a PascalCase class */
 ```
 
-**Why flat, not nested:** a fully-qualified selector is deterministic to read — no `&` to resolve, no nesting depth to track, every rule says exactly what it targets. A bare `.element {}` at column 0 is a scoping bug (generic names like `.popup`/`.grid` would leak across components); the `.Component` prefix is what makes bare element names safe. The one exception: a part rendered *outside* the root (genuinely portaled / top-layer) can't be a descendant, so it takes a root-scoped `.Component-part` name.
+**Why flat, not nested:** a fully-qualified selector is deterministic to read — no `&` to resolve, no nesting depth to track, every rule says exactly what it targets. A bare `[data-part="popup"] {}` at column 0 is a scoping bug (the same part name is used in every component); the `.Component` prefix is what makes generic part names safe. A part rendered *outside* the root (genuinely portaled / top-layer) keeps its `data-part` and is addressed as `[data-component="DateField"] [data-part="popup"]`, which crosses a portal where a descendant selector does not.
 
-Variants and states are `data-*`, never class modifiers: no `.DateField--disabled`, no `.text-sm` utilities.
+Variants and states are `data-*`, never class modifiers: no `.DateField--disabled`, no `.text-sm` utilities. Demo content a kitchensink places *inside* a component (an animation a MotionRegion wraps) is the consumer's markup, not a part, and carries `demo-*` classes to say so.
 
-**Shared lexicon** — same kind of part, same word, everywhere: `.content` · `.options` · `.popup` · `.trigger` · `.rail` · `.arrow` · `.icon` · `.title` · `.hint` · `.notice-region`. `.container` is reserved for a genuinely role-less box (a part *with* a role gets the role's name, so `.container` never becomes the new catch-all "wrapper"). See ADR-0019.
+**Shared lexicon** — same kind of part, same word, everywhere, now as an attribute value: `content` · `options` · `option` · `popup` · `trigger` · `icon` · `rail` · `arrow` · `title` · `hint` · `notice-region` · `native` · `overlay` · `segments` · `segment` · `separator` · `announce` · `footer`. `container` is reserved for a genuinely role-less box (a part *with* a role gets the role's name). Each `<Name>.md` lists its parts under `## Parts`. See ADR-0019 and ADR-0026.
 
-**Why — the swap map.** A consumer decoding this library reads three seams by case + namespace: `PascalCase` = component boundaries (map to your components), `lowercase-kebab` = our internal element styling (swap for your utilities on the same DOM), `--ui-*` = design values (ADR-0018). Case itself tells you where to go in.
+**Why — the swap map, now literally true.** A consumer decoding this library reads three seams: `PascalCase` class = component boundary (map to your components), `data-part` = part identity (keep it; restyle on the same DOM with any class convention or none), `--ui-*` = design values (ADR-0018). Delete every class name except the roots and the conformance suite still passes — that is what the attribute buys.
 
 ---
 
