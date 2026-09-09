@@ -149,6 +149,7 @@ class FileUpload {
     if (!this.root.hasAttribute('data-drop-zone')) return
     if (this.root.querySelector('[data-part="drop-label"]')) return
     const label = document.createElement('span')
+    label.className = 'drop-label'
     label.setAttribute('data-part', 'drop-label')
     label.setAttribute('aria-hidden', 'true')
     label.textContent = this._t.labelDropZone
@@ -233,10 +234,12 @@ class FileUpload {
     this.fileContainer.setAttribute('data-status', entry.status)
 
     const nameSpan = document.createElement('span')
+    nameSpan.className = 'item-name'
     nameSpan.setAttribute('data-part', 'item-name')
     nameSpan.textContent = entry.name
 
     const sizeSpan = document.createElement('span')
+    sizeSpan.className = 'item-size'
     sizeSpan.setAttribute('data-part', 'item-size')
     sizeSpan.textContent = formatFileSize(entry.size)
 
@@ -245,6 +248,7 @@ class FileUpload {
 
     if (entry.status !== 'valid') {
       const errorSpan = document.createElement('span')
+      errorSpan.className = 'item-error'
       errorSpan.setAttribute('data-part', 'item-error')
       errorSpan.setAttribute('role', 'alert')
       errorSpan.textContent =
@@ -254,6 +258,7 @@ class FileUpload {
 
     const removeBtn = document.createElement('button')
     removeBtn.type = 'button'
+    removeBtn.className = 'item-remove'
     removeBtn.setAttribute('data-part', 'item-remove')
     removeBtn.setAttribute('aria-label', interpolate(this._t.labelRemove, { name: entry.name }))
     removeBtn.textContent = '×'
@@ -270,16 +275,19 @@ class FileUpload {
 
   private _renderItem(entry: FileEntry): HTMLLIElement {
     const li = document.createElement('li')
+    li.className = 'item'
     li.setAttribute('data-part', 'item')
     li.setAttribute('data-status', entry.status)
     li.dataset.entryId = entry.id
     if (entry.source === 'server') li.setAttribute('data-source', 'server')
 
     const nameSpan = document.createElement('span')
+    nameSpan.className = 'item-name'
     nameSpan.setAttribute('data-part', 'item-name')
     nameSpan.textContent = entry.name
 
     const sizeSpan = document.createElement('span')
+    sizeSpan.className = 'item-size'
     sizeSpan.setAttribute('data-part', 'item-size')
     sizeSpan.textContent = formatFileSize(entry.size)
 
@@ -288,6 +296,7 @@ class FileUpload {
 
     if (entry.status !== 'valid') {
       const errorSpan = document.createElement('span')
+      errorSpan.className = 'item-error'
       errorSpan.setAttribute('data-part', 'item-error')
       errorSpan.setAttribute('role', 'alert')
       errorSpan.textContent =
@@ -297,6 +306,7 @@ class FileUpload {
 
     const removeBtn = document.createElement('button')
     removeBtn.type = 'button'
+    removeBtn.className = 'item-remove'
     removeBtn.setAttribute('data-part', 'item-remove')
     removeBtn.setAttribute(
       'aria-label',

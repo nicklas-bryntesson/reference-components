@@ -3,7 +3,7 @@
  * Notice — a presentational message (severity + icon + text).
  *
  * PAYLOAD ONLY: no live role, no announcement, no dismissal/timing. To announce
- * it, the CONTEXT renders it into a persistent live region (`[data-part="notice-region"]`,
+ * it, the CONTEXT renders it into a persistent live region (`.notice-region`,
  * role="alert"|"status", present and empty at load, content swapped in). See Notice.md.
  *
  * Composable, from basic to enriched — three independent boolean data-* toggles
@@ -14,11 +14,12 @@
  *   data-emphasis   the "styled" hook — a thick leading accent bar (the richest look).
  * Severity is carried by the icon (shape + colour), never by chrome alone.
  *
- * Icons are inline SVG using currentColor (pointed at the accent on [data-part="icon"]), so the
+ * Icons are inline SVG using currentColor (pointed at the accent on .icon), so the
  * mark re-tints with the variant — no sprite sheet dependency, fully portable.
  *
- * Root carries tokens + root props only. Parts are identified by `data-part`, never by
- * class; every rule below is a flat, fully-qualified `.Notice [data-part="…"]` rule.
+ * Root carries tokens + root props only. Parts are styled by class and never by
+ * `data-part` (that attribute is the suite's and the JS's); every rule below is a flat,
+ * fully-qualified `.Notice .part` rule.
  */
 
 .Notice {
@@ -48,31 +49,31 @@
 }
 
 /* ── Icon ──────────────────────────────────────────────────────────────── */
-.Notice [data-part="icon"] {
+.Notice .icon {
   color: var(--_nt-accent);
   display: flex;
   align-items: flex-start;   /* top-align with the first line of content */
 }
-.Notice [data-part="icon"] svg {
+.Notice .icon svg {
   display: block;
   inline-size: var(--_nt-icon-size);
   block-size: var(--_nt-icon-size);
   fill: none;
-  stroke: currentColor;    /* inherits --_nt-accent from [data-part="icon"] */
+  stroke: currentColor;    /* inherits --_nt-accent from .icon */
   stroke-width: 2;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
 
 /* ── Content ───────────────────────────────────────────────────────────── */
-.Notice [data-part="content"] {
+.Notice .content {
   display: flex;
   flex-direction: column;
   gap: var(--_nt-content-gap);
   min-inline-size: 0;        /* let long words wrap instead of overflowing */
 }
 
-.Notice [data-part="title"] {
+.Notice .title {
   color: var(--_nt-title-color);
   font-weight: 600;
 }
@@ -81,7 +82,7 @@
 
 /* Icon on/off */
 .Notice[data-icon="false"] { grid-template-columns: 1fr; }
-.Notice[data-icon="false"] [data-part="icon"] { display: none; }
+.Notice[data-icon="false"] .icon { display: none; }
 
 /* Full border in the accent (icon) colour */
 .Notice[data-border="true"] { border: var(--_nt-border-width) solid var(--_nt-accent); }
@@ -102,5 +103,5 @@
 @media (forced-colors: active) {
   .Notice { border: 1px solid CanvasText; background-color: Canvas; }
   .Notice[data-emphasis="true"] { border-inline-start-color: CanvasText; }
-  .Notice [data-part="icon"] { color: CanvasText; }
+  .Notice .icon { color: CanvasText; }
 }

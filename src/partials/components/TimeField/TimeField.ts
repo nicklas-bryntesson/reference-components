@@ -283,6 +283,7 @@ class TimeField {
 
   _createSep(text: string): HTMLSpanElement {
     const sep = document.createElement('span')
+    sep.className = 'separator'
     sep.setAttribute('data-part', 'separator')
     sep.setAttribute('aria-hidden', 'true')
     sep.textContent = text
@@ -291,6 +292,7 @@ class TimeField {
 
   _createSegmentEl(type: TimeSegmentType): HTMLSpanElement {
     const span = document.createElement('span')
+    span.className = 'segment'
     span.setAttribute('data-part', 'segment')
     span.setAttribute('role', 'spinbutton')
     span.setAttribute('data-segment', type)

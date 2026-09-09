@@ -135,12 +135,13 @@ class WheelColumn {
     }
 
     this.cylinder = document.createElement('div')
-    this.cylinder.setAttribute('data-part', 'cylinder')
+    this.cylinder.className = 'cylinder'
     this.cylinder.style.transformStyle = 'preserve-3d'
     this.cylinder.style.transform = `translateZ(${-this.radius}px)`
 
     for (let o = -HALF; o <= HALF; o++) {
       const slotEl = document.createElement('div')
+      slotEl.className = 'option'
       slotEl.setAttribute('data-part', 'option')
       slotEl.setAttribute('aria-hidden', 'true')
       this.cylinder.appendChild(slotEl)
@@ -148,8 +149,7 @@ class WheelColumn {
     }
 
     const band = document.createElement('div')
-    band.setAttribute('data-part', 'band')
-
+    band.className = 'band'
     this.el.appendChild(this.cylinder)
     this.el.appendChild(band)
   }

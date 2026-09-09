@@ -7,15 +7,15 @@
  * gates its own `animation-play-state` on `[data-motion="paused"]` (zero JS; see
  * the kitchensink), the video adapter maps the attribute to play()/pause().
  *
- Parts are identified by `data-part`, never by class; every rule below is a flat,
- fully-qualified `.MotionRegion [data-part="…"]` rule.
+ Parts are styled by class and never by `data-part` (that attribute is the
+ suite's and the JS's); every rule below is a flat, fully-qualified `.MotionRegion .part` rule.
  */
 
 .MotionRegion {
   position: relative;
 }
 
-.MotionRegion [data-part="control"] {
+.MotionRegion .control {
   --_size: 2.75rem;
 
   position: absolute;
@@ -38,14 +38,14 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.MotionRegion [data-part="control"] svg {
+.MotionRegion .control svg {
   inline-size: 1.25rem;
   block-size: 1.25rem;
 }
 
 /* The spoken state channel — visually hidden, never display:none (a hidden
    live region does not announce). Standard clip recipe. */
-.MotionRegion [data-part="status"] {
+.MotionRegion .status {
   position: absolute;
   inline-size: 1px;
   block-size: 1px;
@@ -54,7 +54,7 @@
   white-space: nowrap;
 }
 
-.MotionRegion [data-part="control"]:focus-visible {
+.MotionRegion .control:focus-visible {
   outline: 2px solid #fff;
   outline-offset: 2px;
 }

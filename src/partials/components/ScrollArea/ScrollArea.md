@@ -16,13 +16,13 @@ Authored:
 
 ```html
 <div class="ScrollArea" data-component="ScrollArea">
-  <div data-part="viewport" data-scroll-viewport
+  <div class="viewport" data-part="viewport" data-scroll-viewport
        role="region" aria-label="Members table">
-    <div data-part="content">
+    <div class="content" data-part="content">
       <!-- the overflowing content, e.g. a wide table -->
     </div>
   </div>
-  <div data-part="fades" aria-hidden="true"></div>
+  <div class="fades" data-part="fades" aria-hidden="true"></div>
 </div>
 ```
 
@@ -38,17 +38,19 @@ Authored:
 
 ## Parts
 
-Parts are identified by `data-part`, never by class name. The reference JS, the stylesheet and the
-conformance suite address them through the attribute, so a consumer may restyle the same DOM under
-any class convention — or none — and the suite still passes.
+Every part carries a lowercase class **for styling only** — rename, hash or delete them all and the
+suite still passes. A part also carries `data-part` when the suite, the reference JS or a composing
+component has to *find* it; that attribute is the contract, and the stylesheet never reads it.
+The **Bound by** column says who holds on to each part.
 
-| `data-part` | Element | Role |
-|---|---|---|
-| `viewport` | `<div>` | The scrolling element (also `data-scroll-viewport`) |
-| `content` | `<div>` | The scrolled content |
-| `fades` | `<div aria-hidden>` | Edge fades, stacked over the viewport |
-| `scrollbar` | `<div>` | Custom horizontal bar, injected by JS |
-| `thumb` | `<div>` | The bar's thumb, sized and moved by JS |
+
+| Part | Element | Role | Bound by |
+|---|---|---|---|
+| `viewport` | `<div>` | The scrolling element (also `data-scroll-viewport`) | suite |
+| `content` | `<div>` | The scrolled content | suite |
+| `fades` | `<div aria-hidden>` | Edge fades, stacked over the viewport | suite |
+| `scrollbar` | `<div>` | Custom horizontal bar, injected by JS | suite |
+| `thumb` | `<div>` | The bar's thumb, sized and moved by JS | suite |
 
 ## Progressive enhancement
 

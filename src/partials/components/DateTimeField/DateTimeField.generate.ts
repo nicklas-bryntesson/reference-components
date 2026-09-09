@@ -20,11 +20,11 @@ function canonical(id: string, attrs: Record<string, string> = {}, locale = 'en-
   // aria-labelledby; in display mode it labels the native input directly.
   return `<label for="${id}">${label}</label>
 <div class="DateTimeField" data-component="DateTimeField" data-id="${id}" data-name="${id}" data-locale="${locale}" ${attrStr}>
-  <input type="datetime-local" data-part="native" tabindex="-1" aria-hidden="true">
-  <div data-part="overlay">
-    <div data-part="segments" role="group"></div>
-    <button data-part="trigger" type="button" aria-label="Open calendar" aria-expanded="false" aria-haspopup="dialog">
-      <svg data-part="icon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+  <input class="native" data-part="native" type="datetime-local" tabindex="-1" aria-hidden="true">
+  <div class="overlay" data-part="overlay">
+    <div class="segments" data-part="segments" role="group"></div>
+    <button class="trigger" data-part="trigger" type="button" aria-label="Open calendar" aria-expanded="false" aria-haspopup="dialog">
+      <svg class="icon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
         <line x1="16" y1="2" x2="16" y2="6"></line>
         <line x1="8" y1="2" x2="8" y2="6"></line>
@@ -32,40 +32,40 @@ function canonical(id: string, attrs: Record<string, string> = {}, locale = 'en-
       </svg>
     </button>
   </div>
-  <template data-part="calendar-template">
-    <div data-part="popup" role="dialog" aria-modal="true">
-      <div data-part="calendar-inner">
-        <div data-part="calendar-left">
-          <div data-part="calendar-header">
-            <button data-part="prev-month" type="button">&#8249;</button>
-            <button data-part="month-year-trigger" type="button" aria-expanded="false"><span data-part="calendar-month-year"></span></button>
-            <button data-part="next-month" type="button">&#8250;</button>
+  <template class="calendar-template" data-part="calendar-template">
+    <div class="popup" data-part="popup" role="dialog" aria-modal="true">
+      <div class="calendar-inner">
+        <div class="calendar-left">
+          <div class="calendar-header">
+            <button class="prev-month" data-part="prev-month" type="button">&#8249;</button>
+            <button class="month-year-trigger" data-part="month-year-trigger" type="button" aria-expanded="false"><span class="calendar-month-year" data-part="calendar-month-year"></span></button>
+            <button class="next-month" data-part="next-month" type="button">&#8250;</button>
           </div>
           <div data-panel="calendar" data-active="true">
-            <table data-part="calendar-grid" role="grid"></table>
+            <table class="calendar-grid" data-part="calendar-grid" role="grid"></table>
           </div>
-          <div data-part="year-month-picker" class="WheelColumns" role="group" data-panel="picker" data-active="false">
+          <div class="year-month-picker WheelColumns" data-part="year-month-picker" role="group" data-panel="picker" data-active="false">
             <div class="Wheel" data-picker="month" tabindex="0"></div>
             <div class="Wheel" data-picker="year" tabindex="0"></div>
           </div>
         </div>
-        <div data-part="time-columns" class="WheelColumns">
+        <div class="time-columns WheelColumns">
           <div class="Wheel" data-segment="hour" tabindex="0"></div>
           <div class="Wheel" data-segment="minute" tabindex="0"></div>
           <div class="Wheel" data-segment="second" tabindex="0" style="display:none"></div>
-          <div data-part="ampm" role="group" hidden></div>
+          <div class="ampm" data-part="ampm" role="group" hidden></div>
         </div>
       </div>
-      <div data-part="calendar-footer">
-        <button type="button" data-part="calendar-footer-clear"></button>
-        <button type="button" data-part="calendar-footer-today"></button>
-        <button type="button" data-part="calendar-footer-now"></button>
+      <div class="calendar-footer">
+        <button class="calendar-footer-clear" data-part="calendar-footer-clear" type="button"></button>
+        <button class="calendar-footer-today" data-part="calendar-footer-today" type="button"></button>
+        <button class="calendar-footer-now" data-part="calendar-footer-now" type="button"></button>
       </div>
-      <div data-part="arrow"></div>
+      <div class="arrow"></div>
     </div>
   </template>
-  <div data-part="rail"></div>
-  <div data-part="announce" aria-live="polite" aria-atomic="true"></div>
+  <div class="rail" data-part="rail"></div>
+  <div class="announce" data-part="announce" aria-live="polite" aria-atomic="true"></div>
 </div>`
 }
 

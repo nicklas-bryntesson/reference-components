@@ -2,9 +2,9 @@
    ToggleTip — fully self-contained
    No Tailwind, no framework reset, no external dependencies
 
-   The component root is the custom element `toggle-tip`. Parts are addressed by
-   `data-part`, never by class, so every rule is a flat, fully-qualified
-   `toggle-tip [data-part="…"]` rule and a consumer may restyle on the same DOM.
+   The component root is the custom element `toggle-tip`. Parts are styled by class and
+   never by `data-part` (that attribute is the suite's and the JS's), so every rule is a
+   flat, fully-qualified `toggle-tip .part` rule and a consumer may restyle on the same DOM.
    ================================================================ */
 
 /* ── Public API (theme layer) ──────────────────────────────────── */
@@ -68,7 +68,7 @@ toggle-tip[initialized] > * {
 }
 
 /* ── Button ────────────────────────────────────────────────────── */
-toggle-tip [data-part="trigger"] {
+toggle-tip .trigger {
   all: unset;
   box-sizing: border-box;
   display: inline-block;
@@ -81,7 +81,7 @@ toggle-tip [data-part="trigger"] {
 }
 
 /* Enlarged hit area */
-toggle-tip [data-part="trigger"]::after {
+toggle-tip .trigger::after {
   --_click-area: 2rem;
   --_offset: calc((var(--_tt-button-width) - var(--_click-area)) / 2);
   position: absolute;
@@ -91,7 +91,7 @@ toggle-tip [data-part="trigger"]::after {
   inset: var(--_offset);
 }
 
-toggle-tip [data-part="trigger"] [data-part="icon"] {
+toggle-tip .trigger .icon {
   display: block;
   width: var(--_tt-button-width);
   height: var(--_tt-button-width);
@@ -108,7 +108,7 @@ toggle-tip [data-part="trigger"] [data-part="icon"] {
  * Note: physical properties (left, top, bottom) are used intentionally here.
  * The slider-rail model is left-to-right by design; RTL is not in scope.
  */
-toggle-tip [data-part="rail"] {
+toggle-tip .rail {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -120,7 +120,7 @@ toggle-tip [data-part="rail"] {
 }
 
 /* ── Bubble ────────────────────────────────────────────────────── */
-toggle-tip [data-part="popup"] {
+toggle-tip .popup {
   position: absolute;
   left: var(--_tt-popup-offset);
   transform: translateX(-50%);
@@ -141,15 +141,15 @@ toggle-tip [data-part="popup"] {
 }
 
 /* Force all descendant text to use the bubble's colour, not the page default */
-toggle-tip [data-part="popup"] * {
+toggle-tip .popup * {
   color: inherit;
 }
 
-toggle-tip [data-part="popup"][aria-hidden="true"] {
+toggle-tip .popup[aria-hidden="true"] {
   display: none;
 }
 
-toggle-tip [data-part="popup"][aria-hidden="false"] {
+toggle-tip .popup[aria-hidden="false"] {
   display: block;
   transition: opacity 0.15s;
 
@@ -159,7 +159,7 @@ toggle-tip [data-part="popup"][aria-hidden="false"] {
 }
 
 /* ── Title ─────────────────────────────────────────────────────── */
-toggle-tip [data-part="title"] {
+toggle-tip .title {
   display: block;
   font-weight: bold;
   margin-block-end: 1rem;
@@ -168,7 +168,7 @@ toggle-tip [data-part="title"] {
 }
 
 /* ── Arrow ─────────────────────────────────────────────────────── */
-toggle-tip [data-part="arrow"] {
+toggle-tip .arrow {
   position: absolute;
   width: var(--_tt-arrow-size);
   height: var(--_tt-arrow-size);
@@ -177,22 +177,22 @@ toggle-tip [data-part="arrow"] {
 }
 
 /* ── Direction: top (bubble above trigger) ─────────────────────── */
-toggle-tip[data-direction="top"] [data-part="popup"] {
+toggle-tip[data-direction="top"] .popup {
   bottom: var(--_tt-gap);
 }
 
-toggle-tip[data-direction="top"] [data-part="arrow"] {
+toggle-tip[data-direction="top"] .arrow {
   bottom: calc(var(--_tt-arrow-size) * -0.5);
   transform: translateX(calc(-50% + var(--_tt-arrow-offset))) rotate(45deg);
   border-end-end-radius: var(--_tt-arrow-corner-radius);
 }
 
 /* ── Direction: bottom (bubble below trigger) ──────────────────── */
-toggle-tip[data-direction="bottom"] [data-part="popup"] {
+toggle-tip[data-direction="bottom"] .popup {
   top: var(--_tt-gap);
 }
 
-toggle-tip[data-direction="bottom"] [data-part="arrow"] {
+toggle-tip[data-direction="bottom"] .arrow {
   top: calc(var(--_tt-arrow-size) * -0.5);
   transform: translateX(calc(-50% + var(--_tt-arrow-offset))) rotate(45deg);
   border-start-start-radius: var(--_tt-arrow-corner-radius);

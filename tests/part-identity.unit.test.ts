@@ -1,21 +1,27 @@
 import { describe, it, expect } from 'vitest'
-import { readdirSync, readFileSync, existsSync } from 'node:fs'
+import { readdirSync, readFileSync, existsSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 
 /**
- * Part identity is `data-part`; class names carry styling only.
+ * A part has two names (ADR-0033): a lowercase class the stylesheet reads, and
+ * `data-part` when a test, the reference JS or a composing component has to find
+ * it. The two never cross:
  *
- * In a swept component nothing may find a part by a lowercase class: not the
- * stylesheet, not a querySelector in the reference JS, not a locator in the
- * suite, and the authored markup must not mint one. Otherwise the promise that a
- * consumer may discard every class name is only nearly true — the suite passes
- * upstream and fails on the first CSS-Modules or shadow-DOM port, where class
- * names are hashed or invisible.
+ *   - a stylesheet never selects on `data-part`          (appearance reads classes)
+ *   - a test or JS never finds a part by class            (behaviour reads data-part)
+ *   - a `data-part` that nothing finds is dead            (identity is earned, not decorative)
  *
- * Every active component is covered — the directory is the list, so a new
- * component is guarded the day its folder appears. Parked legacy references are
- * excluded as in ADR-0019. The kernel's WheelColumn injects parts too, and is
- * checked alongside.
+ * That is what lets a reader tell, from the markup alone, which names are
+ * load-bearing: a class is free to change, a `data-part` is a contract.
+ *
+ * "Finds" is judged per component: a finder file counts for component C if it
+ * lives under C or mentions C by name (root class, data-component, custom element,
+ * attach/constructor call). That is how Picklist's tests may hold on to the Notice
+ * parts they render, without Notice's `title` counting as found for ToggleTip.
+ *
+ * Every active component is covered — the directory is the list. Parked legacy
+ * references are excluded as in ADR-0019. The kernel's WheelColumn is checked
+ * alongside.
  */
 
 const DIR = 'src/partials/components'
@@ -34,17 +40,6 @@ const read = (p: string): string => (existsSync(p) ? readFileSync(p, 'utf8') : '
 // quote inside one (`// "$"`) mis-pairs the string scan below.
 const stripComments = (s: string): string =>
   s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '').replace(/\s\/\/\s.*$/gm, '')
-
-/** Lowercase class selectors in a stylesheet, outside comments. */
-function cssClassSelectors(css: string): string[] {
-  const out = new Set<string>()
-  for (const chunk of stripComments(css).split('{')) {
-    const selector = chunk.split('}').pop() ?? ''
-    if (!selector.trim() || selector.trim().startsWith('@')) continue
-    for (const m of selector.matchAll(/\.([a-z][a-z0-9-]*)/g)) out.add(m[1])
-  }
-  return [...out].sort()
-}
 
 /** `.lowercase` inside a querySelector / closest / matches / locator string literal. */
 function queryClassSelectors(src: string): string[] {
@@ -84,38 +79,39 @@ function stringClassSelectors(src: string, parts: string[]): string[] {
   return [...out].sort()
 }
 
-/** Lowercase classes minted in authored markup — TS template strings, generator, kitchensink. */
-function authoredClasses(src: string): string[] {
-  const out = new Set<string>()
-  for (const m of stripComments(src).matchAll(/class=["']([^"']*)["']/g)) {
-    for (const c of m[1].split(/\s+/)) {
-      // Harness classes on the kitchensink page are not component parts, and neither is
-      // demo CONTENT a region wraps (`demo-*`) — a consumer's own markup stands in there.
-      if (/^[a-z]/.test(c) && !c.startsWith('kitchensink-') && !c.startsWith('demo-') && c !== 'state-table' && c !== 'prose') out.add(c)
-    }
-  }
-  return [...out].sort()
-}
+const finderFiles: string[] = [
+  ...SWEPT.flatMap((c) => {
+    const t = join(DIR, c, 'tests')
+    return [
+      ...(existsSync(t) ? readdirSync(t, { withFileTypes: true }).filter((e) => e.isFile()).map((e) => join(t, e.name)) : []),
+      ...[`${DIR}/${c}/${c}.ts`, `${DIR}/${c}/${c}.js`].filter(existsSync),
+    ]
+  }),
+  'src/kernel/js/WheelColumn.ts',
+  ...readdirSync('src/kernel/js/tests').map((f) => 'src/kernel/js/tests/' + f),
+  ...readdirSync('tests').map((f) => 'tests/' + f),
+].filter((f) => statSync(f).isFile())
 
-describe('part identity is data-part, not a class (swept components)', () => {
+const customElement = (c: string) => c.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()
+const mentions = (file: string, c: string): boolean =>
+  file.includes(`/${c}/`) ||
+  new RegExp(`\\.${c}\\b|data-component="${c}"|<${customElement(c)}\\b|${c}\\.attach|new ${c}\\(`).test(read(file))
+const foundFor = (part: string, c: string): boolean =>
+  finderFiles.filter((f) => mentions(f, c)).some((f) => new RegExp(`data-part=\\\\?["']${part}\\\\?["']`).test(read(f)))
+/** Components whose markup a kitchensink hosts (a Notice inside a Picklist): their parts are theirs. */
+const composedBy = (c: string): string[] =>
+  [...new Set([...read(join(DIR, c, `${c}.html`)).matchAll(/class="([A-Z][A-Za-z]+)/g)].map((m) => m[1]))].filter((x) => x !== c && SWEPT.includes(x))
+const isFound = (part: string, c: string): boolean => foundFor(part, c) || composedBy(c).some((x) => foundFor(part, x))
+
+/** `[data-part=…]` in a stylesheet — appearance reading identity. */
+const cssDataPartSelectors = (css: string): string[] =>
+  [...new Set([...stripComments(css).matchAll(/\[data-part=["']([a-z][a-z0-9-]*)["']\]/g)].map((m) => m[1]))].sort()
+
+describe('a part has two names — class for styling, data-part for identity (ADR-0033)', () => {
   it('covers the whole component directory', () => {
     expect(SWEPT.length).toBeGreaterThan(15)
     for (const name of SWEPT) expect(existsSync(join(DIR, name))).toBe(true)
   })
-
-  for (const [label, cssPath, logicPath, testsDir] of KERNEL) {
-    const testFiles = readdirSync(testsDir, { withFileTypes: true }).filter((e) => e.isFile()).map((e) => join(testsDir, e.name))
-    const logic = read(logicPath)
-    const tests = testFiles.map(read).join('\n')
-    const parts = partVocabulary(logic)
-    describe(label, () => {
-      it('stylesheet selects no lowercase class', () => expect(cssClassSelectors(read(cssPath))).toEqual([]))
-      it('kernel JS finds no part by class', () => expect(queryClassSelectors(logic)).toEqual([]))
-      it('kernel tests locate no part by class', () => expect(queryClassSelectors(tests)).toEqual([]))
-      it('no string literal in JS or tests names a part by class', () =>
-        expect(stringClassSelectors(logic + '\n' + tests, parts)).toEqual([]))
-    })
-  }
 
   for (const name of SWEPT) {
     const base = join(DIR, name, name)
@@ -129,8 +125,8 @@ describe('part identity is data-part, not a class (swept components)', () => {
     const parts = partVocabulary(markup)
 
     describe(name, () => {
-      it('stylesheet selects no lowercase class', () => {
-        expect(cssClassSelectors(read(`${base}.css`))).toEqual([])
+      it('stylesheet never selects on data-part', () => {
+        expect(cssDataPartSelectors(read(`${base}.css`))).toEqual([])
       })
       it('reference JS finds no part by class', () => {
         expect(queryClassSelectors(logic)).toEqual([])
@@ -141,9 +137,30 @@ describe('part identity is data-part, not a class (swept components)', () => {
       it('no string literal in JS or tests names a part by class', () => {
         expect(stringClassSelectors(logic + '\n' + tests, parts)).toEqual([])
       })
-      it('authored markup mints no lowercase class', () => {
-        expect(authoredClasses(markup)).toEqual([])
+      it('every data-part is found by a test, the JS or a composing component', () => {
+        const dead = parts.filter((p) => !isFound(p, name))
+        expect(dead, [
+          `${name} carries data-part on ${dead.length} part(s) nothing finds:`,
+          ...dead.map((p) => `  ${p}`),
+          'Identity is earned: drop the attribute and keep the class, or write the test that needs it.',
+        ].join('\n')).toEqual([])
       })
+    })
+  }
+
+  for (const [label, cssPath, logicPath, testsDir] of KERNEL) {
+    const testFiles = readdirSync(testsDir, { withFileTypes: true }).filter((e) => e.isFile()).map((e) => join(testsDir, e.name))
+    const logic = read(logicPath)
+    const tests = testFiles.map(read).join('\n')
+    const parts = partVocabulary(logic)
+    describe(label, () => {
+      it('stylesheet never selects on data-part', () => expect(cssDataPartSelectors(read(cssPath))).toEqual([]))
+      it('kernel JS finds no part by class', () => expect(queryClassSelectors(logic)).toEqual([]))
+      it('kernel tests locate no part by class', () => expect(queryClassSelectors(tests)).toEqual([]))
+      it('no string literal in JS or tests names a part by class', () =>
+        expect(stringClassSelectors(logic + '\n' + tests, parts)).toEqual([]))
+      it('every data-part is found by a test or the JS', () =>
+        expect(parts.filter((p) => !isFound(p, 'Wheel'))).toEqual([]))
     })
   }
 })

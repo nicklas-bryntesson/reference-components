@@ -15,11 +15,11 @@ a thick leading accent bar, the richest look). Severity is always carried by the
 
 ```html
 <div class="Notice" data-variant="error">
-  <div data-part="icon" aria-hidden="true">
+  <div class="icon" data-part="icon" aria-hidden="true">
     <svg viewBox="0 0 24 24"><!-- variant icon, stroke=currentColor --></svg>
   </div>
-  <div data-part="content">
-    <strong data-part="title">Optional title</strong>   <!-- omit for a title-less message -->
+  <div class="content" data-part="content">
+    <strong class="title">Optional title</strong>   <!-- omit for a title-less message -->
     <p>Message body. May contain inline markup like a <a href="#">link</a>.</p>
   </div>
 </div>
@@ -31,16 +31,18 @@ a thick leading accent bar, the richest look). Severity is always carried by the
 
 ## Parts
 
-Parts are identified by `data-part`, never by class name. The stylesheet and the conformance suite
-address them through the attribute, so a consumer may restyle the same DOM under any class
-convention — or none — and the suite still passes. The only class name in the markup is the component root (`Notice`).
+Every part carries a lowercase class **for styling only** — rename, hash or delete them all and the
+suite still passes. A part also carries `data-part` when the suite, the reference JS or a composing
+component has to *find* it; that attribute is the contract, and the stylesheet never reads it.
+The **Bound by** column says who holds on to each part.
 
-| `data-part` | Element | Role |
-|---|---|---|
-| `icon` | `<div>` | The variant glyph, coloured by `data-variant` |
-| `title` | `<strong>` | Optional heading line |
-| `content` | `<div>` | The message body |
-| `notice-region` | `<div>` | The separate, persistent live region a Notice is rendered into by its host |
+
+| Part | Element | Role | Bound by |
+|---|---|---|---|
+| `icon` | `<div>` | The variant glyph, coloured by `data-variant` | suite |
+| `title` | `<strong>` | Optional heading line | styled only |
+| `content` | `<div>` | The message body | suite |
+| `notice-region` | `<div>` | The separate, persistent live region a Notice is rendered into by its host | suite |
 
 ## HTML Authoring API (`data-*`)
 
@@ -87,7 +89,7 @@ empty from load — and you swap Notice content into it:
 
 ```html
 <!-- present and empty at load; the announcer -->
-<div data-part="notice-region" role="alert" aria-live="assertive"></div>
+<div class="notice-region" data-part="notice-region" role="alert" aria-live="assertive"></div>
 ```
 
 ```js

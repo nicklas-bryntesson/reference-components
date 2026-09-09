@@ -48,12 +48,12 @@ Arrow size / corner-radius / site-padding are CSS custom properties (e.g. `--_tf
 
 | Thing | Convention | Notes |
 |---|---|---|
-| Part identity | `data-part="…"` | never a lowercase class — tests, JS and CSS all address parts through the attribute; each `<Name>.md` lists its parts under `## Parts`. Guarded by `tests/part-identity.unit.test.ts` |
-| Popup container | `data-part="popup"` | the same word in every component; the CSS rule is always fully qualified — `.DateField [data-part="popup"]`, `.TimeField [data-part="popup"]` |
-| Rail | `data-part="rail"` | same word everywhere; the JS property is `_rail` |
-| Arrow | `data-part="arrow"` | same word everywhere |
-| Trigger | `data-part="trigger"` | on ToggleTip it is the bare `<button>` |
-| Every part rule | `.Component [data-part="…"]` | **never a bare `[data-part="…"]` at column 0** — generic part names are only safe because the root qualifies them. Only components (roots, composed sub-components) are classes, `PascalCase`. See the class-naming section in [`.claude/philosophy.md`](.claude/philosophy.md) |
+| A part's two names | `class="popup" data-part="popup"` | the **class is for styling only** (CSS reads nothing else); **`data-part` is present iff a test, the JS or a composing component finds the part**, and CSS never reads it. Each `<Name>.md` lists its parts under `## Parts` with a Bound-by column. Guarded by `tests/part-identity.unit.test.ts` in both directions |
+| Popup container | `popup` | the same word in every component; the CSS rule is always fully qualified — `.DateField .popup`, `.TimeField .popup` |
+| Rail | `rail` | same word everywhere; the JS property is `_rail` |
+| Arrow | `arrow` | same word everywhere; styled only in DateTimeField (no `data-part`), found in the others |
+| Trigger | `trigger` | on ToggleTip it is the bare `<button>` |
+| Every part rule | `.Component .part` | **never a bare `.part` at column 0** — generic part names are only safe because the root qualifies them; **never `[data-part=…]` in a stylesheet**. See the class-naming section in [`.claude/philosophy.md`](.claude/philosophy.md) |
 | Direction | `data-direction="top\|bottom"` | not a bare `direction` attribute |
 | Orientation | `data-orientation="horizontal\|vertical"` | same word and values in every component that has a direction of flow (ChoiceGroup, Picklist) |
 | Offset vars | `--<prefix>-popup-offset`, `--<prefix>-arrow-offset` | set from JS |

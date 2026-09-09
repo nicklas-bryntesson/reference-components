@@ -1,8 +1,8 @@
 /* Shared 3D wheel / spinner — driven by src/kernel/js/WheelColumn.ts.
    Used by DateField, DateTimeField, TimeField and MonthField. The host element
-   carries .Wheel; WheelColumn injects the parts cylinder / option / band, each
-   identified by `data-part`, never by class. Every rule is a flat, fully-qualified
-   `.Wheel [data-part="…"]` rule. */
+   carries .Wheel; WheelColumn injects the parts cylinder / option / band, styled by class;
+   only `option` also carries `data-part` because the suite and the JS find it. Every
+   rule is a flat, fully-qualified `.Wheel .part` rule. */
 
 .Wheel {
   /* Geometry token read by WheelColumn (readRowHeight) */
@@ -30,14 +30,14 @@
   outline-offset: -2px;
 }
 
-.Wheel [data-part="cylinder"] {
+.Wheel .cylinder {
   position: absolute;
   inset: 0;
   transform-style: preserve-3d;
   will-change: transform;
 }
 
-.Wheel [data-part="option"] {
+.Wheel .option {
   position: absolute;
   left: 0; right: 0;
   top: 50%;
@@ -54,14 +54,14 @@
   cursor: pointer;
 }
 
-.Wheel [data-part="option"][aria-selected="true"] {
+.Wheel .option[aria-selected="true"] {
   color: var(--_wheel-color-selected);
   font-weight: bold;
 }
 
 /* Center band — moved to the full-width .WheelColumns container below.
    WheelColumn still injects this element; hide the per-column version. */
-.Wheel [data-part="band"] {
+.Wheel .band {
   display: none;
 }
 

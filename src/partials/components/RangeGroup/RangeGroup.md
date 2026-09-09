@@ -14,14 +14,14 @@ The lane draws. This component owns only the rules that are about the **pair**.
 ```html
 <fieldset class="RangeGroup" data-component="RangeGroup">
   <legend>Price</legend>
-  <div data-part="roles">
+  <div class="roles" data-part="roles">
     <label for="price-lower">Lowest <b data-readout="lower" aria-hidden="true" data-suffix="tkr">200 tkr</b></label>
     <label for="price-upper">Highest <b data-readout="upper" aria-hidden="true" data-suffix="tkr">700 tkr</b></label>
   </div>
   <div class="RangeScale" data-component="RangeScale" data-fields="2"
        style="--_rs-a: 0.2; --_rs-b: 0.7">
-    <span data-part="track"></span>
-    <span data-part="fill"></span>
+    <span class="track" data-part="track"></span>
+    <span class="fill" data-part="fill"></span>
     <input class="RangeField" type="range" id="price-lower" name="price-lower" data-role="lower"
            min="0" max="1000" step="10" value="200">
     <input class="RangeField" type="range" id="price-upper" name="price-upper" data-role="upper"
@@ -53,14 +53,17 @@ Contract rules (enforced by the unit test):
 
 ## Parts
 
-Parts are identified by `data-part`, never by class name. The only part RangeGroup adds is `roles`; the lane
-it composes is a RangeScale, whose parts (`track`, `fill`, `digits`, …) are documented in
+Every part carries a lowercase class **for styling only** — rename, hash or delete them all and the
+suite still passes. A part also carries `data-part` when the suite, the reference JS or a composing
+component has to *find* it; that attribute is the contract, and the stylesheet never reads it.
+The **Bound by** column says who holds on to each part.
+
 [`RangeScale.md`](../RangeScale/RangeScale.md#parts). The readouts are `<b data-readout="lower|upper">`,
 identified by that attribute.
 
-| `data-part` | Element | Role |
-|---|---|---|
-| `roles` | `<div>` | Row holding the two labelled readouts above the lane |
+| Part | Element | Role | Bound by |
+|---|---|---|---|
+| `roles` | `<div>` | Row holding the two labelled readouts above the lane | suite |
 
 ## HTML Authoring API
 

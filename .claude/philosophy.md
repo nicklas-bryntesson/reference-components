@@ -175,31 +175,33 @@ Every real pseudo-class has a `data-test-state` counterpart on the component roo
 &[data-test-state="focus"] .Segments { outline: 2px solid; }
 ```
 
-### Class naming — a class names a component; a part is `data-part`
+### Class naming — a part has two names: a class for styling, `data-part` for identity
 
-Two mechanisms, two jobs:
+Two concerns, two names, and they never cross:
 
-- **A component is a `PascalCase` class, no dash** (`.DateField`, `.Wheel`, `.ChoiceField`) — the root *and* any nested/composed sub-component. Litmus: *it has its own `.md` contract* (or is a kernel primitive with one). The class is the stylesheet's entry point and is greppable as a set.
-- **A part is a `data-part` attribute** (`[data-part="popup"]`, `[data-part="calendar-header"]`, `[data-part="option"]`) — a presentational piece of a component with no standalone contract. **There are no lowercase element classes.** Identity that a test, a `querySelector` or another component has to *find* lives in the attribute, and the stylesheet keys on the same attribute, so nothing in the library depends on a class a consumer might rename, hash (CSS Modules) or hide (shadow DOM). Guarded by `tests/part-identity.unit.test.ts`.
-  - **A part name may not be a bare utility-class name**, even as an attribute value — the rule outlived the mechanism. `.grid` and `.ring` both shipped as classes and both broke in a Tailwind port, not as a specificity fight but because **the cascade resolves per declaration**: `.DateField .popup .grid` set `width` and no `display`, so Tailwind's `.grid { display: grid }` met nothing and turned the calendar `<table>` into a one-column grid. The test is simple: **is the name a part, or a CSS behaviour?** `grid`, `ring`, `container`, `hidden`, `truncate` are behaviours; `calendar-grid` and `cylinder` are parts. Guarded by `tests/utility-name-collisions.unit.test.ts`.
+- **A component is a `PascalCase` class, no dash** (`.DateField`, `.Wheel`, `.ChoiceField`) — the root *and* any nested/composed sub-component. Litmus: *it has its own `.md` contract* (or is a kernel primitive with one).
+- **A part carries a `lowercase-kebab` class, for styling only** (`.popup`, `.calendar-header`, `.option`). The stylesheet reads *only* this name. A consuming project may rename, hash (CSS Modules), replace with utilities or delete every one of them — the suite does not know they exist.
+- **A part *also* carries `data-part` when a test, the reference JS or a composing component has to find it** (`class="popup" data-part="popup"`). That attribute is the contract. Its presence in the markup is the readable signal *"renaming me breaks a test or the component"*; a part with only a class is free to change. A `data-part` nothing finds is dead and fails the guard.
+- **A stylesheet never selects on `data-part`.** State and *which*-discriminators stay CSS's per the `data-*` rule below — `data-open`, `data-invalid`, `data-direction`, `data-segment="hour"`, `data-panel="picker"` — because they are axes with values, not names. `[data-part=…]` in a stylesheet fails `tests/part-identity.unit.test.ts`, and so does a test or `querySelector` reaching for a class.
+  - **A part name may not be a bare utility-class name.** `.grid` and `.ring` both shipped and both broke in a Tailwind port, not as a specificity fight but because **the cascade resolves per declaration**: `.DateField .popup .grid` set `width` and no `display`, so Tailwind's `.grid { display: grid }` met nothing and turned the calendar `<table>` into a one-column grid. The test is simple: **is the name a part, or a CSS behaviour?** `grid`, `ring`, `container`, `hidden`, `truncate` are behaviours; `calendar-grid` and `cylinder` are parts. Guarded by `tests/utility-name-collisions.unit.test.ts`.
 
-**Every rule is fully qualified from the root** — `.Component [data-part="…"]`, never a bare `[data-part="popup"]` at column 0 and never `&`-nested. The `.Component { }` block holds only the tokens and the properties applied to the root itself; every part is its own flat, rooted rule:
+**Every rule is fully qualified from the root** — `.Component .part`, never a bare `.part` at column 0 and never `&`-nested. The `.Component { }` block holds only the tokens and the properties applied to the root itself; every part is its own flat, rooted rule:
 
 ```css
 .DateField { /* tokens + root-level props only */ }
-.DateField [data-part="segments"] {}
-.DateField[data-invalid="true"] [data-part="segments"] {}
-.DateField [data-part="popup"] [data-panel="picker"][data-active="true"] {}
+.DateField .segments {}
+.DateField[data-invalid="true"] .segments {}
+.DateField .popup [data-panel="picker"][data-active="true"] {}
 .DateField .Wheel {}   /* sub-component — still a PascalCase class */
 ```
 
-**Why flat, not nested:** a fully-qualified selector is deterministic to read — no `&` to resolve, no nesting depth to track, every rule says exactly what it targets. A bare `[data-part="popup"] {}` at column 0 is a scoping bug (the same part name is used in every component); the `.Component` prefix is what makes generic part names safe. A part rendered *outside* the root (genuinely portaled / top-layer) keeps its `data-part` and is addressed as `[data-component="DateField"] [data-part="popup"]`, which crosses a portal where a descendant selector does not.
+**Why flat, not nested:** a fully-qualified selector is deterministic to read — no `&` to resolve, no nesting depth to track, every rule says exactly what it targets. A bare `.popup {}` at column 0 is a scoping bug (the same part name is used in every component); the `.Component` prefix is what makes generic part names safe. A part rendered *outside* the root (genuinely portaled / top-layer) keeps its class and its `data-part`, and the JS addresses it as `[data-component="DateField"] [data-part="popup"]`, which crosses a portal where a descendant selector does not.
 
 Variants and states are `data-*`, never class modifiers: no `.DateField--disabled`, no `.text-sm` utilities. Demo content a kitchensink places *inside* a component (an animation a MotionRegion wraps) is the consumer's markup, not a part, and carries `demo-*` classes to say so.
 
-**Shared lexicon** — same kind of part, same word, everywhere, now as an attribute value: `content` · `options` · `option` · `popup` · `trigger` · `icon` · `rail` · `arrow` · `title` · `hint` · `notice-region` · `native` · `overlay` · `segments` · `segment` · `separator` · `announce` · `footer`. `container` is reserved for a genuinely role-less box (a part *with* a role gets the role's name). Each `<Name>.md` lists its parts under `## Parts`. See ADR-0019 and ADR-0026.
+**Shared lexicon** — same kind of part, same word, everywhere, as the class and (when found) as the attribute value: `content` · `options` · `option` · `popup` · `trigger` · `icon` · `rail` · `arrow` · `title` · `hint` · `notice-region` · `native` · `overlay` · `segments` · `segment` · `separator` · `announce` · `footer`. `container` is reserved for a genuinely role-less box (a part *with* a role gets the role's name). Each `<Name>.md` lists its parts under `## Parts` with a **Bound by** column — *styled only*, *suite*, *JS* — which is the human-readable form of what the guard enforces. See ADR-0019, ADR-0026 and ADR-0033.
 
-**Why — the swap map, now literally true.** A consumer decoding this library reads three seams: `PascalCase` class = component boundary (map to your components), `data-part` = part identity (keep it; restyle on the same DOM with any class convention or none), `--ui-*` = design values (ADR-0018). Delete every class name except the roots and the conformance suite still passes — that is what the attribute buys.
+**Why — the swap map, in both directions.** A consumer decoding this library reads three seams: `PascalCase` class = component boundary (map to your components), lowercase class = our styling (swap for yours on the same DOM), `data-part` = what the suite and the JS hold on to (keep it), `--ui-*` = design values (ADR-0018). Delete every lowercase class and the suite passes; delete every `data-part` and it fails on exactly the parts it depends on. Both can be run.
 
 ---
 

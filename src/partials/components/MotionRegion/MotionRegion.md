@@ -81,14 +81,16 @@ reduced-motion — that is an accessibility footgun (WCAG 2.3.3), and a non-goal
 
 ## Parts
 
-Parts are identified by `data-part`, never by class name. The reference JS, the stylesheet and the
-conformance suite address them through the attribute, so a consumer may restyle the same DOM under
-any class convention — or none — and the suite still passes.
+Every part carries a lowercase class **for styling only** — rename, hash or delete them all and the
+suite still passes. A part also carries `data-part` when the suite, the reference JS or a composing
+component has to *find* it; that attribute is the contract, and the stylesheet never reads it.
+The **Bound by** column says who holds on to each part.
 
-| `data-part` | Element | Role |
-|---|---|---|
-| `control` | `<button>` | The play/pause toggle, injected by JS; swaps its `aria-label` |
-| `status` | `<div role="status">` | Live region that speaks the resolved state on a user toggle |
+
+| Part | Element | Role | Bound by |
+|---|---|---|---|
+| `control` | `<button>` | The play/pause toggle, injected by JS; swaps its `aria-label` | suite |
+| `status` | `<div role="status">` | Live region that speaks the resolved state on a user toggle | styled only |
 
 The animated content inside the region is the consumer's own markup, not a part — the kitchensink's
 `demo-*` classes stand in for it.

@@ -33,10 +33,10 @@ interface StateDefinition {
 // ─── Affix helpers ────────────────────────────────────────────────────────────
 
 const prefix = (text: string, extra: Attrs = {}) =>
-  `<span data-part="prefix"${attrs(extra)}>${text}</span>`
+  `<span class="prefix" data-part="prefix"${attrs(extra)}>${text}</span>`
 
 const suffix = (text: string, extra: Attrs = {}) =>
-  `<span data-part="suffix"${attrs(extra)}>${text}</span>`
+  `<span class="suffix" data-part="suffix"${attrs(extra)}>${text}</span>`
 
 // ─── Attribute serializers ────────────────────────────────────────────────────
 
@@ -83,7 +83,7 @@ function canonical(state: StateDefinition): string {
   class="AffixField"
   data-component="AffixField"${rootIdAttr}${rootExtra}
 >${prefixLine}
-  <input data-part="input" id="${state.id}" name="${state.id}"${inputAttrs} />${suffixLine}
+  <input class="input" data-part="input" id="${state.id}" name="${state.id}"${inputAttrs} />${suffixLine}
 </div>${hintLine}
 `
 }

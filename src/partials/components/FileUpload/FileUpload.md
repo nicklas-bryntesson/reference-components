@@ -11,20 +11,18 @@ Custom accessible file upload component wrapping a hidden native `input[type=fil
   role="group"
   aria-labelledby="LABEL_ID"
 >
-  <span id="LABEL_ID" data-part="label">Label text</span>
-  <input
-    data-part="input"
+  <span class="label" id="LABEL_ID">Label text</span>
+  <input class="input" data-part="input"
+   
     type="file"
     aria-hidden="true"
-    tabindex="-1"
-  >
-  <ul
-    data-part="list"
+    tabindex="-1">
+  <ul class="list" data-part="list"
+   
     aria-live="polite"
     aria-relevant="additions removals"
-    aria-label="Selected files"
-  ></ul>
-  <button type="button" data-part="trigger">Add file</button>
+    aria-label="Selected files"></ul>
+  <button class="trigger" data-part="trigger" type="button">Add file</button>
 </div>
 ```
 
@@ -32,47 +30,49 @@ Custom accessible file upload component wrapping a hidden native `input[type=fil
 
 The file container has two forms, chosen by whether the native input has `multiple`:
 
-- **multiple:** `<ul data-part="list" aria-live="polite" aria-relevant="additions removals" aria-label="Selected files">` — each file is an `<li data-part="item">` (shown empty above).
-- **single:** `<div data-part="selected" aria-live="polite" aria-atomic="true">` — the file's spans and button render inline, with no `<li>` wrapper.
+- **multiple:** `<ul class="list" data-part="list" aria-live="polite" aria-relevant="additions removals" aria-label="Selected files">` — each file is an `<li class="item" data-part="item">` (shown empty above).
+- **single:** `<div class="selected" data-part="selected" aria-live="polite" aria-atomic="true">` — the file's spans and button render inline, with no `<li>` wrapper.
 
 JS renders the entries — do not author them. In multiple mode each `<li>` carries `data-status` (`valid` / `invalid-type` / `invalid-size`), a `data-entry-id`, and `data-source="server"` for server-seeded files. In single mode the `[data-part="selected"]` container carries only `data-status` — no `data-entry-id` or `data-source` (the hidden `uploaded-ref` input is still emitted for server files):
 
 ```html
-<li data-part="item" data-status="valid" data-entry-id="...">
-  <span data-part="item-name">report.pdf</span>
-  <span data-part="item-size">200 KB</span>
-  <span data-part="item-error" role="alert">File type not allowed</span> <!-- only when data-status is an error -->
-  <button type="button" data-part="item-remove" aria-label="Remove report.pdf">&#215;</button>
+<li class="item" data-part="item" data-status="valid" data-entry-id="...">
+  <span class="item-name" data-part="item-name">report.pdf</span>
+  <span class="item-size" data-part="item-size">200 KB</span>
+  <span class="item-error" data-part="item-error" role="alert">File type not allowed</span> <!-- only when data-status is an error -->
+  <button class="item-remove" data-part="item-remove" type="button" aria-label="Remove report.pdf">&#215;</button>
   <input type="hidden" name="uploaded-ref" value="..."> <!-- only when data-source="server" -->
 </li>
 ```
 
 ## Parts
 
-Parts are identified by `data-part`, never by class name. The reference JS, the stylesheet and the
-conformance suite address them through the attribute, so a consumer may restyle the same DOM under
-any class convention — or none — and the suite still passes.
+Every part carries a lowercase class **for styling only** — rename, hash or delete them all and the
+suite still passes. A part also carries `data-part` when the suite, the reference JS or a composing
+component has to *find* it; that attribute is the contract, and the stylesheet never reads it.
+The **Bound by** column says who holds on to each part.
 
-| `data-part` | Element | Role |
-|---|---|---|
-| `label` | `<span>` | The visible field label the input is `aria-labelledby` |
-| `input` | `<input type="file">` | The real form control, visually hidden; the trigger proxies it |
-| `trigger` | `<button>` | Opens the file picker |
-| `drop-label` | `<span aria-hidden>` | Drop-zone hint text, injected by JS when `data-drop-zone` is set |
-| `selected` | `<div>` | Single-file mode: holds the one selected file's spans |
-| `list` | `<ul>` | Multiple-file mode: one `item` per file |
-| `item` | `<li>` | One file row |
-| `item-name` · `item-size` · `item-error` | `<span>` | File name, formatted size, validation message |
-| `item-remove` | `<button>` | Removes the file; its `aria-label` includes the file name |
+
+| Part | Element | Role | Bound by |
+|---|---|---|---|
+| `label` | `<span>` | The visible field label the input is `aria-labelledby` | styled only |
+| `input` | `<input type="file">` | The real form control, visually hidden; the trigger proxies it | suite + JS |
+| `trigger` | `<button>` | Opens the file picker | suite + JS |
+| `drop-label` | `<span aria-hidden>` | Drop-zone hint text, injected by JS when `data-drop-zone` is set | suite + JS |
+| `selected` | `<div>` | Single-file mode: holds the one selected file's spans | suite + JS |
+| `list` | `<ul>` | Multiple-file mode: one `item` per file | suite + JS |
+| `item` | `<li>` | One file row | suite |
+| `item-name` · `item-size` · `item-error` | `<span>` | File name, formatted size, validation message | suite |
+| `item-remove` | `<button>` | Removes the file; its `aria-label` includes the file name | suite + JS |
 
 ## Usage
 
 ```html
 <div class="FileUpload" data-component="FileUpload" role="group" aria-labelledby="cv-label">
-  <span id="cv-label" data-part="label">CV</span>
-  <input data-part="input" type="file" accept=".pdf,.docx" aria-hidden="true" tabindex="-1">
-  <ul data-part="list" aria-live="polite" aria-relevant="additions removals" aria-label="Selected files"></ul>
-  <button type="button" data-part="trigger">Add file</button>
+  <span class="label" id="cv-label">CV</span>
+  <input class="input" data-part="input" type="file" accept=".pdf,.docx" aria-hidden="true" tabindex="-1">
+  <ul class="list" data-part="list" aria-live="polite" aria-relevant="additions removals" aria-label="Selected files"></ul>
+  <button class="trigger" data-part="trigger" type="button">Add file</button>
 </div>
 ```
 
